@@ -46,6 +46,7 @@ export default function Home() {
             />
           </Link>
 <meta name="google-site-verification" content="4PC_v8BAE_F7-BT66Rz3aodHsFygO6pjz7vrKWRHYpI" />
+<meta name="google-site-verification" content="BbCfisC6OtfA0Xjo0YAizMxT_fv3QDqaaZQr4nudzRw" />
           <nav className="flex items-center gap-2 sm:gap-3 text-sm">
             <Link
               href="/calculators"
