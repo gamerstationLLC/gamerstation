@@ -2,6 +2,7 @@
 import Link from "next/link";
 
 export default function Home() {
+  console.log("CSV URL:", process.env.COD_WEAPONS_CSV_URL);
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
       {/* Ambient background */}
