@@ -1,6 +1,17 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <section>
+    {/* headline, description, badges */}
+  </section>
+
+  <section>
+    {/* COD TTK + OSRS DPS cards */}
+  </section>
+</div>
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
