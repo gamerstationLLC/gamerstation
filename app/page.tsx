@@ -45,7 +45,7 @@ export default function Home() {
               "
             />
           </Link>
-google: "4PC_v8BAE_F7-BT66Rz3aodHsFygO6pjz7vrKWRHYpI" 
+<meta name="google-site-verification" content="4PC_v8BAE_F7-BT66Rz3aodHsFygO6pjz7vrKWRHYpI" />
           <nav className="flex items-center gap-2 sm:gap-3 text-sm">
             <Link
               href="/calculators"
