@@ -72,7 +72,8 @@ export async function getCodAttachments(): Promise<CodAttachmentRow[]> {
   const url = process.env.COD_ATTACHMENTS_CSV_URL;
   if (!url) return [];
 
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await fetch(url, { cache: "no-store" });
+
   if (!res.ok) return [];
 
   const csv = await res.text();
