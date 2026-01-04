@@ -186,7 +186,7 @@ export default function Home() {
               <div className="mt-4 rounded-2xl border border-white/10 bg-black/30 p-4 sm:mt-6">
                 <div className="text-xs text-neutral-400">Coming next</div>
                 <ul className="mt-2 space-y-1 text-sm text-neutral-200">
-                  <li>• Range profiles (close/mid/long)</li>
+                  <li>• Account linking for OSRS</li>
                   <li>• Headshot/chest multipliers</li>
                   <li>• Compare multiple weapons</li>
                 </ul>
@@ -197,7 +197,16 @@ export default function Home() {
             <div className="pointer-events-none absolute -inset-1 -z-10 rounded-[28px] bg-gradient-to-r from-white/10 via-white/5 to-transparent blur-xl" />
           </div>
         </section>
+        <footer className="mt-16 border-t border-neutral-800 pt-6 text-center text-xs text-neutral-500">
+  GamerStation is not affiliated with or endorsed by Activision, Epic Games, or any game publishers.
+  <br />
+  All trademarks belong to their respective owners.
+</footer>
+
       </div>
+      
+
     </main>
+    
   );
 }

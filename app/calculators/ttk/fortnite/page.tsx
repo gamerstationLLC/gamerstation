@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CATEGORIES,
   FORTNITE_WEAPONS,
@@ -10,6 +10,10 @@ import {
   type FortniteWeapon,
   type Rarity,
 } from "./weapons";
+
+console.log("FORTNITE_WEAPONS:", FORTNITE_WEAPONS.length);
+console.log("CATEGORIES:", CATEGORIES.map((c) => c.value));
+
 
 const HP_PRESETS: { label: string; hp: number }[] = [
   { label: "No shield (100)", hp: 100 },
@@ -39,24 +43,27 @@ export default function FortniteTTKPage() {
     [weaponClass]
   );
 
-  const [weaponId, setWeaponId] = useState<string>(() => {
-    const first = FORTNITE_WEAPONS.find((w) => w.class === "assault_rifle");
-    return first?.id ?? "";
-  });
+  // ✅ weapon selection
+  const [weaponId, setWeaponId] = useState<string>("");
 
-  // keep weaponId valid when class changes
+  // ✅ initialize + keep weaponId valid when class changes
+  useEffect(() => {
+    if (weaponsForClass.length === 0) {
+      setWeaponId("");
+      return;
+    }
+
+    // If empty OR not valid for current class, set to first weapon in class
+    const stillValid = weaponId && weaponsForClass.some((w) => w.id === weaponId);
+    if (!stillValid) {
+      setWeaponId(weaponsForClass[0].id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weaponClass, weaponsForClass.length]);
+
   const selectedWeapon: FortniteWeapon | undefined = useMemo(() => {
-    const w = weaponsForClass.find((x) => x.id === weaponId);
-    return w ?? weaponsForClass[0];
+    return weaponsForClass.find((x) => x.id === weaponId) ?? weaponsForClass[0];
   }, [weaponId, weaponsForClass]);
-
-  const resolvedWeaponId = selectedWeapon?.id ?? "";
-
-  // Update weaponId if it's invalid for the new class
-  if (weaponsForClass.length > 0 && weaponId !== resolvedWeaponId) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    setWeaponId(resolvedWeaponId);
-  }
 
   // Inputs
   const [targetHp, setTargetHp] = useState<number>(200);
@@ -69,8 +76,7 @@ export default function FortniteTTKPage() {
 
   // Expected damage per shot given expected headshot %
   const hsFrac = clamp(hsPct, 0, 100) / 100;
-  const expectedDamage =
-    bodyDmg * (1 - hsFrac) + bodyDmg * hsMult * hsFrac;
+  const expectedDamage = bodyDmg * (1 - hsFrac) + bodyDmg * hsMult * hsFrac;
 
   // Shots to kill + TTK
   const shotsToKill =
@@ -95,12 +101,15 @@ export default function FortniteTTKPage() {
         <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
           Fortnite TTK Calculator
         </h1>
+        <p className="mt-2 text-sm text-neutral-400 italic">
+  Not affiliated with, endorsed by, or sponsored by Epic Games.
+</p>
         <p className="mt-3 text-neutral-300 max-w-2xl">
           Choose a weapon class, weapon, and rarity, then calculate shots-to-kill
           and time-to-kill. (Body damage + headshot multiplier + fire rate.)
         </p>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+        <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:items-start">
           {/* Inputs */}
           <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
             <h2 className="text-lg font-semibold">Inputs</h2>
@@ -126,7 +135,7 @@ export default function FortniteTTKPage() {
               <div>
                 <label className="text-sm text-neutral-300">Weapon</label>
                 <select
-                  value={resolvedWeaponId}
+                  value={weaponId}
                   onChange={(e) => setWeaponId(e.target.value)}
                   className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                 >
@@ -164,9 +173,7 @@ export default function FortniteTTKPage() {
                 <input
                   value={targetHp}
                   onChange={(e) =>
-                    setTargetHp(
-                      clamp(Number(e.target.value || 0), 1, 9999)
-                    )
+                    setTargetHp(clamp(Number(e.target.value || 0), 1, 9999))
                   }
                   type="number"
                   className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
@@ -239,13 +246,12 @@ export default function FortniteTTKPage() {
             </div>
 
             <div className="mt-6 text-xs text-neutral-500">
-              Want bloom/recoil or range falloff later? We can add “effective hit
-              %” and distance scaling.
+              Note: Effective hit % will be added in future updates.
             </div>
           </section>
 
           {/* Results */}
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
+          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 h-fit self-start">
             <h2 className="text-lg font-semibold">Results</h2>
 
             <div className="mt-6 space-y-3">
@@ -264,7 +270,9 @@ export default function FortniteTTKPage() {
               </div>
 
               <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                <span className="text-sm text-neutral-300">Time to kill (TTK)</span>
+                <span className="text-sm text-neutral-300">
+                  Time to kill (TTK)
+                </span>
                 <span className="font-semibold">
                   {Number.isFinite(ttkSeconds) ? `${fmt(ttkSeconds, 3)}s` : "—"}
                 </span>
@@ -278,7 +286,8 @@ export default function FortniteTTKPage() {
               <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
                 <div className="text-sm font-semibold">Formula</div>
                 <div className="mt-2 text-xs text-neutral-300 leading-relaxed">
-                  ExpectedDamage = BaseDamage(rarity) × (1 − HS%) + BaseDamage(rarity) × HSMultiplier × HS%
+                  ExpectedDamage = BaseDamage(rarity) × (1 − HS%) + BaseDamage(rarity) ×
+                  HSMultiplier × HS%
                   <br />
                   ShotsToKill = ceil(TargetHP / ExpectedDamage)
                   <br />

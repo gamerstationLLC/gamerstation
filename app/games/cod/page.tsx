@@ -56,7 +56,7 @@ export default function CodHubPage() {
 
         {/* Optional small footer */}
         <p className="mt-10 text-xs text-neutral-500">
-          Tip: Later we can add “latest meta loadouts” and auto-update this page.
+          
         </p>
       </div>
     </main>

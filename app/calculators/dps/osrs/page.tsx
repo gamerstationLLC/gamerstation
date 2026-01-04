@@ -365,7 +365,8 @@ export default function OsrsDpsPage() {
           </section>
 
           {/* RESULTS */}
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
+         <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 h-fit self-start">
+
             <div className="text-sm font-semibold">Results</div>
 
             <div className="mt-5 grid gap-3">

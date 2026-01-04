@@ -131,7 +131,8 @@ export default function DpsPage() {
           </section>
 
           {/* Results */}
-          <section className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
+          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-5 h-fit self-start">
+
             <h2 className="text-sm font-semibold">Results</h2>
 
             <div className="mt-4 grid gap-4">
