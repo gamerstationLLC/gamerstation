@@ -1,12 +1,9 @@
 // lib/codattachments.ts
-import { readFile } from "fs/promises";
-import path from "path";
-
 export type CodAttachmentRow = {
   attachment_id: string;
   attachment_name: string;
-  slot: string; // "barrel", "conversion_kit", etc
-  applies_to: string; // weapon_id like "ak_27" (or "ALL")
+  slot: string;
+  applies_to: string;
   dmg10_add: number;
   dmg25_add: number;
   dmg50_add: number;
@@ -17,7 +14,6 @@ function toNumber(v: string | undefined) {
   return Number.isFinite(n) ? n : 0;
 }
 
-// CSV parser (handles quotes + commas)
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
@@ -46,11 +42,10 @@ function parseCsv(text: string): string[][] {
     }
 
     if ((ch === "\n" || ch === "\r") && !inQuotes) {
-      if (ch === "\r" && next === "\n") i++; // CRLF
+      if (ch === "\r" && next === "\n") i++;
       row.push(cell);
       cell = "";
-
-      if (row.some((c) => c.trim() !== "")) rows.push(row);
+      if (row.some(c => c.trim() !== "")) rows.push(row);
       row = [];
       continue;
     }
@@ -59,49 +54,31 @@ function parseCsv(text: string): string[][] {
   }
 
   row.push(cell);
-  if (row.some((c) => c.trim() !== "")) rows.push(row);
-
+  if (row.some(c => c.trim() !== "")) rows.push(row);
   return rows;
 }
 
 export async function getCodAttachments(): Promise<CodAttachmentRow[]> {
-  // MUST match your repo tree exactly
-  const csvPath = path.join(process.cwd(), "attachments_global.csv");
+  const url = process.env.COD_ATTACHMENTS_CSV_URL;
+  if (!url) return [];
 
-  let csv: string;
-  try {
-    csv = await readFile(csvPath, "utf8");
-  } catch (err) {
-    console.error("[COD ATTACHMENTS] Failed to read CSV:", csvPath);
-    return [];
-  }
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return [];
 
+  const csv = await res.text();
   const table = parseCsv(csv);
   if (table.length < 2) return [];
 
-  const header = table[0].map((h) => h.trim().toLowerCase());
-  const idx = (name: string) => header.indexOf(name.toLowerCase());
+  const header = table[0].map(h => h.trim().toLowerCase());
+  const idx = (n: string) => header.indexOf(n);
 
-  const i_attachment_id = idx("attachment_id");
-  const i_attachment_name = idx("attachment_name");
-  const i_slot = idx("slot");
-  const i_applies_to = idx("applies_to");
-  const i_dmg10_add = idx("dmg10_add");
-  const i_dmg25_add = idx("dmg25_add");
-  const i_dmg50_add = idx("dmg50_add");
-
-  if ([i_attachment_id, i_attachment_name, i_slot, i_applies_to].some((i) => i < 0)) {
-    console.error("[COD ATTACHMENTS] Missing required columns:", header);
-    return [];
-  }
-
-  return table.slice(1).map((line) => ({
-    attachment_id: (line[i_attachment_id] ?? "").trim(),
-    attachment_name: (line[i_attachment_name] ?? "").trim(),
-    slot: (line[i_slot] ?? "").trim().toLowerCase(),        // 🔑 normalize
-    applies_to: (line[i_applies_to] ?? "").trim().toLowerCase(), // 🔑 normalize
-    dmg10_add: i_dmg10_add >= 0 ? toNumber(line[i_dmg10_add]) : 0,
-    dmg25_add: i_dmg25_add >= 0 ? toNumber(line[i_dmg25_add]) : 0,
-    dmg50_add: i_dmg50_add >= 0 ? toNumber(line[i_dmg50_add]) : 0,
+  return table.slice(1).map(line => ({
+    attachment_id: line[idx("attachment_id")]?.trim() ?? "",
+    attachment_name: line[idx("attachment_name")]?.trim() ?? "",
+    slot: line[idx("slot")]?.trim().toLowerCase() ?? "",
+    applies_to: line[idx("applies_to")]?.trim().toLowerCase() ?? "",
+    dmg10_add: toNumber(line[idx("dmg10_add")]),
+    dmg25_add: toNumber(line[idx("dmg25_add")]),
+    dmg50_add: toNumber(line[idx("dmg50_add")]),
   }));
 }
