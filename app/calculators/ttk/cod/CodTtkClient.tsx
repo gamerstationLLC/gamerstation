@@ -4,7 +4,9 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import type { CodWeaponRow } from "@/lib/codweapons";
-import type { CodAttachmentRow } from "@/lib/codattachments";
+import { type CodAttachmentRow, getCodAttachments } from "@/lib/codattachments";
+
+
 
 /**
  * attachments_global columns:
