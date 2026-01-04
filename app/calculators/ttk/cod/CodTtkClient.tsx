@@ -178,34 +178,47 @@ export default function CodTtkClient({
     [weapons, weaponId]
   );
 
-  const attachments: UIAttachment[] = useMemo(() => {
-    return (sheetAttachments ?? []).map((a: any) => ({
-      id: String(a.attachment_id),
-      name: String(a.attachment_name),
-      slot: String(a.slot),
-      applies_to: String(a.applies_to),
-      dmg10_add: toNum(a.dmg10_add),
-      dmg25_add: toNum(a.dmg25_add),
-      dmg50_add: toNum(a.dmg50_add),
-    }));
-  }, [sheetAttachments]);
+ const attachments: UIAttachment[] = useMemo(() => {
+  
+
+  return (sheetAttachments ?? []).map((a: any) => ({
+    id: String(a.attachment_id),
+    name: String(a.attachment_name),
+    slot: String(a.slot),
+    applies_to: String(a.applies_to),
+    dmg10_add: toNum(a.dmg10_add),
+    dmg25_add: toNum(a.dmg25_add),
+    dmg50_add: toNum(a.dmg50_add),
+  }));
+}, [sheetAttachments]);
+
 
   // ✅ BARRELS: normalize slot + allow applies_to "all" OR CSV list containing selected weapon_id
-  const barrels = useMemo(() => {
-    const wid = String(selected?.id ?? "").trim();
-    if (!wid) return [];
+  const normalize = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-    return attachments.filter((a) => {
-      const slot = String(a.slot ?? "").trim().toLowerCase();
-      if (slot !== "barrel") return false;
+const barrels = useMemo(() => {
+  if (!selected) return [];
 
-      const applies = String(a.applies_to ?? "")
-        .split(",")
-        .map((s) => s.trim());
+  const weaponNameNorm = normalize(selected.name);
+  const weaponTypeNorm = normalize(selected.weapon_type ?? "");
 
-      return applies.includes("all") || applies.includes(wid);
-    });
-  }, [attachments, selected?.id]);
+  return attachments.filter((a) => {
+    const slot = String(a.slot ?? "").toLowerCase();
+    if (!slot.includes("barrel")) return false;
+
+    const applies = String(a.applies_to ?? "")
+      .split(",")
+      .map((s) => normalize(s));
+
+    return (
+      applies.includes("all") ||
+      applies.includes(weaponNameNorm) ||
+      applies.includes(weaponTypeNorm)
+    );
+  });
+}, [attachments, selected]);
+
 
   const [barrelId, setBarrelId] = useState<string>("");
 
