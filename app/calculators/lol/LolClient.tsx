@@ -24,20 +24,6 @@ const setNum =
     setter(clamp(n, min, max));
   };
 
-type TargetPreset = {
-  key: "squishy" | "bruiser" | "tank";
-  label: string;
-  hp: number;
-  armor: number;
-  mr: number;
-};
-
-const TARGET_PRESETS: TargetPreset[] = [
-  { key: "squishy", label: "Squishy", hp: 1600, armor: 55, mr: 40 },
-  { key: "bruiser", label: "Bruiser", hp: 2400, armor: 95, mr: 70 },
-  { key: "tank", label: "Tank", hp: 3600, armor: 170, mr: 120 },
-];
-
 // Standard LoL damage multiplier for resists
 function damageMultiplierFromResist(resist: number) {
   if (!Number.isFinite(resist)) return NaN;
@@ -160,12 +146,9 @@ export default function LolClient({
   const [targetHp, setTargetHp] = useState<Num>(2000);
   const [targetArmor, setTargetArmor] = useState<Num>(80);
   const [targetMr, setTargetMr] = useState<Num>(60);
-  const [activePreset, setActivePreset] = useState<TargetPreset["key"] | null>(
-    null
-  );
 
   // ✅ Target champion + target level
-  const [targetChampionId, setTargetChampionId] = useState<string>(""); // "" = custom/preset
+  const [targetChampionId, setTargetChampionId] = useState<string>(""); // "" = custom
   const [targetLevel, setTargetLevel] = useState<number>(1);
   const [targetLevelTouched, setTargetLevelTouched] = useState(false);
 
@@ -291,7 +274,6 @@ export default function LolClient({
   // ✅ Auto-fill target stats when target champ/level changes
   useEffect(() => {
     if (!targetChampionId) return;
-    setActivePreset(null);
     setTargetHp(Number.isFinite(targetChampHp) ? Math.round(targetChampHp) : "");
     setTargetArmor(
       Number.isFinite(targetChampArmor) ? Math.round(targetChampArmor) : ""
@@ -299,16 +281,7 @@ export default function LolClient({
     setTargetMr(Number.isFinite(targetChampMr) ? Math.round(targetChampMr) : "");
   }, [targetChampionId, tLvl, targetChampHp, targetChampArmor, targetChampMr]);
 
-  // Target presets
-  function applyPreset(p: TargetPreset) {
-    setTargetChampionId(""); // presets imply custom target values
-    setActivePreset(p.key);
-    setTargetHp(p.hp);
-    setTargetArmor(p.armor);
-    setTargetMr(p.mr);
-  }
   function onTargetManualChange() {
-    if (activePreset !== null) setActivePreset(null);
     if (targetChampionId) setTargetChampionId(""); // switch back to custom
   }
 
@@ -493,8 +466,108 @@ export default function LolClient({
       ? simpleDpsPost * sWindow
       : NaN;
 
+  // ✅ Kill Check (est.)
+  const hasItems = selectedItems.length > 0;
+  const killLabel = hasItems ? "with items" : "no items";
+
+  const killCheck = useMemo(() => {
+    if (!(tHP > 0)) {
+      return { status: "—", detail: "Enter a target HP.", hint: "" };
+    }
+
+    // SIMPLE
+    if (uiMode === "simple") {
+      if (simpleType === "burst") {
+        if (!Number.isFinite(simpleBurstPost)) {
+          return { status: "—", detail: "Not enough data.", hint: "" };
+        }
+        if (simpleBurstPost >= tHP) {
+          return {
+            status: "✅ Killable",
+            detail: `Burst kills (${killLabel}).`,
+            hint: "",
+          };
+        }
+        return {
+          status: "❌ Not killable",
+          detail: `Burst doesn't kill (${killLabel}).`,
+          hint: "",
+        };
+      } else {
+        // DPS/Window
+        if (!Number.isFinite(simpleTimeToKill) || !Number.isFinite(sWindow) || sWindow <= 0) {
+          return { status: "—", detail: "Set a window (sec).", hint: "" };
+        }
+        if (simpleTimeToKill <= sWindow) {
+          return {
+            status: "✅ Killable",
+            detail: `Kills in ~${fmt(simpleTimeToKill, 2)}s (${killLabel}).`,
+            hint: "",
+          };
+        }
+        return {
+          status: "❌ Not killable",
+          detail: `Needs ~${fmt(simpleTimeToKill, 2)}s (${killLabel}).`,
+          hint: "",
+        };
+      }
+    }
+
+    // ADVANCED
+    if (mode === "burst") {
+      if (!Number.isFinite(burstPost)) {
+        return { status: "—", detail: "Not enough data.", hint: "" };
+      }
+      if (burstPost >= tHP) {
+        return {
+          status: "✅ Killable",
+          detail: `Burst kills (${killLabel}).`,
+          hint: "",
+        };
+      }
+      return {
+        status: "❌ Not killable",
+        detail: `Burst doesn't kill (${killLabel}).`,
+        hint: "",
+      };
+    } else {
+      if (!Number.isFinite(timeToKill) || !Number.isFinite(advWindow) || advWindow <= 0) {
+        return { status: "—", detail: "Set a window (sec).", hint: "" };
+      }
+      if (timeToKill <= advWindow) {
+        return {
+          status: "✅ Killable",
+          detail: `Kills in ~${fmt(timeToKill, 2)}s (${killLabel}).`,
+          hint: "",
+        };
+      }
+      return {
+        status: "❌ Not killable",
+        detail: `Needs ~${fmt(timeToKill, 2)}s (${killLabel}).`,
+        hint: "",
+      };
+    }
+  }, [
+    tHP,
+    uiMode,
+    simpleType,
+    simpleBurstPost,
+    simpleTimeToKill,
+    sWindow,
+    mode,
+    burstPost,
+    timeToKill,
+    advWindow,
+    killLabel,
+  ]);
+
   return (
-    <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:items-start">
+    <div
+  className={`mt-10 grid gap-6 lg:grid-cols-2 ${
+    uiMode === "simple" ? "lg:items-stretch" : "lg:items-start"
+  }`}
+>
+
       {/* Inputs */}
       <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
         <div className="flex items-center justify-between">
@@ -508,9 +581,9 @@ export default function LolClient({
                 ? "border-neutral-500 bg-neutral-900 text-white"
                 : "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600"
             }`}
-            title="Toggle Simple/Advanced"
+            title="Click to switch mode"
           >
-            {uiMode === "simple" ? "Advanced" : "Simple"}
+            {uiMode === "simple" ? "Simple" : "Advanced"}
           </button>
         </div>
 
@@ -588,173 +661,158 @@ export default function LolClient({
             ))}
           </div>
         </div>
+{/* Target */}
+<div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+  <div className="flex items-center justify-between">
+    <div className="text-sm font-semibold">Target</div>
+    <div className="text-xs text-neutral-500">
+      {uiMode === "advanced"
+        ? "Choose a champion or enter custom stats."
+        : "Choose a champion to simulate a matchup."}
+    </div>
+  </div>
 
-        {/* Target */}
-        <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold">Target</div>
-            <div className="text-xs text-neutral-500">
-              Presets are quick approximations.
-            </div>
-          </div>
+  {/* ✅ Target Champion + Target Level (minimal layout change) */}
+  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+    <div>
+      <label className="text-sm text-neutral-300">Champion:</label>
+      <select
+        value={targetChampionId}
+        onChange={(e) => {
+          const id = e.target.value;
+          setTargetChampionId(id);
+          // If user never touched target level, keep it synced
+          if (!targetLevelTouched) setTargetLevel(lvl);
+        }}
+        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+      >
+        <option value="">Custom</option>
+        {champions.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
 
-          {/* ✅ Target Champion + Target Level (minimal layout change) */}
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <div>
-              <label className="text-sm text-neutral-300">
-                Champion: 
-              </label>
-              <select
-                value={targetChampionId}
-                onChange={(e) => {
-                  const id = e.target.value;
-                  setTargetChampionId(id);
-                  setActivePreset(null);
-                  // If user never touched target level, keep it synced
-                  if (!targetLevelTouched) setTargetLevel(lvl);
-                }}
-                className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-              >
-                <option value="">Custom / Preset</option>
-                {champions.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+      {targetChampionId && (
+        <div className="mt-1 text-xs text-neutral-500">
+          Using{" "}
+          <span className="text-neutral-300 font-semibold">
+            {targetChampion?.name ?? "—"}
+          </span>{" "}
+          stats.
+        </div>
+      )}
+    </div>
 
-              {targetChampionId && (
-                <div className="mt-1 text-xs text-neutral-500">
-                  Using{" "}
-                  <span className="text-neutral-300 font-semibold">
-                    {targetChampion?.name ?? "—"}
-                  </span>{" "}
-                  stats.
-                </div>
-              )}
-            </div>
+    <div>
+      <label className="text-sm text-neutral-300">Target Level</label>
+      <div className="mt-2 flex items-center gap-3">
+        <input
+          type="range"
+          min={1}
+          max={18}
+          value={tLvl}
+          onChange={(e) => {
+            setTargetLevelTouched(true);
+            setTargetLevel(Number(e.target.value));
+          }}
+          className="w-full"
+        />
+        <div className="min-w-[2.5rem] text-right text-sm text-neutral-200 font-semibold">
+          {tLvl}
+        </div>
+      </div>
 
-            <div>
-              <label className="text-sm text-neutral-300">Target Level</label>
-              <div className="mt-2 flex items-center gap-3">
-                <input
-                  type="range"
-                  min={1}
-                  max={18}
-                  value={tLvl}
-                  onChange={(e) => {
-                    setTargetLevelTouched(true);
-                    setTargetLevel(Number(e.target.value));
-                  }}
-                  className="w-full"
-                />
-                <div className="min-w-[2.5rem] text-right text-sm text-neutral-200 font-semibold">
-                  {tLvl}
-                </div>
-              </div>
+      {!targetLevelTouched ? (
+        <div className="mt-1 text-xs text-neutral-500">Auto-synced to your level.</div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => {
+            setTargetLevelTouched(false);
+            setTargetLevel(lvl);
+          }}
+          className="mt-2 rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600"
+        >
+          Sync to my level
+        </button>
+      )}
+    </div>
+  </div>
 
-              {!targetLevelTouched ? (
-                <div className="mt-1 text-xs text-neutral-500">
-                  Auto-synced to your level.
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetLevelTouched(false);
-                    setTargetLevel(lvl);
-                  }}
-                  className="mt-2 rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600"
-                >
-                  Sync to my level
-                </button>
-              )}
-            </div>
-          </div>
+  {/* ✅ Custom target stats + EHP preview should be Advanced-only */}
+  {uiMode === "advanced" && (
+    <>
+      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="flex flex-col gap-2 sm:col-span-1">
+          <label className="text-sm text-neutral-300">Target HP</label>
+          <input
+            type="number"
+            value={targetHp}
+            onChange={(e) => {
+              onTargetManualChange();
+              setNum(setTargetHp, 1, 99999)(e.target.value);
+            }}
+            className="w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+          />
+        </div>
 
-          <div className="mt-3 flex flex-wrap gap-2">
-            {TARGET_PRESETS.map((p) => (
-              <button
-                key={p.key}
-                type="button"
-                onClick={() => applyPreset(p)}
-                className={`rounded-xl border px-3 py-1.5 text-xs ${
-                  activePreset === p.key
-                    ? "border-neutral-500 bg-neutral-900"
-                    : "border-neutral-800 bg-black hover:border-neutral-600"
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            <div className="flex flex-col gap-2 sm:col-span-1">
-              <label className="text-sm text-neutral-300">Target HP</label>
-              <input
-                type="number"
-                value={targetHp}
-                onChange={(e) => {
-                  onTargetManualChange();
-                  setNum(setTargetHp, 1, 99999)(e.target.value);
-                }}
-                className="w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm text-neutral-300">Armor</label>
-              <input
-                type="number"
-                value={targetArmor}
-                onChange={(e) => {
-                  onTargetManualChange();
-                  setNum(setTargetArmor, -999, 9999)(e.target.value);
-                }}
-                className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-              />
-              <div className="mt-1 text-xs text-neutral-500">
-                After pen:{" "}
-                <span className="text-neutral-300 font-semibold">
-                  {fmt(targetArmorAfterPen, 1)}
-                </span>{" "}
-                • mult: {Number.isFinite(physMult) ? fmt(physMult, 3) : "—"}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm text-neutral-300">MR</label>
-              <input
-                type="number"
-                value={targetMr}
-                onChange={(e) => {
-                  onTargetManualChange();
-                  setNum(setTargetMr, -999, 9999)(e.target.value);
-                }}
-                className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-              />
-              <div className="mt-1 text-xs text-neutral-500">
-                After pen:{" "}
-                <span className="text-neutral-300 font-semibold">
-                  {fmt(targetMrAfterPen, 1)}
-                </span>{" "}
-                • mult: {Number.isFinite(magicMult) ? fmt(magicMult, 3) : "—"}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 text-xs text-neutral-500">
-            Effective HP preview:{" "}
+        <div>
+          <label className="text-sm text-neutral-300">Armor</label>
+          <input
+            type="number"
+            value={targetArmor}
+            onChange={(e) => {
+              onTargetManualChange();
+              setNum(setTargetArmor, -999, 9999)(e.target.value);
+            }}
+            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+          />
+          <div className="mt-1 text-xs text-neutral-500">
+            After pen:{" "}
             <span className="text-neutral-300 font-semibold">
-              vs Physical {fmt(ehpPhys, 0)}
+              {fmt(targetArmorAfterPen, 1)}
             </span>{" "}
-            •{" "}
-            <span className="text-neutral-300 font-semibold">
-              vs Magic {fmt(ehpMagic, 0)}
-            </span>
+            • mult: {Number.isFinite(physMult) ? fmt(physMult, 3) : "—"}
           </div>
         </div>
+
+        <div>
+          <label className="text-sm text-neutral-300">MR</label>
+          <input
+            type="number"
+            value={targetMr}
+            onChange={(e) => {
+              onTargetManualChange();
+              setNum(setTargetMr, -999, 9999)(e.target.value);
+            }}
+            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+          />
+          <div className="mt-1 text-xs text-neutral-500">
+            After pen:{" "}
+            <span className="text-neutral-300 font-semibold">
+              {fmt(targetMrAfterPen, 1)}
+            </span>{" "}
+            • mult: {Number.isFinite(magicMult) ? fmt(magicMult, 3) : "—"}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 text-xs text-neutral-500">
+        Effective HP preview:{" "}
+        <span className="text-neutral-300 font-semibold">
+          vs Physical {fmt(ehpPhys, 0)}
+        </span>{" "}
+        •{" "}
+        <span className="text-neutral-300 font-semibold">
+          vs Magic {fmt(ehpMagic, 0)}
+        </span>
+      </div>
+    </>
+  )}
+</div>
+
 
         {/* Items */}
         <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
@@ -1078,16 +1136,14 @@ export default function LolClient({
       </section>
 
       {/* Right column */}
-      <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 flex flex-col self-start">
+      <section
+  className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 flex flex-col ${
+    uiMode === "simple" ? "h-full" : "self-start"
+  }`}
+>
+
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Selected champion</h2>
-
-          <div className="text-xs text-neutral-500">
-            View:{" "}
-            <span className="text-neutral-300 font-semibold">
-              {uiMode === "simple" ? "Simple" : "Advanced"}
-            </span>
-          </div>
         </div>
 
         <div className="mt-6 space-y-3">
@@ -1136,7 +1192,13 @@ export default function LolClient({
         </div>
 
         {/* Results */}
-        <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+        
+        <div
+  className={` rounded-2xl border border-neutral-800 bg-black p-3.5 ${
+    uiMode === "simple" ? "mt-13" : "mt-9"
+  }`}
+>
+
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">Results</div>
             <div className="text-xs text-neutral-500">
@@ -1158,50 +1220,69 @@ export default function LolClient({
             </div>
           </div>
 
-       {uiMode === "advanced" && (
-  <>
-    {/* Effective stats */}
-    <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-3 py-3">
-      <div className="text-xs font-semibold text-neutral-300">
-        Effective stats (champ + items)
-      </div>
+          {/* ✅ Kill Check (est.) */}
+          <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-semibold text-neutral-300">Kill Check (est.)</div>
+              <div className="text-[11px] text-neutral-500">
+                {hasItems ? "With items" : "No items"}
+              </div>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-sm text-neutral-300">Result</span>
+              <span className="font-semibold text-neutral-200">{killCheck.status}</span>
+            </div>
+            <div className="mt-1 text-xs text-neutral-500">{killCheck.detail}</div>
+            <div className="mt-2 text-[11px] text-neutral-500">
+              Based on your damage vs target HP only (no enemy damage/healing/shields/CC).
+            </div>
+          </div>
 
-      <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-        <div className="flex justify-between">
-          <span className="text-neutral-500">HP</span>
-          <span className="text-neutral-200 font-semibold">{fmt(effHp, 0)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-neutral-500">AD</span>
-          <span className="text-neutral-200 font-semibold">{fmt(effAd, 0)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-neutral-500">AP</span>
-          <span className="text-neutral-200 font-semibold">{fmt(effAp, 0)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-neutral-500">AS</span>
-          <span className="text-neutral-200 font-semibold">{fmt(effAs, 3)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-neutral-500">Crit</span>
-          <span className="text-neutral-200 font-semibold">{fmt(totals.critChancePct, 0)}%</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-neutral-500">AA DPS</span>
-          <span className="text-neutral-200 font-semibold">
-            {Number.isFinite(inferredAaDps) ? fmt(inferredAaDps, 1) : "—"}
-          </span>
-        </div>
-      </div>
+          {uiMode === "advanced" && (
+            <>
+              {/* Effective stats */}
+              <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-3 py-3">
+                <div className="text-xs font-semibold text-neutral-300">
+                  Effective stats (champ + items)
+                </div>
 
-      <div className="mt-2 text-[11px] text-neutral-500">
-        Resists include your pen: Armor→{fmt(targetArmorAfterPen, 1)}, MR→{fmt(targetMrAfterPen, 1)}
-      </div>
-    </div>
-  </>
-)}
+                <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">HP</span>
+                    <span className="text-neutral-200 font-semibold">{fmt(effHp, 0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">AD</span>
+                    <span className="text-neutral-200 font-semibold">{fmt(effAd, 0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">AP</span>
+                    <span className="text-neutral-200 font-semibold">{fmt(effAp, 0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">AS</span>
+                    <span className="text-neutral-200 font-semibold">{fmt(effAs, 3)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">Crit</span>
+                    <span className="text-neutral-200 font-semibold">
+                      {fmt(totals.critChancePct, 0)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-neutral-500">AA DPS</span>
+                    <span className="text-neutral-200 font-semibold">
+                      {Number.isFinite(inferredAaDps) ? fmt(inferredAaDps, 1) : "—"}
+                    </span>
+                  </div>
+                </div>
 
+                <div className="mt-2 text-[11px] text-neutral-500">
+                  Resists include your pen: Armor→{fmt(targetArmorAfterPen, 1)}, MR→{fmt(targetMrAfterPen, 1)}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* SIMPLE RESULTS */}
           {uiMode === "simple" ? (
