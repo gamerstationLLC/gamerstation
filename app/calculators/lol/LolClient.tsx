@@ -1197,7 +1197,7 @@ export default function LolClient({
 
      {/* Results */}
 <div
-  className={`mt-17.5 rounded-2xl border border-neutral-800 bg-black p-3 ${
+  className={`mt-13.5 rounded-2xl border border-neutral-800 bg-black p-3 ${
     uiMode === "simple" ? "min-h-[240px]" : ""
   }`}
 >
