@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "",
     "/calculators",
+    "/calculators/lol",
     "/calculators/ttk/cod",
     "/calculators/ttk/fortnite",
     "/calculators/dps/osrs",
