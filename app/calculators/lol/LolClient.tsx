@@ -1028,76 +1028,80 @@ export default function LolClient({
           </div>
         )}
 
-        {/* SIMPLE CONTROLS */}
-        {uiMode === "simple" && (
-          <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold">Quick Mode</div>
-              <div className="text-xs text-neutral-500">
-                Autos baseline + stats + pen + crit.
-              </div>
-            </div>
+     {/* SIMPLE CONTROLS */}
+{uiMode === "simple" && (
+  <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+    <div className="flex items-center justify-between">
+      <div className="text-sm font-semibold">Quick Mode</div>
+      <div className="text-xs text-neutral-500">
+        Autos baseline + stats + pen + crit.
+      </div>
+    </div>
 
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setSimpleType("burst")}
-                className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
-                  simpleType === "burst"
-                    ? "border-neutral-500 bg-neutral-900"
-                    : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-                }`}
-              >
-                Burst (autos)
-              </button>
-              <button
-                type="button"
-                onClick={() => setSimpleType("dps")}
-                className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
-                  simpleType === "dps"
-                    ? "border-neutral-500 bg-neutral-900"
-                    : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-                }`}
-              >
-                DPS (autos)
-              </button>
-            </div>
+    <div className="mt-3 grid grid-cols-2 gap-2">
+      <button
+        type="button"
+        onClick={() => setSimpleType("burst")}
+        className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+          simpleType === "burst"
+            ? "border-neutral-500 bg-neutral-900"
+            : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+        }`}
+      >
+        Burst (autos)
+      </button>
+      <button
+        type="button"
+        onClick={() => setSimpleType("dps")}
+        className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+          simpleType === "dps"
+            ? "border-neutral-500 bg-neutral-900"
+            : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+        }`}
+      >
+        DPS (autos)
+      </button>
+    </div>
 
-            {simpleType === "burst" ? (
-              <div className="mt-4">
-                <label className="text-sm text-neutral-300">Autos in combo</label>
-                <input
-                  type="number"
-                  value={simpleAAs}
-                  onChange={(e) => setNum(setSimpleAAs, 0, 50)(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                />
-                <div className="mt-1 text-xs text-neutral-500">
-                  Number of basic attacks you expect to land during the trade.
-                </div>
-              </div>
-            ) : (
-              <div className="mt-4">
-                <label className="text-sm text-neutral-300">Window (sec)</label>
-                <input
-                  type="number"
-                  value={simpleWindow}
-                  onChange={(e) => setNum(setSimpleWindow, 0, 120)(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                />
-                <div className="mt-1 text-xs text-neutral-500"></div>
-              </div>
-            )}
+    {/* ✅ Fixed-height slot so Burst/DPS doesn't change card height */}
+    <div className="mt-4 min-h-[88px]">
+      {simpleType === "burst" ? (
+        <div>
+          <label className="text-sm text-neutral-300">Autos in combo</label>
+          <input
+            type="number"
+            value={simpleAAs}
+            onChange={(e) => setNum(setSimpleAAs, 0, 50)(e.target.value)}
+            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+          />
+          <div className="mt-1 text-xs text-neutral-500">
+            Number of basic attacks you expect to land during the trade.
           </div>
-        )}
-
-        <div className="mt-2 text-xs text-neutral-500">
-          <span className="font-semibold">Burst (autos):</span> Total damage from
-          a small number of autos.
-          <br />
-          <span className="font-semibold">DPS (autos):</span> Damage if you
-          auto-attack continuously for a set time.
         </div>
+      ) : (
+        <div>
+          <label className="text-sm text-neutral-300">Window (sec)</label>
+          <input
+            type="number"
+            value={simpleWindow}
+            onChange={(e) => setNum(setSimpleWindow, 0, 120)(e.target.value)}
+            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+          />
+          {/* keep a line here to preserve spacing like the burst hint */}
+          <div className="mt-1 text-xs text-neutral-500">&nbsp;</div>
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+<div className="mt-2 text-xs text-neutral-500">
+  <span className="font-semibold">Burst (autos):</span> Total damage from a small
+  number of autos.
+  <br />
+  <span className="font-semibold">DPS (autos):</span> Damage if you auto-attack
+  continuously for a set time.
+</div>
 
         {/* ADVANCED CONTROLS */}
         {uiMode === "advanced" && (
@@ -1191,13 +1195,14 @@ export default function LolClient({
           </div>
         </div>
 
-        {/* Results */}
-        
-        <div
-  className={` rounded-2xl border border-neutral-800 bg-black p-3.5 ${
-    uiMode === "simple" ? "mt-13" : "mt-9"
+     {/* Results */}
+<div
+  className={`mt-17.5 rounded-2xl border border-neutral-800 bg-black p-3 ${
+    uiMode === "simple" ? "min-h-[240px]" : ""
   }`}
 >
+
+
 
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">Results</div>
