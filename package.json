@@ -1,7 +1,7 @@
 {
   "name": "gamerstation",
   "private": true,
- "scripts": {
+  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -10,6 +10,7 @@
     "lol:items": "node scripts/fetch-lol-items.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"
