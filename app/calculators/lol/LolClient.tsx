@@ -164,6 +164,11 @@ export default function LolClient({
     null
   );
 
+  // ✅ Target champion + target level
+  const [targetChampionId, setTargetChampionId] = useState<string>(""); // "" = custom/preset
+  const [targetLevel, setTargetLevel] = useState<number>(1);
+  const [targetLevelTouched, setTargetLevelTouched] = useState(false);
+
   // Items
   const [itemQuery, setItemQuery] = useState("");
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
@@ -221,6 +226,13 @@ export default function LolClient({
 
   const lvl = clamp(level, 1, 18);
 
+  // ✅ Keep target level synced to attacker level unless user manually changes it
+  useEffect(() => {
+    if (!targetLevelTouched) setTargetLevel(lvl);
+  }, [lvl, targetLevelTouched]);
+
+  const tLvl = clamp(targetLevel, 1, 18);
+
   // Base champ stats
   const champHp =
     selected ? selected.stats.hp + selected.stats.hpperlevel * (lvl - 1) : NaN;
@@ -230,12 +242,15 @@ export default function LolClient({
       : NaN;
   const champMr =
     selected
-      ? selected.stats.spellblock + selected.stats.spellblockperlevel * (lvl - 1)
+      ? selected.stats.spellblock +
+        selected.stats.spellblockperlevel * (lvl - 1)
       : NaN;
 
   // AD / AS (assumes your ChampionIndexRow.stats includes these fields in runtime data)
   const champBaseAd = selected ? (selected.stats as any).attackdamage : NaN;
-  const champAdPer = selected ? (selected.stats as any).attackdamageperlevel : 0;
+  const champAdPer = selected
+    ? (selected.stats as any).attackdamageperlevel
+    : 0;
 
   const champBaseAs = selected ? (selected.stats as any).attackspeed : NaN;
   const champAsPer = selected ? (selected.stats as any).attackspeedperlevel : 0;
@@ -250,8 +265,43 @@ export default function LolClient({
       ? champBaseAs * (1 + (champAsPer * (lvl - 1)) / 100)
       : NaN;
 
+  // ✅ Target champion computed stats (optional)
+  const targetChampion = useMemo(
+    () => champions.find((c) => c.id === targetChampionId),
+    [champions, targetChampionId]
+  );
+
+  const targetChampHp =
+    targetChampion
+      ? targetChampion.stats.hp + targetChampion.stats.hpperlevel * (tLvl - 1)
+      : NaN;
+
+  const targetChampArmor =
+    targetChampion
+      ? targetChampion.stats.armor +
+        targetChampion.stats.armorperlevel * (tLvl - 1)
+      : NaN;
+
+  const targetChampMr =
+    targetChampion
+      ? targetChampion.stats.spellblock +
+        targetChampion.stats.spellblockperlevel * (tLvl - 1)
+      : NaN;
+
+  // ✅ Auto-fill target stats when target champ/level changes
+  useEffect(() => {
+    if (!targetChampionId) return;
+    setActivePreset(null);
+    setTargetHp(Number.isFinite(targetChampHp) ? Math.round(targetChampHp) : "");
+    setTargetArmor(
+      Number.isFinite(targetChampArmor) ? Math.round(targetChampArmor) : ""
+    );
+    setTargetMr(Number.isFinite(targetChampMr) ? Math.round(targetChampMr) : "");
+  }, [targetChampionId, tLvl, targetChampHp, targetChampArmor, targetChampMr]);
+
   // Target presets
   function applyPreset(p: TargetPreset) {
+    setTargetChampionId(""); // presets imply custom target values
     setActivePreset(p.key);
     setTargetHp(p.hp);
     setTargetArmor(p.armor);
@@ -259,6 +309,7 @@ export default function LolClient({
   }
   function onTargetManualChange() {
     if (activePreset !== null) setActivePreset(null);
+    if (targetChampionId) setTargetChampionId(""); // switch back to custom
   }
 
   // Items
@@ -364,7 +415,8 @@ export default function LolClient({
   const oneAutoRaw = useMemo(() => {
     if (!Number.isFinite(effAd)) return NaN;
     const base = effAd * expectedCritMult;
-    const onHitPhysFromPct = (clamp(ohPct, 0, 50) / 100) * clamp(tHP, 0, 999999);
+    const onHitPhysFromPct =
+      (clamp(ohPct, 0, 50) / 100) * clamp(tHP, 0, 999999);
     return base + onHitPhysFromPct;
   }, [effAd, expectedCritMult, ohPct, tHP]);
 
@@ -391,7 +443,8 @@ export default function LolClient({
     (Number.isFinite(magicMult) ? advDpsMagic * magicMult : NaN) +
     advDpsTrue;
 
-  const timeToKill = Number.isFinite(dpsPost) && dpsPost > 0 ? tHP / dpsPost : NaN;
+  const timeToKill =
+    Number.isFinite(dpsPost) && dpsPost > 0 ? tHP / dpsPost : NaN;
 
   const windowDamage =
     Number.isFinite(dpsPost) && Number.isFinite(advWindow) && advWindow > 0
@@ -408,7 +461,8 @@ export default function LolClient({
   function addOneAutoToBurst() {
     if (!Number.isFinite(oneAutoRaw)) return;
     setBurstPhysRaw((prev) => Math.round(num0(prev) + oneAutoRaw));
-    if (ohMagic > 0) setBurstMagicRaw((prev) => Math.round(num0(prev) + ohMagic));
+    if (ohMagic > 0)
+      setBurstMagicRaw((prev) => Math.round(num0(prev) + ohMagic));
   }
 
   // ---------- Simple estimates (autos-based) ----------
@@ -417,7 +471,9 @@ export default function LolClient({
     : NaN;
 
   const simpleBurstPct =
-    Number.isFinite(simpleBurstPost) && tHP > 0 ? (simpleBurstPost / tHP) * 100 : NaN;
+    Number.isFinite(simpleBurstPost) && tHP > 0
+      ? (simpleBurstPost / tHP) * 100
+      : NaN;
 
   const simpleDpsPost =
     (Number.isFinite(inferredAaDps) && Number.isFinite(physMult)
@@ -428,10 +484,14 @@ export default function LolClient({
       : 0);
 
   const simpleTimeToKill =
-    Number.isFinite(simpleDpsPost) && simpleDpsPost > 0 ? tHP / simpleDpsPost : NaN;
+    Number.isFinite(simpleDpsPost) && simpleDpsPost > 0
+      ? tHP / simpleDpsPost
+      : NaN;
 
   const simpleWindowDamage =
-    Number.isFinite(simpleDpsPost) && sWindow > 0 ? simpleDpsPost * sWindow : NaN;
+    Number.isFinite(simpleDpsPost) && sWindow > 0
+      ? simpleDpsPost * sWindow
+      : NaN;
 
   return (
     <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:items-start">
@@ -480,14 +540,18 @@ export default function LolClient({
 
           <div className="mt-2 text-xs text-neutral-500">
             Loaded{" "}
-            <span className="text-neutral-300 font-semibold">{champions.length}</span>{" "}
+            <span className="text-neutral-300 font-semibold">
+              {champions.length}
+            </span>{" "}
             champions • Data Dragon patch{" "}
             <span className="text-neutral-300 font-semibold">{patch}</span>
           </div>
 
           <div className="mt-2 text-xs text-neutral-500">
             Showing {filtered.length} results (type to filter). Selected:{" "}
-            <span className="text-neutral-300 font-semibold">{selected?.name ?? "—"}</span>
+            <span className="text-neutral-300 font-semibold">
+              {selected?.name ?? "—"}
+            </span>
           </div>
         </div>
 
@@ -529,7 +593,83 @@ export default function LolClient({
         <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">Target</div>
-            <div className="text-xs text-neutral-500">Presets are quick approximations.</div>
+            <div className="text-xs text-neutral-500">
+              Presets are quick approximations.
+            </div>
+          </div>
+
+          {/* ✅ Target Champion + Target Level (minimal layout change) */}
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="text-sm text-neutral-300">
+                Champion: 
+              </label>
+              <select
+                value={targetChampionId}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  setTargetChampionId(id);
+                  setActivePreset(null);
+                  // If user never touched target level, keep it synced
+                  if (!targetLevelTouched) setTargetLevel(lvl);
+                }}
+                className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+              >
+                <option value="">Custom / Preset</option>
+                {champions.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+
+              {targetChampionId && (
+                <div className="mt-1 text-xs text-neutral-500">
+                  Using{" "}
+                  <span className="text-neutral-300 font-semibold">
+                    {targetChampion?.name ?? "—"}
+                  </span>{" "}
+                  stats.
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="text-sm text-neutral-300">Target Level</label>
+              <div className="mt-2 flex items-center gap-3">
+                <input
+                  type="range"
+                  min={1}
+                  max={18}
+                  value={tLvl}
+                  onChange={(e) => {
+                    setTargetLevelTouched(true);
+                    setTargetLevel(Number(e.target.value));
+                  }}
+                  className="w-full"
+                />
+                <div className="min-w-[2.5rem] text-right text-sm text-neutral-200 font-semibold">
+                  {tLvl}
+                </div>
+              </div>
+
+              {!targetLevelTouched ? (
+                <div className="mt-1 text-xs text-neutral-500">
+                  Auto-synced to your level.
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTargetLevelTouched(false);
+                    setTargetLevel(lvl);
+                  }}
+                  className="mt-2 rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600"
+                >
+                  Sync to my level
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="mt-3 flex flex-wrap gap-2">
@@ -606,9 +746,13 @@ export default function LolClient({
 
           <div className="mt-4 text-xs text-neutral-500">
             Effective HP preview:{" "}
-            <span className="text-neutral-300 font-semibold">vs Physical {fmt(ehpPhys, 0)}</span>{" "}
+            <span className="text-neutral-300 font-semibold">
+              vs Physical {fmt(ehpPhys, 0)}
+            </span>{" "}
             •{" "}
-            <span className="text-neutral-300 font-semibold">vs Magic {fmt(ehpMagic, 0)}</span>
+            <span className="text-neutral-300 font-semibold">
+              vs Magic {fmt(ehpMagic, 0)}
+            </span>
           </div>
         </div>
 
@@ -616,7 +760,9 @@ export default function LolClient({
         <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold">Items</div>
-            <div className="text-xs text-neutral-500">{selectedItems.length}/6</div>
+            <div className="text-xs text-neutral-500">
+              {selectedItems.length}/6
+            </div>
           </div>
 
           <div className="relative mt-3">
@@ -636,7 +782,9 @@ export default function LolClient({
               <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-neutral-800 bg-black shadow-xl">
                 <div className="max-h-64 overflow-auto">
                   {itemResults.length === 0 ? (
-                    <div className="px-3 py-2 text-xs text-neutral-500">No matches. Try a different search.</div>
+                    <div className="px-3 py-2 text-xs text-neutral-500">
+                      No matches. Try a different search.
+                    </div>
                   ) : (
                     itemResults.map((it) => (
                       <button
@@ -648,7 +796,9 @@ export default function LolClient({
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-neutral-200">{it.name}</span>
-                          <span className="text-xs text-neutral-500">{it.gold ? `${it.gold}g` : ""}</span>
+                          <span className="text-xs text-neutral-500">
+                            {it.gold ? `${it.gold}g` : ""}
+                          </span>
                         </div>
                       </button>
                     ))
@@ -680,53 +830,76 @@ export default function LolClient({
                 <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-neutral-400">HP</span>
-                    <span className="text-neutral-200 font-semibold">+{totals.hp}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{totals.hp}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">AD</span>
-                    <span className="text-neutral-200 font-semibold">+{totals.ad}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{totals.ad}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">AP</span>
-                    <span className="text-neutral-200 font-semibold">+{totals.ap}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{totals.ap}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Armor</span>
-                    <span className="text-neutral-200 font-semibold">+{totals.armor}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{totals.armor}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">MR</span>
-                    <span className="text-neutral-200 font-semibold">+{totals.mr}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{totals.mr}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">AS</span>
-                    <span className="text-neutral-200 font-semibold">+{fmt(totals.asPct, 0)}%</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{fmt(totals.asPct, 0)}%
+                    </span>
                   </div>
 
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Crit</span>
-                    <span className="text-neutral-200 font-semibold">+{fmt(totals.critChancePct, 0)}%</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{fmt(totals.critChancePct, 0)}%
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Lethality</span>
-                    <span className="text-neutral-200 font-semibold">+{fmt(totals.lethality, 0)}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{fmt(totals.lethality, 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">% Armor Pen</span>
-                    <span className="text-neutral-200 font-semibold">+{fmt(totals.armorPenPct, 0)}%</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{fmt(totals.armorPenPct, 0)}%
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">Magic Pen</span>
-                    <span className="text-neutral-200 font-semibold">+{fmt(totals.magicPenFlat, 0)}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{fmt(totals.magicPenFlat, 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-400">% Magic Pen</span>
-                    <span className="text-neutral-200 font-semibold">+{fmt(totals.magicPenPct, 0)}%</span>
+                    <span className="text-neutral-200 font-semibold">
+                      +{fmt(totals.magicPenPct, 0)}%
+                    </span>
                   </div>
                 </div>
 
                 <div className="mt-3 text-xs text-neutral-500">
-                  Stats are applied. True “unique passives” require the knobs below (we’ll expand later).
+                  Stats are applied. True “unique passives” require the knobs
+                  below (we’ll expand later).
                 </div>
               </div>
             </>
@@ -743,22 +916,32 @@ export default function LolClient({
 
             <div className="mt-3 grid gap-3 sm:grid-cols-3">
               <div>
-                <label className="text-sm text-neutral-300">On-hit Magic (flat)</label>
+                <label className="text-sm text-neutral-300">
+                  On-hit Magic (flat)
+                </label>
                 <input
                   type="number"
                   value={onHitFlatMagic}
-                  onChange={(e) => setNum(setOnHitFlatMagic, 0, 9999)(e.target.value)}
+                  onChange={(e) =>
+                    setNum(setOnHitFlatMagic, 0, 9999)(e.target.value)
+                  }
                   className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                 />
-                <div className="mt-1 text-xs text-neutral-500">Applied per auto (mitigated by MR).</div>
+                <div className="mt-1 text-xs text-neutral-500">
+                  Applied per auto (mitigated by MR).
+                </div>
               </div>
 
               <div>
-                <label className="text-sm text-neutral-300">% Target HP On-hit (phys)</label>
+                <label className="text-sm text-neutral-300">
+                  % Target HP On-hit (phys)
+                </label>
                 <input
                   type="number"
                   value={onHitPctTargetMaxHpPhys}
-                  onChange={(e) => setNum(setOnHitPctTargetMaxHpPhys, 0, 50)(e.target.value)}
+                  onChange={(e) =>
+                    setNum(setOnHitPctTargetMaxHpPhys, 0, 50)(e.target.value)
+                  }
                   className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                 />
                 <div className="mt-1 text-xs text-neutral-500">
@@ -767,15 +950,21 @@ export default function LolClient({
               </div>
 
               <div>
-                <label className="text-sm text-neutral-300">Crit Damage Mult</label>
+                <label className="text-sm text-neutral-300">
+                  Crit Damage Mult
+                </label>
                 <input
                   type="number"
                   step="0.05"
                   value={critDamageMult}
-                  onChange={(e) => setNum(setCritDamageMult, 1.0, 5.0)(e.target.value)}
+                  onChange={(e) =>
+                    setNum(setCritDamageMult, 1.0, 5.0)(e.target.value)
+                  }
                   className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                 />
-                <div className="mt-1 text-xs text-neutral-500">Default is 2.00 (expected crit).</div>
+                <div className="mt-1 text-xs text-neutral-500">
+                  Default is 2.00 (expected crit).
+                </div>
               </div>
             </div>
           </div>
@@ -786,7 +975,9 @@ export default function LolClient({
           <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
             <div className="flex items-center justify-between">
               <div className="text-sm font-semibold">Quick Mode</div>
-              <div className="text-xs text-neutral-500">Autos baseline + stats + pen + crit.</div>
+              <div className="text-xs text-neutral-500">
+                Autos baseline + stats + pen + crit.
+              </div>
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
@@ -810,7 +1001,6 @@ export default function LolClient({
                     : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
                 }`}
               >
-                
                 DPS (autos)
               </button>
             </div>
@@ -824,8 +1014,9 @@ export default function LolClient({
                   onChange={(e) => setNum(setSimpleAAs, 0, 50)(e.target.value)}
                   className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                 />
-                <div className="mt-1 text-xs text-neutral-500">Number of basic attacks you expect to land during the trade.
-</div>
+                <div className="mt-1 text-xs text-neutral-500">
+                  Number of basic attacks you expect to land during the trade.
+                </div>
               </div>
             ) : (
               <div className="mt-4">
@@ -841,11 +1032,14 @@ export default function LolClient({
             )}
           </div>
         )}
-<div className="mt-2 text-xs text-neutral-500">
-  <span className="font-semibold">Burst (autos):</span> Total damage from a small number of autos.
-  <br />
-  <span className="font-semibold">DPS (autos):</span> Damage if you auto-attack continuously for a set time.
-</div>
+
+        <div className="mt-2 text-xs text-neutral-500">
+          <span className="font-semibold">Burst (autos):</span> Total damage from
+          a small number of autos.
+          <br />
+          <span className="font-semibold">DPS (autos):</span> Damage if you
+          auto-attack continuously for a set time.
+        </div>
 
         {/* ADVANCED CONTROLS */}
         {uiMode === "advanced" && (
@@ -876,7 +1070,8 @@ export default function LolClient({
               </button>
             </div>
             <div className="mt-3 text-xs text-neutral-500">
-              Advanced = manual damage buckets. Pen applied automatically. Crit expectation used in AA helpers.
+              Advanced = manual damage buckets. Pen applied automatically. Crit
+              expectation used in AA helpers.
             </div>
           </div>
         )}
@@ -903,7 +1098,9 @@ export default function LolClient({
 
           <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
             <span className="text-sm text-neutral-300">Title</span>
-            <span className="font-semibold text-neutral-200">{selected?.title ?? "—"}</span>
+            <span className="font-semibold text-neutral-200">
+              {selected?.title ?? "—"}
+            </span>
           </div>
 
           <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
@@ -913,12 +1110,16 @@ export default function LolClient({
 
           <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
             <span className="text-sm text-neutral-300">HP (at level)</span>
-            <span className="font-semibold text-neutral-200">{fmt(champHp, 1)}</span>
+            <span className="font-semibold text-neutral-200">
+              {fmt(champHp, 1)}
+            </span>
           </div>
 
           <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
             <span className="text-sm text-neutral-300">Armor (at level)</span>
-            <span className="font-semibold text-neutral-200">{fmt(champArmor, 1)}</span>
+            <span className="font-semibold text-neutral-200">
+              {fmt(champArmor, 1)}
+            </span>
           </div>
 
           <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
@@ -928,7 +1129,9 @@ export default function LolClient({
 
           <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
             <span className="text-sm text-neutral-300">Resource</span>
-            <span className="font-semibold text-neutral-200">{selected?.partype ?? "—"}</span>
+            <span className="font-semibold text-neutral-200">
+              {selected?.partype ?? "—"}
+            </span>
           </div>
         </div>
 
@@ -955,42 +1158,50 @@ export default function LolClient({
             </div>
           </div>
 
-          {/* Effective stats */}
-          <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-3 py-3">
-            <div className="text-xs font-semibold text-neutral-300">Effective stats (champ + items)</div>
-            <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-neutral-500">HP</span>
-                <span className="text-neutral-200 font-semibold">{fmt(effHp, 0)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">AD</span>
-                <span className="text-neutral-200 font-semibold">{fmt(effAd, 0)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">AP</span>
-                <span className="text-neutral-200 font-semibold">{fmt(effAp, 0)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">AS</span>
-                <span className="text-neutral-200 font-semibold">{fmt(effAs, 3)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">Crit</span>
-                <span className="text-neutral-200 font-semibold">{fmt(totals.critChancePct, 0)}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-500">AA DPS</span>
-                <span className="text-neutral-200 font-semibold">
-                  {Number.isFinite(inferredAaDps) ? fmt(inferredAaDps, 1) : "—"}
-                </span>
-              </div>
-            </div>
+       {uiMode === "advanced" && (
+  <>
+    {/* Effective stats */}
+    <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-3 py-3">
+      <div className="text-xs font-semibold text-neutral-300">
+        Effective stats (champ + items)
+      </div>
 
-            <div className="mt-2 text-[11px] text-neutral-500">
-              Resists include your pen: Armor→{fmt(targetArmorAfterPen, 1)}, MR→{fmt(targetMrAfterPen, 1)}
-            </div>
-          </div>
+      <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+        <div className="flex justify-between">
+          <span className="text-neutral-500">HP</span>
+          <span className="text-neutral-200 font-semibold">{fmt(effHp, 0)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">AD</span>
+          <span className="text-neutral-200 font-semibold">{fmt(effAd, 0)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">AP</span>
+          <span className="text-neutral-200 font-semibold">{fmt(effAp, 0)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">AS</span>
+          <span className="text-neutral-200 font-semibold">{fmt(effAs, 3)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">Crit</span>
+          <span className="text-neutral-200 font-semibold">{fmt(totals.critChancePct, 0)}%</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-neutral-500">AA DPS</span>
+          <span className="text-neutral-200 font-semibold">
+            {Number.isFinite(inferredAaDps) ? fmt(inferredAaDps, 1) : "—"}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-2 text-[11px] text-neutral-500">
+        Resists include your pen: Armor→{fmt(targetArmorAfterPen, 1)}, MR→{fmt(targetMrAfterPen, 1)}
+      </div>
+    </div>
+  </>
+)}
+
 
           {/* SIMPLE RESULTS */}
           {uiMode === "simple" ? (
@@ -998,33 +1209,48 @@ export default function LolClient({
               {simpleType === "burst" ? (
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                    <span className="text-sm text-neutral-300">Damage (autos)</span>
-                    <span className="font-semibold text-neutral-200">{fmt(simpleBurstPost, 0)}</span>
+                    <span className="text-sm text-neutral-300">
+                      Damage (autos)
+                    </span>
+                    <span className="font-semibold text-neutral-200">
+                      {fmt(simpleBurstPost, 0)}
+                    </span>
                   </div>
                   <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
                     <span className="text-sm text-neutral-300">% of Target HP</span>
                     <span className="font-semibold text-neutral-200">
-                      {Number.isFinite(simpleBurstPct) ? `${fmt(simpleBurstPct, 1)}%` : "—"}
+                      {Number.isFinite(simpleBurstPct)
+                        ? `${fmt(simpleBurstPct, 1)}%`
+                        : "—"}
                     </span>
                   </div>
                 </div>
               ) : (
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                    <span className="text-sm text-neutral-300">Damage (autos, window)</span>
-                    <span className="font-semibold text-neutral-200">{fmt(simpleWindowDamage, 0)}</span>
+                    <span className="text-sm text-neutral-300">
+                      Damage (autos, window)
+                    </span>
+                    <span className="font-semibold text-neutral-200">
+                      {fmt(simpleWindowDamage, 0)}
+                    </span>
                   </div>
                   <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                    <span className="text-sm text-neutral-300">Time to kill (est.)</span>
+                    <span className="text-sm text-neutral-300">
+                      Time to kill (est.)
+                    </span>
                     <span className="font-semibold text-neutral-200">
-                      {Number.isFinite(simpleTimeToKill) ? `${fmt(simpleTimeToKill, 2)}s` : "—"}
+                      {Number.isFinite(simpleTimeToKill)
+                        ? `${fmt(simpleTimeToKill, 2)}s`
+                        : "—"}
                     </span>
                   </div>
                 </div>
               )}
 
               <div className="mt-3 text-xs text-neutral-500">
-                Simple mode is autos-baseline (stats + pen + expected crit). Abilities come later.
+                Simple mode is autos-baseline (stats + pen + expected crit).
+                Abilities come later.
               </div>
             </>
           ) : (
@@ -1055,13 +1281,17 @@ export default function LolClient({
                       <input
                         type="number"
                         value={burstPhysRaw}
-                        onChange={(e) => setNum(setBurstPhysRaw, 0, 999999)(e.target.value)}
+                        onChange={(e) =>
+                          setNum(setBurstPhysRaw, 0, 999999)(e.target.value)
+                        }
                         className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                       />
                       <div className="mt-1 text-xs text-neutral-500">
                         After armor:{" "}
                         <span className="text-neutral-300 font-semibold">
-                          {Number.isFinite(physMult) ? fmt(num0(burstPhysRaw) * physMult, 0) : "—"}
+                          {Number.isFinite(physMult)
+                            ? fmt(num0(burstPhysRaw) * physMult, 0)
+                            : "—"}
                         </span>
                       </div>
                     </div>
@@ -1071,13 +1301,17 @@ export default function LolClient({
                       <input
                         type="number"
                         value={burstMagicRaw}
-                        onChange={(e) => setNum(setBurstMagicRaw, 0, 999999)(e.target.value)}
+                        onChange={(e) =>
+                          setNum(setBurstMagicRaw, 0, 999999)(e.target.value)
+                        }
                         className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                       />
                       <div className="mt-1 text-xs text-neutral-500">
                         After MR:{" "}
                         <span className="text-neutral-300 font-semibold">
-                          {Number.isFinite(magicMult) ? fmt(num0(burstMagicRaw) * magicMult, 0) : "—"}
+                          {Number.isFinite(magicMult)
+                            ? fmt(num0(burstMagicRaw) * magicMult, 0)
+                            : "—"}
                         </span>
                       </div>
                     </div>
@@ -1087,17 +1321,25 @@ export default function LolClient({
                       <input
                         type="number"
                         value={burstTrueRaw}
-                        onChange={(e) => setNum(setBurstTrueRaw, 0, 999999)(e.target.value)}
+                        onChange={(e) =>
+                          setNum(setBurstTrueRaw, 0, 999999)(e.target.value)
+                        }
                         className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                       />
-                      <div className="mt-1 text-xs text-neutral-500">Not reduced by resists</div>
+                      <div className="mt-1 text-xs text-neutral-500">
+                        Not reduced by resists
+                      </div>
                     </div>
                   </div>
 
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                      <span className="text-sm text-neutral-300">Total (post-mitigation)</span>
-                      <span className="font-semibold text-neutral-200">{fmt(burstPost, 0)}</span>
+                      <span className="text-sm text-neutral-300">
+                        Total (post-mitigation)
+                      </span>
+                      <span className="font-semibold text-neutral-200">
+                        {fmt(burstPost, 0)}
+                      </span>
                     </div>
 
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
@@ -1133,7 +1375,9 @@ export default function LolClient({
                       <input
                         type="number"
                         value={dpsPhysRaw}
-                        onChange={(e) => setNum(setDpsPhysRaw, 0, 999999)(e.target.value)}
+                        onChange={(e) =>
+                          setNum(setDpsPhysRaw, 0, 999999)(e.target.value)
+                        }
                         className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                       />
                     </div>
@@ -1142,7 +1386,9 @@ export default function LolClient({
                       <input
                         type="number"
                         value={dpsMagicRaw}
-                        onChange={(e) => setNum(setDpsMagicRaw, 0, 999999)(e.target.value)}
+                        onChange={(e) =>
+                          setNum(setDpsMagicRaw, 0, 999999)(e.target.value)
+                        }
                         className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                       />
                     </div>
@@ -1151,7 +1397,9 @@ export default function LolClient({
                       <input
                         type="number"
                         value={dpsTrueRaw}
-                        onChange={(e) => setNum(setDpsTrueRaw, 0, 999999)(e.target.value)}
+                        onChange={(e) =>
+                          setNum(setDpsTrueRaw, 0, 999999)(e.target.value)
+                        }
                         className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                       />
                     </div>
@@ -1160,7 +1408,9 @@ export default function LolClient({
                       <input
                         type="number"
                         value={windowSec}
-                        onChange={(e) => setNum(setWindowSec, 0, 120)(e.target.value)}
+                        onChange={(e) =>
+                          setNum(setWindowSec, 0, 120)(e.target.value)
+                        }
                         className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                       />
                     </div>
@@ -1173,12 +1423,18 @@ export default function LolClient({
 
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                      <span className="text-sm text-neutral-300">Damage (autos, window)</span>
-                      <span className="font-semibold text-neutral-200">{fmt(windowDamage, 0)}</span>
+                      <span className="text-sm text-neutral-300">
+                        Damage (autos, window)
+                      </span>
+                      <span className="font-semibold text-neutral-200">
+                        {fmt(windowDamage, 0)}
+                      </span>
                     </div>
 
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                      <span className="text-sm text-neutral-300">Time to kill (est.)</span>
+                      <span className="text-sm text-neutral-300">
+                        Time to kill (est.)
+                      </span>
                       <span className="font-semibold text-neutral-200">
                         {Number.isFinite(timeToKill) ? `${fmt(timeToKill, 2)}s` : "—"}
                       </span>
@@ -1192,9 +1448,9 @@ export default function LolClient({
           {/* Small legend */}
           <div className="mt-4 text-[11px] leading-relaxed text-neutral-500">
             <span className="font-semibold text-neutral-400">Legend:</span>{" "}
-            HP = Health, AD = Attack Damage, AP = Ability Power, AS = Attack Speed, MR = Magic
-            Resist, AA = Auto Attack, DPS = Damage per Second, TTK = Time to Kill, Pen = Penetration
-            (Armor/MR)
+            HP = Health, AD = Attack Damage, AP = Ability Power, AS = Attack Speed,
+            MR = Magic Resist, AA = Auto Attack, DPS = Damage per Second, TTK = Time
+            to Kill, Pen = Penetration (Armor/MR)
           </div>
         </div>
       </section>
