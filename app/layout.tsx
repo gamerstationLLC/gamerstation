@@ -1,17 +1,6 @@
-
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  <section>
-    {/* headline, description, badges */}
-  </section>
-
-  <section>
-    {/* COD TTK + OSRS DPS cards */}
-  </section>
-</div>
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,33 +14,52 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "GamerStation",
-  description: "Multi-game calculators, stats tools, and competitive gaming utilities.",
+  description:
+    "Multi-game calculators, stats tools, and competitive gaming utilities.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/favicon-192x192.png",
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
-        <footer className="border-t border-white/10 bg-black text-neutral-400">
-  <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-    <p className="text-sm">© {new Date().getFullYear()} GamerStation. Built for gamers.</p>
-    <div className="flex gap-4 text-sm">
-      <a className="hover:text-white" href="/privacy">Privacy</a>
-      <a className="hover:text-white" href="/terms">Terms</a>
-      <a className="hover:text-white" href="/contact">Contact</a>
-      {/* optional */}
-      <a className="hover:text-white" href="/disclaimer">Disclaimer</a>
-    </div>
-  </div>
-</footer>
 
+        <footer className="border-t border-white/10 bg-black text-neutral-400">
+          <div className="mx-auto max-w-6xl px-6 py-10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <p className="text-sm">
+              © {new Date().getFullYear()} GamerStation. Built for gamers.
+            </p>
+            <div className="flex gap-4 text-sm">
+              <a className="hover:text-white" href="/privacy">
+                Privacy
+              </a>
+              <a className="hover:text-white" href="/terms">
+                Terms
+              </a>
+              <a className="hover:text-white" href="/contact">
+                Contact
+              </a>
+              <a className="hover:text-white" href="/disclaimer">
+                Disclaimer
+              </a>
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );

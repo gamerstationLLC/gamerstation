@@ -4,9 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import type { CodWeaponRow } from "@/lib/codweapons";
-import { type CodAttachmentRow, getCodAttachments } from "@/lib/codattachments";
-
-
+import { type CodAttachmentRow } from "@/lib/codattachments";
 
 /**
  * attachments_global columns:
@@ -98,67 +96,28 @@ export default function CodTtkClient({
 }) {
   const [weaponClass, setWeaponClass] = useState<WeaponClass>("smg");
 
-  /**
-   * ✅ CRITICAL FIX:
-   * Weapon IDs MUST be the exact `weapon_id` values used by attachments.applies_to.
-   * No fallback to name/id, because that breaks matching (e.g. "Ryden 45K" vs "ryden_45k").
-   */
+  // ✅ FIX: always use the real weapon_id from the sheet
   const weapons: UIWeapon[] = useMemo(() => {
-  const wanted = weaponClass;
+    const wanted = weaponClass;
 
-  // Build a set of weapon ids that attachments actually reference
-  const appliesSet = new Set<string>();
-  for (const a of sheetAttachments ?? []) {
-    const raw = String((a as any).applies_to ?? "").trim();
-    if (!raw) continue;
-    raw.split(",").forEach((s) => {
-      const v = s.trim();
-      if (v) appliesSet.add(v);
-    });
-  }
+    return (sheetWeapons ?? [])
+      .filter((w: any) => normalizeTypeToClass(w.weapon_type) === wanted)
+      .map((w: any) => {
+        const id = String(w.weapon_id ?? "").trim(); // ✅ weapon_id is required
+        if (!id) return null;
 
-  const slugify = (s: string) =>
-    s
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "");
-
-  return (sheetWeapons ?? [])
-    .filter((w: any) => normalizeTypeToClass(w.weapon_type) === wanted)
-    .map((w: any) => {
-      const name = String(w.weapon_name ?? w.weaponName ?? "").trim();
-
-      // try common key variants
-      const candidates = [
-        w.weapon_id,
-        w.weaponId,
-        w.weaponID,
-        w.id,
-        name ? slugify(name) : "",
-      ]
-        .map((v) => String(v ?? "").trim())
-        .filter(Boolean);
-
-      // prefer an id that exists in attachments.applies_to
-      const matched = candidates.find((c) => appliesSet.has(c));
-      const id = matched ?? candidates[0]; // fallback so weapons still render
-
-      if (!id) return null;
-
-      return {
-        id,
-        name: name || id,
-        rpm: toNum(w.rpm),
-        headshot_mult: toNum(w.headshot_mult) || 1,
-        fire_mode: w.fire_mode,
-        weapon_type: w.weapon_type,
-        damage_profile: (w.damage_profile ?? []) as { meters: number; damage: number }[],
-      };
-    })
-    .filter(Boolean) as UIWeapon[];
-}, [sheetWeapons, sheetAttachments, weaponClass]);
-
+        return {
+          id,
+          name: String(w.weapon_name ?? "").trim() || id,
+          rpm: toNum(w.rpm),
+          headshot_mult: toNum(w.headshot_mult) || 1,
+          fire_mode: w.fire_mode,
+          weapon_type: w.weapon_type,
+          damage_profile: (w.damage_profile ?? []) as { meters: number; damage: number }[],
+        };
+      })
+      .filter(Boolean) as UIWeapon[];
+  }, [sheetWeapons, weaponClass]);
 
   const [weaponId, setWeaponId] = useState<string>("");
 
@@ -178,51 +137,40 @@ export default function CodTtkClient({
     [weapons, weaponId]
   );
 
- const attachments: UIAttachment[] = useMemo(() => {
-  
+  const attachments: UIAttachment[] = useMemo(() => {
+    return (sheetAttachments ?? []).map((a: any) => ({
+      id: String(a.attachment_id ?? "").trim(),
+      name: String(a.attachment_name ?? "").trim(),
+      slot: String(a.slot ?? "").trim(),
+      applies_to: String(a.applies_to ?? "").trim(),
+      dmg10_add: toNum(a.dmg10_add),
+      dmg25_add: toNum(a.dmg25_add),
+      dmg50_add: toNum(a.dmg50_add),
+    }));
+  }, [sheetAttachments]);
 
-  return (sheetAttachments ?? []).map((a: any) => ({
-    id: String(a.attachment_id),
-    name: String(a.attachment_name),
-    slot: String(a.slot),
-    applies_to: String(a.applies_to),
-    dmg10_add: toNum(a.dmg10_add),
-    dmg25_add: toNum(a.dmg25_add),
-    dmg50_add: toNum(a.dmg50_add),
-  }));
-}, [sheetAttachments]);
+  // ✅ FIX: barrels match by weapon_id (selected.id) <-> applies_to
+  const barrels = useMemo(() => {
+    const wid = String(selected?.id ?? "").trim().toLowerCase();
+    if (!wid) return [];
 
+    return attachments.filter((a) => {
+      const slot = String(a.slot ?? "").trim().toLowerCase();
+      if (slot !== "barrel") return false;
 
-  // ✅ BARRELS: normalize slot + allow applies_to "all" OR CSV list containing selected weapon_id
-  const normalize = (s: string) =>
-  s.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const applies = String(a.applies_to ?? "")
+        .toLowerCase()
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
 
-const barrels = useMemo(() => {
-  if (!selected) return [];
-
-  const weaponNameNorm = normalize(selected.name);
-  const weaponTypeNorm = normalize(selected.weapon_type ?? "");
-
-  return attachments.filter((a) => {
-    const slot = String(a.slot ?? "").toLowerCase();
-    if (!slot.includes("barrel")) return false;
-
-    const applies = String(a.applies_to ?? "")
-      .split(",")
-      .map((s) => normalize(s));
-
-    return (
-      applies.includes("all") ||
-      applies.includes(weaponNameNorm) ||
-      applies.includes(weaponTypeNorm)
-    );
-  });
-}, [attachments, selected]);
-
+      return applies.includes("all") || applies.includes(wid);
+    });
+  }, [attachments, selected?.id]);
 
   const [barrelId, setBarrelId] = useState<string>("");
 
-  // ✅ prevent holding an invalid barrel ID when switching weapons
+  // prevent holding an invalid barrel ID when switching weapons
   useEffect(() => {
     setBarrelId("");
   }, [selected?.id]);
@@ -236,7 +184,7 @@ const barrels = useMemo(() => {
   const [mode, setMode] = useState<"mp" | "wz">("mp");
   const [plates, setPlates] = useState<number>(3);
 
-  // ✅ ACCURACY: string state so iOS users can delete/backspace normally
+  // ACCURACY: string state so iOS users can delete/backspace normally
   const [accuracyStr, setAccuracyStr] = useState<string>("100");
 
   // Distance buckets
@@ -385,7 +333,9 @@ const barrels = useMemo(() => {
                     ))}
                   </select>
                   <div className="mt-1 text-[11px] text-neutral-500">
-                    Note: Most barrels in Call of Duty primarily affect recoil, range, or bullet velocity. Many do not change damage values, and therefore may not affect time-to-kill. This calculator reflects damage-based TTK only.
+                    Note: Most barrels in Call of Duty primarily affect recoil, range, or bullet velocity. Many do not
+                    change damage values, and therefore may not affect time-to-kill. This calculator reflects damage-based
+                    TTK only.
                   </div>
                 </label>
 
@@ -484,14 +434,8 @@ const barrels = useMemo(() => {
             </div>
           </section>
 
-
           {/* Results */}
-      
-
-
           <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-4 h-fit self-start">
-
-            
             <div className="text-sm font-semibold">Results</div>
 
             <div className="mt-5 grid gap-3">

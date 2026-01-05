@@ -1,6 +1,7 @@
 // lib/codweapons.ts
 
 export type CodWeaponRow = {
+  weapon_id: string; // ✅ ADD THIS
   weapon_name: string;
   weapon_type: string;
   rpm?: number;
@@ -54,7 +55,6 @@ function csvToRows(csv: string): string[][] {
   row.push(cur);
   rows.push(row);
 
-  // Remove any fully empty trailing rows
   return rows.filter((r) => r.some((c) => String(c ?? "").trim().length > 0));
 }
 
@@ -83,7 +83,6 @@ export async function getCodWeapons(): Promise<CodWeaponRow[]> {
   const url = process.env.COD_WEAPONS_CSV_URL;
   if (!url) throw new Error("Missing COD_WEAPONS_CSV_URL");
 
-  // Instant updates while you edit the sheet
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Failed to fetch CSV (${res.status})`);
 
@@ -95,8 +94,7 @@ export async function getCodWeapons(): Promise<CodWeaponRow[]> {
 
   const idx = (name: string) => {
     const i = headers.indexOf(name);
-    if (i === -1) return -1;
-    return i;
+    return i === -1 ? -1 : i;
   };
 
   const get = (r: string[], name: string) => {
@@ -108,6 +106,7 @@ export async function getCodWeapons(): Promise<CodWeaponRow[]> {
   return table
     .slice(1)
     .map((r) => ({
+      weapon_id: get(r, "weapon_id"), // ✅ ADD THIS
       weapon_name: get(r, "weapon_name"),
       weapon_type: get(r, "weapon_type"),
       rpm: toNum(get(r, "rpm")),
@@ -115,5 +114,6 @@ export async function getCodWeapons(): Promise<CodWeaponRow[]> {
       fire_mode: get(r, "fire_mode") || undefined,
       damage_profile: parseDamageProfile(headers, r),
     }))
-    .filter((w) => w.weapon_name.length > 0);
+    // keep only rows that have an id + name
+    .filter((w) => w.weapon_id.length > 0 && w.weapon_name.length > 0);
 }
