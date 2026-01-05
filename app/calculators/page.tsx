@@ -37,32 +37,39 @@ export default function CalculatorsPage() {
               TTK calculator + weapon buffs / nerfs.
             </div>
           </Link>
+
+          {/* Fortnite TTK */}
           <Link
-  href="/calculators/ttk/fortnite"
-  className="group rounded-2xl border border-white/10 bg-white/5 p-5 hover:border-white/20"
->
-  <div className="flex items-center justify-between">
-    <div className="text-sm font-semibold">Fortnite TTK Calculator</div>
-    <div className="text-xs text-neutral-400 group-hover:text-neutral-200">
-      
-    </div>
-  </div>
-  <div className="mt-2 text-xs text-neutral-400">
-    Per-rarity weapon damage • live fire rates
-  </div>
-</Link>
-<Link
-  href="/calculators/dps/osrs"
-  className="group rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
->
-  <div className="mt-2 text-sm font-semibold">OSRS DPS Calculator</div>
-  <p className="mt-2 text-sm text-neutral-300">
-    Baseline DPS + hit chance + time-to-kill.
-  </p>
-  <div className="mt-4 text-sm text-neutral-400 group-hover:text-white">
-    
-  </div>
-</Link>
+            href="/calculators/ttk/fortnite"
+            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">Fortnite TTK Calculator</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Per-rarity weapon damage • live fire rates
+            </div>
+          </Link>
+
+          {/* OSRS DPS */}
+          <Link
+            href="/calculators/dps/osrs"
+            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">OSRS DPS Calculator</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Baseline DPS + hit chance + time-to-kill.
+            </div>
+          </Link>
+
+          {/* League of Legends */}
+          <Link
+            href="/calculators/lol"
+            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">League of Legends</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Burst + DPS/time-window damage calculator.
+            </div>
+          </Link>
         </div>
       </div>
     </main>

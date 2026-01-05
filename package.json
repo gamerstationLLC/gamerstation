@@ -1,12 +1,13 @@
 {
-  "name": "gamestation",
-  "version": "0.1.0",
+  "name": "gamerstation",
   "private": true,
-  "scripts": {
+ "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lol:fetch": "node scripts/fetch-lol-ddragon.mjs",
+    "lol:items": "node scripts/fetch-lol-items.mjs"
   },
   "dependencies": {
     "next": "16.1.1",
