@@ -24,3 +24,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* Only when a page adds .has-stickybar to <body> */
+body.has-stickybar {
+  padding-bottom: calc(92px + env(safe-area-inset-bottom));
+}

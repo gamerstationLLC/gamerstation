@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChampionIndexRow, ItemRow } from "./page";
 
 function clamp(n: number, min: number, max: number) {
@@ -120,6 +120,7 @@ function itemTotals(selectedItems: ItemRow[]) {
 
 type Mode = "burst" | "dps";
 type UiMode = "simple" | "advanced";
+type MobileTab = "inputs" | "results";
 
 export default function LolClient({
   champions,
@@ -130,6 +131,13 @@ export default function LolClient({
   patch: string;
   items: ItemRow[];
 }) {
+  // ----------------------------
+  // ✅ Mobile UX state
+  // ----------------------------
+  const [mobileTab, setMobileTab] = useState<MobileTab>("inputs"); // default Inputs
+  const [showChampMobile, setShowChampMobile] = useState(false); // collapsed by default
+  const resultsRef = useRef<HTMLDivElement | null>(null);
+
   // ✅ Simple vs Advanced toggle
   const [uiMode, setUiMode] = useState<UiMode>("simple");
   const toggleUiMode = () =>
@@ -466,6 +474,11 @@ export default function LolClient({
       ? simpleDpsPost * sWindow
       : NaN;
 
+  const simpleWindowPct =
+    Number.isFinite(simpleWindowDamage) && tHP > 0
+      ? (simpleWindowDamage / tHP) * 100
+      : NaN;
+
   // ✅ Kill Check (est.)
   const hasItems = selectedItems.length > 0;
   const killLabel = hasItems ? "with items" : "no items";
@@ -495,7 +508,11 @@ export default function LolClient({
         };
       } else {
         // DPS/Window
-        if (!Number.isFinite(simpleTimeToKill) || !Number.isFinite(sWindow) || sWindow <= 0) {
+        if (
+          !Number.isFinite(simpleTimeToKill) ||
+          !Number.isFinite(sWindow) ||
+          sWindow <= 0
+        ) {
           return { status: "—", detail: "Set a window (sec).", hint: "" };
         }
         if (simpleTimeToKill <= sWindow) {
@@ -531,7 +548,11 @@ export default function LolClient({
         hint: "",
       };
     } else {
-      if (!Number.isFinite(timeToKill) || !Number.isFinite(advWindow) || advWindow <= 0) {
+      if (
+        !Number.isFinite(timeToKill) ||
+        !Number.isFinite(advWindow) ||
+        advWindow <= 0
+      ) {
         return { status: "—", detail: "Set a window (sec).", hint: "" };
       }
       if (timeToKill <= advWindow) {
@@ -561,691 +582,849 @@ export default function LolClient({
     killLabel,
   ]);
 
+  // ----------------------------
+  // ✅ Sticky "Killable" bar numbers
+  // ----------------------------
+  const stickyModeLabel =
+    uiMode === "simple"
+      ? simpleType === "burst"
+        ? "Burst"
+        : "DPS"
+      : mode === "burst"
+      ? "Burst"
+      : "DPS";
+
+  const stickyDamage =
+    uiMode === "simple"
+      ? simpleType === "burst"
+        ? simpleBurstPost
+        : simpleWindowDamage
+      : mode === "burst"
+      ? burstPost
+      : windowDamage;
+
+  const stickyPct =
+    uiMode === "simple"
+      ? simpleType === "burst"
+        ? simpleBurstPct
+        : simpleWindowPct
+      : mode === "burst"
+      ? burstPct
+      : Number.isFinite(windowDamage) && tHP > 0
+      ? (windowDamage / tHP) * 100
+      : NaN;
+
+  // ----------------------------
+  // ✅ Top sticky Burst/DPS switch (mobile)
+  // - In Simple: controls simpleType
+  // - In Advanced: controls mode
+  // ----------------------------
+  const currentFightMode: Mode = uiMode === "simple" ? simpleType : mode;
+  const setFightMode = (m: Mode) => {
+    if (uiMode === "simple") setSimpleType(m);
+    else setMode(m);
+  };
+
+  // ----------------------------
+  // Layout wrapper
+  // - Add bottom padding so sticky bar doesn't cover content on mobile
+  // ----------------------------
   return (
-    <div
-  className={`mt-10 grid gap-6 lg:grid-cols-2 ${
-    uiMode === "simple" ? "lg:items-stretch" : "lg:items-start"
-  }`}
->
+    <div className="pb- lg:pb-0">
 
-      {/* Inputs */}
-      <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Inputs</h2>
-
-          <button
-            type="button"
-            onClick={toggleUiMode}
-            className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
-              uiMode === "advanced"
-                ? "border-neutral-500 bg-neutral-900 text-white"
-                : "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600"
-            }`}
-            title="Click to switch mode"
-          >
-            {uiMode === "simple" ? "Simple" : "Advanced"}
-          </button>
-        </div>
-
-        {/* Champion picker */}
-        <div className="mt-6">
-          <label className="text-sm text-neutral-300">Champion</label>
-
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search champion (e.g., Ahri, Yasuo, Mage)..."
-            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-          />
-
-          <select
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-            className="mt-3 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-          >
-            {filtered.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-                {c.title ? ` — ${c.title}` : ""}
-              </option>
-            ))}
-          </select>
-
-          <div className="mt-2 text-xs text-neutral-500">
-            Loaded{" "}
-            <span className="text-neutral-300 font-semibold">
-              {champions.length}
-            </span>{" "}
-            champions • Data Dragon patch{" "}
-            <span className="text-neutral-300 font-semibold">{patch}</span>
-          </div>
-
-          <div className="mt-2 text-xs text-neutral-500">
-            Showing {filtered.length} results (type to filter). Selected:{" "}
-            <span className="text-neutral-300 font-semibold">
-              {selected?.name ?? "—"}
-            </span>
-          </div>
-        </div>
-
-        {/* Level */}
-        <div className="mt-6">
-          <div className="flex items-center justify-between">
-            <label className="text-sm text-neutral-300">Level</label>
-            <span className="text-sm text-neutral-200">{lvl}</span>
-          </div>
-
-          <input
-            type="range"
-            min={1}
-            max={18}
-            value={lvl}
-            onChange={(e) => setLevel(Number(e.target.value))}
-            className="mt-3 w-full"
-          />
-
-          <div className="mt-2 grid grid-cols-3 gap-2">
-            {[1, 9, 18].map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setLevel(v)}
-                className={`rounded-xl border px-3 py-1.5 text-xs ${
-                  lvl === v
-                    ? "border-neutral-500 bg-neutral-900"
-                    : "border-neutral-800 bg-black hover:border-neutral-600"
-                }`}
-              >
-                Level {v}
-              </button>
-            ))}
-          </div>
-        </div>
-{/* Target */}
-<div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
-  <div className="flex items-center justify-between">
-    <div className="text-sm font-semibold">Target</div>
-    <div className="text-xs text-neutral-500">
-      {uiMode === "advanced"
-        ? "Choose a champion or enter custom stats."
-        : "Choose a champion to simulate a matchup."}
-    </div>
-  </div>
-
-  {/* ✅ Target Champion + Target Level (minimal layout change) */}
-  <div className="mt-3 grid gap-3 sm:grid-cols-2">
-    <div>
-      <label className="text-sm text-neutral-300">Champion:</label>
-      <select
-        value={targetChampionId}
-        onChange={(e) => {
-          const id = e.target.value;
-          setTargetChampionId(id);
-          // If user never touched target level, keep it synced
-          if (!targetLevelTouched) setTargetLevel(lvl);
-        }}
-        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+      {/* ✅ Mobile sticky header: Tabs + Burst/DPS */}
+      <div className="lg:hidden sticky top-0 z-40 border-b border-neutral-800 bg-black/80 backdrop-blur">
+  <div className="mx-auto max-w-xl px-3 py-1.5">
+    {/* Tabs */}
+    <div className="flex gap-2">
+      <button
+        type="button"
+        onClick={() => setMobileTab("inputs")}
+        className={`flex-1 rounded-lg border px-3 py-1.5 text-xs font-semibold ${
+          mobileTab === "inputs"
+            ? "border-neutral-500 bg-neutral-900 text-white"
+            : "border-neutral-800 bg-black text-neutral-300 hover:border-neutral-600"
+        }`}
       >
-        <option value="">Custom</option>
-        {champions.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-
-      {targetChampionId && (
-        <div className="mt-1 text-xs text-neutral-500">
-          Using{" "}
-          <span className="text-neutral-300 font-semibold">
-            {targetChampion?.name ?? "—"}
-          </span>{" "}
-          stats.
-        </div>
-      )}
+        Inputs
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setMobileTab("results");
+          setTimeout(() => {
+            resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 60);
+        }}
+        className={`flex-1 rounded-lg border px-3 py-1.5 text-xs font-semibold ${
+          mobileTab === "results"
+            ? "border-neutral-500 bg-neutral-900 text-white"
+            : "border-neutral-800 bg-black text-neutral-300 hover:border-neutral-600"
+        }`}
+      >
+        Results
+      </button>
     </div>
 
-    <div>
-      <label className="text-sm text-neutral-300">Target Level</label>
-      <div className="mt-2 flex items-center gap-3">
-        <input
-          type="range"
-          min={1}
-          max={18}
-          value={tLvl}
-          onChange={(e) => {
-            setTargetLevelTouched(true);
-            setTargetLevel(Number(e.target.value));
-          }}
-          className="w-full"
-        />
-        <div className="min-w-[2.5rem] text-right text-sm text-neutral-200 font-semibold">
-          {tLvl}
-        </div>
-      </div>
-
-      {!targetLevelTouched ? (
-        <div className="mt-1 text-xs text-neutral-500">Auto-synced to your level.</div>
-      ) : (
-        <button
-          type="button"
-          onClick={() => {
-            setTargetLevelTouched(false);
-            setTargetLevel(lvl);
-          }}
-          className="mt-2 rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600"
-        >
-          Sync to my level
-        </button>
-      )}
+    {/* Burst/DPS toggle (more compact + secondary) */}
+    <div className="mt-1.5 grid grid-cols-2 gap-2">
+      <button
+        type="button"
+        onClick={() => setFightMode("burst")}
+        className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold ${
+          currentFightMode === "burst"
+            ? "border-neutral-600 bg-neutral-900 text-white"
+            : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+        }`}
+      >
+        Burst
+      </button>
+      <button
+        type="button"
+        onClick={() => setFightMode("dps")}
+        className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold ${
+          currentFightMode === "dps"
+            ? "border-neutral-600 bg-neutral-900 text-white"
+            : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+        }`}
+      >
+        DPS / Window
+      </button>
     </div>
   </div>
-
-  {/* ✅ Custom target stats + EHP preview should be Advanced-only */}
-  {uiMode === "advanced" && (
-    <>
-      <div className="mt-4 grid gap-4 sm:grid-cols-3">
-        <div className="flex flex-col gap-2 sm:col-span-1">
-          <label className="text-sm text-neutral-300">Target HP</label>
-          <input
-            type="number"
-            value={targetHp}
-            onChange={(e) => {
-              onTargetManualChange();
-              setNum(setTargetHp, 1, 99999)(e.target.value);
-            }}
-            className="w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-          />
-        </div>
-
-        <div>
-          <label className="text-sm text-neutral-300">Armor</label>
-          <input
-            type="number"
-            value={targetArmor}
-            onChange={(e) => {
-              onTargetManualChange();
-              setNum(setTargetArmor, -999, 9999)(e.target.value);
-            }}
-            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-          />
-          <div className="mt-1 text-xs text-neutral-500">
-            After pen:{" "}
-            <span className="text-neutral-300 font-semibold">
-              {fmt(targetArmorAfterPen, 1)}
-            </span>{" "}
-            • mult: {Number.isFinite(physMult) ? fmt(physMult, 3) : "—"}
-          </div>
-        </div>
-
-        <div>
-          <label className="text-sm text-neutral-300">MR</label>
-          <input
-            type="number"
-            value={targetMr}
-            onChange={(e) => {
-              onTargetManualChange();
-              setNum(setTargetMr, -999, 9999)(e.target.value);
-            }}
-            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-          />
-          <div className="mt-1 text-xs text-neutral-500">
-            After pen:{" "}
-            <span className="text-neutral-300 font-semibold">
-              {fmt(targetMrAfterPen, 1)}
-            </span>{" "}
-            • mult: {Number.isFinite(magicMult) ? fmt(magicMult, 3) : "—"}
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 text-xs text-neutral-500">
-        Effective HP preview:{" "}
-        <span className="text-neutral-300 font-semibold">
-          vs Physical {fmt(ehpPhys, 0)}
-        </span>{" "}
-        •{" "}
-        <span className="text-neutral-300 font-semibold">
-          vs Magic {fmt(ehpMagic, 0)}
-        </span>
-      </div>
-    </>
-  )}
 </div>
 
 
-        {/* Items */}
-        <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+      <div
+        className={`mt-10 grid gap-6 lg:grid-cols-2 ${
+          uiMode === "simple" ? "lg:items-stretch" : "lg:items-start"
+        }`}
+      >
+        {/* Inputs */}
+        <section
+          className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 ${
+            mobileTab !== "inputs" ? "hidden lg:block" : ""
+          }`}
+        >
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold">Items</div>
-            <div className="text-xs text-neutral-500">
-              {selectedItems.length}/6
-            </div>
+            <h2 className="text-lg font-semibold">Inputs</h2>
+
+            <button
+              type="button"
+              onClick={toggleUiMode}
+              className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
+                uiMode === "advanced"
+                  ? "border-neutral-500 bg-neutral-900 text-white"
+                  : "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600"
+              }`}
+              title="Click to switch mode"
+            >
+              {uiMode === "simple" ? "Simple" : "Advanced"}
+            </button>
           </div>
 
-          <div className="relative mt-3">
-            <input
-              value={itemQuery}
-              onChange={(e) => {
-                setItemQuery(e.target.value);
-                setItemDropdownOpen(true);
-              }}
-              onFocus={() => setItemDropdownOpen(true)}
-              onBlur={() => setTimeout(() => setItemDropdownOpen(false), 120)}
-              placeholder="Search items (type 2+ letters)..."
-              className="w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-            />
+          {/* ✅ Mobile: collapsible Selected champion (inside Inputs) */}
+          <div className="lg:hidden mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+            <button
+              type="button"
+              onClick={() => setShowChampMobile((v) => !v)}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="text-sm font-semibold">
+                {selected?.name ?? "—"} • Lvl {lvl}
+              </div>
+              <div className="text-xs text-neutral-500">
+                {showChampMobile ? "Hide" : "Show"}
+              </div>
+            </button>
 
-            {itemDropdownOpen && itemQuery.trim().length >= 2 && (
-              <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-neutral-800 bg-black shadow-xl">
-                <div className="max-h-64 overflow-auto">
-                  {itemResults.length === 0 ? (
-                    <div className="px-3 py-2 text-xs text-neutral-500">
-                      No matches. Try a different search.
-                    </div>
-                  ) : (
-                    itemResults.map((it) => (
-                      <button
-                        key={it.id}
-                        type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => addItem(it.id)}
-                        className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-900"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-neutral-200">{it.name}</span>
-                          <span className="text-xs text-neutral-500">
-                            {it.gold ? `${it.gold}g` : ""}
-                          </span>
-                        </div>
-                      </button>
-                    ))
-                  )}
+            <div className="mt-2 text-xs text-neutral-400">
+              HP {fmt(champHp, 0)} • Armor {fmt(champArmor, 0)} • MR{" "}
+              {fmt(champMr, 0)}
+            </div>
+
+            {showChampMobile && (
+              <div className="mt-3 space-y-3">
+                <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+                  <span className="text-sm text-neutral-300">Title</span>
+                  <span className="font-semibold text-neutral-200">
+                    {selected?.title ?? "—"}
+                  </span>
+                </div>
+
+                <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+                  <span className="text-sm text-neutral-300">Resource</span>
+                  <span className="font-semibold text-neutral-200">
+                    {(selected as any)?.partype ?? "—"}
+                  </span>
                 </div>
               </div>
             )}
           </div>
 
-          {selectedItems.length > 0 && (
-            <>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {selectedItems.map((it) => (
-                  <button
-                    key={it.id}
-                    type="button"
-                    onClick={() => removeItem(it.id)}
-                    className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600"
-                    title="Click to remove"
-                  >
-                    {it.name} ✕
-                  </button>
-                ))}
-              </div>
+          {/* Champion picker */}
+          <div className="mt-6">
+            <label className="text-sm text-neutral-300">Champion</label>
 
-              <div className="mt-4 rounded-2xl border border-neutral-800 bg-black p-4">
-                <div className="text-sm font-semibold">Item totals (stats)</div>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search champion (e.g., Ahri, Yasuo, Mage)..."
+              className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+            />
 
-                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">HP</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{totals.hp}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">AD</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{totals.ad}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">AP</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{totals.ap}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">Armor</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{totals.armor}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">MR</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{totals.mr}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">AS</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{fmt(totals.asPct, 0)}%
-                    </span>
-                  </div>
+            <select
+              value={selectedId}
+              onChange={(e) => setSelectedId(e.target.value)}
+              className="mt-3 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+            >
+              {filtered.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                  {c.title ? ` — ${c.title}` : ""}
+                </option>
+              ))}
+            </select>
 
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">Crit</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{fmt(totals.critChancePct, 0)}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">Lethality</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{fmt(totals.lethality, 0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">% Armor Pen</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{fmt(totals.armorPenPct, 0)}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">Magic Pen</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{fmt(totals.magicPenFlat, 0)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-neutral-400">% Magic Pen</span>
-                    <span className="text-neutral-200 font-semibold">
-                      +{fmt(totals.magicPenPct, 0)}%
-                    </span>
-                  </div>
-                </div>
+            <div className="mt-2 text-xs text-neutral-500">
+              Loaded{" "}
+              <span className="text-neutral-300 font-semibold">
+                {champions.length}
+              </span>{" "}
+              champions • Data Dragon patch{" "}
+              <span className="text-neutral-300 font-semibold">{patch}</span>
+            </div>
 
-                <div className="mt-3 text-xs text-neutral-500">
-                  Stats are applied. True “unique passives” require the knobs
-                  below (we’ll expand later).
-                </div>
-              </div>
-            </>
-          )}
-        </div>
+            <div className="mt-2 text-xs text-neutral-500">
+              Showing {filtered.length} results (type to filter). Selected:{" "}
+              <span className="text-neutral-300 font-semibold">
+                {selected?.name ?? "—"}
+              </span>
+            </div>
+          </div>
 
-        {/* ✅ Advanced-only passives */}
-        {uiMode === "advanced" && (
-          <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+          {/* Level */}
+          <div className="mt-6">
             <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold">Item passives & on-hit</div>
-              <div className="text-xs text-neutral-500">Advanced</div>
+              <label className="text-sm text-neutral-300">Level</label>
+              <span className="text-sm text-neutral-200">{lvl}</span>
             </div>
 
-            <div className="mt-3 grid gap-3 sm:grid-cols-3">
-              <div>
-                <label className="text-sm text-neutral-300">
-                  On-hit Magic (flat)
-                </label>
-                <input
-                  type="number"
-                  value={onHitFlatMagic}
-                  onChange={(e) =>
-                    setNum(setOnHitFlatMagic, 0, 9999)(e.target.value)
-                  }
-                  className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                />
-                <div className="mt-1 text-xs text-neutral-500">
-                  Applied per auto (mitigated by MR).
-                </div>
-              </div>
+            <input
+              type="range"
+              min={1}
+              max={18}
+              value={lvl}
+              onChange={(e) => setLevel(Number(e.target.value))}
+              className="mt-3 w-full"
+            />
 
-              <div>
-                <label className="text-sm text-neutral-300">
-                  % Target HP On-hit (phys)
-                </label>
-                <input
-                  type="number"
-                  value={onHitPctTargetMaxHpPhys}
-                  onChange={(e) =>
-                    setNum(setOnHitPctTargetMaxHpPhys, 0, 50)(e.target.value)
-                  }
-                  className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                />
-                <div className="mt-1 text-xs text-neutral-500">
-                  Example: 3 = 3% max HP per hit (mitigated by armor).
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm text-neutral-300">
-                  Crit Damage Mult
-                </label>
-                <input
-                  type="number"
-                  step="0.05"
-                  value={critDamageMult}
-                  onChange={(e) =>
-                    setNum(setCritDamageMult, 1.0, 5.0)(e.target.value)
-                  }
-                  className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                />
-                <div className="mt-1 text-xs text-neutral-500">
-                  Default is 2.00 (expected crit).
-                </div>
-              </div>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {[1, 9, 18].map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setLevel(v)}
+                  className={`rounded-xl border px-3 py-1.5 text-xs ${
+                    lvl === v
+                      ? "border-neutral-500 bg-neutral-900"
+                      : "border-neutral-800 bg-black hover:border-neutral-600"
+                  }`}
+                >
+                  Level {v}
+                </button>
+              ))}
             </div>
           </div>
-        )}
 
-     {/* SIMPLE CONTROLS */}
-{uiMode === "simple" && (
-  <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
-    <div className="flex items-center justify-between">
-      <div className="text-sm font-semibold">Quick Mode</div>
-      <div className="text-xs text-neutral-500">
-        Autos baseline + stats + pen + crit.
-      </div>
-    </div>
+          {/* Target */}
+          <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
+  <div className="text-sm font-semibold">Target</div>
 
-    <div className="mt-3 grid grid-cols-2 gap-2">
-      <button
-        type="button"
-        onClick={() => setSimpleType("burst")}
-        className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
-          simpleType === "burst"
-            ? "border-neutral-500 bg-neutral-900"
-            : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-        }`}
-      >
-        Burst (autos)
-      </button>
-      <button
-        type="button"
-        onClick={() => setSimpleType("dps")}
-        className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
-          simpleType === "dps"
-            ? "border-neutral-500 bg-neutral-900"
-            : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-        }`}
-      >
-        DPS (autos)
-      </button>
-    </div>
-
-    {/* ✅ Fixed-height slot so Burst/DPS doesn't change card height */}
-    <div className="mt-4 min-h-[88px]">
-      {simpleType === "burst" ? (
-        <div>
-          <label className="text-sm text-neutral-300">Autos in combo</label>
-          <input
-            type="number"
-            value={simpleAAs}
-            onChange={(e) => setNum(setSimpleAAs, 0, 50)(e.target.value)}
-            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-          />
-          <div className="mt-1 text-xs text-neutral-500">
-            Number of basic attacks you expect to land during the trade.
-          </div>
-        </div>
-      ) : (
-        <div>
-          <label className="text-sm text-neutral-300">Window (sec)</label>
-          <input
-            type="number"
-            value={simpleWindow}
-            onChange={(e) => setNum(setSimpleWindow, 0, 120)(e.target.value)}
-            className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-          />
-          {/* keep a line here to preserve spacing like the burst hint */}
-          <div className="mt-1 text-xs text-neutral-500">&nbsp;</div>
-        </div>
-      )}
-    </div>
+  <div className="text-[11px] leading-snug text-neutral-500 sm:text-xs sm:leading-normal sm:text-neutral-500">
+    {uiMode === "advanced"
+      ? "Choose a champion or enter custom stats."
+      : "Choose a champion to simulate a matchup."}
   </div>
-)}
-
-<div className="mt-2 text-xs text-neutral-500">
-  <span className="font-semibold">Burst (autos):</span> Total damage from a small
-  number of autos.
-  <br />
-  <span className="font-semibold">DPS (autos):</span> Damage if you auto-attack
-  continuously for a set time.
 </div>
 
-        {/* ADVANCED CONTROLS */}
-        {uiMode === "advanced" && (
-          <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
-            <div className="text-sm font-semibold">Mode</div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setMode("burst")}
-                className={`rounded-xl border px-3 py-2 text-center text-sm font-semibold ${
-                  mode === "burst"
-                    ? "border-neutral-500 bg-neutral-900"
-                    : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-                }`}
-              >
-                Burst (Combo)
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("dps")}
-                className={`rounded-xl border px-3 py-2 text-center text-sm font-semibold ${
-                  mode === "dps"
-                    ? "border-neutral-500 bg-neutral-900"
-                    : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-                }`}
-              >
-                DPS / Window
-              </button>
-            </div>
-            <div className="mt-3 text-xs text-neutral-500">
-              Advanced = manual damage buckets. Pen applied automatically. Crit
-              expectation used in AA helpers.
-            </div>
-          </div>
-        )}
-      </section>
+            {/* ✅ Target Champion + Target Level */}
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="text-sm text-neutral-300">Champion:</label>
+                <select
+                  value={targetChampionId}
+                  onChange={(e) => {
+                    const id = e.target.value;
+                    setTargetChampionId(id);
+                    if (!targetLevelTouched) setTargetLevel(lvl);
+                  }}
+                  className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                >
+                  <option value="">Custom</option>
+                  {champions.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
 
-      {/* Right column */}
-      <section
-  className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 flex flex-col ${
-    uiMode === "simple" ? "h-full" : "self-start"
-  }`}
->
+                {targetChampionId && (
+                  <div className="mt-1 text-xs text-neutral-500">
+                    Using{" "}
+                    <span className="text-neutral-300 font-semibold">
+                      {targetChampion?.name ?? "—"}
+                    </span>{" "}
+                    stats.
+                  </div>
+                )}
+              </div>
 
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Selected champion</h2>
-        </div>
+              <div>
+                <label className="text-sm text-neutral-300">Target Level</label>
+                <div className="mt-2 flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={1}
+                    max={18}
+                    value={tLvl}
+                    onChange={(e) => {
+                      setTargetLevelTouched(true);
+                      setTargetLevel(Number(e.target.value));
+                    }}
+                    className="w-full"
+                  />
+                  <div className="min-w-[2.5rem] text-right text-sm text-neutral-200 font-semibold">
+                    {tLvl}
+                  </div>
+                </div>
 
-        <div className="mt-6 space-y-3">
-          <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-neutral-300">Name</span>
-            <span className="font-semibold">{selected?.name ?? "—"}</span>
-          </div>
-
-          <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-neutral-300">Title</span>
-            <span className="font-semibold text-neutral-200">
-              {selected?.title ?? "—"}
-            </span>
-          </div>
-
-          <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-neutral-300">Level</span>
-            <span className="font-semibold text-neutral-200">{lvl}</span>
-          </div>
-
-          <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-neutral-300">HP (at level)</span>
-            <span className="font-semibold text-neutral-200">
-              {fmt(champHp, 1)}
-            </span>
-          </div>
-
-          <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-neutral-300">Armor (at level)</span>
-            <span className="font-semibold text-neutral-200">
-              {fmt(champArmor, 1)}
-            </span>
-          </div>
-
-          <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-neutral-300">MR (at level)</span>
-            <span className="font-semibold text-neutral-200">{fmt(champMr, 1)}</span>
-          </div>
-
-          <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-neutral-300">Resource</span>
-            <span className="font-semibold text-neutral-200">
-              {selected?.partype ?? "—"}
-            </span>
-          </div>
-        </div>
-
-     {/* Results */}
-<div
-  className={`mt-13.5 rounded-2xl border border-neutral-800 bg-black p-3 ${
-    uiMode === "simple" ? "min-h-[240px]" : ""
-  }`}
->
-
-
-
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold">Results</div>
-            <div className="text-xs text-neutral-500">
-              {uiMode === "simple" ? (
-                <>
-                  Mode:{" "}
-                  <span className="text-neutral-300 font-semibold">
-                    {simpleType === "burst" ? "Burst" : "DPS/Window"}
-                  </span>
-                </>
-              ) : (
-                <>
-                  Mode:{" "}
-                  <span className="text-neutral-300 font-semibold">
-                    {mode === "burst" ? "Burst" : "DPS/Window"}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* ✅ Kill Check (est.) */}
-          <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div className="text-xs font-semibold text-neutral-300">Kill Check (est.)</div>
-              <div className="text-[11px] text-neutral-500">
-                {hasItems ? "With items" : "No items"}
+                {!targetLevelTouched ? (
+                  <div className="mt-1 text-xs text-neutral-500">
+                    Auto-synced to your level.
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTargetLevelTouched(false);
+                      setTargetLevel(lvl);
+                    }}
+                    className="mt-2 rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600"
+                  >
+                    Sync to my level
+                  </button>
+                )}
               </div>
             </div>
-            <div className="mt-2 flex items-center justify-between">
-              <span className="text-sm text-neutral-300">Result</span>
-              <span className="font-semibold text-neutral-200">{killCheck.status}</span>
+
+            {/* ✅ Advanced-only custom target stats */}
+            {uiMode === "advanced" && (
+              <>
+                <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                  <div className="flex flex-col gap-2 sm:col-span-1">
+                    <label className="text-sm text-neutral-300">Target HP</label>
+                    <input
+                      type="number"
+                      value={targetHp}
+                      onChange={(e) => {
+                        onTargetManualChange();
+                        setNum(setTargetHp, 1, 99999)(e.target.value);
+                      }}
+                      className="w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-neutral-300">Armor</label>
+                    <input
+                      type="number"
+                      value={targetArmor}
+                      onChange={(e) => {
+                        onTargetManualChange();
+                        setNum(setTargetArmor, -999, 9999)(e.target.value);
+                      }}
+                      className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                    />
+                    <div className="mt-1 text-xs text-neutral-500">
+                      After pen:{" "}
+                      <span className="text-neutral-300 font-semibold">
+                        {fmt(targetArmorAfterPen, 1)}
+                      </span>{" "}
+                      • mult: {Number.isFinite(physMult) ? fmt(physMult, 3) : "—"}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-neutral-300">MR</label>
+                    <input
+                      type="number"
+                      value={targetMr}
+                      onChange={(e) => {
+                        onTargetManualChange();
+                        setNum(setTargetMr, -999, 9999)(e.target.value);
+                      }}
+                      className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                    />
+                    <div className="mt-1 text-xs text-neutral-500">
+                      After pen:{" "}
+                      <span className="text-neutral-300 font-semibold">
+                        {fmt(targetMrAfterPen, 1)}
+                      </span>{" "}
+                      • mult: {Number.isFinite(magicMult) ? fmt(magicMult, 3) : "—"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 text-xs text-neutral-500">
+                  Effective HP preview:{" "}
+                  <span className="text-neutral-300 font-semibold">
+                    vs Physical {fmt(ehpPhys, 0)}
+                  </span>{" "}
+                  •{" "}
+                  <span className="text-neutral-300 font-semibold">
+                    vs Magic {fmt(ehpMagic, 0)}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Items */}
+          <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-semibold">Items</div>
+              <div className="text-xs text-neutral-500">
+                {selectedItems.length}/6
+              </div>
             </div>
-            <div className="mt-1 text-xs text-neutral-500">{killCheck.detail}</div>
-            <div className="mt-2 text-[11px] text-neutral-500">
-              Based on your damage vs target HP only (no enemy damage/healing/shields/CC).
+
+            <div className="relative mt-3">
+              <input
+                value={itemQuery}
+                onChange={(e) => {
+                  setItemQuery(e.target.value);
+                  setItemDropdownOpen(true);
+                }}
+                onFocus={() => setItemDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setItemDropdownOpen(false), 120)}
+                placeholder="Search items (type 2+ letters)..."
+                className="w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+              />
+
+              {itemDropdownOpen && itemQuery.trim().length >= 2 && (
+                <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-neutral-800 bg-black shadow-xl">
+                  <div className="max-h-64 overflow-auto">
+                    {itemResults.length === 0 ? (
+                      <div className="px-3 py-2 text-xs text-neutral-500">
+                        No matches. Try a different search.
+                      </div>
+                    ) : (
+                      itemResults.map((it) => (
+                        <button
+                          key={it.id}
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => addItem(it.id)}
+                          className="w-full px-3 py-2 text-left text-sm hover:bg-neutral-900"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-neutral-200">{it.name}</span>
+                            <span className="text-xs text-neutral-500">
+                              {it.gold ? `${it.gold}g` : ""}
+                            </span>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {selectedItems.length > 0 && (
+              <>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {selectedItems.map((it) => (
+                    <button
+                      key={it.id}
+                      type="button"
+                      onClick={() => removeItem(it.id)}
+                      className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600"
+                      title="Click to remove"
+                    >
+                      {it.name} ✕
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-neutral-800 bg-black p-4">
+                  <div className="text-sm font-semibold">Item totals (stats)</div>
+
+                  <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">HP</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{totals.hp}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">AD</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{totals.ad}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">AP</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{totals.ap}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">Armor</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{totals.armor}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">MR</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{totals.mr}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">AS</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{fmt(totals.asPct, 0)}%
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">Crit</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{fmt(totals.critChancePct, 0)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">Lethality</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{fmt(totals.lethality, 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">% Armor Pen</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{fmt(totals.armorPenPct, 0)}%
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">Magic Pen</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{fmt(totals.magicPenFlat, 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-neutral-400">% Magic Pen</span>
+                      <span className="text-neutral-200 font-semibold">
+                        +{fmt(totals.magicPenPct, 0)}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 text-xs text-neutral-500">
+                    Stats are applied. True “unique passives” require the knobs
+                    below (we’ll expand later).
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* ✅ Advanced-only passives */}
+          {uiMode === "advanced" && (
+            <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold">Item passives & on-hit</div>
+                <div className="text-xs text-neutral-500">Advanced</div>
+              </div>
+
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                <div>
+                  <label className="text-sm text-neutral-300">
+                    On-hit Magic (flat)
+                  </label>
+                  <input
+                    type="number"
+                    value={onHitFlatMagic}
+                    onChange={(e) =>
+                      setNum(setOnHitFlatMagic, 0, 9999)(e.target.value)
+                    }
+                    className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                  />
+                  <div className="mt-1 text-xs text-neutral-500">
+                    Applied per auto (mitigated by MR).
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm text-neutral-300">
+                    % Target HP On-hit (phys)
+                  </label>
+                  <input
+                    type="number"
+                    value={onHitPctTargetMaxHpPhys}
+                    onChange={(e) =>
+                      setNum(setOnHitPctTargetMaxHpPhys, 0, 50)(e.target.value)
+                    }
+                    className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                  />
+                  <div className="mt-1 text-xs text-neutral-500">
+                    Example: 3 = 3% max HP per hit (mitigated by armor).
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm text-neutral-300">
+                    Crit Damage Mult
+                  </label>
+                  <input
+                    type="number"
+                    step="0.05"
+                    value={critDamageMult}
+                    onChange={(e) =>
+                      setNum(setCritDamageMult, 1.0, 5.0)(e.target.value)
+                    }
+                    className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                  />
+                  <div className="mt-1 text-xs text-neutral-500">
+                    Default is 2.00 (expected crit).
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SIMPLE CONTROLS */}
+          {uiMode === "simple" && (
+            <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold">Quick Mode</div>
+                <div className="text-xs text-neutral-500">
+                  Autos baseline + stats + pen + crit.
+                </div>
+              </div>
+
+              {/* We keep the internal toggle too (desktop + redundancy), but on mobile the header already has it. */}
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSimpleType("burst")}
+                  className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+                    simpleType === "burst"
+                      ? "border-neutral-500 bg-neutral-900"
+                      : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+                  }`}
+                >
+                  Burst (autos)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSimpleType("dps")}
+                  className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+                    simpleType === "dps"
+                      ? "border-neutral-500 bg-neutral-900"
+                      : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+                  }`}
+                >
+                  DPS (autos)
+                </button>
+              </div>
+
+              {/* ✅ Fixed-height slot so Burst/DPS doesn't change card height */}
+              <div className="mt-4 min-h-[88px]">
+                {simpleType === "burst" ? (
+                  <div>
+                    <label className="text-sm text-neutral-300">Autos in combo</label>
+                    <input
+                      type="number"
+                      value={simpleAAs}
+                      onChange={(e) => setNum(setSimpleAAs, 0, 50)(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                    />
+                    <div className="mt-1 text-xs text-neutral-500">
+                      Number of basic attacks you expect to land during the trade.
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="text-sm text-neutral-300">Window (sec)</label>
+                    <input
+                      type="number"
+                      value={simpleWindow}
+                      onChange={(e) => setNum(setSimpleWindow, 0, 120)(e.target.value)}
+                      className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                    />
+                    <div className="mt-1 text-xs text-neutral-500">&nbsp;</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-2 text-xs text-neutral-500">
+            <span className="font-semibold">Burst (autos):</span> Total damage from a small
+            number of autos.
+            <br />
+            <span className="font-semibold">DPS (autos):</span> Damage if you auto-attack
+            continuously for a set time.
+          </div>
+
+          {/* ADVANCED CONTROLS */}
+          {uiMode === "advanced" && (
+            <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+              <div className="text-sm font-semibold">Mode</div>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setMode("burst")}
+                  className={`rounded-xl border px-3 py-2 text-center text-sm font-semibold ${
+                    mode === "burst"
+                      ? "border-neutral-500 bg-neutral-900"
+                      : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+                  }`}
+                >
+                  Burst (Combo)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("dps")}
+                  className={`rounded-xl border px-3 py-2 text-center text-sm font-semibold ${
+                    mode === "dps"
+                      ? "border-neutral-500 bg-neutral-900"
+                      : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+                  }`}
+                >
+                  DPS / Window
+                </button>
+              </div>
+              <div className="mt-3 text-xs text-neutral-500">
+                Advanced = manual damage buckets. Pen applied automatically. Crit
+                expectation used in AA helpers.
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Right column (desktop) + Results tab (mobile) */}
+        <section
+          className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 flex flex-col ${
+            uiMode === "simple" ? "h-full" : "self-start"
+          } ${mobileTab !== "results" ? "hidden lg:flex" : ""}`}
+        >
+          {/* Desktop-only Selected champion (kept unchanged) */}
+          <div className="hidden lg:flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Selected champion</h2>
+          </div>
+
+          <div className="hidden lg:block mt-6 space-y-3">
+            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-neutral-300">Name</span>
+              <span className="font-semibold">{selected?.name ?? "—"}</span>
+            </div>
+
+            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-neutral-300">Title</span>
+              <span className="font-semibold text-neutral-200">
+                {selected?.title ?? "—"}
+              </span>
+            </div>
+
+            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-neutral-300">Level</span>
+              <span className="font-semibold text-neutral-200">{lvl}</span>
+            </div>
+
+            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-neutral-300">HP (at level)</span>
+              <span className="font-semibold text-neutral-200">
+                {fmt(champHp, 1)}
+              </span>
+            </div>
+
+            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-neutral-300">Armor (at level)</span>
+              <span className="font-semibold text-neutral-200">
+                {fmt(champArmor, 1)}
+              </span>
+            </div>
+
+            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-neutral-300">MR (at level)</span>
+              <span className="font-semibold text-neutral-200">
+                {fmt(champMr, 1)}
+              </span>
+            </div>
+
+            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-neutral-300">Resource</span>
+              <span className="font-semibold text-neutral-200">
+                {(selected as any)?.partype ?? "—"}
+              </span>
             </div>
           </div>
 
-          {uiMode === "advanced" && (
-            <>
-              {/* Effective stats */}
+          {/* Results */}
+          <div
+            ref={resultsRef}
+            className={`mt-6 rounded-2xl border border-neutral-800 bg-black p-3 ${
+              uiMode === "simple" ? "min-h-[240px]" : ""
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-semibold">Results</div>
+              <div className="text-xs text-neutral-500">
+                {uiMode === "simple" ? (
+                  <>
+                    Mode:{" "}
+                    <span className="text-neutral-300 font-semibold">
+                      {simpleType === "burst" ? "Burst" : "DPS/Window"}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    Mode:{" "}
+                    <span className="text-neutral-300 font-semibold">
+                      {mode === "burst" ? "Burst" : "DPS/Window"}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* ✅ Kill Check (est.) */}
+            <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-4 py-3">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-semibold text-neutral-300">
+                  Kill Check (est.)
+                </div>
+                <div className="text-[11px] text-neutral-500">
+                  {hasItems ? "With items" : "No items"}
+                </div>
+              </div>
+              <div className="mt-2 flex items-center justify-between">
+                <span className="text-sm text-neutral-300">Result</span>
+                <span className="font-semibold text-neutral-200">
+                  {killCheck.status}
+                </span>
+              </div>
+              <div className="mt-1 text-xs text-neutral-500">{killCheck.detail}</div>
+              <div className="mt-2 text-[11px] text-neutral-500">
+                Based on your damage vs target HP only (no enemy damage/healing/shields/CC).
+              </div>
+            </div>
+
+            {uiMode === "advanced" && (
               <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-3 py-3">
                 <div className="text-xs font-semibold text-neutral-300">
                   Effective stats (champ + items)
@@ -1254,19 +1433,27 @@ export default function LolClient({
                 <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                   <div className="flex justify-between">
                     <span className="text-neutral-500">HP</span>
-                    <span className="text-neutral-200 font-semibold">{fmt(effHp, 0)}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      {fmt(effHp, 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">AD</span>
-                    <span className="text-neutral-200 font-semibold">{fmt(effAd, 0)}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      {fmt(effAd, 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">AP</span>
-                    <span className="text-neutral-200 font-semibold">{fmt(effAp, 0)}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      {fmt(effAp, 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">AS</span>
-                    <span className="text-neutral-200 font-semibold">{fmt(effAs, 3)}</span>
+                    <span className="text-neutral-200 font-semibold">
+                      {fmt(effAs, 3)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Crit</span>
@@ -1283,263 +1470,261 @@ export default function LolClient({
                 </div>
 
                 <div className="mt-2 text-[11px] text-neutral-500">
-                  Resists include your pen: Armor→{fmt(targetArmorAfterPen, 1)}, MR→{fmt(targetMrAfterPen, 1)}
+                  Resists include your pen: Armor→{fmt(targetArmorAfterPen, 1)}, MR→
+                  {fmt(targetMrAfterPen, 1)}
                 </div>
               </div>
-            </>
-          )}
+            )}
 
-          {/* SIMPLE RESULTS */}
-          {uiMode === "simple" ? (
-            <>
-              {simpleType === "burst" ? (
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                    <span className="text-sm text-neutral-300">
-                      Damage (autos)
-                    </span>
-                    <span className="font-semibold text-neutral-200">
-                      {fmt(simpleBurstPost, 0)}
-                    </span>
-                  </div>
-                  <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                    <span className="text-sm text-neutral-300">% of Target HP</span>
-                    <span className="font-semibold text-neutral-200">
-                      {Number.isFinite(simpleBurstPct)
-                        ? `${fmt(simpleBurstPct, 1)}%`
-                        : "—"}
-                    </span>
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                    <span className="text-sm text-neutral-300">
-                      Damage (autos, window)
-                    </span>
-                    <span className="font-semibold text-neutral-200">
-                      {fmt(simpleWindowDamage, 0)}
-                    </span>
-                  </div>
-                  <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                    <span className="text-sm text-neutral-300">
-                      Time to kill (est.)
-                    </span>
-                    <span className="font-semibold text-neutral-200">
-                      {Number.isFinite(simpleTimeToKill)
-                        ? `${fmt(simpleTimeToKill, 2)}s`
-                        : "—"}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-3 text-xs text-neutral-500">
-                Simple mode is autos-baseline (stats + pen + expected crit).
-                Abilities come later.
-              </div>
-            </>
-          ) : (
-            <>
-              {/* ADVANCED RESULTS */}
-              {mode === "burst" ? (
-                <>
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <div className="text-xs text-neutral-500">
-                      One AA (post-mitigation):{" "}
-                      <span className="text-neutral-300 font-semibold">
-                        {Number.isFinite(oneAutoPost) ? fmt(oneAutoPost, 0) : "—"}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={addOneAutoToBurst}
-                      disabled={!Number.isFinite(oneAutoRaw)}
-                      className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
-                    >
-                      Add 1 AA
-                    </button>
-                  </div>
-
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    <div>
-                      <label className="text-sm text-neutral-300">Raw Physical</label>
-                      <input
-                        type="number"
-                        value={burstPhysRaw}
-                        onChange={(e) =>
-                          setNum(setBurstPhysRaw, 0, 999999)(e.target.value)
-                        }
-                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                      />
-                      <div className="mt-1 text-xs text-neutral-500">
-                        After armor:{" "}
-                        <span className="text-neutral-300 font-semibold">
-                          {Number.isFinite(physMult)
-                            ? fmt(num0(burstPhysRaw) * physMult, 0)
-                            : "—"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm text-neutral-300">Raw Magic</label>
-                      <input
-                        type="number"
-                        value={burstMagicRaw}
-                        onChange={(e) =>
-                          setNum(setBurstMagicRaw, 0, 999999)(e.target.value)
-                        }
-                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                      />
-                      <div className="mt-1 text-xs text-neutral-500">
-                        After MR:{" "}
-                        <span className="text-neutral-300 font-semibold">
-                          {Number.isFinite(magicMult)
-                            ? fmt(num0(burstMagicRaw) * magicMult, 0)
-                            : "—"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="text-sm text-neutral-300">True Damage</label>
-                      <input
-                        type="number"
-                        value={burstTrueRaw}
-                        onChange={(e) =>
-                          setNum(setBurstTrueRaw, 0, 999999)(e.target.value)
-                        }
-                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                      />
-                      <div className="mt-1 text-xs text-neutral-500">
-                        Not reduced by resists
-                      </div>
-                    </div>
-                  </div>
-
+            {/* SIMPLE RESULTS */}
+            {uiMode === "simple" ? (
+              <>
+                {simpleType === "burst" ? (
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                      <span className="text-sm text-neutral-300">
-                        Total (post-mitigation)
-                      </span>
+                      <span className="text-sm text-neutral-300">Damage (autos)</span>
                       <span className="font-semibold text-neutral-200">
-                        {fmt(burstPost, 0)}
+                        {fmt(simpleBurstPost, 0)}
                       </span>
                     </div>
-
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
                       <span className="text-sm text-neutral-300">% of Target HP</span>
                       <span className="font-semibold text-neutral-200">
-                        {Number.isFinite(burstPct) ? `${fmt(burstPct, 1)}%` : "—"}
+                        {Number.isFinite(simpleBurstPct) ? `${fmt(simpleBurstPct, 1)}%` : "—"}
                       </span>
                     </div>
                   </div>
-                </>
-              ) : (
-                <>
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <div className="text-xs text-neutral-500">
-                      Expected AA DPS (raw):{" "}
-                      <span className="text-neutral-300 font-semibold">
-                        {Number.isFinite(inferredAaDps) ? fmt(inferredAaDps, 1) : "—"}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={useAaDpsAsPhys}
-                      disabled={!Number.isFinite(inferredAaDps)}
-                      className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
-                    >
-                      Use AA DPS
-                    </button>
-                  </div>
-
-                  <div className="mt-4 grid gap-3 sm:grid-cols-4">
-                    <div>
-                      <label className="text-sm text-neutral-300">Phys DPS (raw)</label>
-                      <input
-                        type="number"
-                        value={dpsPhysRaw}
-                        onChange={(e) =>
-                          setNum(setDpsPhysRaw, 0, 999999)(e.target.value)
-                        }
-                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm text-neutral-300">Magic DPS (raw)</label>
-                      <input
-                        type="number"
-                        value={dpsMagicRaw}
-                        onChange={(e) =>
-                          setNum(setDpsMagicRaw, 0, 999999)(e.target.value)
-                        }
-                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm text-neutral-300">True DPS</label>
-                      <input
-                        type="number"
-                        value={dpsTrueRaw}
-                        onChange={(e) =>
-                          setNum(setDpsTrueRaw, 0, 999999)(e.target.value)
-                        }
-                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm text-neutral-300">Window (sec)</label>
-                      <input
-                        type="number"
-                        value={windowSec}
-                        onChange={(e) =>
-                          setNum(setWindowSec, 0, 120)(e.target.value)
-                        }
-                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-3 text-xs text-neutral-500">
-                    Post-mitigation DPS:{" "}
-                    <span className="text-neutral-300 font-semibold">{fmt(dpsPost, 1)}</span>
-                  </div>
-
+                ) : (
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                      <span className="text-sm text-neutral-300">
-                        Damage (autos, window)
-                      </span>
+                      <span className="text-sm text-neutral-300">Damage (autos, window)</span>
                       <span className="font-semibold text-neutral-200">
-                        {fmt(windowDamage, 0)}
+                        {fmt(simpleWindowDamage, 0)}
                       </span>
                     </div>
-
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                      <span className="text-sm text-neutral-300">
-                        Time to kill (est.)
-                      </span>
+                      <span className="text-sm text-neutral-300">Time to kill (est.)</span>
                       <span className="font-semibold text-neutral-200">
-                        {Number.isFinite(timeToKill) ? `${fmt(timeToKill, 2)}s` : "—"}
+                        {Number.isFinite(simpleTimeToKill) ? `${fmt(simpleTimeToKill, 2)}s` : "—"}
                       </span>
                     </div>
                   </div>
-                </>
-              )}
-            </>
-          )}
+                )}
 
-          {/* Small legend */}
-          <div className="mt-4 text-[11px] leading-relaxed text-neutral-500">
-            <span className="font-semibold text-neutral-400">Legend:</span>{" "}
-            HP = Health, AD = Attack Damage, AP = Ability Power, AS = Attack Speed,
-            MR = Magic Resist, AA = Auto Attack, DPS = Damage per Second, TTK = Time
-            to Kill, Pen = Penetration (Armor/MR)
+                <div className="mt-3 text-xs text-neutral-500">
+                  Simple mode is autos-baseline (stats + pen + expected crit). Abilities come later.
+                </div>
+              </>
+            ) : (
+              <>
+                {/* ADVANCED RESULTS */}
+                {mode === "burst" ? (
+                  <>
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      <div className="text-xs text-neutral-500">
+                        One AA (post-mitigation):{" "}
+                        <span className="text-neutral-300 font-semibold">
+                          {Number.isFinite(oneAutoPost) ? fmt(oneAutoPost, 0) : "—"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={addOneAutoToBurst}
+                        disabled={!Number.isFinite(oneAutoRaw)}
+                        className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
+                      >
+                        Add 1 AA
+                      </button>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                      <div>
+                        <label className="text-sm text-neutral-300">Raw Physical</label>
+                        <input
+                          type="number"
+                          value={burstPhysRaw}
+                          onChange={(e) => setNum(setBurstPhysRaw, 0, 999999)(e.target.value)}
+                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                        />
+                        <div className="mt-1 text-xs text-neutral-500">
+                          After armor:{" "}
+                          <span className="text-neutral-300 font-semibold">
+                            {Number.isFinite(physMult) ? fmt(num0(burstPhysRaw) * physMult, 0) : "—"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-sm text-neutral-300">Raw Magic</label>
+                        <input
+                          type="number"
+                          value={burstMagicRaw}
+                          onChange={(e) => setNum(setBurstMagicRaw, 0, 999999)(e.target.value)}
+                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                        />
+                        <div className="mt-1 text-xs text-neutral-500">
+                          After MR:{" "}
+                          <span className="text-neutral-300 font-semibold">
+                            {Number.isFinite(magicMult) ? fmt(num0(burstMagicRaw) * magicMult, 0) : "—"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-sm text-neutral-300">True Damage</label>
+                        <input
+                          type="number"
+                          value={burstTrueRaw}
+                          onChange={(e) => setNum(setBurstTrueRaw, 0, 999999)(e.target.value)}
+                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                        />
+                        <div className="mt-1 text-xs text-neutral-500">Not reduced by resists</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+                        <span className="text-sm text-neutral-300">Total (post-mitigation)</span>
+                        <span className="font-semibold text-neutral-200">{fmt(burstPost, 0)}</span>
+                      </div>
+
+                      <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+                        <span className="text-sm text-neutral-300">% of Target HP</span>
+                        <span className="font-semibold text-neutral-200">
+                          {Number.isFinite(burstPct) ? `${fmt(burstPct, 1)}%` : "—"}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="mt-3 flex items-center justify-between gap-2">
+                      <div className="text-xs text-neutral-500">
+                        Expected AA DPS (raw):{" "}
+                        <span className="text-neutral-300 font-semibold">
+                          {Number.isFinite(inferredAaDps) ? fmt(inferredAaDps, 1) : "—"}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={useAaDpsAsPhys}
+                        disabled={!Number.isFinite(inferredAaDps)}
+                        className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
+                      >
+                        Use AA DPS
+                      </button>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-4">
+                      <div>
+                        <label className="text-sm text-neutral-300">Phys DPS (raw)</label>
+                        <input
+                          type="number"
+                          value={dpsPhysRaw}
+                          onChange={(e) => setNum(setDpsPhysRaw, 0, 999999)(e.target.value)}
+                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-neutral-300">Magic DPS (raw)</label>
+                        <input
+                          type="number"
+                          value={dpsMagicRaw}
+                          onChange={(e) => setNum(setDpsMagicRaw, 0, 999999)(e.target.value)}
+                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-neutral-300">True DPS</label>
+                        <input
+                          type="number"
+                          value={dpsTrueRaw}
+                          onChange={(e) => setNum(setDpsTrueRaw, 0, 999999)(e.target.value)}
+                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-neutral-300">Window (sec)</label>
+                        <input
+                          type="number"
+                          value={windowSec}
+                          onChange={(e) => setNum(setWindowSec, 0, 120)(e.target.value)}
+                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-3 text-xs text-neutral-500">
+                      Post-mitigation DPS:{" "}
+                      <span className="text-neutral-300 font-semibold">{fmt(dpsPost, 1)}</span>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+                        <span className="text-sm text-neutral-300">Damage (autos, window)</span>
+                        <span className="font-semibold text-neutral-200">{fmt(windowDamage, 0)}</span>
+                      </div>
+
+                      <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+                        <span className="text-sm text-neutral-300">Time to kill (est.)</span>
+                        <span className="font-semibold text-neutral-200">
+                          {Number.isFinite(timeToKill) ? `${fmt(timeToKill, 2)}s` : "—"}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* Small legend */}
+            <div className="mt-4 text-[11px] leading-relaxed text-neutral-500">
+              <span className="font-semibold text-neutral-400">Legend:</span>{" "}
+              HP = Health, AD = Attack Damage, AP = Ability Power, AS = Attack Speed,
+              MR = Magic Resist, AA = Auto Attack, DPS = Damage per Second, TTK = Time
+              to Kill, Pen = Penetration (Armor/MR)
+            </div>
           </div>
+        </section>
+      </div>
+
+      {/* ✅ Mobile sticky bottom: Killable bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-800 bg-black/80 backdrop-blur">
+        <div className="mx-auto max-w-xl px-3 py-3 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="text-xs text-neutral-400">
+              {stickyModeLabel} •{" "}
+              <span className="text-neutral-200 font-semibold truncate">
+                {killCheck.status}
+              </span>
+            </div>
+            <div className="text-xs text-neutral-500">
+              Dmg{" "}
+              <span className="text-neutral-200 font-semibold">
+                {fmt(stickyDamage, 0)}
+              </span>
+              {" • "}
+              <span className="text-neutral-200 font-semibold">
+                {Number.isFinite(stickyPct) ? `${fmt(stickyPct, 1)}%` : "—"}
+              </span>{" "}
+              of HP
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setMobileTab("results");
+              setTimeout(() => {
+                resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }, 60);
+            }}
+            className="shrink-0 rounded-xl border border-neutral-700 bg-black px-3 py-2 text-sm font-semibold text-neutral-100 hover:border-neutral-500"
+          >
+            Results
+          </button>
         </div>
-      </section>
+      </div>
     </div>
   );
 }
