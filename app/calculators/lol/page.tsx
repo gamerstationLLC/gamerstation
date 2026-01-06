@@ -97,22 +97,52 @@ async function loadLolItems(): Promise<{ patch: string; items: ItemRow[] }> {
   const json = JSON.parse(raw) as LolItemsFile;
 
   const patch = json.version ?? "unknown";
+  const SR_MAP_ID = "11";
 
-  const items: ItemRow[] = Object.entries(json.data ?? {})
-    .map(([id, it]: any) => ({
-      id,
-      name: String(it.name ?? id),
-      gold: typeof it.gold?.total === "number" ? it.gold.total : null,
-      purchasable: it.gold?.purchasable ?? true,
-      tags: Array.isArray(it.tags) ? it.tags : [],
-      stats: (it.stats ?? {}) as Record<string, number>,
-      description: String(it.description ?? ""),
-    }))
-    .filter((x) => x.purchasable)
+  // Build rows while keeping raw fields needed for filtering
+  const rows = Object.entries(json.data ?? {}).map(([id, it]: any) => ({
+    id: String(id),
+    name: String(it?.name ?? id),
+    gold: typeof it?.gold?.total === "number" ? it.gold.total : null,
+    purchasable: it?.gold?.purchasable ?? true,
+    tags: Array.isArray(it?.tags) ? it.tags : [],
+    stats: (it?.stats ?? {}) as Record<string, number>,
+    description: String(it?.description ?? ""),
+    _maps: it?.maps,
+    _inStore: it?.inStore,
+  }));
+
+  // ✅ SR-only + inStore
+  const srOnly = rows.filter((x) => {
+    const allowedByMap = x._maps?.[SR_MAP_ID] !== false; // missing maps => allowed
+    const allowedInStore = x._inStore !== false;
+    return allowedByMap && allowedInStore;
+  });
+
+  // ✅ purchasable only (your existing filter)
+  const purch = srOnly.filter((x) => x.purchasable);
+
+  // ✅ dedupe by normalized name (keeps the more expensive one if duplicates exist)
+  const byName = new Map<string, (typeof purch)[number]>();
+  for (const it of purch) {
+    const key = it.name.trim().toLowerCase();
+    const prev = byName.get(key);
+    if (!prev) {
+      byName.set(key, it);
+      continue;
+    }
+    const prevGold = prev.gold ?? -1;
+    const nextGold = it.gold ?? -1;
+    if (nextGold > prevGold) byName.set(key, it);
+  }
+
+  const items: ItemRow[] = Array.from(byName.values())
+    .map(({ _maps, _inStore, ...rest }) => rest as ItemRow)
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return { patch, items };
 }
+
 
 export default async function LolCalculatorPage() {
   const [{ patch, champions }, { items }] = await Promise.all([
@@ -139,12 +169,13 @@ export default async function LolCalculatorPage() {
         </p>
 
         <p className="mt-3 text-neutral-300 max-w-3xl">
-          Choose a champion and we&apos;ll build Burst (combo) and DPS/window math
-          on top of official Data Dragon values.
+          Choose a champion and see how much damage you can deal in a combo or over a short time window. [Summoner's Rift Only]
         </p>
+
 
         <LolClient champions={champions} patch={patch} items={items} />
       </div>
     </main>
-  );
+
+);
 }

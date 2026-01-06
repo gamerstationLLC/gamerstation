@@ -677,7 +677,7 @@ export default function LolClient({
             : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
         }`}
       >
-        Burst
+        Combos
       </button>
       <button
         type="button"
@@ -688,7 +688,7 @@ export default function LolClient({
             : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
         }`}
       >
-        DPS / Window
+       Damage Over Time
       </button>
     </div>
   </div>
@@ -1226,7 +1226,7 @@ export default function LolClient({
                       : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
                   }`}
                 >
-                  Burst (autos)
+                  Combos
                 </button>
                 <button
                   type="button"
@@ -1237,7 +1237,7 @@ export default function LolClient({
                       : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
                   }`}
                 >
-                  DPS (autos)
+                  Damage Over Time
                 </button>
               </div>
 
@@ -1272,13 +1272,7 @@ export default function LolClient({
             </div>
           )}
 
-          <div className="mt-2 text-xs text-neutral-500">
-            <span className="font-semibold">Burst (autos):</span> Total damage from a small
-            number of autos.
-            <br />
-            <span className="font-semibold">DPS (autos):</span> Damage if you auto-attack
-            continuously for a set time.
-          </div>
+          
 
           {/* ADVANCED CONTROLS */}
           {uiMode === "advanced" && (
@@ -1294,7 +1288,7 @@ export default function LolClient({
                       : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
                   }`}
                 >
-                  Burst (Combo)
+                  Combos
                 </button>
                 <button
                   type="button"
@@ -1305,7 +1299,7 @@ export default function LolClient({
                       : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
                   }`}
                 >
-                  DPS / Window
+                  Damage Over Time
                 </button>
               </div>
               <div className="mt-3 text-xs text-neutral-500">
@@ -1377,7 +1371,7 @@ export default function LolClient({
           {/* Results */}
           <div
             ref={resultsRef}
-            className={`mt-6 rounded-2xl border border-neutral-800 bg-black p-3 ${
+            className={`mt-13.5 rounded-2xl border border-neutral-800 bg-black p-3  ${
               uiMode === "simple" ? "min-h-[240px]" : ""
             }`}
           >
@@ -1388,14 +1382,14 @@ export default function LolClient({
                   <>
                     Mode:{" "}
                     <span className="text-neutral-300 font-semibold">
-                      {simpleType === "burst" ? "Burst" : "DPS/Window"}
+                      {simpleType === "burst" ? "Burst" : "Damage Over Time"}
                     </span>
                   </>
                 ) : (
                   <>
                     Mode:{" "}
                     <span className="text-neutral-300 font-semibold">
-                      {mode === "burst" ? "Burst" : "DPS/Window"}
+                      {mode === "burst" ? "Burst" : "Damage Over Time"}
                     </span>
                   </>
                 )}
@@ -1482,7 +1476,7 @@ export default function LolClient({
                 {simpleType === "burst" ? (
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                      <span className="text-sm text-neutral-300">Damage (autos)</span>
+                      <span className="text-sm text-neutral-300">Total Damage</span>
                       <span className="font-semibold text-neutral-200">
                         {fmt(simpleBurstPost, 0)}
                       </span>
