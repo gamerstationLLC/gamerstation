@@ -9,6 +9,9 @@ import { type CodAttachmentRow } from "@/lib/codattachments";
 /**
  * attachments_global columns:
  * attachment_id, attachment_name, slot, applies_to, dmg10_add, dmg25_add, dmg50_add
+ *
+ * ✅ This client assumes your weapons CSV provides:
+ * weapon_id, weapon_name, weapon_type, rpm, headshot_mult, fire_mode, dmg10, dmg25, dmg50
  */
 
 type WeaponClass = "assault_rifles" | "smg" | "lmg";
@@ -26,7 +29,11 @@ type UIWeapon = {
   headshot_mult: number;
   fire_mode?: string;
   weapon_type?: string;
-  damage_profile: { meters: number; damage: number }[];
+
+  // ✅ NEW: flat dmg buckets from CSV
+  dmg10: number;
+  dmg25: number;
+  dmg50: number;
 };
 
 type UIAttachment = {
@@ -66,21 +73,15 @@ function normalizeTypeToClass(t: string): WeaponClass | null {
   return null;
 }
 
+// ✅ uses flat dmg buckets (10/25/50) instead of a damage_profile array
 function damageAtMeters(weapon: UIWeapon | undefined, meters: number) {
   if (!weapon) return 0;
-  const profile = weapon.damage_profile ?? [];
-  if (profile.length === 0) return 0;
-
-  // choose last breakpoint <= meters
-  let chosen = profile[0].damage;
-  for (const p of profile) {
-    if (meters >= p.meters) chosen = p.damage;
-    else break;
-  }
-  return chosen;
+  if (meters <= 10) return toNum(weapon.dmg10);
+  if (meters <= 25) return toNum(weapon.dmg25);
+  return toNum(weapon.dmg50);
 }
 
-// your simplified distance buckets
+// your simplified distance buckets (used for barrel adds)
 function bucketForDistance(meters: number): "dmg10" | "dmg25" | "dmg50" {
   if (meters <= 10) return "dmg10";
   if (meters <= 25) return "dmg25";
@@ -96,14 +97,14 @@ export default function CodTtkClient({
 }) {
   const [weaponClass, setWeaponClass] = useState<WeaponClass>("smg");
 
-  // ✅ FIX: always use the real weapon_id from the sheet
+  // ✅ map sheet rows -> UIWeapon (expects dmg10/dmg25/dmg50 on each row)
   const weapons: UIWeapon[] = useMemo(() => {
     const wanted = weaponClass;
 
     return (sheetWeapons ?? [])
       .filter((w: any) => normalizeTypeToClass(w.weapon_type) === wanted)
       .map((w: any) => {
-        const id = String(w.weapon_id ?? "").trim(); // ✅ weapon_id is required
+        const id = String(w.weapon_id ?? "").trim();
         if (!id) return null;
 
         return {
@@ -113,7 +114,11 @@ export default function CodTtkClient({
           headshot_mult: toNum(w.headshot_mult) || 1,
           fire_mode: w.fire_mode,
           weapon_type: w.weapon_type,
-          damage_profile: (w.damage_profile ?? []) as { meters: number; damage: number }[],
+
+          // ✅ damage buckets from CSV
+          dmg10: toNum((w as any).dmg10),
+          dmg25: toNum((w as any).dmg25),
+          dmg50: toNum((w as any).dmg50),
         };
       })
       .filter(Boolean) as UIWeapon[];
@@ -149,7 +154,7 @@ export default function CodTtkClient({
     }));
   }, [sheetAttachments]);
 
-  // ✅ FIX: barrels match by weapon_id (selected.id) <-> applies_to
+  // ✅ barrels match by weapon_id (selected.id) <-> applies_to
   const barrels = useMemo(() => {
     const wid = String(selected?.id ?? "").trim().toLowerCase();
     if (!wid) return [];
@@ -197,9 +202,10 @@ export default function CodTtkClient({
   const armorHp = mode === "wz" ? clamp(plates, 0, 3) * 50 : 0;
   const totalHp = baseHp + armorHp;
 
-  const rpm = rpmOverride === "" ? selected?.rpm ?? 0 : clamp(Number(rpmOverride), 1, 3000);
+  const rpm =
+    rpmOverride === "" ? selected?.rpm ?? 0 : clamp(Number(rpmOverride), 1, 3000);
 
-  // base damage from sheet
+  // base damage from sheet (bucketed)
   const sheetDmg = damageAtMeters(selected, distanceM);
   const sheetHsm = selected?.headshot_mult ?? 1.0;
 
@@ -214,38 +220,53 @@ export default function CodTtkClient({
 
   const basePlusAdds = Math.max(0, sheetDmg + barrelAdd);
 
-  // same behavior you had: show "damage per shot after multiplier"
+  // keep same behavior: damage per shot after multiplier
   const dmg = basePlusAdds * clamp(sheetHsm, 1, 5);
 
   const shotsPerSecond = rpm / 60;
   const shotsToKill = dmg > 0 ? Math.ceil(totalHp / dmg) : 0;
 
   const ttkMs =
-    shotsToKill > 0 && shotsPerSecond > 0 ? ((shotsToKill - 1) / shotsPerSecond) * 1000 : NaN;
+    shotsToKill > 0 && shotsPerSecond > 0
+      ? ((shotsToKill - 1) / shotsPerSecond) * 1000
+      : NaN;
 
   // convert accuracy string to number only for math
   const accuracyNumRaw = accuracyStr === "" ? 0 : Number(accuracyStr);
-  const accuracyNum = clamp(Number.isFinite(accuracyNumRaw) ? accuracyNumRaw : 0, 1, 100);
+  const accuracyNum = clamp(
+    Number.isFinite(accuracyNumRaw) ? accuracyNumRaw : 0,
+    1,
+    100
+  );
 
   const acc = accuracyNum / 100;
   const effectiveShots = shotsToKill > 0 ? Math.ceil(shotsToKill / acc) : 0;
+
   const ttkMsWithAccuracy =
-    effectiveShots > 0 && shotsPerSecond > 0 ? ((effectiveShots - 1) / shotsPerSecond) * 1000 : NaN;
+    effectiveShots > 0 && shotsPerSecond > 0
+      ? ((effectiveShots - 1) / shotsPerSecond) * 1000
+      : NaN;
 
   return (
     <main className="min-h-screen bg-black text-white px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center justify-between">
-          <Link href="/calculators" className="text-sm text-neutral-300 hover:text-white">
+          <Link
+            href="/calculators"
+            className="text-sm text-neutral-300 hover:text-white"
+          >
             ← Back to calculators
           </Link>
           <div className="text-sm text-neutral-400">Call of Duty • TTK</div>
         </header>
 
         <div className="mt-8">
-          <h1 className="text-4xl font-bold tracking-tight"> COD TTK Calculator</h1>
+          <h1 className="text-4xl font-bold tracking-tight">
+            COD TTK Calculator
+          </h1>
           <p className="mt-3 text-neutral-300 max-w-2xl">
-            Pick a weapon, choose Multiplayer or Warzone plates, and get shots-to-kill + time-to-kill.
+            Pick a weapon, choose Multiplayer or Warzone plates, and get
+            shots-to-kill + time-to-kill.
           </p>
         </div>
 
@@ -333,9 +354,10 @@ export default function CodTtkClient({
                     ))}
                   </select>
                   <div className="mt-1 text-[11px] text-neutral-500">
-                    Note: Most barrels in Call of Duty primarily affect recoil, range, or bullet velocity. Many do not
-                    change damage values, and therefore may not affect time-to-kill. This calculator reflects damage-based
-                    TTK only.
+                    Note: Most barrels primarily affect recoil, range, or bullet
+                    velocity. Many do not change damage values, and therefore may
+                    not affect time-to-kill. This calculator reflects
+                    damage-based TTK only.
                   </div>
                 </label>
 
@@ -343,7 +365,12 @@ export default function CodTtkClient({
                   <div className="text-xs text-neutral-400">Current add</div>
                   <div className="mt-1 text-lg font-semibold">+{barrelAdd}</div>
                   <div className="text-xs text-neutral-500">
-                    Bucket: {bucket === "dmg10" ? "10m" : bucket === "dmg25" ? "25m" : "50m"}
+                    Bucket:{" "}
+                    {bucket === "dmg10"
+                      ? "10m"
+                      : bucket === "dmg25"
+                      ? "25m"
+                      : "50m"}
                   </div>
                 </div>
               </div>
@@ -366,7 +393,8 @@ export default function CodTtkClient({
 
                     if (/^\d{0,3}$/.test(val)) {
                       const asNum = Number(val);
-                      if (Number.isFinite(asNum) && asNum <= 100) setAccuracyStr(val);
+                      if (Number.isFinite(asNum) && asNum <= 100)
+                        setAccuracyStr(val);
                       else if (val.length <= 2) setAccuracyStr(val);
                     }
                   }}
@@ -418,17 +446,23 @@ export default function CodTtkClient({
                     min={1}
                     className="mt-2 w-full rounded-lg border border-neutral-800 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-600"
                   />
-                  <div className="mt-1 text-[11px] text-neutral-500">Leave blank to use sheet value.</div>
+                  <div className="mt-1 text-[11px] text-neutral-500">
+                    Leave blank to use sheet value.
+                  </div>
                 </label>
 
                 <label className="block">
-                  <div className="text-xs text-neutral-400">Base Damage @{distanceM}m + add</div>
+                  <div className="text-xs text-neutral-400">
+                    Base Damage @{distanceM}m + add
+                  </div>
                   <input
                     value={`${sheetDmg || 0} + ${barrelAdd} = ${basePlusAdds}`}
                     readOnly
                     className="mt-2 w-full rounded-lg border border-neutral-800 bg-black px-3 py-2 text-sm outline-none"
                   />
-                  <div className="mt-1 text-[11px] text-neutral-500">Headshot mult (sheet): {fmt(sheetHsm, 2)}</div>
+                  <div className="mt-1 text-[11px] text-neutral-500">
+                    Headshot mult (sheet): {fmt(sheetHsm, 2)}
+                  </div>
                 </label>
               </div>
             </div>
@@ -441,7 +475,9 @@ export default function CodTtkClient({
             <div className="mt-5 grid gap-3">
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
                 <div className="text-sm text-neutral-300">Selected weapon</div>
-                <div className="text-sm font-semibold">{selected?.name ?? "—"}</div>
+                <div className="text-sm font-semibold">
+                  {selected?.name ?? "—"}
+                </div>
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
@@ -451,33 +487,46 @@ export default function CodTtkClient({
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
                 <div className="text-sm text-neutral-300">Shots per second</div>
-                <div className="text-sm font-semibold">{fmt(shotsPerSecond, 2)}</div>
+                <div className="text-sm font-semibold">
+                  {fmt(shotsPerSecond, 2)}
+                </div>
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
-                <div className="text-sm text-neutral-300">Damage per shot (after multiplier)</div>
+                <div className="text-sm text-neutral-300">
+                  Damage per shot (after multiplier)
+                </div>
                 <div className="text-sm font-semibold">{fmt(dmg, 2)}</div>
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
                 <div className="text-sm text-neutral-300">Shots to kill</div>
-                <div className="text-sm font-semibold">{isFinite(ttkMs) ? shotsToKill : "—"}</div>
+                <div className="text-sm font-semibold">
+                  {isFinite(ttkMs) ? shotsToKill : "—"}
+                </div>
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
-                <div className="text-sm text-neutral-300">TTK (perfect accuracy)</div>
+                <div className="text-sm text-neutral-300">
+                  TTK (perfect accuracy)
+                </div>
                 <div className="text-sm font-semibold">{fmtMs(ttkMs)}</div>
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
-                <div className="text-sm text-neutral-300">TTK (with accuracy %)</div>
-                <div className="text-sm font-semibold">{fmtMs(ttkMsWithAccuracy)}</div>
+                <div className="text-sm text-neutral-300">
+                  TTK (with accuracy %)
+                </div>
+                <div className="text-sm font-semibold">
+                  {fmtMs(ttkMsWithAccuracy)}
+                </div>
               </div>
             </div>
 
             <div className="mt-6 text-xs text-neutral-500 leading-relaxed">
-              Note: Real in-game TTK depends on range breakpoints, limb modifiers, headshot rules, sprint-to-fire, ADS,
-              recoil, and server tick/latency. This tool is meant as a clean baseline.
+              Note: Real in-game TTK depends on range breakpoints, limb
+              modifiers, headshot rules, sprint-to-fire, ADS, recoil, and server
+              tick/latency. This tool is meant as a clean baseline.
             </div>
           </section>
         </div>

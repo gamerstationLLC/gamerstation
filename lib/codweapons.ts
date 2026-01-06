@@ -1,16 +1,20 @@
 // lib/codweapons.ts
 
 export type CodWeaponRow = {
-  weapon_id: string; // ✅ ADD THIS
+  weapon_id: string;
   weapon_name: string;
   weapon_type: string;
   rpm?: number;
   headshot_mult?: number;
   fire_mode?: string;
-  damage_profile?: { meters: number; damage: number }[];
+
+  // ✅ ship the only values you actually use
+  dmg10?: number;
+  dmg25?: number;
+  dmg50?: number;
 };
 
-function toNum(v: string): number | undefined {
+function toNumU(v: string): number | undefined {
   const n = Number(v);
   return Number.isFinite(n) ? n : undefined;
 }
@@ -44,7 +48,7 @@ function csvToRows(csv: string): string[][] {
       if (ch === "\r" && csv[i + 1] === "\n") i++;
       row.push(cur);
       cur = "";
-      rows.push(row);
+      if (row.some((c) => String(c ?? "").trim().length > 0)) rows.push(row);
       row = [];
       continue;
     }
@@ -53,67 +57,55 @@ function csvToRows(csv: string): string[][] {
   }
 
   row.push(cur);
-  rows.push(row);
+  if (row.some((c) => String(c ?? "").trim().length > 0)) rows.push(row);
 
-  return rows.filter((r) => r.some((c) => String(c ?? "").trim().length > 0));
-}
-
-type DamagePoint = { meters: number; damage: number };
-
-function parseDamageProfile(headers: string[], row: string[]) {
-  const points: DamagePoint[] = [];
-
-  for (let i = 0; i < headers.length; i++) {
-    const h = headers[i].trim().toLowerCase();
-    const m = h.match(/^dmg_(\d+)$/); // dmg_10, dmg_25, dmg_50
-    if (!m) continue;
-
-    const meters = Number(m[1]);
-    const dmg = toNum(String(row[i] ?? "").trim());
-    if (dmg !== undefined && Number.isFinite(meters)) {
-      points.push({ meters, damage: dmg });
-    }
-  }
-
-  points.sort((a, b) => a.meters - b.meters);
-  return points;
+  return rows;
 }
 
 export async function getCodWeapons(): Promise<CodWeaponRow[]> {
   const url = process.env.COD_WEAPONS_CSV_URL;
   if (!url) throw new Error("Missing COD_WEAPONS_CSV_URL");
 
-  const res = await fetch(url, { cache: "no-store" });
+  // ✅ stop no-store; cache on the server
+  // Revalidate hourly (change if you update sheets more often)
+  const res = await fetch(url, {
+    next: { revalidate: 60 * 60 },
+  });
+
   if (!res.ok) throw new Error(`Failed to fetch CSV (${res.status})`);
 
   const csv = await res.text();
   const table = csvToRows(csv);
   if (table.length < 2) return [];
 
-  const headers = table[0].map((h) => h.trim());
+  const headers = table[0].map((h) => h.trim().toLowerCase());
 
-  const idx = (name: string) => {
-    const i = headers.indexOf(name);
-    return i === -1 ? -1 : i;
-  };
+  // ✅ index map (faster than repeated headers.indexOf)
+  const index: Record<string, number> = {};
+  for (let i = 0; i < headers.length; i++) index[headers[i]] = i;
 
-  const get = (r: string[], name: string) => {
-    const i = idx(name);
-    if (i === -1) return "";
-    return String(r[i] ?? "").trim();
-  };
+  const get = (r: string[], key: string) => String(r[index[key]] ?? "").trim();
 
   return table
     .slice(1)
-    .map((r) => ({
-      weapon_id: get(r, "weapon_id"), // ✅ ADD THIS
-      weapon_name: get(r, "weapon_name"),
-      weapon_type: get(r, "weapon_type"),
-      rpm: toNum(get(r, "rpm")),
-      headshot_mult: toNum(get(r, "headshot_mult")),
-      fire_mode: get(r, "fire_mode") || undefined,
-      damage_profile: parseDamageProfile(headers, r),
-    }))
-    // keep only rows that have an id + name
-    .filter((w) => w.weapon_id.length > 0 && w.weapon_name.length > 0);
+    .map((r) => {
+      const weapon_id = get(r, "weapon_id");
+      const weapon_name = get(r, "weapon_name");
+      if (!weapon_id || !weapon_name) return null;
+
+      return {
+        weapon_id,
+        weapon_name,
+        weapon_type: get(r, "weapon_type"),
+        rpm: toNumU(get(r, "rpm")),
+        headshot_mult: toNumU(get(r, "headshot_mult")),
+        fire_mode: get(r, "fire_mode") || undefined,
+
+        // ✅ pull these directly (assuming your CSV has dmg_10,dmg_25,dmg_50 columns)
+        dmg10: toNumU(get(r, "dmg_10")),
+        dmg25: toNumU(get(r, "dmg_25")),
+        dmg50: toNumU(get(r, "dmg_50")),
+      } satisfies CodWeaponRow;
+    })
+    .filter(Boolean) as CodWeaponRow[];
 }
