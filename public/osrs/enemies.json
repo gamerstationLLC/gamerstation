@@ -1,0 +1,6948 @@
+{
+  "enemies": [
+    {
+      "key": "a_doubt_3477",
+      "name": "A Doubt",
+      "hp": 50,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "aberrant_spectre_2",
+      "name": "Aberrant spectre",
+      "hp": 90,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "abhorrent_spectre_7402",
+      "name": "Abhorrent spectre",
+      "hp": 250,
+      "defLevel": 180,
+      "defBonus": 0
+    },
+    {
+      "key": "abomination_8262",
+      "name": "Abomination",
+      "hp": 200,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "abyssal_demon_415",
+      "name": "Abyssal demon",
+      "hp": 150,
+      "defLevel": 135,
+      "defBonus": 0
+    },
+    {
+      "key": "abyssal_guardian_2585",
+      "name": "Abyssal guardian",
+      "hp": 55,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "abyssal_leech_2584",
+      "name": "Abyssal leech",
+      "hp": 10,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "abyssal_sire_5886",
+      "name": "Abyssal Sire",
+      "hp": 400,
+      "defLevel": 250,
+      "defBonus": 0
+    },
+    {
+      "key": "abyssal_walker_2586",
+      "name": "Abyssal walker",
+      "hp": 95,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "acidic_bloodveld_9573",
+      "name": "Acidic Bloodveld",
+      "hp": 5,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "adamant_dragon_8030",
+      "name": "Adamant dragon",
+      "hp": 295,
+      "defLevel": 272,
+      "defBonus": 0
+    },
+    {
+      "key": "afflicted_1293",
+      "name": "Afflicted",
+      "hp": 30,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "agrith_naar_911",
+      "name": "Agrith Naar",
+      "hp": 95,
+      "defLevel": 82,
+      "defBonus": 0
+    },
+    {
+      "key": "agrith_naar_hard_6327",
+      "name": "Agrith Naar (hard)",
+      "hp": 209,
+      "defLevel": 82,
+      "defBonus": 0
+    },
+    {
+      "key": "agrith_na_na_4880",
+      "name": "Agrith-Na-Na",
+      "hp": 200,
+      "defLevel": 82,
+      "defBonus": 0
+    },
+    {
+      "key": "agrith_na_na_hard_6308",
+      "name": "Agrith-Na-Na (hard)",
+      "hp": 255,
+      "defLevel": 82,
+      "defBonus": 0
+    },
+    {
+      "key": "ahrim_the_blighted_1672",
+      "name": "Ahrim the Blighted",
+      "hp": 100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "air_elemental_1369",
+      "name": "Air elemental",
+      "hp": 30,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "air_wizard_1559",
+      "name": "Air wizard",
+      "hp": 25,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "al_kharid_warrior_3292",
+      "name": "Al-Kharid warrior",
+      "hp": 19,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "albino_bat_1039",
+      "name": "Albino bat",
+      "hp": 33,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "alchemical_hydra_8615",
+      "name": "Alchemical Hydra",
+      "hp": 1100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "alexis_2623",
+      "name": "Alexis",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "alomone_1204",
+      "name": "Alomone",
+      "hp": 25,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "alrik_3676",
+      "name": "Alrik",
+      "hp": 1,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "ammonite_crab_7799",
+      "name": "Ammonite Crab",
+      "hp": 100,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "ancient_guardian_10654",
+      "name": "Ancient Guardian",
+      "hp": 40,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "ancient_wizard_7307",
+      "name": "Ancient Wizard",
+      "hp": 80,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "ancient_wyvern_7795",
+      "name": "Ancient Wyvern",
+      "hp": 300,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "ancient_zygomite_7797",
+      "name": "Ancient Zygomite",
+      "hp": 150,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "angry_barbarian_spirit_5563",
+      "name": "Angry barbarian spirit",
+      "hp": 190,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "angry_bear_4692",
+      "name": "Angry bear",
+      "hp": 50,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "angry_giant_rat_4689",
+      "name": "Angry giant rat",
+      "hp": 50,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "angry_goblin_4691",
+      "name": "Angry goblin",
+      "hp": 50,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "angry_unicorn_4688",
+      "name": "Angry unicorn",
+      "hp": 50,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "animated_adamant_armour_2455",
+      "name": "Animated Adamant Armour",
+      "hp": 99,
+      "defLevel": 99,
+      "defBonus": 0
+    },
+    {
+      "key": "animated_black_armour_2453",
+      "name": "Animated Black Armour",
+      "hp": 60,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "animated_bronze_armour_2450",
+      "name": "Animated Bronze Armour",
+      "hp": 10,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "animated_iron_armour_2451",
+      "name": "Animated Iron Armour",
+      "hp": 20,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "animated_mithril_armour_2454",
+      "name": "Animated Mithril Armour",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "animated_rune_armour_2456",
+      "name": "Animated Rune Armour",
+      "hp": 120,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "animated_spade_6470",
+      "name": "Animated spade",
+      "hp": 40,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "animated_steel_armour_6438",
+      "name": "Animated steel armour",
+      "hp": 50,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "anja_3285",
+      "name": "Anja",
+      "hp": 7,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "ankou_7864",
+      "name": "Ankou",
+      "hp": 100,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "apmeken_4196",
+      "name": "Apmeken",
+      "hp": 70,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "archer_4096",
+      "name": "Archer",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "arianwyn_8865",
+      "name": "Arianwyn",
+      "hp": 300,
+      "defLevel": 102,
+      "defBonus": 0
+    },
+    {
+      "key": "armadylean_guard_6587",
+      "name": "Armadylean guard",
+      "hp": 132,
+      "defLevel": 82,
+      "defBonus": 0
+    },
+    {
+      "key": "arrg_643",
+      "name": "Arrg",
+      "hp": 140,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "arrg_hard_6331",
+      "name": "Arrg (hard)",
+      "hp": 255,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "arzinian_avatar_of_magic_1234",
+      "name": "Arzinian Avatar of Magic",
+      "hp": 100,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "arzinian_avatar_of_ranging_1231",
+      "name": "Arzinian Avatar of Ranging",
+      "hp": 100,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "arzinian_avatar_of_strength_1228",
+      "name": "Arzinian Avatar of Strength",
+      "hp": 100,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "assassin_10940",
+      "name": "Assassin",
+      "hp": 120,
+      "defLevel": 92,
+      "defBonus": 0
+    },
+    {
+      "key": "asyn_shade_1284",
+      "name": "Asyn Shade",
+      "hp": 90,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "asyn_shadow_5632",
+      "name": "Asyn shadow",
+      "hp": 94,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "avatar_of_creation_10531",
+      "name": "Avatar of Creation",
+      "hp": 1500,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "avatar_of_destruction_10532",
+      "name": "Avatar of Destruction",
+      "hp": 1500,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "aviansie_3176",
+      "name": "Aviansie",
+      "hp": 139,
+      "defLevel": 160,
+      "defBonus": 0
+    },
+    {
+      "key": "awakened_altar_7288",
+      "name": "Awakened Altar",
+      "hp": 100,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "baby_black_dragon_1871",
+      "name": "Baby black dragon",
+      "hp": 80,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "baby_blue_dragon_241",
+      "name": "Baby blue dragon",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "baby_green_dragon_5194",
+      "name": "Baby green dragon",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "baby_red_dragon_137",
+      "name": "Baby red dragon",
+      "hp": 65,
+      "defLevel": 55,
+      "defBonus": 0
+    },
+    {
+      "key": "baby_roc_762",
+      "name": "Baby Roc",
+      "hp": 50,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "baby_tanglefoot_5853",
+      "name": "Baby tanglefoot",
+      "hp": 40,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "balfrug_kreeyath_3132",
+      "name": "Balfrug Kreeyath",
+      "hp": 161,
+      "defLevel": 153,
+      "defBonus": 0
+    },
+    {
+      "key": "bandit_6605",
+      "name": "Bandit",
+      "hp": 155,
+      "defLevel": 57,
+      "defBonus": 0
+    },
+    {
+      "key": "bandit_champion_738",
+      "name": "Bandit champion",
+      "hp": 50,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "bandosian_guard_6588",
+      "name": "Bandosian guard",
+      "hp": 130,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "banshee_414",
+      "name": "Banshee",
+      "hp": 22,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "barbarian_3055",
+      "name": "Barbarian",
+      "hp": 24,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "barbarian_warlord_10989",
+      "name": "Barbarian Warlord",
+      "hp": 80,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "bark_blamish_snail_2648",
+      "name": "Bark Blamish Snail",
+      "hp": 22,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "barrelchest_600",
+      "name": "Barrelchest",
+      "hp": 134,
+      "defLevel": 140,
+      "defBonus": 0
+    },
+    {
+      "key": "barrelchest_hard_1126",
+      "name": "Barrelchest (hard)",
+      "hp": 255,
+      "defLevel": 140,
+      "defBonus": 0
+    },
+    {
+      "key": "basilisk_417",
+      "name": "Basilisk",
+      "hp": 75,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "basilisk_knight_9293",
+      "name": "Basilisk Knight",
+      "hp": 300,
+      "defLevel": 186,
+      "defBonus": 0
+    },
+    {
+      "key": "basilisk_sentinel_9258",
+      "name": "Basilisk Sentinel",
+      "hp": 520,
+      "defLevel": 274,
+      "defBonus": 0
+    },
+    {
+      "key": "basilisk_youngling_9282",
+      "name": "Basilisk Youngling",
+      "hp": 60,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "bat_2827",
+      "name": "Bat",
+      "hp": 8,
+      "defLevel": 5,
+      "defBonus": 0
+    },
+    {
+      "key": "battle_mage_1610",
+      "name": "Battle mage",
+      "hp": 120,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "bear_cub_3908",
+      "name": "Bear Cub",
+      "hp": 20,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "bedabin_nomad_fighter_4655",
+      "name": "Bedabin Nomad Fighter",
+      "hp": 50,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "berry_4132",
+      "name": "Berry",
+      "hp": 90,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "berserk_barbarian_spirit_5565",
+      "name": "Berserk barbarian spirit",
+      "hp": 190,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "big_frog_478",
+      "name": "Big frog",
+      "hp": 25,
+      "defLevel": 15,
+      "defBonus": 0
+    },
+    {
+      "key": "big_snake_2978",
+      "name": "Big Snake",
+      "hp": 120,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "big_wolf_109",
+      "name": "Big Wolf",
+      "hp": 74,
+      "defLevel": 62,
+      "defBonus": 0
+    },
+    {
+      "key": "billy_goat_1794",
+      "name": "Billy Goat",
+      "hp": 28,
+      "defLevel": 29,
+      "defBonus": 0
+    },
+    {
+      "key": "bird_5240",
+      "name": "Bird",
+      "hp": 10,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "black_bear_2839",
+      "name": "Black bear",
+      "hp": 25,
+      "defLevel": 13,
+      "defBonus": 0
+    },
+    {
+      "key": "black_chinchompa_2912",
+      "name": "Black chinchompa",
+      "hp": 1,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "black_demon_7874",
+      "name": "Black demon",
+      "hp": 200,
+      "defLevel": 152,
+      "defBonus": 0
+    },
+    {
+      "key": "black_demon_hard_6295",
+      "name": "Black demon (hard)",
+      "hp": 255,
+      "defLevel": 152,
+      "defBonus": 0
+    },
+    {
+      "key": "black_dragon_7861",
+      "name": "Black dragon",
+      "hp": 250,
+      "defLevel": 200,
+      "defBonus": 0
+    },
+    {
+      "key": "black_golem_4742",
+      "name": "Black golem",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "black_guard_6046",
+      "name": "Black Guard",
+      "hp": 40,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "black_guard_berserker_6050",
+      "name": "Black Guard Berserker",
+      "hp": 50,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "black_heather_301",
+      "name": "Black Heather",
+      "hp": 37,
+      "defLevel": 27,
+      "defBonus": 0
+    },
+    {
+      "key": "black_knight_516",
+      "name": "Black Knight",
+      "hp": 42,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "black_knight_titan_4067",
+      "name": "Black Knight Titan",
+      "hp": 142,
+      "defLevel": 91,
+      "defBonus": 0
+    },
+    {
+      "key": "black_knight_titan_hard_6299",
+      "name": "Black Knight Titan (hard)",
+      "hp": 255,
+      "defLevel": 91,
+      "defBonus": 0
+    },
+    {
+      "key": "black_unicorn_2849",
+      "name": "Black unicorn",
+      "hp": 29,
+      "defLevel": 23,
+      "defBonus": 0
+    },
+    {
+      "key": "black_unicorn_foal_3911",
+      "name": "Black unicorn Foal",
+      "hp": 25,
+      "defLevel": 18,
+      "defBonus": 0
+    },
+    {
+      "key": "blessed_giant_rat_4534",
+      "name": "Blessed giant rat",
+      "hp": 30,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "blessed_spider_4533",
+      "name": "Blessed spider",
+      "hp": 32,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "blood_blamish_snail_2645",
+      "name": "Blood Blamish Snail",
+      "hp": 13,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "blood_spawn_8367",
+      "name": "Blood spawn",
+      "hp": 120,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "bloodveld_3138",
+      "name": "Bloodveld",
+      "hp": 134,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "bloodworm_1678",
+      "name": "Bloodworm",
+      "hp": 45,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "blue_dragon_265",
+      "name": "Blue dragon",
+      "hp": 105,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "boar_11067",
+      "name": "Boar",
+      "hp": 12,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "body_golem_10691",
+      "name": "Body Golem",
+      "hp": 60,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "boris_2613",
+      "name": "Boris",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "borrokar_3939",
+      "name": "Borrokar",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "bouncer_3508",
+      "name": "Bouncer",
+      "hp": 120,
+      "defLevel": 145,
+      "defBonus": 0
+    },
+    {
+      "key": "bouncer_hard_6293",
+      "name": "Bouncer (hard)",
+      "hp": 232,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "brassican_mage_7310",
+      "name": "Brassican Mage",
+      "hp": 150,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "brawler_1738",
+      "name": "Brawler",
+      "hp": 173,
+      "defLevel": 143,
+      "defBonus": 0
+    },
+    {
+      "key": "bree_2208",
+      "name": "Bree",
+      "hp": 162,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "breoca_4107",
+      "name": "Breoca",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "brine_rat_4501",
+      "name": "Brine rat",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "broddi_3685",
+      "name": "Broddi",
+      "hp": 1,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "bronze_dragon_270",
+      "name": "Bronze dragon",
+      "hp": 122,
+      "defLevel": 112,
+      "defBonus": 0
+    },
+    {
+      "key": "broodoo_victim_6409",
+      "name": "Broodoo victim",
+      "hp": 100,
+      "defLevel": 26,
+      "defBonus": 0
+    },
+    {
+      "key": "bruise_blamish_snail_2652",
+      "name": "Bruise Blamish Snail",
+      "hp": 15,
+      "defLevel": 27,
+      "defBonus": 0
+    },
+    {
+      "key": "brutal_black_dragon_7275",
+      "name": "Brutal black dragon",
+      "hp": 315,
+      "defLevel": 258,
+      "defBonus": 0
+    },
+    {
+      "key": "brutal_blue_dragon_7273",
+      "name": "Brutal blue dragon",
+      "hp": 245,
+      "defLevel": 198,
+      "defBonus": 0
+    },
+    {
+      "key": "brutal_green_dragon_2918",
+      "name": "Brutal green dragon",
+      "hp": 175,
+      "defLevel": 168,
+      "defBonus": 0
+    },
+    {
+      "key": "brutal_red_dragon_7274",
+      "name": "Brutal red dragon",
+      "hp": 285,
+      "defLevel": 198,
+      "defBonus": 0
+    },
+    {
+      "key": "bryophyta_8195",
+      "name": "Bryophyta",
+      "hp": 115,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "bunny_3902",
+      "name": "Bunny",
+      "hp": 5,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "bush_snake_6102",
+      "name": "Bush snake",
+      "hp": 25,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "callisto_6503",
+      "name": "Callisto",
+      "hp": 255,
+      "defLevel": 440,
+      "defBonus": 0
+    },
+    {
+      "key": "camp_dweller_1379",
+      "name": "Camp dweller",
+      "hp": 30,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "carnivorous_chinchompa_2911",
+      "name": "Carnivorous chinchompa",
+      "hp": 1,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "catablepon_2475",
+      "name": "Catablepon",
+      "hp": 70,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_abomination_7401",
+      "name": "Cave abomination",
+      "hp": 130,
+      "defLevel": 142,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_bug_483",
+      "name": "Cave bug",
+      "hp": 93,
+      "defLevel": 84,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_crawler_406",
+      "name": "Cave crawler",
+      "hp": 22,
+      "defLevel": 18,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_goblin_6434",
+      "name": "Cave goblin",
+      "hp": 10,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_goblin_guard_5334",
+      "name": "Cave goblin guard",
+      "hp": 26,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_goblin_miner_5330",
+      "name": "Cave goblin miner",
+      "hp": 10,
+      "defLevel": 7,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_horror_1047",
+      "name": "Cave horror",
+      "hp": 55,
+      "defLevel": 62,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_kraken_492",
+      "name": "Cave kraken",
+      "hp": 125,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_lizard_7424",
+      "name": "Cave lizard",
+      "hp": 20,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "cave_slime_480",
+      "name": "Cave slime",
+      "hp": 25,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "ceolburg_4111",
+      "name": "Ceolburg",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "cerberus_5862",
+      "name": "Cerberus",
+      "hp": 600,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "chaos_druid_520",
+      "name": "Chaos druid",
+      "hp": 20,
+      "defLevel": 12,
+      "defBonus": 0
+    },
+    {
+      "key": "chaos_druid_warrior_532",
+      "name": "Chaos druid warrior",
+      "hp": 40,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "chaos_dwarf_291",
+      "name": "Chaos dwarf",
+      "hp": 61,
+      "defLevel": 28,
+      "defBonus": 0
+    },
+    {
+      "key": "chaos_elemental_2054",
+      "name": "Chaos Elemental",
+      "hp": 250,
+      "defLevel": 270,
+      "defBonus": 0
+    },
+    {
+      "key": "chaos_fanatic_6619",
+      "name": "Chaos Fanatic",
+      "hp": 225,
+      "defLevel": 220,
+      "defBonus": 0
+    },
+    {
+      "key": "chaos_golem_10689",
+      "name": "Chaos Golem",
+      "hp": 94,
+      "defLevel": 59,
+      "defBonus": 0
+    },
+    {
+      "key": "chaotic_death_spawn_6716",
+      "name": "Chaotic death spawn",
+      "hp": 50,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "chasm_crawler_7389",
+      "name": "Chasm Crawler",
+      "hp": 64,
+      "defLevel": 18,
+      "defBonus": 0
+    },
+    {
+      "key": "chicken_1173",
+      "name": "Chicken",
+      "hp": 3,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "chinchompa_2910",
+      "name": "Chinchompa",
+      "hp": 1,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "choke_devil_7404",
+      "name": "Choke devil",
+      "hp": 300,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "chompy_bird_1475",
+      "name": "Chompy bird",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "chronozon_4987",
+      "name": "Chronozon",
+      "hp": 60,
+      "defLevel": 173,
+      "defBonus": 0
+    },
+    {
+      "key": "chronozon_hard_6292",
+      "name": "Chronozon (hard)",
+      "hp": 120,
+      "defLevel": 173,
+      "defBonus": 0
+    },
+    {
+      "key": "city_guard_4373",
+      "name": "City guard",
+      "hp": 80,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "clivet_1206",
+      "name": "Clivet",
+      "hp": 25,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "cockathrice_7393",
+      "name": "Cockathrice",
+      "hp": 95,
+      "defLevel": 78,
+      "defBonus": 0
+    },
+    {
+      "key": "cockatrice_419",
+      "name": "Cockatrice",
+      "hp": 37,
+      "defLevel": 37,
+      "defBonus": 0
+    },
+    {
+      "key": "colonel_radick_4406",
+      "name": "Colonel Radick",
+      "hp": 65,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "colossal_hydra_10402",
+      "name": "Colossal Hydra",
+      "hp": 750,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "commander_zilyana_2205",
+      "name": "Commander Zilyana",
+      "hp": 255,
+      "defLevel": 300,
+      "defBonus": 0
+    },
+    {
+      "key": "confused_barbarian_2920",
+      "name": "Confused barbarian",
+      "hp": 124,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "confusion_beast_4694",
+      "name": "Confusion beast",
+      "hp": 64,
+      "defLevel": 52,
+      "defBonus": 0
+    },
+    {
+      "key": "corporeal_beast_319",
+      "name": "Corporeal Beast",
+      "hp": 2000,
+      "defLevel": 310,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupt_lizardman_7997",
+      "name": "Corrupt Lizardman",
+      "hp": 50,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupt_lizardman_hard_7996",
+      "name": "Corrupt Lizardman (hard)",
+      "hp": 150,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_bat_9042",
+      "name": "Corrupted Bat",
+      "hp": 14,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_bear_9046",
+      "name": "Corrupted Bear",
+      "hp": 100,
+      "defLevel": 98,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_dark_beast_9048",
+      "name": "Corrupted Dark Beast",
+      "hp": 100,
+      "defLevel": 98,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_dragon_9047",
+      "name": "Corrupted Dragon",
+      "hp": 100,
+      "defLevel": 98,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_hunllef_9035",
+      "name": "Corrupted Hunllef",
+      "hp": 1000,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_rat_9040",
+      "name": "Corrupted Rat",
+      "hp": 14,
+      "defLevel": 6,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_scorpion_9044",
+      "name": "Corrupted Scorpion",
+      "hp": 38,
+      "defLevel": 18,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_spider_9041",
+      "name": "Corrupted Spider",
+      "hp": 12,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_unicorn_9043",
+      "name": "Corrupted Unicorn",
+      "hp": 44,
+      "defLevel": 24,
+      "defBonus": 0
+    },
+    {
+      "key": "corrupted_wolf_9045",
+      "name": "Corrupted Wolf",
+      "hp": 52,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "count_draynor_3481",
+      "name": "Count Draynor",
+      "hp": 35,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "count_draynor_hard_6332",
+      "name": "Count Draynor (hard)",
+      "hp": 210,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "cow_2790",
+      "name": "Cow",
+      "hp": 8,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "cow_hard_6340",
+      "name": "Cow (hard)",
+      "hp": 160,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "cow_calf_2792",
+      "name": "Cow calf",
+      "hp": 6,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "crab_4819",
+      "name": "Crab",
+      "hp": 19,
+      "defLevel": 26,
+      "defBonus": 0
+    },
+    {
+      "key": "crawling_hand_457",
+      "name": "Crawling Hand",
+      "hp": 19,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "crazy_archaeologist_6618",
+      "name": "Crazy archaeologist",
+      "hp": 225,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "crocodile_4184",
+      "name": "Crocodile",
+      "hp": 62,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "crondis_4198",
+      "name": "Crondis",
+      "hp": 60,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "crushing_hand_7388",
+      "name": "Crushing hand",
+      "hp": 55,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "crypt_rat_1679",
+      "name": "Crypt rat",
+      "hp": 35,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "crypt_spider_1683",
+      "name": "Crypt spider",
+      "hp": 60,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_bat_9028",
+      "name": "Crystalline Bat",
+      "hp": 14,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_bear_9032",
+      "name": "Crystalline Bear",
+      "hp": 100,
+      "defLevel": 98,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_dark_beast_9034",
+      "name": "Crystalline Dark Beast",
+      "hp": 100,
+      "defLevel": 98,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_dragon_9033",
+      "name": "Crystalline Dragon",
+      "hp": 100,
+      "defLevel": 98,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_hunllef_9021",
+      "name": "Crystalline Hunllef",
+      "hp": 600,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_rat_9026",
+      "name": "Crystalline Rat",
+      "hp": 14,
+      "defLevel": 6,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_scorpion_9030",
+      "name": "Crystalline Scorpion",
+      "hp": 38,
+      "defLevel": 18,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_spider_9027",
+      "name": "Crystalline Spider",
+      "hp": 12,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_unicorn_9029",
+      "name": "Crystalline Unicorn",
+      "hp": 44,
+      "defLevel": 24,
+      "defBonus": 0
+    },
+    {
+      "key": "crystalline_wolf_9031",
+      "name": "Crystalline Wolf",
+      "hp": 52,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "cuffs_3279",
+      "name": "Cuffs",
+      "hp": 7,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "culinaromancer_4878",
+      "name": "Culinaromancer",
+      "hp": 150,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "culinaromancer_hard_6307",
+      "name": "Culinaromancer (hard)",
+      "hp": 255,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "cyclops_2137",
+      "name": "Cyclops",
+      "hp": 150,
+      "defLevel": 55,
+      "defBonus": 0
+    },
+    {
+      "key": "dad_4130",
+      "name": "Dad",
+      "hp": 120,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "dad_hard_6330",
+      "name": "Dad (hard)",
+      "hp": 240,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "dagannoth_140",
+      "name": "Dagannoth",
+      "hp": 142,
+      "defLevel": 98,
+      "defBonus": 0
+    },
+    {
+      "key": "dagannoth_fledgeling_2264",
+      "name": "Dagannoth fledgeling",
+      "hp": 100,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "dagannoth_mother_983",
+      "name": "Dagannoth mother",
+      "hp": 120,
+      "defLevel": 81,
+      "defBonus": 0
+    },
+    {
+      "key": "dagannoth_mother_hard_6300",
+      "name": "Dagannoth mother (hard)",
+      "hp": 240,
+      "defLevel": 81,
+      "defBonus": 0
+    },
+    {
+      "key": "dagannoth_prime_2266",
+      "name": "Dagannoth Prime",
+      "hp": 255,
+      "defLevel": 255,
+      "defBonus": 0
+    },
+    {
+      "key": "dagannoth_rex_2267",
+      "name": "Dagannoth Rex",
+      "hp": 255,
+      "defLevel": 255,
+      "defBonus": 0
+    },
+    {
+      "key": "dagannoth_spawn_3184",
+      "name": "Dagannoth spawn",
+      "hp": 35,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "dagannoth_supreme_2265",
+      "name": "Dagannoth Supreme",
+      "hp": 255,
+      "defLevel": 128,
+      "defBonus": 0
+    },
+    {
+      "key": "damien_leucurte_9564",
+      "name": "Damien Leucurte",
+      "hp": 217,
+      "defLevel": 160,
+      "defBonus": 0
+    },
+    {
+      "key": "damis_683",
+      "name": "Damis",
+      "hp": 200,
+      "defLevel": 160,
+      "defBonus": 0
+    },
+    {
+      "key": "damis_hard_1135",
+      "name": "Damis (hard)",
+      "hp": 255,
+      "defLevel": 160,
+      "defBonus": 0
+    },
+    {
+      "key": "dark_ankou_7296",
+      "name": "Dark Ankou",
+      "hp": 60,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "dark_beast_4005",
+      "name": "Dark beast",
+      "hp": 220,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "dark_energy_core_320",
+      "name": "Dark energy core",
+      "hp": 25,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "dark_warrior_6606",
+      "name": "Dark warrior",
+      "hp": 165,
+      "defLevel": 55,
+      "defBonus": 0
+    },
+    {
+      "key": "dark_wizard_2056",
+      "name": "Dark wizard",
+      "hp": 25,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "dawn_7852",
+      "name": "Dawn",
+      "hp": 450,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "deadly_red_spider_3021",
+      "name": "Deadly red spider",
+      "hp": 35,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "death_spawn_10",
+      "name": "Death spawn",
+      "hp": 60,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "death_wing_509",
+      "name": "Death wing",
+      "hp": 80,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "defiler_1732",
+      "name": "Defiler",
+      "hp": 97,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "delrith_5079",
+      "name": "Delrith",
+      "hp": 10,
+      "defLevel": 5,
+      "defBonus": 0
+    },
+    {
+      "key": "demon_142",
+      "name": "Demon",
+      "hp": 79,
+      "defLevel": 71,
+      "defBonus": 0
+    },
+    {
+      "key": "demonic_gorilla_7144",
+      "name": "Demonic gorilla",
+      "hp": 380,
+      "defLevel": 200,
+      "defBonus": 0
+    },
+    {
+      "key": "deranged_archaeologist_7806",
+      "name": "Deranged archaeologist",
+      "hp": 200,
+      "defLevel": 280,
+      "defBonus": 0
+    },
+    {
+      "key": "derwen_7859",
+      "name": "Derwen",
+      "hp": 320,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "desert_lizard_459",
+      "name": "Desert Lizard",
+      "hp": 25,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "desert_snake_3544",
+      "name": "Desert snake",
+      "hp": 6,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "desert_wolf_4649",
+      "name": "Desert Wolf",
+      "hp": 34,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "dessourt_4883",
+      "name": "Dessourt",
+      "hp": 130,
+      "defLevel": 99,
+      "defBonus": 0
+    },
+    {
+      "key": "dessourt_hard_6311",
+      "name": "Dessourt (hard)",
+      "hp": 255,
+      "defLevel": 99,
+      "defBonus": 0
+    },
+    {
+      "key": "dessous_3459",
+      "name": "Dessous",
+      "hp": 200,
+      "defLevel": 99,
+      "defBonus": 0
+    },
+    {
+      "key": "dessous_hard_1128",
+      "name": "Dessous (hard)",
+      "hp": 255,
+      "defLevel": 99,
+      "defBonus": 0
+    },
+    {
+      "key": "deviant_spectre_7279",
+      "name": "Deviant spectre",
+      "hp": 190,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "dharok_the_wretched_1673",
+      "name": "Dharok the Wretched",
+      "hp": 100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "dire_wolf_3426",
+      "name": "Dire Wolf",
+      "hp": 85,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "disciple_of_iban_8997",
+      "name": "Disciple of Iban",
+      "hp": 20,
+      "defLevel": 12,
+      "defBonus": 0
+    },
+    {
+      "key": "don_t_know_what_8439",
+      "name": "Don't Know What",
+      "hp": 220,
+      "defLevel": 160,
+      "defBonus": 0
+    },
+    {
+      "key": "donny_the_lad_302",
+      "name": "Donny the lad",
+      "hp": 37,
+      "defLevel": 27,
+      "defBonus": 0
+    },
+    {
+      "key": "doomion_8995",
+      "name": "Doomion",
+      "hp": 87,
+      "defLevel": 77,
+      "defBonus": 0
+    },
+    {
+      "key": "double_agent_7312",
+      "name": "Double agent",
+      "hp": 160,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "drake_8612",
+      "name": "Drake",
+      "hp": 250,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "druid_3258",
+      "name": "Druid",
+      "hp": 30,
+      "defLevel": 32,
+      "defBonus": 0
+    },
+    {
+      "key": "drunken_man_3263",
+      "name": "Drunken man",
+      "hp": 7,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "duck_1838",
+      "name": "Duck",
+      "hp": 3,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "duckling_2001",
+      "name": "Duckling",
+      "hp": 3,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "dungeon_rat_2865",
+      "name": "Dungeon rat",
+      "hp": 12,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "dusk_7888",
+      "name": "Dusk",
+      "hp": 450,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "dust_devil_7249",
+      "name": "Dust devil",
+      "hp": 130,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "dwarf_292",
+      "name": "Dwarf",
+      "hp": 26,
+      "defLevel": 16,
+      "defBonus": 0
+    },
+    {
+      "key": "dwarf_gang_member_1354",
+      "name": "Dwarf gang member",
+      "hp": 40,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "eadburg_4095",
+      "name": "Eadburg",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "earth_elemental_1366",
+      "name": "Earth elemental",
+      "hp": 35,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "earth_warrior_2840",
+      "name": "Earth warrior",
+      "hp": 54,
+      "defLevel": 42,
+      "defBonus": 0
+    },
+    {
+      "key": "earth_warrior_champion_3328",
+      "name": "Earth Warrior Champion",
+      "hp": 108,
+      "defLevel": 84,
+      "defBonus": 0
+    },
+    {
+      "key": "earth_wizard_1558",
+      "name": "Earth wizard",
+      "hp": 25,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "eduard_2618",
+      "name": "Eduard",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "einar_3675",
+      "name": "Einar",
+      "hp": 1,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "elder_chaos_druid_6607",
+      "name": "Elder Chaos druid",
+      "hp": 150,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "elf_archer_5295",
+      "name": "Elf Archer",
+      "hp": 105,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "elf_warrior_5293",
+      "name": "Elf Warrior",
+      "hp": 105,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "elvarg_6349",
+      "name": "Elvarg",
+      "hp": 80,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "elvarg_hard_6118",
+      "name": "Elvarg (hard)",
+      "hp": 240,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "enclave_guard_4381",
+      "name": "Enclave guard",
+      "hp": 80,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "energy_sprite_6624",
+      "name": "Energy sprite",
+      "hp": 62,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "enormous_tentacle_5535",
+      "name": "Enormous Tentacle",
+      "hp": 120,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "enraged_barbarian_spirit_5564",
+      "name": "Enraged barbarian spirit",
+      "hp": 190,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "ent_6594",
+      "name": "Ent",
+      "hp": 75,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "entrana_firebird_4927",
+      "name": "Entrana firebird",
+      "hp": 5,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "essyllt_8950",
+      "name": "Essyllt",
+      "hp": 320,
+      "defLevel": 104,
+      "defBonus": 0
+    },
+    {
+      "key": "evil_chicken_1870",
+      "name": "Evil Chicken",
+      "hp": 120,
+      "defLevel": 126,
+      "defBonus": 0
+    },
+    {
+      "key": "evil_chicken_hard_6306",
+      "name": "Evil Chicken (hard)",
+      "hp": 240,
+      "defLevel": 126,
+      "defBonus": 0
+    },
+    {
+      "key": "evil_spirit_625",
+      "name": "Evil spirit",
+      "hp": 90,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "experiment_1274",
+      "name": "Experiment",
+      "hp": 100,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "experiment_no_2_5126",
+      "name": "Experiment No.2",
+      "hp": 95,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "fareed_3456",
+      "name": "Fareed",
+      "hp": 130,
+      "defLevel": 135,
+      "defBonus": 0
+    },
+    {
+      "key": "fareed_hard_4115",
+      "name": "Fareed (hard)",
+      "hp": 255,
+      "defLevel": 135,
+      "defBonus": 0
+    },
+    {
+      "key": "farmer_3114",
+      "name": "Farmer",
+      "hp": 12,
+      "defLevel": 8,
+      "defBonus": 0
+    },
+    {
+      "key": "fear_reaper_4693",
+      "name": "Fear reaper",
+      "hp": 57,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "feral_vampyre_5642",
+      "name": "Feral Vampyre",
+      "hp": 185,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "ferocious_barbarian_spirit_5566",
+      "name": "Ferocious barbarian spirit",
+      "hp": 190,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "fever_spider_626",
+      "name": "Fever spider",
+      "hp": 40,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "fire_elemental_1365",
+      "name": "Fire elemental",
+      "hp": 30,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "fire_giant_7251",
+      "name": "Fire giant",
+      "hp": 150,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "fire_warrior_of_lesarkus_3448",
+      "name": "Fire Warrior of Lesarkus",
+      "hp": 59,
+      "defLevel": 78,
+      "defBonus": 0
+    },
+    {
+      "key": "fire_wizard_1556",
+      "name": "Fire wizard",
+      "hp": 25,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "fiyr_shade_1286",
+      "name": "Fiyr Shade",
+      "hp": 110,
+      "defLevel": 85,
+      "defBonus": 0
+    },
+    {
+      "key": "fiyr_shadow_1285",
+      "name": "Fiyr Shadow",
+      "hp": 110,
+      "defLevel": 85,
+      "defBonus": 0
+    },
+    {
+      "key": "flambeed_4881",
+      "name": "Flambeed",
+      "hp": 210,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "flambeed_hard_6309",
+      "name": "Flambeed (hard)",
+      "hp": 255,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "flaming_pyrelord_7394",
+      "name": "Flaming pyrelord",
+      "hp": 126,
+      "defLevel": 52,
+      "defBonus": 0
+    },
+    {
+      "key": "flawed_golem_10695",
+      "name": "Flawed Golem",
+      "hp": 25,
+      "defLevel": 6,
+      "defBonus": 0
+    },
+    {
+      "key": "flesh_crawler_2498",
+      "name": "Flesh Crawler",
+      "hp": 25,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "flight_kilisa_3165",
+      "name": "Flight Kilisa",
+      "hp": 133,
+      "defLevel": 175,
+      "defBonus": 0
+    },
+    {
+      "key": "flockleader_geerin_3164",
+      "name": "Flockleader Geerin",
+      "hp": 132,
+      "defLevel": 175,
+      "defBonus": 0
+    },
+    {
+      "key": "flower_8584",
+      "name": "Flower",
+      "hp": 10,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "foreman_1429",
+      "name": "Foreman",
+      "hp": 20,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "forester_3296",
+      "name": "Forester",
+      "hp": 17,
+      "defLevel": 8,
+      "defBonus": 0
+    },
+    {
+      "key": "forgotten_soul_10525",
+      "name": "Forgotten Soul",
+      "hp": 77,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "fortress_guard_4772",
+      "name": "Fortress Guard",
+      "hp": 22,
+      "defLevel": 15,
+      "defBonus": 0
+    },
+    {
+      "key": "fox_3901",
+      "name": "Fox",
+      "hp": 30,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "fragment_of_seren_8917",
+      "name": "Fragment of Seren",
+      "hp": 1000,
+      "defLevel": 102,
+      "defBonus": 0
+    },
+    {
+      "key": "freidir_3938",
+      "name": "Freidir",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "frog_8702",
+      "name": "Frog",
+      "hp": 8,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "frogeel_3600",
+      "name": "Frogeel",
+      "hp": 90,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "gadderanks_4484",
+      "name": "Gadderanks",
+      "hp": 20,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "galina_2625",
+      "name": "Galina",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "galvek_8095",
+      "name": "Galvek",
+      "hp": 1200,
+      "defLevel": 188,
+      "defBonus": 0
+    },
+    {
+      "key": "gang_boss_6900",
+      "name": "Gang boss",
+      "hp": 80,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "gangster_6898",
+      "name": "Gangster",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "gardener_3275",
+      "name": "Gardener",
+      "hp": 7,
+      "defLevel": 7,
+      "defBonus": 0
+    },
+    {
+      "key": "gargoyle_412",
+      "name": "Gargoyle",
+      "hp": 105,
+      "defLevel": 107,
+      "defBonus": 0
+    },
+    {
+      "key": "gelatinnoth_mother_4884",
+      "name": "Gelatinnoth Mother",
+      "hp": 240,
+      "defLevel": 81,
+      "defBonus": 0
+    },
+    {
+      "key": "gelatinnoth_mother_hard_6312",
+      "name": "Gelatinnoth Mother (hard)",
+      "hp": 240,
+      "defLevel": 81,
+      "defBonus": 0
+    },
+    {
+      "key": "general_graardor_2215",
+      "name": "General Graardor",
+      "hp": 255,
+      "defLevel": 250,
+      "defBonus": 0
+    },
+    {
+      "key": "general_khazard_1213",
+      "name": "General Khazard",
+      "hp": 170,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "georgy_2620",
+      "name": "Georgy",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "ghast_946",
+      "name": "Ghast",
+      "hp": 45,
+      "defLevel": 18,
+      "defBonus": 0
+    },
+    {
+      "key": "ghost_2527",
+      "name": "Ghost",
+      "hp": 80,
+      "defLevel": 68,
+      "defBonus": 0
+    },
+    {
+      "key": "ghost_guard_6698",
+      "name": "Ghost guard",
+      "hp": 800,
+      "defLevel": 300,
+      "defBonus": 0
+    },
+    {
+      "key": "ghoul_289",
+      "name": "Ghoul",
+      "hp": 50,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "ghoul_champion_3330",
+      "name": "Ghoul Champion",
+      "hp": 100,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_bat_2834",
+      "name": "Giant bat",
+      "hp": 32,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_champion_3329",
+      "name": "Giant Champion",
+      "hp": 70,
+      "defLevel": 52,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_crypt_rat_1680",
+      "name": "Giant crypt rat",
+      "hp": 70,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_crypt_spider_1684",
+      "name": "Giant crypt spider",
+      "hp": 80,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_frog_477",
+      "name": "Giant frog",
+      "hp": 100,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_lobster_2994",
+      "name": "Giant lobster",
+      "hp": 32,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_mole_5779",
+      "name": "Giant Mole",
+      "hp": 200,
+      "defLevel": 200,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_mosquito_1041",
+      "name": "Giant mosquito",
+      "hp": 3,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_rat_2510",
+      "name": "Giant rat",
+      "hp": 25,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_roc_763",
+      "name": "Giant Roc",
+      "hp": 250,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_roc_hard_6323",
+      "name": "Giant Roc (hard)",
+      "hp": 255,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_rock_crab_2261",
+      "name": "Giant Rock Crab",
+      "hp": 180,
+      "defLevel": 200,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_rockslug_7392",
+      "name": "Giant rockslug",
+      "hp": 77,
+      "defLevel": 77,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_scarab_797",
+      "name": "Giant scarab",
+      "hp": 130,
+      "defLevel": 169,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_scarab_hard_1127",
+      "name": "Giant scarab (hard)",
+      "hp": 255,
+      "defLevel": 169,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_sea_snake_1101",
+      "name": "Giant Sea Snake",
+      "hp": 100,
+      "defLevel": 160,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_skeleton_6440",
+      "name": "Giant skeleton",
+      "hp": 110,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_snail_5630",
+      "name": "Giant snail",
+      "hp": 160,
+      "defLevel": 86,
+      "defBonus": 0
+    },
+    {
+      "key": "giant_spider_2477",
+      "name": "Giant spider",
+      "hp": 50,
+      "defLevel": 31,
+      "defBonus": 0
+    },
+    {
+      "key": "glod_5129",
+      "name": "Glod",
+      "hp": 160,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "glod_hard_6297",
+      "name": "Glod (hard)",
+      "hp": 255,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "glough_7101",
+      "name": "Glough",
+      "hp": 575,
+      "defLevel": 248,
+      "defBonus": 0
+    },
+    {
+      "key": "gnome_5968",
+      "name": "Gnome",
+      "hp": 3,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "gnome_archer_6097",
+      "name": "Gnome Archer",
+      "hp": 10,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "gnome_child_6077",
+      "name": "Gnome child",
+      "hp": 2,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "gnome_driver_6098",
+      "name": "Gnome Driver",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "gnome_guard_6574",
+      "name": "Gnome guard",
+      "hp": 800,
+      "defLevel": 300,
+      "defBonus": 0
+    },
+    {
+      "key": "gnome_mage_6099",
+      "name": "Gnome Mage",
+      "hp": 10,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "gnome_troop_4973",
+      "name": "Gnome troop",
+      "hp": 3,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "gnome_woman_6086",
+      "name": "Gnome woman",
+      "hp": 2,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "goat_1792",
+      "name": "Goat",
+      "hp": 21,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "goblin_2488",
+      "name": "Goblin",
+      "hp": 26,
+      "defLevel": 17,
+      "defBonus": 0
+    },
+    {
+      "key": "goblin_champion_3353",
+      "name": "Goblin Champion",
+      "hp": 32,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "goblin_guard_5369",
+      "name": "Goblin guard",
+      "hp": 43,
+      "defLevel": 37,
+      "defBonus": 0
+    },
+    {
+      "key": "golem_2836",
+      "name": "Golem",
+      "hp": 14,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "gorad_4367",
+      "name": "Gorad",
+      "hp": 80,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "gorak_3141",
+      "name": "Gorak",
+      "hp": 128,
+      "defLevel": 135,
+      "defBonus": 0
+    },
+    {
+      "key": "grave_scorpion_5372",
+      "name": "Grave scorpion",
+      "hp": 7,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "great_olm_7554",
+      "name": "Great Olm",
+      "hp": 800,
+      "defLevel": 225,
+      "defBonus": 0
+    },
+    {
+      "key": "great_olm_left_claw_7555",
+      "name": "Great Olm (Left claw)",
+      "hp": 600,
+      "defLevel": 262,
+      "defBonus": 0
+    },
+    {
+      "key": "great_olm_right_claw_7553",
+      "name": "Great Olm (Right claw)",
+      "hp": 600,
+      "defLevel": 262,
+      "defBonus": 0
+    },
+    {
+      "key": "greater_abyssal_demon_7410",
+      "name": "Greater abyssal demon",
+      "hp": 400,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "greater_demon_7246",
+      "name": "Greater demon",
+      "hp": 130,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "greater_nechryael_7278",
+      "name": "Greater Nechryael",
+      "hp": 205,
+      "defLevel": 85,
+      "defBonus": 0
+    },
+    {
+      "key": "greater_skeleton_hellhound_6614",
+      "name": "Greater Skeleton Hellhound",
+      "hp": 190,
+      "defLevel": 220,
+      "defBonus": 0
+    },
+    {
+      "key": "green_dragon_7868",
+      "name": "Green dragon",
+      "hp": 100,
+      "defLevel": 68,
+      "defBonus": 0
+    },
+    {
+      "key": "grey_golem_4744",
+      "name": "Grey golem",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "grip_4919",
+      "name": "Grip",
+      "hp": 25,
+      "defLevel": 18,
+      "defBonus": 0
+    },
+    {
+      "key": "grizzly_bear_3423",
+      "name": "Grizzly bear",
+      "hp": 35,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "grizzly_bear_cub_3425",
+      "name": "Grizzly bear cub",
+      "hp": 35,
+      "defLevel": 28,
+      "defBonus": 0
+    },
+    {
+      "key": "growler_2207",
+      "name": "Growler",
+      "hp": 146,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "growthling_8194",
+      "name": "Growthling",
+      "hp": 10,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "guard_3361",
+      "name": "Guard",
+      "hp": 800,
+      "defLevel": 300,
+      "defBonus": 0
+    },
+    {
+      "key": "guard_bandit_1027",
+      "name": "Guard Bandit",
+      "hp": 27,
+      "defLevel": 17,
+      "defBonus": 0
+    },
+    {
+      "key": "guard_dog_114",
+      "name": "Guard dog",
+      "hp": 49,
+      "defLevel": 37,
+      "defBonus": 0
+    },
+    {
+      "key": "guardian_drake_10400",
+      "name": "Guardian Drake",
+      "hp": 630,
+      "defLevel": 200,
+      "defBonus": 0
+    },
+    {
+      "key": "guardian_of_armadyl_3445",
+      "name": "Guardian of Armadyl",
+      "hp": 50,
+      "defLevel": 37,
+      "defBonus": 0
+    },
+    {
+      "key": "gunthor_the_brave_299",
+      "name": "Gunthor the brave",
+      "hp": 35,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "guthan_the_infested_1674",
+      "name": "Guthan the Infested",
+      "hp": 100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "h_a_m_archer_5157",
+      "name": "H.A.M. Archer",
+      "hp": 35,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "h_a_m_guard_2538",
+      "name": "H.A.M. Guard",
+      "hp": 30,
+      "defLevel": 12,
+      "defBonus": 0
+    },
+    {
+      "key": "h_a_m_mage_5158",
+      "name": "H.A.M. Mage",
+      "hp": 35,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "halla_3678",
+      "name": "Halla",
+      "hp": 1,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "harpie_bug_swarm_464",
+      "name": "Harpie Bug Swarm",
+      "hp": 25,
+      "defLevel": 32,
+      "defBonus": 0
+    },
+    {
+      "key": "hazeel_cultist_1207",
+      "name": "Hazeel Cultist",
+      "hp": 25,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "head_5644",
+      "name": "Head",
+      "hp": 150,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "head_guard_11093",
+      "name": "Head Guard",
+      "hp": 86,
+      "defLevel": 61,
+      "defBonus": 0
+    },
+    {
+      "key": "head_thief_4248",
+      "name": "Head Thief",
+      "hp": 37,
+      "defLevel": 16,
+      "defBonus": 0
+    },
+    {
+      "key": "headless_beast_hard_10492",
+      "name": "Headless Beast (hard)",
+      "hp": 320,
+      "defLevel": 42,
+      "defBonus": 0
+    },
+    {
+      "key": "hellhound_7877",
+      "name": "Hellhound",
+      "hp": 150,
+      "defLevel": 102,
+      "defBonus": 0
+    },
+    {
+      "key": "hengel_3284",
+      "name": "Hengel",
+      "hp": 7,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "hero_3295",
+      "name": "Hero",
+      "hp": 82,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "hespori_11192",
+      "name": "Hespori",
+      "hp": 360,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "het_4195",
+      "name": "Het",
+      "hp": 75,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "highwayman_519",
+      "name": "Highwayman",
+      "hp": 13,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "hill_giant_2098",
+      "name": "Hill Giant",
+      "hp": 35,
+      "defLevel": 26,
+      "defBonus": 0
+    },
+    {
+      "key": "hobgoblin_132",
+      "name": "Hobgoblin",
+      "hp": 62,
+      "defLevel": 43,
+      "defBonus": 0
+    },
+    {
+      "key": "hobgoblin_champion_3354",
+      "name": "Hobgoblin Champion",
+      "hp": 58,
+      "defLevel": 48,
+      "defBonus": 0
+    },
+    {
+      "key": "holthion_8996",
+      "name": "Holthion",
+      "hp": 87,
+      "defLevel": 77,
+      "defBonus": 0
+    },
+    {
+      "key": "hoop_snake_7802",
+      "name": "Hoop Snake",
+      "hp": 25,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "hopeless_creature_4695",
+      "name": "Hopeless creature",
+      "hp": 71,
+      "defLevel": 59,
+      "defBonus": 0
+    },
+    {
+      "key": "huge_spider_134",
+      "name": "Huge spider",
+      "hp": 90,
+      "defLevel": 69,
+      "defBonus": 0
+    },
+    {
+      "key": "husk_9454",
+      "name": "Husk",
+      "hp": 20,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "hydra_8609",
+      "name": "Hydra",
+      "hp": 300,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "hygd_4110",
+      "name": "Hygd",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_demon_7585",
+      "name": "Ice demon",
+      "hp": 210,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_giant_7878",
+      "name": "Ice giant",
+      "hp": 100,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_queen_4922",
+      "name": "Ice Queen",
+      "hp": 104,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_spider_3022",
+      "name": "Ice spider",
+      "hp": 65,
+      "defLevel": 43,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_troll_650",
+      "name": "Ice Troll",
+      "hp": 100,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_troll_female_1876",
+      "name": "Ice troll female",
+      "hp": 80,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_troll_grunt_1877",
+      "name": "Ice troll grunt",
+      "hp": 80,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_troll_king_5822",
+      "name": "Ice Troll King",
+      "hp": 150,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_troll_king_hard_6294",
+      "name": "Ice Troll King (hard)",
+      "hp": 255,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_troll_male_1875",
+      "name": "Ice troll male",
+      "hp": 80,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_troll_runt_1874",
+      "name": "Ice troll runt",
+      "hp": 60,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_warrior_2841",
+      "name": "Ice warrior",
+      "hp": 59,
+      "defLevel": 47,
+      "defBonus": 0
+    },
+    {
+      "key": "ice_wolf_645",
+      "name": "Ice wolf",
+      "hp": 70,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "icefiend_3140",
+      "name": "Icefiend",
+      "hp": 20,
+      "defLevel": 19,
+      "defBonus": 0
+    },
+    {
+      "key": "icelord_852",
+      "name": "Icelord",
+      "hp": 60,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "imp_3134",
+      "name": "Imp",
+      "hp": 10,
+      "defLevel": 6,
+      "defBonus": 0
+    },
+    {
+      "key": "imp_champion_3355",
+      "name": "Imp Champion",
+      "hp": 40,
+      "defLevel": 5,
+      "defBonus": 0
+    },
+    {
+      "key": "imre_2614",
+      "name": "Imre",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "infernal_mage_443",
+      "name": "Infernal Mage",
+      "hp": 60,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "infernal_pyrelord_9465",
+      "name": "Infernal pyrelord",
+      "hp": 184,
+      "defLevel": 68,
+      "defBonus": 0
+    },
+    {
+      "key": "insatiable_bloodveld_7397",
+      "name": "Insatiable Bloodveld",
+      "hp": 380,
+      "defLevel": 85,
+      "defBonus": 0
+    },
+    {
+      "key": "insatiable_mutated_bloodveld_7398",
+      "name": "Insatiable mutated Bloodveld",
+      "hp": 410,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "invrigar_the_necromancer_511",
+      "name": "Invrigar the Necromancer",
+      "hp": 24,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "iorwerth_archer_3428",
+      "name": "Iorwerth Archer",
+      "hp": 105,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "iorwerth_warrior_3429",
+      "name": "Iorwerth Warrior",
+      "hp": 105,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "irina_2622",
+      "name": "Irina",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "iron_dragon_7254",
+      "name": "Iron dragon",
+      "hp": 195,
+      "defLevel": 185,
+      "defBonus": 0
+    },
+    {
+      "key": "irvig_senay_3965",
+      "name": "Irvig Senay",
+      "hp": 125,
+      "defLevel": 81,
+      "defBonus": 0
+    },
+    {
+      "key": "ithoi_the_navigator_7964",
+      "name": "Ithoi the Navigator",
+      "hp": 55,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "jackal_4185",
+      "name": "Jackal",
+      "hp": 27,
+      "defLevel": 15,
+      "defBonus": 0
+    },
+    {
+      "key": "jail_guard_4276",
+      "name": "Jail guard",
+      "hp": 32,
+      "defLevel": 21,
+      "defBonus": 0
+    },
+    {
+      "key": "jailer_300",
+      "name": "Jailer",
+      "hp": 47,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "jake_3863",
+      "name": "Jake",
+      "hp": 50,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_ak_7693",
+      "name": "Jal-Ak",
+      "hp": 40,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_akrek_ket_7696",
+      "name": "Jal-AkRek-Ket",
+      "hp": 15,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_akrek_mej_7694",
+      "name": "Jal-AkRek-Mej",
+      "hp": 15,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_akrek_xil_7695",
+      "name": "Jal-AkRek-Xil",
+      "hp": 15,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_imkot_7697",
+      "name": "Jal-ImKot",
+      "hp": 75,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_mejjak_7708",
+      "name": "Jal-MejJak",
+      "hp": 75,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_mejrah_7692",
+      "name": "Jal-MejRah",
+      "hp": 25,
+      "defLevel": 55,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_nib_7691",
+      "name": "Jal-Nib",
+      "hp": 10,
+      "defLevel": 15,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_xil_7698",
+      "name": "Jal-Xil",
+      "hp": 125,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "jal_zek_7699",
+      "name": "Jal-Zek",
+      "hp": 220,
+      "defLevel": 260,
+      "defBonus": 0
+    },
+    {
+      "key": "jaltok_jad_7700",
+      "name": "JalTok-Jad",
+      "hp": 350,
+      "defLevel": 480,
+      "defBonus": 0
+    },
+    {
+      "key": "jeff_3282",
+      "name": "Jeff",
+      "hp": 7,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "jelly_437",
+      "name": "Jelly",
+      "hp": 75,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "jennella_3944",
+      "name": "Jennella",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "jogre_2234",
+      "name": "Jogre",
+      "hp": 70,
+      "defLevel": 43,
+      "defBonus": 0
+    },
+    {
+      "key": "jogre_champion_3356",
+      "name": "Jogre Champion",
+      "hp": 120,
+      "defLevel": 86,
+      "defBonus": 0
+    },
+    {
+      "key": "jonny_the_beard_5213",
+      "name": "Jonny the beard",
+      "hp": 8,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "joseph_2616",
+      "name": "Joseph",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "jubbly_bird_4863",
+      "name": "Jubbly bird",
+      "hp": 21,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "jubster_3604",
+      "name": "Jubster",
+      "hp": 60,
+      "defLevel": 81,
+      "defBonus": 0
+    },
+    {
+      "key": "judge_of_yama_10938",
+      "name": "Judge of Yama",
+      "hp": 260,
+      "defLevel": 84,
+      "defBonus": 0
+    },
+    {
+      "key": "jungle_demon_1443",
+      "name": "Jungle Demon",
+      "hp": 170,
+      "defLevel": 170,
+      "defBonus": 0
+    },
+    {
+      "key": "jungle_demon_hard_6321",
+      "name": "Jungle Demon (hard)",
+      "hp": 255,
+      "defLevel": 170,
+      "defBonus": 0
+    },
+    {
+      "key": "jungle_horror_1042",
+      "name": "Jungle horror",
+      "hp": 45,
+      "defLevel": 55,
+      "defBonus": 0
+    },
+    {
+      "key": "jungle_savage_3959",
+      "name": "Jungle savage",
+      "hp": 90,
+      "defLevel": 76,
+      "defBonus": 0
+    },
+    {
+      "key": "jungle_spider_3020",
+      "name": "Jungle spider",
+      "hp": 50,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "jungle_wolf_232",
+      "name": "Jungle Wolf",
+      "hp": 69,
+      "defLevel": 52,
+      "defBonus": 0
+    },
+    {
+      "key": "justiciar_zachariah_7858",
+      "name": "Justiciar Zachariah",
+      "hp": 320,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "k_ril_tsutsaroth_3129",
+      "name": "K'ril Tsutsaroth",
+      "hp": 255,
+      "defLevel": 270,
+      "defBonus": 0
+    },
+    {
+      "key": "kalphite_guardian_959",
+      "name": "Kalphite Guardian",
+      "hp": 170,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "kalphite_queen_963",
+      "name": "Kalphite Queen",
+      "hp": 255,
+      "defLevel": 300,
+      "defBonus": 0
+    },
+    {
+      "key": "kalphite_soldier_138",
+      "name": "Kalphite Soldier",
+      "hp": 90,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "kalphite_worker_955",
+      "name": "Kalphite Worker",
+      "hp": 40,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "kalrag_8993",
+      "name": "Kalrag",
+      "hp": 78,
+      "defLevel": 78,
+      "defBonus": 0
+    },
+    {
+      "key": "kamil_3458",
+      "name": "Kamil",
+      "hp": 130,
+      "defLevel": 135,
+      "defBonus": 0
+    },
+    {
+      "key": "kamil_hard_1129",
+      "name": "Kamil (hard)",
+      "hp": 255,
+      "defLevel": 135,
+      "defBonus": 0
+    },
+    {
+      "key": "karamel_4882",
+      "name": "Karamel",
+      "hp": 250,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "karamel_hard_6310",
+      "name": "Karamel (hard)",
+      "hp": 255,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "karil_the_tainted_1675",
+      "name": "Karil the Tainted",
+      "hp": 100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "kebbit_1494",
+      "name": "Kebbit",
+      "hp": 50,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "keef_7105",
+      "name": "Keef",
+      "hp": 180,
+      "defLevel": 165,
+      "defBonus": 0
+    },
+    {
+      "key": "ket_zek_3125",
+      "name": "Ket-Zek",
+      "hp": 160,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "khazard_commander_4972",
+      "name": "Khazard commander",
+      "hp": 22,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "khazard_guard_1208",
+      "name": "Khazard Guard",
+      "hp": 25,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "khazard_ogre_1225",
+      "name": "Khazard Ogre",
+      "hp": 60,
+      "defLevel": 53,
+      "defBonus": 0
+    },
+    {
+      "key": "khazard_scorpion_1226",
+      "name": "Khazard Scorpion",
+      "hp": 40,
+      "defLevel": 34,
+      "defBonus": 0
+    },
+    {
+      "key": "khazard_trooper_4969",
+      "name": "Khazard trooper",
+      "hp": 22,
+      "defLevel": 12,
+      "defBonus": 0
+    },
+    {
+      "key": "khazard_warlord_6390",
+      "name": "Khazard warlord",
+      "hp": 170,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "khazard_warlord_hard_6329",
+      "name": "Khazard warlord (hard)",
+      "hp": 255,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "killerwatt_469",
+      "name": "Killerwatt",
+      "hp": 51,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "king_black_dragon_239",
+      "name": "King Black Dragon",
+      "hp": 240,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "king_kurask_7405",
+      "name": "King kurask",
+      "hp": 420,
+      "defLevel": 250,
+      "defBonus": 0
+    },
+    {
+      "key": "king_roald_4163",
+      "name": "King Roald",
+      "hp": 75,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "king_sand_crab_7266",
+      "name": "King Sand Crab",
+      "hp": 200,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "king_scorpion_3027",
+      "name": "King Scorpion",
+      "hp": 30,
+      "defLevel": 23,
+      "defBonus": 0
+    },
+    {
+      "key": "knight_of_ardougne_8852",
+      "name": "Knight of Ardougne",
+      "hp": 54,
+      "defLevel": 28,
+      "defBonus": 0
+    },
+    {
+      "key": "knight_of_saradomin_2213",
+      "name": "Knight of Saradomin",
+      "hp": 135,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "kob_7107",
+      "name": "Kob",
+      "hp": 200,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "kolodion_1609",
+      "name": "Kolodion",
+      "hp": 107,
+      "defLevel": 105,
+      "defBonus": 0
+    },
+    {
+      "key": "koschei_the_deathless_3897",
+      "name": "Koschei the deathless",
+      "hp": 30,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "kraka_928",
+      "name": "Kraka",
+      "hp": 120,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "kraken_494",
+      "name": "Kraken",
+      "hp": 255,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "kree_arra_3162",
+      "name": "Kree'arra",
+      "hp": 255,
+      "defLevel": 260,
+      "defBonus": 0
+    },
+    {
+      "key": "kroy_9560",
+      "name": "Kroy",
+      "hp": 209,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "kruk_6805",
+      "name": "Kruk",
+      "hp": 210,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "ksenia_2627",
+      "name": "Ksenia",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "kurask_410",
+      "name": "Kurask",
+      "hp": 97,
+      "defLevel": 105,
+      "defBonus": 0
+    },
+    {
+      "key": "lanzig_3940",
+      "name": "Lanzig",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "large_mosquito_6272",
+      "name": "Large mosquito",
+      "hp": 3,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "lava_beast_7817",
+      "name": "Lava beast",
+      "hp": 65,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "lava_dragon_6593",
+      "name": "Lava dragon",
+      "hp": 230,
+      "defLevel": 220,
+      "defBonus": 0
+    },
+    {
+      "key": "leech_3233",
+      "name": "Leech",
+      "hp": 45,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "lensa_3943",
+      "name": "Lensa",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "leon_d_cour_3360",
+      "name": "Leon d'Cour",
+      "hp": 123,
+      "defLevel": 123,
+      "defBonus": 0
+    },
+    {
+      "key": "lesser_demon_7865",
+      "name": "Lesser demon",
+      "hp": 110,
+      "defLevel": 71,
+      "defBonus": 0
+    },
+    {
+      "key": "lesser_demon_champion_3357",
+      "name": "Lesser Demon Champion",
+      "hp": 148,
+      "defLevel": 142,
+      "defBonus": 0
+    },
+    {
+      "key": "lev_2619",
+      "name": "Lev",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "liliya_2632",
+      "name": "Liliya",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "lizard_458",
+      "name": "Lizard",
+      "hp": 40,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "lizardman_6916",
+      "name": "Lizardman",
+      "hp": 60,
+      "defLevel": 52,
+      "defBonus": 0
+    },
+    {
+      "key": "lizardman_brute_6918",
+      "name": "Lizardman brute",
+      "hp": 60,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "lizardman_shaman_6766",
+      "name": "Lizardman shaman",
+      "hp": 150,
+      "defLevel": 140,
+      "defBonus": 0
+    },
+    {
+      "key": "loar_shade_1277",
+      "name": "Loar Shade",
+      "hp": 38,
+      "defLevel": 26,
+      "defBonus": 0
+    },
+    {
+      "key": "loar_shadow_1276",
+      "name": "Loar Shadow",
+      "hp": 38,
+      "defLevel": 26,
+      "defBonus": 0
+    },
+    {
+      "key": "lobstrosity_7796",
+      "name": "Lobstrosity",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "locust_4186",
+      "name": "Locust",
+      "hp": 27,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "locust_rider_795",
+      "name": "Locust rider",
+      "hp": 90,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "long_tailed_wyvern_7792",
+      "name": "Long-tailed Wyvern",
+      "hp": 200,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "lost_barbarian_2921",
+      "name": "Lost barbarian",
+      "hp": 124,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "lucien_3443",
+      "name": "Lucien",
+      "hp": 17,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "lynx_11069",
+      "name": "Lynx",
+      "hp": 30,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "lynx_tamer_11071",
+      "name": "Lynx Tamer",
+      "hp": 22,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "magic_axe_2844",
+      "name": "Magic axe",
+      "hp": 44,
+      "defLevel": 29,
+      "defBonus": 0
+    },
+    {
+      "key": "malevolent_mage_7396",
+      "name": "Malevolent Mage",
+      "hp": 175,
+      "defLevel": 135,
+      "defBonus": 0
+    },
+    {
+      "key": "mammoth_6604",
+      "name": "Mammoth",
+      "hp": 130,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "man_1118",
+      "name": "Man",
+      "hp": 13,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "maniacal_monkey_6803",
+      "name": "Maniacal monkey",
+      "hp": 65,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "maniacal_monkey_archer_7119",
+      "name": "Maniacal Monkey Archer",
+      "hp": 60,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "marble_gargoyle_7407",
+      "name": "Marble gargoyle",
+      "hp": 270,
+      "defLevel": 190,
+      "defBonus": 0
+    },
+    {
+      "key": "market_guard_3949",
+      "name": "Market Guard",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "me_785",
+      "name": "Me",
+      "hp": 45,
+      "defLevel": 74,
+      "defBonus": 0
+    },
+    {
+      "key": "me_hard_6320",
+      "name": "Me (hard)",
+      "hp": 135,
+      "defLevel": 74,
+      "defBonus": 0
+    },
+    {
+      "key": "melzar_the_mad_823",
+      "name": "Melzar the Mad",
+      "hp": 44,
+      "defLevel": 34,
+      "defBonus": 0
+    },
+    {
+      "key": "menaphite_thug_3549",
+      "name": "Menaphite Thug",
+      "hp": 60,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "mercenary_4656",
+      "name": "Mercenary",
+      "hp": 60,
+      "defLevel": 39,
+      "defBonus": 0
+    },
+    {
+      "key": "mercenary_captain_4635",
+      "name": "Mercenary Captain",
+      "hp": 80,
+      "defLevel": 32,
+      "defBonus": 0
+    },
+    {
+      "key": "milla_2624",
+      "name": "Milla",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "mind_golem_10693",
+      "name": "Mind Golem",
+      "hp": 40,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "minotaur_2483",
+      "name": "Minotaur",
+      "hp": 22,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "mithril_dragon_2919",
+      "name": "Mithril dragon",
+      "hp": 254,
+      "defLevel": 268,
+      "defBonus": 0
+    },
+    {
+      "key": "mogre_2592",
+      "name": "Mogre",
+      "hp": 48,
+      "defLevel": 48,
+      "defBonus": 0
+    },
+    {
+      "key": "molanisk_1",
+      "name": "Molanisk",
+      "hp": 52,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "monk_2579",
+      "name": "Monk",
+      "hp": 15,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "monk_of_zamorak_529",
+      "name": "Monk of Zamorak",
+      "hp": 40,
+      "defLevel": 42,
+      "defBonus": 0
+    },
+    {
+      "key": "monkey_1038",
+      "name": "Monkey",
+      "hp": 6,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "monkey_archer_5272",
+      "name": "Monkey Archer",
+      "hp": 50,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "monkey_guard_5275",
+      "name": "Monkey Guard",
+      "hp": 130,
+      "defLevel": 200,
+      "defBonus": 0
+    },
+    {
+      "key": "monkey_zombie_5282",
+      "name": "Monkey Zombie",
+      "hp": 90,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "monstrous_basilisk_7395",
+      "name": "Monstrous basilisk",
+      "hp": 170,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "mosquito_swarm_6402",
+      "name": "Mosquito swarm",
+      "hp": 15,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "moss_giant_8736",
+      "name": "Moss Giant",
+      "hp": 120,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "moss_guardian_891",
+      "name": "Moss Guardian",
+      "hp": 120,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "moss_guardian_hard_6325",
+      "name": "Moss Guardian (hard)",
+      "hp": 240,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "mother_8428",
+      "name": "Mother",
+      "hp": 235,
+      "defLevel": 170,
+      "defBonus": 0
+    },
+    {
+      "key": "mountain_troll_936",
+      "name": "Mountain troll",
+      "hp": 90,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "mounted_terrorbird_gnome_2068",
+      "name": "Mounted terrorbird gnome",
+      "hp": 55,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "mourner_8844",
+      "name": "Mourner",
+      "hp": 19,
+      "defLevel": 8,
+      "defBonus": 0
+    },
+    {
+      "key": "mouse_5127",
+      "name": "Mouse",
+      "hp": 70,
+      "defLevel": 86,
+      "defBonus": 0
+    },
+    {
+      "key": "mudskipper_4821",
+      "name": "Mudskipper",
+      "hp": 20,
+      "defLevel": 29,
+      "defBonus": 0
+    },
+    {
+      "key": "mugger_513",
+      "name": "Mugger",
+      "hp": 8,
+      "defLevel": 5,
+      "defBonus": 0
+    },
+    {
+      "key": "mummy_720",
+      "name": "Mummy",
+      "hp": 90,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "mutant_tarn_6477",
+      "name": "Mutant tarn",
+      "hp": 80,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "mutated_bloodveld_7276",
+      "name": "Mutated Bloodveld",
+      "hp": 170,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "myre_blamish_snail_2649",
+      "name": "Myre Blamish Snail",
+      "hp": 13,
+      "defLevel": 12,
+      "defBonus": 0
+    },
+    {
+      "key": "nail_beast_2948",
+      "name": "Nail beast",
+      "hp": 75,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "narf_3280",
+      "name": "Narf",
+      "hp": 7,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "nazastarool_5355",
+      "name": "Nazastarool",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "nazastarool_hard_6338",
+      "name": "Nazastarool (hard)",
+      "hp": 180,
+      "defLevel": 58,
+      "defBonus": 0
+    },
+    {
+      "key": "nechryael_8",
+      "name": "Nechryael",
+      "hp": 105,
+      "defLevel": 105,
+      "defBonus": 0
+    },
+    {
+      "key": "nechryarch_7411",
+      "name": "Nechryarch",
+      "hp": 320,
+      "defLevel": 140,
+      "defBonus": 0
+    },
+    {
+      "key": "necromancer_11088",
+      "name": "Necromancer",
+      "hp": 80,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "newtroost_3605",
+      "name": "Newtroost",
+      "hp": 18,
+      "defLevel": 17,
+      "defBonus": 0
+    },
+    {
+      "key": "nezikchened_3962",
+      "name": "Nezikchened",
+      "hp": 150,
+      "defLevel": 167,
+      "defBonus": 0
+    },
+    {
+      "key": "night_beast_7409",
+      "name": "Night beast",
+      "hp": 550,
+      "defLevel": 220,
+      "defBonus": 0
+    },
+    {
+      "key": "nikita_2629",
+      "name": "Nikita",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "nikolai_2617",
+      "name": "Nikolai",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "nuclear_smoke_devil_7406",
+      "name": "Nuclear smoke devil",
+      "hp": 240,
+      "defLevel": 390,
+      "defBonus": 0
+    },
+    {
+      "key": "nylocas_athanatos_8384",
+      "name": "Nylocas Athanatos",
+      "hp": 180,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "nylocas_hagios_8347",
+      "name": "Nylocas Hagios",
+      "hp": 22,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "nylocas_ischyros_8345",
+      "name": "Nylocas Ischyros",
+      "hp": 22,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "nylocas_matomenos_8366",
+      "name": "Nylocas Matomenos",
+      "hp": 200,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "nylocas_prinkipas_10804",
+      "name": "Nylocas Prinkipas",
+      "hp": 400,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "nylocas_toxobolos_8346",
+      "name": "Nylocas Toxobolos",
+      "hp": 22,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "nylocas_vasilias_8355",
+      "name": "Nylocas Vasilias",
+      "hp": 2500,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "obor_7416",
+      "name": "Obor",
+      "hp": 120,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "ocga_4108",
+      "name": "Ocga",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "ochre_blamish_snail_2651",
+      "name": "Ochre Blamish Snail",
+      "hp": 20,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "ogre_2233",
+      "name": "Ogre",
+      "hp": 70,
+      "defLevel": 43,
+      "defBonus": 0
+    },
+    {
+      "key": "ogre_chieftain_4362",
+      "name": "Ogre chieftain",
+      "hp": 60,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "ogre_shaman_4382",
+      "name": "Ogre shaman",
+      "hp": 1,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "ogress_shaman_7991",
+      "name": "Ogress Shaman",
+      "hp": 82,
+      "defLevel": 82,
+      "defBonus": 0
+    },
+    {
+      "key": "ogress_warrior_7989",
+      "name": "Ogress Warrior",
+      "hp": 82,
+      "defLevel": 82,
+      "defBonus": 0
+    },
+    {
+      "key": "oomlie_bird_2062",
+      "name": "Oomlie bird",
+      "hp": 40,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "ork_2237",
+      "name": "Ork",
+      "hp": 110,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "othainian_8994",
+      "name": "Othainian",
+      "hp": 87,
+      "defLevel": 77,
+      "defBonus": 0
+    },
+    {
+      "key": "otherworldly_being_2843",
+      "name": "Otherworldly being",
+      "hp": 66,
+      "defLevel": 46,
+      "defBonus": 0
+    },
+    {
+      "key": "outlaw_4167",
+      "name": "Outlaw",
+      "hp": 20,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "padulah_5263",
+      "name": "Padulah",
+      "hp": 130,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "paladin_8850",
+      "name": "Paladin",
+      "hp": 82,
+      "defLevel": 64,
+      "defBonus": 0
+    },
+    {
+      "key": "palmer_3869",
+      "name": "Palmer",
+      "hp": 50,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "parasite_9452",
+      "name": "Parasite",
+      "hp": 80,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "pee_hat_927",
+      "name": "Pee Hat",
+      "hp": 120,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "penance_fighter_5747",
+      "name": "Penance Fighter",
+      "hp": 56,
+      "defLevel": 66,
+      "defBonus": 0
+    },
+    {
+      "key": "penance_queen_5775",
+      "name": "Penance Queen",
+      "hp": 250,
+      "defLevel": 132,
+      "defBonus": 0
+    },
+    {
+      "key": "penance_ranger_5765",
+      "name": "Penance Ranger",
+      "hp": 58,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "penda_4109",
+      "name": "Penda",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "penguin_2063",
+      "name": "Penguin",
+      "hp": 4,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "phantom_hand_10957",
+      "name": "Phantom Hand",
+      "hp": 12,
+      "defLevel": 8,
+      "defBonus": 0
+    },
+    {
+      "key": "phosani_s_nightmare_9416",
+      "name": "Phosani's Nightmare",
+      "hp": 3200,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "phrin_shade_1280",
+      "name": "Phrin Shade",
+      "hp": 56,
+      "defLevel": 42,
+      "defBonus": 0
+    },
+    {
+      "key": "phrin_shadow_1279",
+      "name": "Phrin Shadow",
+      "hp": 56,
+      "defLevel": 42,
+      "defBonus": 0
+    },
+    {
+      "key": "pirate_523",
+      "name": "Pirate",
+      "hp": 23,
+      "defLevel": 23,
+      "defBonus": 0
+    },
+    {
+      "key": "pirate_guard_4926",
+      "name": "Pirate Guard",
+      "hp": 25,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "pit_scorpion_3026",
+      "name": "Pit Scorpion",
+      "hp": 32,
+      "defLevel": 23,
+      "defBonus": 0
+    },
+    {
+      "key": "plague_frog_4188",
+      "name": "Plague frog",
+      "hp": 10,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "poison_scorpion_3025",
+      "name": "Poison Scorpion",
+      "hp": 23,
+      "defLevel": 15,
+      "defBonus": 0
+    },
+    {
+      "key": "poison_spider_3023",
+      "name": "Poison spider",
+      "hp": 64,
+      "defLevel": 52,
+      "defBonus": 0
+    },
+    {
+      "key": "poltenip_4758",
+      "name": "Poltenip",
+      "hp": 22,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "porazdir_7860",
+      "name": "Porazdir",
+      "hp": 320,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "possessed_pickaxe_3612",
+      "name": "Possessed pickaxe",
+      "hp": 40,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "possessed_priest_4210",
+      "name": "Possessed Priest",
+      "hp": 90,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "pyrefiend_3139",
+      "name": "Pyrefiend",
+      "hp": 48,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "pyrelord_6762",
+      "name": "Pyrelord",
+      "hp": 80,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "queen_spawn_5776",
+      "name": "Queen spawn",
+      "hp": 45,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "rabbit_9118",
+      "name": "Rabbit",
+      "hp": 2000,
+      "defLevel": 450,
+      "defBonus": 0
+    },
+    {
+      "key": "radat_4759",
+      "name": "Radat",
+      "hp": 22,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "ragnar_3674",
+      "name": "Ragnar",
+      "hp": 1,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "ragnvald_3687",
+      "name": "Ragnvald",
+      "hp": 1,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "ram_1261",
+      "name": "Ram",
+      "hp": 8,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "ranalph_devere_3966",
+      "name": "Ranalph Devere",
+      "hp": 130,
+      "defLevel": 66,
+      "defBonus": 0
+    },
+    {
+      "key": "ranis_drakan_8244",
+      "name": "Ranis Drakan",
+      "hp": 400,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "rannveig_3681",
+      "name": "Rannveig",
+      "hp": 1,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "rat_2492",
+      "name": "Rat",
+      "hp": 2,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "ravager_1708",
+      "name": "Ravager",
+      "hp": 83,
+      "defLevel": 53,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_abyssal_7038",
+      "name": "Reanimated abyssal",
+      "hp": 35,
+      "defLevel": 135,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_aviansie_7037",
+      "name": "Reanimated aviansie",
+      "hp": 35,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_bear_7023",
+      "name": "Reanimated bear",
+      "hp": 15,
+      "defLevel": 15,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_bloodveld_7034",
+      "name": "Reanimated bloodveld",
+      "hp": 35,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_chaos_druid_7026",
+      "name": "Reanimated chaos druid",
+      "hp": 35,
+      "defLevel": 12,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_dagannoth_7033",
+      "name": "Reanimated dagannoth",
+      "hp": 35,
+      "defLevel": 81,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_demon_7036",
+      "name": "Reanimated demon",
+      "hp": 35,
+      "defLevel": 71,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_demon_spawn_7287",
+      "name": "Reanimated demon spawn",
+      "hp": 85,
+      "defLevel": 71,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_dog_7025",
+      "name": "Reanimated dog",
+      "hp": 35,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_dragon_7039",
+      "name": "Reanimated dragon",
+      "hp": 35,
+      "defLevel": 68,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_elf_7029",
+      "name": "Reanimated elf",
+      "hp": 35,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_giant_7027",
+      "name": "Reanimated giant",
+      "hp": 35,
+      "defLevel": 26,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_goblin_7018",
+      "name": "Reanimated goblin",
+      "hp": 5,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_horror_7031",
+      "name": "Reanimated horror",
+      "hp": 35,
+      "defLevel": 55,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_imp_7020",
+      "name": "Reanimated imp",
+      "hp": 5,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_kalphite_7032",
+      "name": "Reanimated kalphite",
+      "hp": 35,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_minotaur_7021",
+      "name": "Reanimated minotaur",
+      "hp": 10,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_monkey_7019",
+      "name": "Reanimated monkey",
+      "hp": 5,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_ogre_7028",
+      "name": "Reanimated ogre",
+      "hp": 35,
+      "defLevel": 43,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_scorpion_7022",
+      "name": "Reanimated scorpion",
+      "hp": 15,
+      "defLevel": 11,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_troll_7030",
+      "name": "Reanimated troll",
+      "hp": 35,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_tzhaar_7035",
+      "name": "Reanimated TzHaar",
+      "hp": 35,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "reanimated_unicorn_7024",
+      "name": "Reanimated unicorn",
+      "hp": 15,
+      "defLevel": 13,
+      "defBonus": 0
+    },
+    {
+      "key": "red_dragon_247",
+      "name": "Red dragon",
+      "hp": 140,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "renegade_knight_3517",
+      "name": "Renegade Knight",
+      "hp": 48,
+      "defLevel": 28,
+      "defBonus": 0
+    },
+    {
+      "key": "repugnant_spectre_7403",
+      "name": "Repugnant spectre",
+      "hp": 390,
+      "defLevel": 220,
+      "defBonus": 0
+    },
+    {
+      "key": "respiratory_system_5914",
+      "name": "Respiratory system",
+      "hp": 50,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_cyclops_7934",
+      "name": "Revenant cyclops",
+      "hp": 110,
+      "defLevel": 49,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_dark_beast_7938",
+      "name": "Revenant dark beast",
+      "hp": 72,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_demon_7936",
+      "name": "Revenant demon",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_dragon_7940",
+      "name": "Revenant dragon",
+      "hp": 155,
+      "defLevel": 87,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_goblin_7931",
+      "name": "Revenant goblin",
+      "hp": 14,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_hellhound_7935",
+      "name": "Revenant hellhound",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_hobgoblin_7933",
+      "name": "Revenant hobgoblin",
+      "hp": 72,
+      "defLevel": 41,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_imp_7881",
+      "name": "Revenant imp",
+      "hp": 10,
+      "defLevel": 4,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_knight_7939",
+      "name": "Revenant knight",
+      "hp": 143,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_ork_7937",
+      "name": "Revenant ork",
+      "hp": 105,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "revenant_pyrefiend_7932",
+      "name": "Revenant pyrefiend",
+      "hp": 48,
+      "defLevel": 33,
+      "defBonus": 0
+    },
+    {
+      "key": "river_troll_6737",
+      "name": "River troll",
+      "hp": 170,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "riyl_shade_1282",
+      "name": "Riyl Shade",
+      "hp": 76,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "riyl_shadow_1281",
+      "name": "Riyl Shadow",
+      "hp": 76,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "robert_the_strong_8057",
+      "name": "Robert the Strong",
+      "hp": 280,
+      "defLevel": 140,
+      "defBonus": 0
+    },
+    {
+      "key": "rock_925",
+      "name": "Rock",
+      "hp": 140,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "rock_crab_100",
+      "name": "Rock Crab",
+      "hp": 50,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "rock_golem_6730",
+      "name": "Rock Golem",
+      "hp": 166,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "rock_lobster_5944",
+      "name": "Rock lobster",
+      "hp": 150,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "rockslug_421",
+      "name": "Rockslug",
+      "hp": 27,
+      "defLevel": 27,
+      "defBonus": 0
+    },
+    {
+      "key": "rocnar_143",
+      "name": "Rocnar",
+      "hp": 100,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "rogue_6603",
+      "name": "Rogue",
+      "hp": 125,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "rooster_1175",
+      "name": "Rooster",
+      "hp": 7,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "rowdy_slave_4634",
+      "name": "Rowdy slave",
+      "hp": 16,
+      "defLevel": 7,
+      "defBonus": 0
+    },
+    {
+      "key": "rune_dragon_8027",
+      "name": "Rune dragon",
+      "hp": 330,
+      "defLevel": 276,
+      "defBonus": 0
+    },
+    {
+      "key": "runite_golem_6600",
+      "name": "Runite Golem",
+      "hp": 170,
+      "defLevel": 165,
+      "defBonus": 0
+    },
+    {
+      "key": "rusty_3281",
+      "name": "Rusty",
+      "hp": 7,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "salarin_the_twisted_304",
+      "name": "Salarin the twisted",
+      "hp": 70,
+      "defLevel": 62,
+      "defBonus": 0
+    },
+    {
+      "key": "san_tojalon_3964",
+      "name": "San Tojalon",
+      "hp": 120,
+      "defLevel": 86,
+      "defBonus": 0
+    },
+    {
+      "key": "sand_crab_5935",
+      "name": "Sand Crab",
+      "hp": 60,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "sand_snake_7895",
+      "name": "Sand Snake",
+      "hp": 60,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "sand_snake_hard_7894",
+      "name": "Sand Snake (hard)",
+      "hp": 180,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "sarachnis_8713",
+      "name": "Sarachnis",
+      "hp": 400,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "saradomin_priest_2209",
+      "name": "Saradomin priest",
+      "hp": 89,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "saradomin_wizard_2955",
+      "name": "Saradomin wizard",
+      "hp": 120,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "scabaras_4197",
+      "name": "Scabaras",
+      "hp": 50,
+      "defLevel": 66,
+      "defBonus": 0
+    },
+    {
+      "key": "scarab_mage_794",
+      "name": "Scarab mage",
+      "hp": 50,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "scarab_swarm_1782",
+      "name": "Scarab swarm",
+      "hp": 25,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "scarabs_729",
+      "name": "Scarabs",
+      "hp": 25,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "scavenger_beast_7549",
+      "name": "Scavenger beast",
+      "hp": 45,
+      "defLevel": 67,
+      "defBonus": 0
+    },
+    {
+      "key": "scion_5918",
+      "name": "Scion",
+      "hp": 50,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "scorpia_6615",
+      "name": "Scorpia",
+      "hp": 200,
+      "defLevel": 180,
+      "defBonus": 0
+    },
+    {
+      "key": "scorpia_s_guardian_6617",
+      "name": "Scorpia's guardian",
+      "hp": 70,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "scorpia_s_offspring_6616",
+      "name": "Scorpia's offspring",
+      "hp": 2,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "scorpion_2479",
+      "name": "Scorpion",
+      "hp": 55,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "screaming_banshee_7390",
+      "name": "Screaming banshee",
+      "hp": 61,
+      "defLevel": 56,
+      "defBonus": 0
+    },
+    {
+      "key": "screaming_twisted_banshee_7391",
+      "name": "Screaming twisted banshee",
+      "hp": 220,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "sea_snake_hatchling_1098",
+      "name": "Sea Snake Hatchling",
+      "hp": 50,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "sea_snake_young_1097",
+      "name": "Sea Snake Young",
+      "hp": 85,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "sea_troll_4308",
+      "name": "Sea troll",
+      "hp": 100,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "sea_troll_queen_4315",
+      "name": "Sea Troll Queen",
+      "hp": 200,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "seagull_1339",
+      "name": "Seagull",
+      "hp": 10,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "sergeant_11073",
+      "name": "Sergeant",
+      "hp": 86,
+      "defLevel": 61,
+      "defBonus": 0
+    },
+    {
+      "key": "sergeant_grimspike_2218",
+      "name": "Sergeant Grimspike",
+      "hp": 146,
+      "defLevel": 132,
+      "defBonus": 0
+    },
+    {
+      "key": "sergeant_steelwill_2217",
+      "name": "Sergeant Steelwill",
+      "hp": 127,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "sergeant_strongstack_2216",
+      "name": "Sergeant Strongstack",
+      "hp": 128,
+      "defLevel": 125,
+      "defBonus": 0
+    },
+    {
+      "key": "servant_4104",
+      "name": "Servant",
+      "hp": 10,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "shade_6740",
+      "name": "Shade",
+      "hp": 170,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "shadow_4004",
+      "name": "Shadow",
+      "hp": 15,
+      "defLevel": 5,
+      "defBonus": 0
+    },
+    {
+      "key": "shadow_hound_3449",
+      "name": "Shadow Hound",
+      "hp": 62,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "shadow_spider_3016",
+      "name": "Shadow spider",
+      "hp": 55,
+      "defLevel": 44,
+      "defBonus": 0
+    },
+    {
+      "key": "shadow_warrior_2853",
+      "name": "Shadow warrior",
+      "hp": 67,
+      "defLevel": 36,
+      "defBonus": 0
+    },
+    {
+      "key": "shadow_wyrm_10398",
+      "name": "Shadow Wyrm",
+      "hp": 320,
+      "defLevel": 125,
+      "defBonus": 0
+    },
+    {
+      "key": "shaeded_beast_8709",
+      "name": "Shaeded Beast",
+      "hp": 210,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "shantay_guard_4643",
+      "name": "Shantay Guard",
+      "hp": 32,
+      "defLevel": 16,
+      "defBonus": 0
+    },
+    {
+      "key": "shifter_1702",
+      "name": "Shifter",
+      "hp": 83,
+      "defLevel": 83,
+      "defBonus": 0
+    },
+    {
+      "key": "shipyard_worker_5457",
+      "name": "Shipyard worker",
+      "hp": 10,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "sigmund_991",
+      "name": "Sigmund",
+      "hp": 60,
+      "defLevel": 24,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_bedivere_4361",
+      "name": "Sir Bedivere",
+      "hp": 90,
+      "defLevel": 99,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_carl_8988",
+      "name": "Sir Carl",
+      "hp": 57,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_gawain_4356",
+      "name": "Sir Gawain",
+      "hp": 110,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_harry_8989",
+      "name": "Sir Harry",
+      "hp": 57,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_jerro_8987",
+      "name": "Sir Jerro",
+      "hp": 57,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_kay_4355",
+      "name": "Sir Kay",
+      "hp": 110,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_lancelot_4354",
+      "name": "Sir Lancelot",
+      "hp": 115,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_leye_4682",
+      "name": "Sir Leye",
+      "hp": 20,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_lucan_4357",
+      "name": "Sir Lucan",
+      "hp": 105,
+      "defLevel": 99,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_mordred_3527",
+      "name": "Sir Mordred",
+      "hp": 38,
+      "defLevel": 33,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_palomedes_4358",
+      "name": "Sir Palomedes",
+      "hp": 100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_pelleas_4360",
+      "name": "Sir Pelleas",
+      "hp": 99,
+      "defLevel": 98,
+      "defBonus": 0
+    },
+    {
+      "key": "sir_tristram_4359",
+      "name": "Sir Tristram",
+      "hp": 105,
+      "defLevel": 99,
+      "defBonus": 0
+    },
+    {
+      "key": "skeletal_miner_3615",
+      "name": "Skeletal miner",
+      "hp": 39,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "skeletal_wyvern_465",
+      "name": "Skeletal Wyvern",
+      "hp": 200,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_6468",
+      "name": "Skeleton",
+      "hp": 92,
+      "defLevel": 55,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_brute_1538",
+      "name": "Skeleton brute",
+      "hp": 124,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_champion_3358",
+      "name": "Skeleton Champion",
+      "hp": 58,
+      "defLevel": 34,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_fremennik_4497",
+      "name": "Skeleton fremennik",
+      "hp": 40,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_heavy_1540",
+      "name": "Skeleton heavy",
+      "hp": 124,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_hellhound_6613",
+      "name": "Skeleton Hellhound",
+      "hp": 110,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_hellhound_hard_6326",
+      "name": "Skeleton Hellhound (hard)",
+      "hp": 132,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_hero_1537",
+      "name": "Skeleton hero",
+      "hp": 124,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_mage_4319",
+      "name": "Skeleton Mage",
+      "hp": 80,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_thug_1541",
+      "name": "Skeleton thug",
+      "hp": 124,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "skeleton_warlord_1539",
+      "name": "Skeleton warlord",
+      "hp": 124,
+      "defLevel": 110,
+      "defBonus": 0
+    },
+    {
+      "key": "skogre_872",
+      "name": "Skogre",
+      "hp": 71,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "skotizo_7286",
+      "name": "Skotizo",
+      "hp": 450,
+      "defLevel": 200,
+      "defBonus": 0
+    },
+    {
+      "key": "skraeling_773",
+      "name": "Skraeling",
+      "hp": 1,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "slagilith_1362",
+      "name": "Slagilith",
+      "hp": 60,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "slagilith_hard_6324",
+      "name": "Slagilith (hard)",
+      "hp": 150,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "slash_bash_882",
+      "name": "Slash Bash",
+      "hp": 100,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "sleepwalker_9446",
+      "name": "Sleepwalker",
+      "hp": 10,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "slug_prince_4797",
+      "name": "Slug Prince",
+      "hp": 70,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "small_lizard_462",
+      "name": "Small Lizard",
+      "hp": 15,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "smoke_devil_498",
+      "name": "Smoke devil",
+      "hp": 185,
+      "defLevel": 275,
+      "defBonus": 0
+    },
+    {
+      "key": "snake_5244",
+      "name": "Snake",
+      "hp": 36,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "snakeling_2045",
+      "name": "Snakeling",
+      "hp": 1,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "sofiya_2626",
+      "name": "Sofiya",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "soldier_4088",
+      "name": "Soldier",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "soldier_tier_1_6905",
+      "name": "Soldier (tier 1)",
+      "hp": 50,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "soldier_tier_2_6907",
+      "name": "Soldier (tier 2)",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "soldier_tier_3_6909",
+      "name": "Soldier (tier 3)",
+      "hp": 55,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "soldier_tier_4_6911",
+      "name": "Soldier (tier 4)",
+      "hp": 65,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "soldier_tier_5_6913",
+      "name": "Soldier (tier 5)",
+      "hp": 90,
+      "defLevel": 86,
+      "defBonus": 0
+    },
+    {
+      "key": "solus_dellagar_4962",
+      "name": "Solus Dellagar",
+      "hp": 40,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "sorebones_561",
+      "name": "Sorebones",
+      "hp": 52,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "soulless_508",
+      "name": "Soulless",
+      "hp": 24,
+      "defLevel": 18,
+      "defBonus": 0
+    },
+    {
+      "key": "sourhog_10435",
+      "name": "Sourhog",
+      "hp": 40,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "spawn_8056",
+      "name": "Spawn",
+      "hp": 80,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "spawn_of_sarachnis_8714",
+      "name": "Spawn of Sarachnis",
+      "hp": 30,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "speedy_keith_303",
+      "name": "Speedy Keith",
+      "hp": 37,
+      "defLevel": 27,
+      "defBonus": 0
+    },
+    {
+      "key": "spider_11176",
+      "name": "Spider",
+      "hp": 100,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "spidine_3602",
+      "name": "Spidine",
+      "hp": 35,
+      "defLevel": 36,
+      "defBonus": 0
+    },
+    {
+      "key": "spiked_turoth_10397",
+      "name": "Spiked Turoth",
+      "hp": 195,
+      "defLevel": 154,
+      "defBonus": 0
+    },
+    {
+      "key": "spinner_1712",
+      "name": "Spinner",
+      "hp": 101,
+      "defLevel": 118,
+      "defBonus": 0
+    },
+    {
+      "key": "spinolyp_5947",
+      "name": "Spinolyp",
+      "hp": 100,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "spiritual_mage_2244",
+      "name": "Spiritual mage",
+      "hp": 106,
+      "defLevel": 103,
+      "defBonus": 0
+    },
+    {
+      "key": "spiritual_ranger_2242",
+      "name": "Spiritual ranger",
+      "hp": 131,
+      "defLevel": 96,
+      "defBonus": 0
+    },
+    {
+      "key": "spiritual_warrior_2243",
+      "name": "Spiritual warrior",
+      "hp": 131,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "spitting_wyvern_7794",
+      "name": "Spitting Wyvern",
+      "hp": 200,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "splatter_1693",
+      "name": "Splatter",
+      "hp": 53,
+      "defLevel": 113,
+      "defBonus": 0
+    },
+    {
+      "key": "stag_1845",
+      "name": "Stag",
+      "hp": 19,
+      "defLevel": 13,
+      "defBonus": 0
+    },
+    {
+      "key": "starlight_2206",
+      "name": "Starlight",
+      "hp": 160,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "steel_dragon_7255",
+      "name": "Steel dragon",
+      "hp": 250,
+      "defLevel": 235,
+      "defBonus": 0
+    },
+    {
+      "key": "stick_926",
+      "name": "Stick",
+      "hp": 135,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "stone_guardian_8064",
+      "name": "Stone Guardian",
+      "hp": 62,
+      "defLevel": 138,
+      "defBonus": 0
+    },
+    {
+      "key": "stranger_685",
+      "name": "Stranger",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "suit_of_armour_5043",
+      "name": "Suit of armour",
+      "hp": 29,
+      "defLevel": 9,
+      "defBonus": 0
+    },
+    {
+      "key": "sulphur_lizard_8614",
+      "name": "Sulphur Lizard",
+      "hp": 50,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "summoned_zombie_69",
+      "name": "Summoned Zombie",
+      "hp": 22,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "suqah_787",
+      "name": "Suqah",
+      "hp": 105,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "svetlana_2621",
+      "name": "Svetlana",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "swamp_crab_8297",
+      "name": "Swamp Crab",
+      "hp": 75,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "swamp_frog_8578",
+      "name": "Swamp frog",
+      "hp": 25,
+      "defLevel": 15,
+      "defBonus": 0
+    },
+    {
+      "key": "swamp_snake_5617",
+      "name": "Swamp snake",
+      "hp": 130,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "swordchick_3603",
+      "name": "Swordchick",
+      "hp": 35,
+      "defLevel": 45,
+      "defBonus": 0
+    },
+    {
+      "key": "taloned_wyvern_7793",
+      "name": "Taloned Wyvern",
+      "hp": 200,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "tanglefoot_5848",
+      "name": "Tanglefoot",
+      "hp": 102,
+      "defLevel": 91,
+      "defBonus": 0
+    },
+    {
+      "key": "tanglefoot_hard_6291",
+      "name": "Tanglefoot (hard)",
+      "hp": 204,
+      "defLevel": 91,
+      "defBonus": 0
+    },
+    {
+      "key": "tar_monster_7804",
+      "name": "Tar Monster",
+      "hp": 200,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "tarik_4757",
+      "name": "Tarik",
+      "hp": 22,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "tarn_6476",
+      "name": "Tarn",
+      "hp": 80,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "tekton_7545",
+      "name": "Tekton",
+      "hp": 450,
+      "defLevel": 246,
+      "defBonus": 0
+    },
+    {
+      "key": "tekton_enraged_7544",
+      "name": "Tekton (enraged)",
+      "hp": 450,
+      "defLevel": 246,
+      "defBonus": 0
+    },
+    {
+      "key": "temple_guardian_7620",
+      "name": "Temple guardian",
+      "hp": 45,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "temple_spider_8703",
+      "name": "Temple Spider",
+      "hp": 70,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "tentacle_5643",
+      "name": "Tentacle",
+      "hp": 75,
+      "defLevel": 75,
+      "defBonus": 0
+    },
+    {
+      "key": "terror_dog_6473",
+      "name": "Terror dog",
+      "hp": 87,
+      "defLevel": 78,
+      "defBonus": 0
+    },
+    {
+      "key": "terrorbird_2064",
+      "name": "Terrorbird",
+      "hp": 34,
+      "defLevel": 19,
+      "defBonus": 0
+    },
+    {
+      "key": "the_draugen_3922",
+      "name": "The Draugen",
+      "hp": 60,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "the_everlasting_3474",
+      "name": "The Everlasting",
+      "hp": 230,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "the_everlasting_hard_6120",
+      "name": "The Everlasting (hard)",
+      "hp": 255,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "the_illusive_3476",
+      "name": "The Illusive",
+      "hp": 140,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "the_inadequacy_3473",
+      "name": "The Inadequacy",
+      "hp": 180,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "the_inadequacy_hard_6119",
+      "name": "The Inadequacy (hard)",
+      "hp": 255,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "the_jormungand_9291",
+      "name": "The Jormungand",
+      "hp": 600,
+      "defLevel": 214,
+      "defBonus": 0
+    },
+    {
+      "key": "the_kendal_1377",
+      "name": "The Kendal",
+      "hp": 50,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "the_kendal_hard_6322",
+      "name": "The Kendal (hard)",
+      "hp": 150,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "the_maiden_of_sugadinti_8360",
+      "name": "The Maiden of Sugadinti",
+      "hp": 3500,
+      "defLevel": 200,
+      "defBonus": 0
+    },
+    {
+      "key": "the_mimic_8633",
+      "name": "The Mimic",
+      "hp": 230,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "the_nightmare_9425",
+      "name": "The Nightmare",
+      "hp": 2400,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "the_shaikahan_4708",
+      "name": "The Shaikahan",
+      "hp": 100,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "the_untouchable_3475",
+      "name": "The Untouchable",
+      "hp": 90,
+      "defLevel": 434,
+      "defBonus": 0
+    },
+    {
+      "key": "the_untouchable_hard_6121",
+      "name": "The Untouchable (hard)",
+      "hp": 180,
+      "defLevel": 434,
+      "defBonus": 0
+    },
+    {
+      "key": "thermonuclear_smoke_devil_499",
+      "name": "Thermonuclear smoke devil",
+      "hp": 240,
+      "defLevel": 360,
+      "defBonus": 0
+    },
+    {
+      "key": "thief_7916",
+      "name": "Thief",
+      "hp": 22,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "thing_under_the_bed_2115",
+      "name": "Thing under the bed",
+      "hp": 25,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "third_age_mage_8637",
+      "name": "Third Age Mage",
+      "hp": 40,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "third_age_ranger_8636",
+      "name": "Third Age Ranger",
+      "hp": 40,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "third_age_warrior_8635",
+      "name": "Third Age Warrior",
+      "hp": 40,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "thora_3682",
+      "name": "Thora",
+      "hp": 1,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "thorhild_3677",
+      "name": "Thorhild",
+      "hp": 1,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "thrantax_the_mighty_3518",
+      "name": "Thrantax the Mighty",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "thrower_troll_931",
+      "name": "Thrower Troll",
+      "hp": 95,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "thug_525",
+      "name": "Thug",
+      "hp": 18,
+      "defLevel": 9,
+      "defBonus": 0
+    },
+    {
+      "key": "tok_xil_141",
+      "name": "Tok-Xil",
+      "hp": 60,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "tolna_1075",
+      "name": "Tolna",
+      "hp": 37,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "torag_the_corrupted_1676",
+      "name": "Torag the Corrupted",
+      "hp": 100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "torcher_1722",
+      "name": "Torcher",
+      "hp": 71,
+      "defLevel": 89,
+      "defBonus": 0
+    },
+    {
+      "key": "tormented_soul_8512",
+      "name": "Tormented Soul",
+      "hp": 20,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "tortoise_6076",
+      "name": "Tortoise",
+      "hp": 120,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "tortured_gorilla_7150",
+      "name": "Tortured gorilla",
+      "hp": 210,
+      "defLevel": 95,
+      "defBonus": 0
+    },
+    {
+      "key": "tortured_soul_2999",
+      "name": "Tortured soul",
+      "hp": 51,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "tough_guy_3551",
+      "name": "Tough Guy",
+      "hp": 75,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "tower_archer_6068",
+      "name": "Tower Archer",
+      "hp": 90,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "tower_guard_4405",
+      "name": "Tower guard",
+      "hp": 22,
+      "defLevel": 26,
+      "defBonus": 0
+    },
+    {
+      "key": "trapped_soul_8514",
+      "name": "Trapped Soul",
+      "hp": 30,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "trapped_soul_hard_8529",
+      "name": "Trapped Soul (hard)",
+      "hp": 100,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "tree_spirit_1866",
+      "name": "Tree spirit",
+      "hp": 170,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "tree_spirit_hard_6319",
+      "name": "Tree spirit (hard)",
+      "hp": 187,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "treus_dayth_3616",
+      "name": "Treus Dayth",
+      "hp": 100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "tribesman_530",
+      "name": "Tribesman",
+      "hp": 39,
+      "defLevel": 26,
+      "defBonus": 0
+    },
+    {
+      "key": "troll_133",
+      "name": "Troll",
+      "hp": 120,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "troll_general_4120",
+      "name": "Troll general",
+      "hp": 140,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "troll_spectator_4123",
+      "name": "Troll spectator",
+      "hp": 90,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "tstanon_karlak_3130",
+      "name": "Tstanon Karlak",
+      "hp": 142,
+      "defLevel": 125,
+      "defBonus": 0
+    },
+    {
+      "key": "turoth_427",
+      "name": "Turoth",
+      "hp": 81,
+      "defLevel": 88,
+      "defBonus": 0
+    },
+    {
+      "key": "twig_4131",
+      "name": "Twig",
+      "hp": 90,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "twisted_banshee_7272",
+      "name": "Twisted Banshee",
+      "hp": 100,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "typhor_9296",
+      "name": "Typhor",
+      "hp": 360,
+      "defLevel": 186,
+      "defBonus": 0
+    },
+    {
+      "key": "tyras_guard_639",
+      "name": "Tyras guard",
+      "hp": 110,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "tz_kek_2191",
+      "name": "Tz-Kek",
+      "hp": 20,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "tz_kih_2189",
+      "name": "Tz-Kih",
+      "hp": 10,
+      "defLevel": 15,
+      "defBonus": 0
+    },
+    {
+      "key": "tzhaar_hur_2161",
+      "name": "TzHaar-Hur",
+      "hp": 80,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "tzhaar_ket_7679",
+      "name": "TzHaar-Ket",
+      "hp": 200,
+      "defLevel": 190,
+      "defBonus": 0
+    },
+    {
+      "key": "tzhaar_mej_2154",
+      "name": "TzHaar-Mej",
+      "hp": 100,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "tzhaar_xil_2167",
+      "name": "TzHaar-Xil",
+      "hp": 120,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "tzkal_zuk_7706",
+      "name": "TzKal-Zuk",
+      "hp": 1200,
+      "defLevel": 260,
+      "defBonus": 0
+    },
+    {
+      "key": "tztok_jad_3127",
+      "name": "TzTok-Jad",
+      "hp": 250,
+      "defLevel": 480,
+      "defBonus": 0
+    },
+    {
+      "key": "ugthanki_4652",
+      "name": "Ugthanki",
+      "hp": 45,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "ulfric_4500",
+      "name": "Ulfric",
+      "hp": 60,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "undead_chicken_2993",
+      "name": "Undead chicken",
+      "hp": 3,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "undead_cow_2992",
+      "name": "Undead cow",
+      "hp": 8,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "undead_druid_2145",
+      "name": "Undead Druid",
+      "hp": 140,
+      "defLevel": 60,
+      "defBonus": 0
+    },
+    {
+      "key": "undead_lumberjack_5681",
+      "name": "Undead Lumberjack",
+      "hp": 14,
+      "defLevel": 14,
+      "defBonus": 0
+    },
+    {
+      "key": "undead_one_5349",
+      "name": "Undead one",
+      "hp": 59,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "undead_zealot_10591",
+      "name": "Undead Zealot",
+      "hp": 28,
+      "defLevel": 38,
+      "defBonus": 0
+    },
+    {
+      "key": "ungadulu_3958",
+      "name": "Ungadulu",
+      "hp": 150,
+      "defLevel": 147,
+      "defBonus": 0
+    },
+    {
+      "key": "unicorn_2837",
+      "name": "Unicorn",
+      "hp": 19,
+      "defLevel": 13,
+      "defBonus": 0
+    },
+    {
+      "key": "unicorn_foal_3910",
+      "name": "Unicorn Foal",
+      "hp": 15,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "unicow_3601",
+      "name": "Unicow",
+      "hp": 24,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "urium_shade_10589",
+      "name": "Urium Shade",
+      "hp": 130,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "urium_shadow_6143",
+      "name": "Urium Shadow",
+      "hp": 130,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "valgerd_3683",
+      "name": "Valgerd",
+      "hp": 1,
+      "defLevel": 3,
+      "defBonus": 0
+    },
+    {
+      "key": "vampyre_juvenile_3692",
+      "name": "Vampyre Juvenile",
+      "hp": 60,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "vampyre_juvinate_5636",
+      "name": "Vampyre Juvinate",
+      "hp": 150,
+      "defLevel": 65,
+      "defBonus": 0
+    },
+    {
+      "key": "vanguard_7527",
+      "name": "Vanguard",
+      "hp": 280,
+      "defLevel": 240,
+      "defBonus": 0
+    },
+    {
+      "key": "vanstrom_klause_3735",
+      "name": "Vanstrom Klause",
+      "hp": 155,
+      "defLevel": 150,
+      "defBonus": 0
+    },
+    {
+      "key": "venenatis_6504",
+      "name": "Venenatis",
+      "hp": 255,
+      "defLevel": 490,
+      "defBonus": 0
+    },
+    {
+      "key": "vera_2630",
+      "name": "Vera",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "verac_the_defiled_1677",
+      "name": "Verac the Defiled",
+      "hp": 100,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "verzik_vitur_8370",
+      "name": "Verzik Vitur",
+      "hp": 2000,
+      "defLevel": 20,
+      "defBonus": 0
+    },
+    {
+      "key": "vet_ion_6611",
+      "name": "Vet'ion",
+      "hp": 255,
+      "defLevel": 395,
+      "defBonus": 0
+    },
+    {
+      "key": "vet_ion_reborn_6612",
+      "name": "Vet'ion Reborn",
+      "hp": 255,
+      "defLevel": 395,
+      "defBonus": 0
+    },
+    {
+      "key": "vitreous_jelly_7399",
+      "name": "Vitreous Jelly",
+      "hp": 190,
+      "defLevel": 220,
+      "defBonus": 0
+    },
+    {
+      "key": "vitreous_warped_jelly_7400",
+      "name": "Vitreous warped Jelly",
+      "hp": 220,
+      "defLevel": 250,
+      "defBonus": 0
+    },
+    {
+      "key": "viyeldi_3963",
+      "name": "Viyeldi",
+      "hp": 80,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "vorkath_8061",
+      "name": "Vorkath",
+      "hp": 750,
+      "defLevel": 214,
+      "defBonus": 0
+    },
+    {
+      "key": "vulture_1267",
+      "name": "Vulture",
+      "hp": 10,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "vyrewatch_3720",
+      "name": "Vyrewatch",
+      "hp": 110,
+      "defLevel": 85,
+      "defBonus": 0
+    },
+    {
+      "key": "vyrewatch_sentinel_9756",
+      "name": "Vyrewatch Sentinel",
+      "hp": 150,
+      "defLevel": 180,
+      "defBonus": 0
+    },
+    {
+      "key": "wall_beast_476",
+      "name": "Wall beast",
+      "hp": 105,
+      "defLevel": 16,
+      "defBonus": 0
+    },
+    {
+      "key": "wallasalki_5938",
+      "name": "Wallasalki",
+      "hp": 120,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "warped_jelly_7277",
+      "name": "Warped Jelly",
+      "hp": 140,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "warrior_3950",
+      "name": "Warrior",
+      "hp": 50,
+      "defLevel": 40,
+      "defBonus": 0
+    },
+    {
+      "key": "warrior_woman_3260",
+      "name": "Warrior woman",
+      "hp": 20,
+      "defLevel": 22,
+      "defBonus": 0
+    },
+    {
+      "key": "watchman_5420",
+      "name": "Watchman",
+      "hp": 22,
+      "defLevel": 31,
+      "defBonus": 0
+    },
+    {
+      "key": "water_elemental_1370",
+      "name": "Water elemental",
+      "hp": 30,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "water_wizard_1557",
+      "name": "Water wizard",
+      "hp": 25,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "waterfiend_2916",
+      "name": "Waterfiend",
+      "hp": 128,
+      "defLevel": 128,
+      "defBonus": 0
+    },
+    {
+      "key": "weaponsmaster_5211",
+      "name": "Weaponsmaster",
+      "hp": 20,
+      "defLevel": 21,
+      "defBonus": 0
+    },
+    {
+      "key": "werewolf_2593",
+      "name": "Werewolf",
+      "hp": 100,
+      "defLevel": 70,
+      "defBonus": 0
+    },
+    {
+      "key": "white_golem_4743",
+      "name": "White golem",
+      "hp": 80,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "white_knight_1829",
+      "name": "White Knight",
+      "hp": 55,
+      "defLevel": 27,
+      "defBonus": 0
+    },
+    {
+      "key": "white_wolf_108",
+      "name": "White wolf",
+      "hp": 44,
+      "defLevel": 32,
+      "defBonus": 0
+    },
+    {
+      "key": "wild_dog_112",
+      "name": "Wild dog",
+      "hp": 62,
+      "defLevel": 54,
+      "defBonus": 0
+    },
+    {
+      "key": "wilson_3865",
+      "name": "Wilson",
+      "hp": 50,
+      "defLevel": 25,
+      "defBonus": 0
+    },
+    {
+      "key": "wingman_skree_3163",
+      "name": "Wingman Skree",
+      "hp": 121,
+      "defLevel": 160,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_514",
+      "name": "Witch",
+      "hp": 10,
+      "defLevel": 0,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_s_experiment_3996",
+      "name": "Witch's experiment",
+      "hp": 21,
+      "defLevel": 19,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_s_experiment_fourth_form_3999",
+      "name": "Witch's experiment (fourth form)",
+      "hp": 51,
+      "defLevel": 49,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_s_experiment_fourth_form_hard_6336",
+      "name": "Witch's experiment (fourth form) (hard)",
+      "hp": 113,
+      "defLevel": 49,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_s_experiment_hard_6333",
+      "name": "Witch's experiment (hard)",
+      "hp": 63,
+      "defLevel": 19,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_s_experiment_second_form_3997",
+      "name": "Witch's experiment (second form)",
+      "hp": 31,
+      "defLevel": 29,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_s_experiment_second_form_hard_6334",
+      "name": "Witch's experiment (second form) (hard)",
+      "hp": 93,
+      "defLevel": 29,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_s_experiment_third_form_3998",
+      "name": "Witch's experiment (third form)",
+      "hp": 41,
+      "defLevel": 39,
+      "defBonus": 0
+    },
+    {
+      "key": "witch_s_experiment_third_form_hard_6335",
+      "name": "Witch's experiment (third form) (hard)",
+      "hp": 103,
+      "defLevel": 39,
+      "defBonus": 0
+    },
+    {
+      "key": "wizard_3257",
+      "name": "Wizard",
+      "hp": 14,
+      "defLevel": 5,
+      "defBonus": 0
+    },
+    {
+      "key": "wolf_10522",
+      "name": "Wolf",
+      "hp": 80,
+      "defLevel": 30,
+      "defBonus": 0
+    },
+    {
+      "key": "woman_1142",
+      "name": "Woman",
+      "hp": 23,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "wormbrain_820",
+      "name": "Wormbrain",
+      "hp": 5,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "wyrm_8610",
+      "name": "Wyrm",
+      "hp": 130,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "xamphur_10955",
+      "name": "Xamphur",
+      "hp": 450,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "xarpus_8340",
+      "name": "Xarpus",
+      "hp": 4300,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "yadviga_2628",
+      "name": "Yadviga",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "yak_5816",
+      "name": "Yak",
+      "hp": 50,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "yt_hurkot_7701",
+      "name": "Yt-HurKot",
+      "hp": 90,
+      "defLevel": 100,
+      "defBonus": 0
+    },
+    {
+      "key": "yt_mejkot_3123",
+      "name": "Yt-MejKot",
+      "hp": 80,
+      "defLevel": 120,
+      "defBonus": 0
+    },
+    {
+      "key": "yuri_2615",
+      "name": "Yuri",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "zakl_n_gritch_3131",
+      "name": "Zakl'n Gritch",
+      "hp": 150,
+      "defLevel": 127,
+      "defBonus": 0
+    },
+    {
+      "key": "zalcano_9049",
+      "name": "Zalcano",
+      "hp": 300,
+      "defLevel": 1,
+      "defBonus": 0
+    },
+    {
+      "key": "zamorak_crafter_7426",
+      "name": "Zamorak crafter",
+      "hp": 25,
+      "defLevel": 12,
+      "defBonus": 0
+    },
+    {
+      "key": "zamorak_mage_7422",
+      "name": "Zamorak mage",
+      "hp": 50,
+      "defLevel": 82,
+      "defBonus": 0
+    },
+    {
+      "key": "zamorak_ranger_7420",
+      "name": "Zamorak ranger",
+      "hp": 50,
+      "defLevel": 80,
+      "defBonus": 0
+    },
+    {
+      "key": "zamorak_warrior_7418",
+      "name": "Zamorak warrior",
+      "hp": 45,
+      "defLevel": 90,
+      "defBonus": 0
+    },
+    {
+      "key": "zamorak_wizard_2954",
+      "name": "Zamorak wizard",
+      "hp": 76,
+      "defLevel": 24,
+      "defBonus": 0
+    },
+    {
+      "key": "zogre_866",
+      "name": "Zogre",
+      "hp": 71,
+      "defLevel": 35,
+      "defBonus": 0
+    },
+    {
+      "key": "zoja_2631",
+      "name": "Zoja",
+      "hp": 60,
+      "defLevel": 10,
+      "defBonus": 0
+    },
+    {
+      "key": "zombie_6741",
+      "name": "Zombie",
+      "hp": 170,
+      "defLevel": 130,
+      "defBonus": 0
+    },
+    {
+      "key": "zombie_pirate_563",
+      "name": "Zombie pirate",
+      "hp": 52,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "zombie_rat_3969",
+      "name": "Zombie rat",
+      "hp": 5,
+      "defLevel": 2,
+      "defBonus": 0
+    },
+    {
+      "key": "zombie_swab_619",
+      "name": "Zombie swab",
+      "hp": 50,
+      "defLevel": 50,
+      "defBonus": 0
+    },
+    {
+      "key": "zombies_champion_3359",
+      "name": "Zombies Champion",
+      "hp": 60,
+      "defLevel": 42,
+      "defBonus": 0
+    },
+    {
+      "key": "zombified_spawn_8063",
+      "name": "Zombified Spawn",
+      "hp": 38,
+      "defLevel": 6,
+      "defBonus": 0
+    },
+    {
+      "key": "zulrah_2042",
+      "name": "Zulrah",
+      "hp": 500,
+      "defLevel": 300,
+      "defBonus": 0
+    },
+    {
+      "key": "zygomite_537",
+      "name": "Zygomite",
+      "hp": 65,
+      "defLevel": 65,
+      "defBonus": 0
+    }
+  ]
+}

@@ -35,6 +35,16 @@ export default function DisclaimerPage() {
           balance changes, attachments, range, accuracy, recoil, player movement, latency, bloom/RNG,
           and other factors. Use results as a guide—not a guarantee.
         </p>
+        <p className="mt-8 text-neutral-200 leading-relaxed">
+  GamerStation is not affiliated with, endorsed by, or associated with Jagex Ltd., OSRSX, the Old School RuneScape Wiki, or any third-party RuneScape services.
+Old School RuneScape and RuneScape are trademarks of Jagex Ltd.
+All trademarks, game content, and data belong to their respective owners.
+</p>
+<p className="mt-8 text-neutral-200 leading-relaxed">
+  All calculations are based on publicly available game mechanics and independently compiled data.
+No proprietary, private, or restricted data sources are used.
+This site does not scrape, mirror, or redistribute content from OSRSX or any other third-party service.
+</p>
       </div>
     </main>
   </main>
