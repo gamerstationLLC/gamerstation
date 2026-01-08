@@ -3,6 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   console.log("CSV URL:", process.env.COD_WEAPONS_CSV_URL);
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
       {/* Ambient background */}
@@ -31,8 +32,8 @@ export default function Home() {
       <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         {/* Top bar */}
         <header className="flex items-center justify-between gap-3">
-          {/* LOGO */}
-          <Link href="/" className="flex items-center">
+          {/* LOGO + BRAND */}
+          <Link href="/" className="flex items-center min-w-0">
             <img
               src="/gs-logo-v2.png"
               alt="GamerStation"
@@ -45,16 +46,34 @@ export default function Home() {
                 sm:h-28 sm:p-5
               "
             />
-           
-<h1 className="ml-3 text-4xl font-black tracking-tight">
-  GamerStation™
-</h1>
 
-
-
+            {/* ✅ SEO H1 + responsive sizing + slight right shift */}
+            <h1
+              className="
+                ml-3
+                min-w-0
+                translate-x-[2px]
+                text-2xl
+                font-black
+                tracking-tight
+                leading-none
+                sm:translate-x-[4px]
+                sm:text-4xl
+              "
+            >
+              GamerStation<span className="align-super text-[0.65em]">™</span>
+            </h1>
           </Link>
-<meta name="google-site-verification" content="4PC_v8BAE_F7-BT66Rz3aodHsFygO6pjz7vrKWRHYpI" />
-<meta name="google-site-verification" content="BbCfisC6OtfA0Xjo0YAizMxT_fv3QDqaaZQr4nudzRw" />
+
+          <meta
+            name="google-site-verification"
+            content="4PC_v8BAE_F7-BT66Rz3aodHsFygO6pjz7vrKWRHYpI"
+          />
+          <meta
+            name="google-site-verification"
+            content="BbCfisC6OtfA0Xjo0YAizMxT_fv3QDqaaZQr4nudzRw"
+          />
+
           <nav className="flex items-center gap-2 sm:gap-3 text-sm">
             <Link
               href="/calculators"
@@ -89,10 +108,11 @@ export default function Home() {
               Live calculators • fast results • clean UI
             </div>
 
-            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:mt-6 sm:text-3xl">
+            {/* (kept exactly as you had it) */}
+            <h2 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:mt-6 sm:text-3xl">
               Multi-game calculators <span className="text-neutral-300">&</span>{" "}
               stats tools.
-            </h1>
+            </h2>
 
             <p className="mt-4 max-w-xl text-sm text-neutral-300 sm:text-base">
               One hub for high-signal tools:{" "}
@@ -193,9 +213,10 @@ export default function Home() {
               <div className="mt-4 rounded-2xl border border-white/10 bg-black/30 p-4 sm:mt-6">
                 <div className="text-xs text-neutral-400">Coming next</div>
                 <ul className="mt-2 space-y-1 text-sm text-neutral-200">
-                  <li>• Account linking for OSRS</li>
-                  <li>• Headshot/chest multipliers</li>
-                  <li>• Compare multiple weapons</li>
+                  <li>• World of Warcraft calculator (PvP and PvE)</li>
+                
+                  <li>• Compare multiple weapons (COD and Fortnite)</li>
+                  <li>• XP calculator for OSRS</li>
                 </ul>
               </div>
             </div>
@@ -204,16 +225,14 @@ export default function Home() {
             <div className="pointer-events-none absolute -inset-1 -z-10 rounded-[28px] bg-gradient-to-r from-white/10 via-white/5 to-transparent blur-xl" />
           </div>
         </section>
+
         <footer className="mt-16 border-t border-neutral-800 pt-6 text-center text-xs text-neutral-500">
-  GamerStation is not affiliated with or endorsed by Activision, Epic Games, or any game publishers.
-  <br />
-  All trademarks belong to their respective owners.
-</footer>
-
+          GamerStation is not affiliated with or endorsed by Activision, Epic
+          Games, or any game publishers.
+          <br />
+          All trademarks belong to their respective owners.
+        </footer>
       </div>
-      
-
     </main>
-    
   );
 }
