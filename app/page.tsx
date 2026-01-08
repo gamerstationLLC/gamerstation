@@ -45,6 +45,13 @@ export default function Home() {
                 sm:h-28 sm:p-5
               "
             />
+           
+<h1 className="ml-3 text-4xl font-black tracking-tight">
+  GamerStation™
+</h1>
+
+
+
           </Link>
 <meta name="google-site-verification" content="4PC_v8BAE_F7-BT66Rz3aodHsFygO6pjz7vrKWRHYpI" />
 <meta name="google-site-verification" content="BbCfisC6OtfA0Xjo0YAizMxT_fv3QDqaaZQr4nudzRw" />
@@ -82,7 +89,7 @@ export default function Home() {
               Live calculators • fast results • clean UI
             </div>
 
-            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:mt-6 sm:text-5xl">
+            <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:mt-6 sm:text-3xl">
               Multi-game calculators <span className="text-neutral-300">&</span>{" "}
               stats tools.
             </h1>
