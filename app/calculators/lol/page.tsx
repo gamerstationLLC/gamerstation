@@ -11,7 +11,6 @@ export const metadata: Metadata = {
     "Calculate burst damage, DPS, and time-to-kill in League of Legends using official Riot Data Dragon values. Simple and Advanced modes supported.",
 };
 
-
 type LolChampionFile = {
   version?: string;
   champions?: any[];
@@ -54,7 +53,38 @@ export type ItemRow = {
   description: string;
 };
 
-async function loadLolIndex(): Promise<{
+/**
+ * ✅ Cached "latest patch" getter with a safe fallback.
+ * - Uses Data Dragon versions endpoint (cached by Next)
+ * - Falls back to your local data/lol/version.json if Riot fetch fails
+ */
+async function getLatestDdragonVersion(): Promise<string> {
+  const fallbackPath = path.join(process.cwd(), "data", "lol", "version.json");
+  let fallback = "unknown";
+
+  try {
+    const raw = await fs.readFile(fallbackPath, "utf-8");
+    const json = JSON.parse(raw) as { version?: string };
+    fallback = json.version ?? fallback;
+  } catch {
+    // ignore
+  }
+
+  try {
+    const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
+      next: { revalidate: 60 * 60 * 6 }, // 6 hours
+    });
+
+    if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
+
+    const versions = (await res.json()) as string[];
+    return versions?.[0] ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+async function loadLolIndex(version: string): Promise<{
   patch: string;
   champions: ChampionIndexRow[];
 }> {
@@ -62,7 +92,8 @@ async function loadLolIndex(): Promise<{
   const raw = await fs.readFile(filePath, "utf-8");
   const json = JSON.parse(raw) as LolChampionFile;
 
-  const patch = json.version ?? "unknown";
+  // ✅ Patch shown on the page comes from cached DDragon version (auto-updating)
+  const patch = version;
 
   const champions: ChampionIndexRow[] = (json.champions ?? [])
     .map((c: any) => ({
@@ -91,12 +122,14 @@ async function loadLolIndex(): Promise<{
   return { patch, champions };
 }
 
-async function loadLolItems(): Promise<{ patch: string; items: ItemRow[] }> {
+async function loadLolItems(version: string): Promise<{ patch: string; items: ItemRow[] }> {
   const filePath = path.join(process.cwd(), "data", "lol", "items.json");
   const raw = await fs.readFile(filePath, "utf-8");
   const json = JSON.parse(raw) as LolItemsFile;
 
-  const patch = json.version ?? "unknown";
+  // ✅ Patch shown on the page comes from cached DDragon version (auto-updating)
+  const patch = version;
+
   const SR_MAP_ID = "11";
 
   // Build rows while keeping raw fields needed for filtering
@@ -143,20 +176,19 @@ async function loadLolItems(): Promise<{ patch: string; items: ItemRow[] }> {
   return { patch, items };
 }
 
-
 export default async function LolCalculatorPage() {
+  // ✅ Get a cached "latest patch" once and reuse it
+  const version = await getLatestDdragonVersion();
+
   const [{ patch, champions }, { items }] = await Promise.all([
-    loadLolIndex(),
-    loadLolItems(),
+    loadLolIndex(version),
+    loadLolItems(version),
   ]);
 
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
-        <Link
-          href="/calculators"
-          className="text-sm text-neutral-300 hover:text-white"
-        >
+        <Link href="/calculators" className="text-sm text-neutral-300 hover:text-white">
           ← Back to Calculators
         </Link>
 
@@ -169,13 +201,12 @@ export default async function LolCalculatorPage() {
         </p>
 
         <p className="mt-3 text-neutral-300 max-w-3xl">
-          Choose a champion and see how much damage you can deal in a combo or over a short time window. [Summoner's Rift Only]
+          Choose a champion and see how much damage you can deal in a combo or over a short time window.
+          [Summoner's Rift Only]
         </p>
-
 
         <LolClient champions={champions} patch={patch} items={items} />
       </div>
     </main>
-
-);
+  );
 }
