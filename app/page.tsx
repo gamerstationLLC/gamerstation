@@ -109,7 +109,7 @@ export default function Home() {
             </div>
 
             {/* (kept exactly as you had it) */}
-            <h2 className="mt-5 text-4xl font-bold leading-tight tracking-tight sm:mt-6 sm:text-3xl">
+            <h2 className="mt-5 text-xl font-bold leading-tight tracking-tight sm:mt-6 sm:text-3xl">
               Multi-game calculators <span className="text-neutral-300">&</span>{" "}
               stats tools.
             </h2>
