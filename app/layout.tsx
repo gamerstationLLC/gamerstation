@@ -14,12 +14,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // ✅ Critical: makes canonicals/OG URLs absolute and consistent
   metadataBase: new URL("https://gamerstation.gg"),
+
   title: "GamerStation",
-  description: "Multi-game calculators, stats tools, and competitive gaming utilities.",
-  alternates: {
-    canonical: "/",
-  },
+  description:
+    "Multi-game calculators, stats tools, and competitive gaming utilities.",
+
+  // ✅ Keep icons here (global is perfect)
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -30,8 +32,10 @@ export const metadata: Metadata = {
     ],
     apple: "/favicon-192x192.png",
   },
-};
 
+  // ❌ IMPORTANT: no global canonical here
+  // Each page should canonicalize to itself (or set its own canonical)
+};
 
 export default function RootLayout({
   children,
@@ -40,9 +44,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="min-h-dvh flex flex-col">
           {/* Main scrollable content */}
           <main className="flex-1">{children}</main>

@@ -1,9 +1,20 @@
-// app/page.tsx
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export default function Home() {
-  console.log("CSV URL:", process.env.COD_WEAPONS_CSV_URL);
+// ✅ Homepage-only metadata (canonical + google verification)
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+  verification: {
+    google: [
+      "4PC_v8BAE_F7-BT66Rz3aodHsFygO6pjz7vrKWRHYpI",
+      "BbCfisC6OtfA0Xjo0YAizMxT_fv3QDqaaZQr4nudzRw",
+    ],
+  },
+};
 
+export default function Home() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
       {/* Ambient background */}
@@ -65,14 +76,7 @@ export default function Home() {
             </h1>
           </Link>
 
-          <meta
-            name="google-site-verification"
-            content="4PC_v8BAE_F7-BT66Rz3aodHsFygO6pjz7vrKWRHYpI"
-          />
-          <meta
-            name="google-site-verification"
-            content="BbCfisC6OtfA0Xjo0YAizMxT_fv3QDqaaZQr4nudzRw"
-          />
+          {/* ❌ Removed meta tags from body (now in export const metadata) */}
 
           <nav className="flex items-center gap-2 sm:gap-3 text-sm">
             <Link
@@ -214,7 +218,6 @@ export default function Home() {
                 <div className="text-xs text-neutral-400">Coming next</div>
                 <ul className="mt-2 space-y-1 text-sm text-neutral-200">
                   <li>• World of Warcraft calculator (PvP and PvE)</li>
-                
                   <li>• Compare multiple weapons (COD and Fortnite)</li>
                   <li>• XP calculator for OSRS</li>
                 </ul>
