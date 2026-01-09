@@ -14,7 +14,6 @@ import {
 console.log("FORTNITE_WEAPONS:", FORTNITE_WEAPONS.length);
 console.log("CATEGORIES:", CATEGORIES.map((c) => c.value));
 
-
 const HP_PRESETS: { label: string; hp: number }[] = [
   { label: "No shield (100)", hp: 100 },
   { label: "50 shield (150)", hp: 150 },
@@ -32,6 +31,9 @@ function fmt(n: number, digits = 2) {
 }
 
 export default function FortniteTTKPage() {
+  // ✅ MOBILE ONLY tab state
+  const [mobileTab, setMobileTab] = useState<"inputs" | "results">("inputs");
+
   // ✅ class selection
   const [weaponClass, setWeaponClass] = useState<Category>("assault_rifle");
 
@@ -53,8 +55,8 @@ export default function FortniteTTKPage() {
       return;
     }
 
-    // If empty OR not valid for current class, set to first weapon in class
-    const stillValid = weaponId && weaponsForClass.some((w) => w.id === weaponId);
+    const stillValid =
+      weaponId && weaponsForClass.some((w) => w.id === weaponId);
     if (!stillValid) {
       setWeaponId(weaponsForClass[0].id);
     }
@@ -88,8 +90,17 @@ export default function FortniteTTKPage() {
       ? Math.max(0, shotsToKill - 1) / fireRate
       : NaN;
 
+  const ttkLabel =
+    Number.isFinite(ttkSeconds) ? `${fmt(ttkSeconds, 3)}s` : "—";
+
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-12">
+    <main
+      className="
+        min-h-screen bg-black text-white px-6
+        pt-12 pb-[calc(92px+env(safe-area-inset-bottom))]
+        lg:py-12
+      "
+    >
       <div className="mx-auto max-w-6xl">
         <Link
           href="/calculators"
@@ -101,17 +112,58 @@ export default function FortniteTTKPage() {
         <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
           Fortnite TTK Calculator
         </h1>
+
         <p className="mt-2 text-sm text-neutral-400 italic">
-  Not affiliated with, endorsed by, or sponsored by Epic Games.
-</p>
+          Not affiliated with, endorsed by, or sponsored by Epic Games.
+        </p>
+
         <p className="mt-3 text-neutral-300 max-w-2xl">
           Choose a weapon class, weapon, and rarity, then calculate shots-to-kill
           and time-to-kill. (Body damage + headshot multiplier + fire rate.)
         </p>
 
+        {/* ✅ small disclaimer above tabs (mobile only) */}
+        <div className="mt-4 italic text-[11px] text-neutral-400 lg:hidden">
+          Some values are approximations based on patch notes and testing.
+        </div>
+
+        {/* ✅ MOBILE ONLY: sticky Inputs/Results tabs */}
+        <div className="lg:hidden sticky top-0 z-40 -mx-6 mt-4 px-6">
+          <div className="rounded-2xl border border-neutral-800 bg-black/70 backdrop-blur">
+            <div className="flex gap-2 p-2">
+              <button
+                type="button"
+                onClick={() => setMobileTab("inputs")}
+                className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold ${
+                  mobileTab === "inputs"
+                    ? "bg-white/10 text-white"
+                    : "bg-transparent text-neutral-300 hover:bg-white/5"
+                }`}
+              >
+                Inputs
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileTab("results")}
+                className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold ${
+                  mobileTab === "results"
+                    ? "bg-white/10 text-white"
+                    : "bg-transparent text-neutral-300 hover:bg-white/5"
+                }`}
+              >
+                Results
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:items-start">
           {/* Inputs */}
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
+          <section
+            className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 ${
+              mobileTab === "inputs" ? "block" : "hidden"
+            } lg:block`}
+          >
             <h2 className="text-lg font-semibold">Inputs</h2>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -251,7 +303,11 @@ export default function FortniteTTKPage() {
           </section>
 
           {/* Results */}
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 h-fit self-start">
+          <section
+            className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 h-fit self-start ${
+              mobileTab === "results" ? "block" : "hidden"
+            } lg:block`}
+          >
             <h2 className="text-lg font-semibold">Results</h2>
 
             <div className="mt-6 space-y-3">
@@ -273,9 +329,7 @@ export default function FortniteTTKPage() {
                 <span className="text-sm text-neutral-300">
                   Time to kill (TTK)
                 </span>
-                <span className="font-semibold">
-                  {Number.isFinite(ttkSeconds) ? `${fmt(ttkSeconds, 3)}s` : "—"}
-                </span>
+                <span className="font-semibold">{ttkLabel}</span>
               </div>
 
               <div className="mt-4 text-xs text-neutral-500">
@@ -296,6 +350,34 @@ export default function FortniteTTKPage() {
               </div>
             </div>
           </section>
+        </div>
+      </div>
+
+      {/* ✅ MOBILE ONLY: sticky bottom TTK bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+        <div className="border-t border-neutral-800 bg-black/80 backdrop-blur">
+          <div className="mx-auto max-w-6xl px-6 py-3 flex items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => setMobileTab("results")}
+              className="min-w-0 text-left"
+            >
+              <div className="text-[11px] text-neutral-400">
+                {selectedWeapon?.name ?? "—"} • {RARITIES.find(r=>r.value===rarity)?.label ?? rarity} • {targetHp} HP
+              </div>
+              <div className="truncate text-sm font-semibold">TTK: {ttkLabel}</div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setMobileTab(mobileTab === "inputs" ? "results" : "inputs")
+              }
+              className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-neutral-200 hover:bg-white/10"
+            >
+              {mobileTab === "inputs" ? "View results" : "Edit inputs"}
+            </button>
+          </div>
         </div>
       </div>
     </main>

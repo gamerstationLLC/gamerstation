@@ -30,7 +30,7 @@ type UIWeapon = {
   fire_mode?: string;
   weapon_type?: string;
 
-  // ✅ NEW: flat dmg buckets from CSV
+  // ✅ flat dmg buckets from CSV
   dmg10: number;
   dmg25: number;
   dmg50: number;
@@ -96,6 +96,9 @@ export default function CodTtkClient({
   sheetAttachments?: CodAttachmentRow[];
 }) {
   const [weaponClass, setWeaponClass] = useState<WeaponClass>("smg");
+
+  // ✅ MOBILE ONLY tab state
+  const [mobileTab, setMobileTab] = useState<"inputs" | "results">("inputs");
 
   // ✅ map sheet rows -> UIWeapon (expects dmg10/dmg25/dmg50 on each row)
   const weapons: UIWeapon[] = useMemo(() => {
@@ -247,8 +250,18 @@ export default function CodTtkClient({
       ? ((effectiveShots - 1) / shotsPerSecond) * 1000
       : NaN;
 
+  // ✅ sticky bottom bar display (prefer accuracy TTK if user set < 100)
+  const showAccTtk = accuracyStr !== "" && Number(accuracyStr) < 100;
+  const primaryTtk = showAccTtk ? ttkMsWithAccuracy : ttkMs;
+
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-10">
+    <main
+      className="
+        min-h-screen bg-black text-white px-6
+        pt-10 pb-[calc(92px+env(safe-area-inset-bottom))]
+        lg:py-10
+      "
+    >
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center justify-between">
           <Link
@@ -268,11 +281,49 @@ export default function CodTtkClient({
             Pick a weapon, choose Multiplayer or Warzone plates, and get
             shots-to-kill + time-to-kill.
           </p>
+          <div className="mt-4 italic text-[11px] text-neutral-400">
+  Damage values are modeled in tiered ranges and may be approximations.
+</div>
+
+        </div>
+
+        {/* ✅ MOBILE ONLY: sticky Inputs/Results tabs */}
+        <div className="lg:hidden sticky top-0 z-40 -mx-6 mt-6 px-6">
+          <div className="rounded-2xl border border-neutral-800 bg-black/70 backdrop-blur">
+            <div className="flex gap-2 p-2">
+              <button
+                type="button"
+                onClick={() => setMobileTab("inputs")}
+                className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold ${
+                  mobileTab === "inputs"
+                    ? "bg-white/10 text-white"
+                    : "bg-transparent text-neutral-300 hover:bg-white/5"
+                }`}
+              >
+                Inputs
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileTab("results")}
+                className={`flex-1 rounded-xl px-3 py-2 text-sm font-semibold ${
+                  mobileTab === "results"
+                    ? "bg-white/10 text-white"
+                    : "bg-transparent text-neutral-300 hover:bg-white/5"
+                }`}
+              >
+                Results
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-2">
           {/* Inputs */}
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
+          <section
+            className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 ${
+              mobileTab === "inputs" ? "block" : "hidden"
+            } lg:block`}
+          >
             <div className="text-sm font-semibold">Inputs</div>
 
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -469,7 +520,11 @@ export default function CodTtkClient({
           </section>
 
           {/* Results */}
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-4 h-fit self-start">
+          <section
+            className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-4 h-fit self-start ${
+              mobileTab === "results" ? "block" : "hidden"
+            } lg:block`}
+          >
             <div className="text-sm font-semibold">Results</div>
 
             <div className="mt-5 grid gap-3">
@@ -529,6 +584,41 @@ export default function CodTtkClient({
               tick/latency. This tool is meant as a clean baseline.
             </div>
           </section>
+        </div>
+      </div>
+
+      {/* ✅ MOBILE ONLY: sticky bottom TTK bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+        <div className="border-t border-neutral-800 bg-black/80 backdrop-blur">
+          <div className="mx-auto max-w-6xl px-6 py-3 flex items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => setMobileTab("results")}
+              className="min-w-0 text-left"
+            >
+              <div className="text-[11px] text-neutral-400">
+                {selected?.name ?? "—"} • {distanceM}m •{" "}
+                {mode === "wz" ? `WZ (${plates} plates)` : "MP"}
+              </div>
+              <div className="truncate text-sm font-semibold">
+                TTK: {fmtMs(primaryTtk)}
+                {showAccTtk ? (
+                  <span className="text-xs font-normal text-neutral-400">
+                    {" "}
+                    (acc)
+                  </span>
+                ) : null}
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileTab(mobileTab === "inputs" ? "results" : "inputs")}
+              className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-neutral-200 hover:bg-white/10"
+            >
+              {mobileTab === "inputs" ? "View results" : "Edit inputs"}
+            </button>
+          </div>
         </div>
       </div>
     </main>
