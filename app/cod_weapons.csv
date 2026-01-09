@@ -1,15 +1,21 @@
-weapon_name,weapon_type,damage,rpm,headshot_mult,fire_mode
-M15 MOD 0,Assault Rifle,,,,
-AK-27,Assault Rifle,,,,
-MXR-17,Assault Rifle,,,,
-X9 Maverick,Assault Rifle,,,,
-Maddox RFB,Assault Rifle,,,,
-DS20 Mirage,Assault Rifle,,,,
-Peacekeeper MK1,Assault Rifle,,,,
-Ryden 45K,SMG,,,,
-RK-9,SMG,,,,
-Razor 9MM,SMG,,,,
-KOGOT-7,SMG,,,,
-Dravec 45,SMG,,,,
-Carbon 57,SMG,,,,
-MPC-25,SMG,,,,
+weapon_id	weapon_name	weapon_type	dmg_10	dmg_25	dmg_50	rpm	headshot_mult	fire_mode
+m15_mod_0	M15 MOD 0	Assault Rifle	33	33	24	769	1.3	auto
+ak_27	AK-27	Assault Rifle	39	39	35	682	1.2	auto
+mxr_17	MXR-17	Assault Rifle	48	48	34	500	1.3	auto
+x9_maverick	X9 Maverick	Assault Rifle	50	50	50	479	1.2	auto
+maddox_rfb	Maddox RFB	Assault Rifle	35	29	25	690	1.2	auto
+ds20_mirage	DS20 Mirage	Assault Rifle	38	38	32	606	1.3	auto
+peacekeeper_mk2	Peacekeeper MK1	Assault Rifle	30	30	21	870	1.3	auto
+ak27_battle_scar_conversion_kit	AK-27 Battle-Scar Conversion Kit	Assault Rifle	56	47	42	341	1.1	auto
+ryden_45k	Ryden 45K	SMG	33	23	23	909	1.2	auto
+rk_9	RK-9	SMG	47	40	32	556	1.2	burst
+razor_9mm	Razor 9MM	SMG	31	20	20	1000	1.1	auto
+kogot_7	KOGOT-7	SMG	32	22	22	952	1.1	auto
+dravec_45	Dravec 45	SMG	45	38	34	652	1.1	auto
+carbon_57	Carbon 57	SMG	35	24	24	857	1.2	auto
+mpc_25	MPC-25	SMG	39	27	27	750	1.2	auto
+mk_78	MK.78	LMG	35	35	30	652	1.3	auto
+xm325	XM325	LMG	25	25	22	1000	1.2	auto
+sokol_545	SOKOL 545	LMG	44	44	41	583	1.2	auto
+sturmwolf_45	Sturmwolf 45	SMG	34	28	24	820	1.2	auto
+hawker_hx	Hawker HX	Sniper	95	95	95	45	2.5	bolt

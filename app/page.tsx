@@ -38,12 +38,12 @@ export default function Home() {
               src="/gs-logo-v2.png"
               alt="GamerStation"
               className="
-                h-16 w-auto
+                h-20 w-auto
                 rounded-2xl
                 bg-black
-                p-3
+                p-1
                 shadow-[0_0_40px_rgba(0,255,255,0.15)]
-                sm:h-28 sm:p-5
+                sm:h-25 sm:p-2
               "
             />
 

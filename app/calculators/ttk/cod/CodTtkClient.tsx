@@ -405,11 +405,13 @@ export default function CodTtkClient({
                     ))}
                   </select>
                   <div className="mt-1 text-[11px] text-neutral-500">
-                    Note: Most barrels primarily affect recoil, range, or bullet
-                    velocity. Many do not change damage values, and therefore may
-                    not affect time-to-kill. This calculator reflects
-                    damage-based TTK only.
+                    Note: Barrels only. Other attachments typically have no effect on TTK. 
                   </div>
+                  
+               <div className="mt-1 text-[11px] text-neutral-500">
+                    Only barrels that affect damage ranges and TTK are included in this calculator.
+                  </div>
+               
                 </label>
 
                 <div className="rounded-xl border border-neutral-800 bg-black/40 p-3">
