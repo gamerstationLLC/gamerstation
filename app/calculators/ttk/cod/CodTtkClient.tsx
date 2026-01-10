@@ -88,6 +88,14 @@ function bucketForDistance(meters: number): "dmg10" | "dmg25" | "dmg50" {
   return "dmg50";
 }
 
+type RangeKey = "r10" | "r25" | "r50" | "rMax";
+const RANGES: { key: RangeKey; label: string; meters: number }[] = [
+  { key: "r10", label: "0–10m", meters: 10 },
+  { key: "r25", label: "10–25m", meters: 25 },
+  { key: "r50", label: "25–50m", meters: 50 },
+  { key: "rMax", label: "50m+", meters: 999 },
+];
+
 export default function CodTtkClient({
   sheetWeapons,
   sheetAttachments = [],
@@ -99,6 +107,9 @@ export default function CodTtkClient({
 
   // ✅ MOBILE ONLY tab state
   const [mobileTab, setMobileTab] = useState<"inputs" | "results">("inputs");
+
+  // ✅ NEW: hit-zone toggle (torso default)
+  const [hitZone, setHitZone] = useState<"torso" | "headshots">("torso");
 
   // ✅ map sheet rows -> UIWeapon (expects dmg10/dmg25/dmg50 on each row)
   const weapons: UIWeapon[] = useMemo(() => {
@@ -195,9 +206,6 @@ export default function CodTtkClient({
   // ACCURACY: string state so iOS users can delete/backspace normally
   const [accuracyStr, setAccuracyStr] = useState<string>("100");
 
-  // Distance buckets
-  const [distanceM, setDistanceM] = useState<number>(25);
-
   // Editable overrides (RPM only)
   const [rpmOverride, setRpmOverride] = useState<number | "">("");
 
@@ -208,31 +216,8 @@ export default function CodTtkClient({
   const rpm =
     rpmOverride === "" ? selected?.rpm ?? 0 : clamp(Number(rpmOverride), 1, 3000);
 
-  // base damage from sheet (bucketed)
-  const sheetDmg = damageAtMeters(selected, distanceM);
-  const sheetHsm = selected?.headshot_mult ?? 1.0;
-
-  // barrel adds by distance bucket
-  const bucket = bucketForDistance(distanceM);
-  const barrelAdd =
-    bucket === "dmg10"
-      ? selectedBarrel?.dmg10_add ?? 0
-      : bucket === "dmg25"
-      ? selectedBarrel?.dmg25_add ?? 0
-      : selectedBarrel?.dmg50_add ?? 0;
-
-  const basePlusAdds = Math.max(0, sheetDmg + barrelAdd);
-
-  // keep same behavior: damage per shot after multiplier
-  const dmg = basePlusAdds * clamp(sheetHsm, 1, 5);
-
   const shotsPerSecond = rpm / 60;
-  const shotsToKill = dmg > 0 ? Math.ceil(totalHp / dmg) : 0;
-
-  const ttkMs =
-    shotsToKill > 0 && shotsPerSecond > 0
-      ? ((shotsToKill - 1) / shotsPerSecond) * 1000
-      : NaN;
+  const sheetHsm = selected?.headshot_mult ?? 1.0;
 
   // convert accuracy string to number only for math
   const accuracyNumRaw = accuracyStr === "" ? 0 : Number(accuracyStr);
@@ -241,18 +226,65 @@ export default function CodTtkClient({
     1,
     100
   );
-
   const acc = accuracyNum / 100;
-  const effectiveShots = shotsToKill > 0 ? Math.ceil(shotsToKill / acc) : 0;
 
-  const ttkMsWithAccuracy =
-    effectiveShots > 0 && shotsPerSecond > 0
-      ? ((effectiveShots - 1) / shotsPerSecond) * 1000
-      : NaN;
+  // ✅ per-range calc (torso default, headshots toggled)
+  const rangeResults = useMemo(() => {
+    return RANGES.map((r) => {
+      const meters = r.meters;
+
+      // base damage from sheet (bucketed)
+      const sheetDmg = damageAtMeters(selected, meters);
+
+      // barrel adds by distance bucket
+      const bucket = bucketForDistance(meters);
+      const barrelAdd =
+        bucket === "dmg10"
+          ? selectedBarrel?.dmg10_add ?? 0
+          : bucket === "dmg25"
+          ? selectedBarrel?.dmg25_add ?? 0
+          : selectedBarrel?.dmg50_add ?? 0;
+
+      const basePlusAdds = Math.max(0, sheetDmg + barrelAdd);
+
+      // ✅ torso = base damage; headshots = apply headshot mult
+      const dmg =
+        hitZone === "headshots"
+          ? basePlusAdds * clamp(sheetHsm, 1, 5)
+          : basePlusAdds;
+
+      const shotsToKill = dmg > 0 ? Math.ceil(totalHp / dmg) : 0;
+
+      const ttkMs =
+        shotsToKill > 0 && shotsPerSecond > 0
+          ? ((shotsToKill - 1) / shotsPerSecond) * 1000
+          : NaN;
+
+      const effectiveShots = shotsToKill > 0 ? Math.ceil(shotsToKill / acc) : 0;
+
+      const ttkMsWithAccuracy =
+        effectiveShots > 0 && shotsPerSecond > 0
+          ? ((effectiveShots - 1) / shotsPerSecond) * 1000
+          : NaN;
+
+      return {
+        key: r.key,
+        label: r.label,
+        meters,
+        bucket,
+        barrelAdd,
+        sheetDmg,
+        basePlusAdds,
+        dmg,
+        shotsToKill,
+        ttkMs,
+        ttkMsWithAccuracy,
+      };
+    });
+  }, [selected, selectedBarrel, hitZone, sheetHsm, totalHp, shotsPerSecond, acc]);
 
   // ✅ sticky bottom bar display (prefer accuracy TTK if user set < 100)
   const showAccTtk = accuracyStr !== "" && Number(accuracyStr) < 100;
-  const primaryTtk = showAccTtk ? ttkMsWithAccuracy : ttkMs;
 
   return (
     <main
@@ -282,9 +314,8 @@ export default function CodTtkClient({
             shots-to-kill + time-to-kill.
           </p>
           <div className="mt-4 italic text-[11px] text-neutral-400">
-  Damage values are modeled in tiered ranges and may be approximations.
-</div>
-
+            Damage values are modeled in tiered ranges and may be approximations.
+          </div>
         </div>
 
         {/* ✅ MOBILE ONLY: sticky Inputs/Results tabs */}
@@ -405,25 +436,36 @@ export default function CodTtkClient({
                     ))}
                   </select>
                   <div className="mt-1 text-[11px] text-neutral-500">
-                    Note: Barrels only. Other attachments typically have no effect on TTK. 
+                    Note: Barrels only. Other attachments typically have no effect on TTK.
                   </div>
-                  
-               <div className="mt-1 text-[11px] text-neutral-500">
+
+                  <div className="mt-1 text-[11px] text-neutral-500">
                     Only barrels that affect damage ranges and TTK are included in this calculator.
                   </div>
-               
                 </label>
 
+                {/* ✅ Minimal replacement: show adds for each bucket instead of one */}
                 <div className="rounded-xl border border-neutral-800 bg-black/40 p-3">
-                  <div className="text-xs text-neutral-400">Current add</div>
-                  <div className="mt-1 text-lg font-semibold">+{barrelAdd}</div>
-                  <div className="text-xs text-neutral-500">
-                    Bucket:{" "}
-                    {bucket === "dmg10"
-                      ? "10m"
-                      : bucket === "dmg25"
-                      ? "25m"
-                      : "50m"}
+                  <div className="text-xs text-neutral-400">Barrel adds</div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-[11px] text-neutral-300">
+                    <div className="flex items-center justify-between rounded-md border border-neutral-800 bg-black/30 px-2 py-1">
+                      <span className="opacity-70">0–10m</span>
+                      <span className="font-semibold tabular-nums">
+                        +{selectedBarrel?.dmg10_add ?? 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-md border border-neutral-800 bg-black/30 px-2 py-1">
+                      <span className="opacity-70">10–25m</span>
+                      <span className="font-semibold tabular-nums">
+                        +{selectedBarrel?.dmg25_add ?? 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-md border border-neutral-800 bg-black/30 px-2 py-1">
+                      <span className="opacity-70">25m+</span>
+                      <span className="font-semibold tabular-nums">
+                        +{selectedBarrel?.dmg50_add ?? 0}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -454,6 +496,32 @@ export default function CodTtkClient({
                   className="mt-2 w-full rounded-lg border border-neutral-800 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-600"
                   placeholder="100"
                 />
+
+                {/* ✅ NEW: tiny toggle buttons right under Accuracy */}
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setHitZone("torso")}
+                    className={`flex-1 rounded-lg border px-3 py-2 text-xs font-semibold ${
+                      hitZone === "torso"
+                        ? "border-neutral-600 bg-white/10 text-white"
+                        : "border-neutral-800 bg-black/40 text-neutral-300 hover:bg-white/5"
+                    }`}
+                  >
+                    Torso
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHitZone("headshots")}
+                    className={`flex-1 rounded-lg border px-3 py-2 text-xs font-semibold ${
+                      hitZone === "headshots"
+                        ? "border-neutral-600 bg-white/10 text-white"
+                        : "border-neutral-800 bg-black/40 text-neutral-300 hover:bg-white/5"
+                    }`}
+                  >
+                    Headshots
+                  </button>
+                </div>
               </label>
 
               <div className="rounded-xl border border-neutral-800 bg-black/40 p-3 sm:col-span-2">
@@ -465,26 +533,11 @@ export default function CodTtkClient({
               </div>
             </div>
 
-            {/* Distance + stats */}
+            {/* Weapon stats */}
             <div className="mt-6 rounded-2xl border border-neutral-800 bg-black/40 p-4">
               <div className="text-sm font-semibold">Weapon stats</div>
 
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <label className="block">
-                  <div className="text-xs text-neutral-400">Distance</div>
-                  <select
-                    value={distanceM}
-                    onChange={(e) => setDistanceM(Number(e.target.value))}
-                    className="mt-2 w-full rounded-lg border border-neutral-800 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-600"
-                  >
-                    <option value={10}>10m (close)</option>
-                    <option value={25}>25m (mid)</option>
-                    <option value={50}>50m (long)</option>
-                  </select>
-                </label>
-
-                <div />
-
                 <label className="block">
                   <div className="text-xs text-neutral-400">RPM</div>
                   <input
@@ -504,19 +557,13 @@ export default function CodTtkClient({
                   </div>
                 </label>
 
-                <label className="block">
-                  <div className="text-xs text-neutral-400">
-                    Base Damage @{distanceM}m + add
+                <div className="rounded-xl border border-neutral-800 bg-black/40 p-3">
+                  <div className="text-xs text-neutral-400">Headshot mult</div>
+                  <div className="mt-1 text-lg font-semibold">{fmt(sheetHsm, 2)}</div>
+                  <div className="text-[11px] text-neutral-500">
+                    Only used when Headshots is enabled.
                   </div>
-                  <input
-                    value={`${sheetDmg || 0} + ${barrelAdd} = ${basePlusAdds}`}
-                    readOnly
-                    className="mt-2 w-full rounded-lg border border-neutral-800 bg-black px-3 py-2 text-sm outline-none"
-                  />
-                  <div className="mt-1 text-[11px] text-neutral-500">
-                    Headshot mult (sheet): {fmt(sheetHsm, 2)}
-                  </div>
-                </label>
+                </div>
               </div>
             </div>
           </section>
@@ -538,44 +585,41 @@ export default function CodTtkClient({
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
-                <div className="text-sm text-neutral-300">Distance</div>
-                <div className="text-sm font-semibold">{distanceM}m</div>
+                <div className="text-sm text-neutral-300">Hit zone</div>
+                <div className="text-sm font-semibold">
+                  {hitZone === "torso" ? "Torso" : "Headshots only"}
+                </div>
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
                 <div className="text-sm text-neutral-300">Shots per second</div>
-                <div className="text-sm font-semibold">
-                  {fmt(shotsPerSecond, 2)}
-                </div>
+                <div className="text-sm font-semibold">{fmt(shotsPerSecond, 2)}</div>
               </div>
 
-              <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
-                <div className="text-sm text-neutral-300">
-                  Damage per shot (after multiplier)
+              {/* ✅ NEW: TTK-by-range in Results tab */}
+              <div className="rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-neutral-300">TTK by range</div>
+                  <div className="text-[11px] text-neutral-500">
+                    {showAccTtk ? "Accuracy applied" : "Perfect accuracy"}
+                  </div>
                 </div>
-                <div className="text-sm font-semibold">{fmt(dmg, 2)}</div>
-              </div>
 
-              <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
-                <div className="text-sm text-neutral-300">Shots to kill</div>
-                <div className="text-sm font-semibold">
-                  {isFinite(ttkMs) ? shotsToKill : "—"}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
-                <div className="text-sm text-neutral-300">
-                  TTK (perfect accuracy)
-                </div>
-                <div className="text-sm font-semibold">{fmtMs(ttkMs)}</div>
-              </div>
-
-              <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
-                <div className="text-sm text-neutral-300">
-                  TTK (with accuracy %)
-                </div>
-                <div className="text-sm font-semibold">
-                  {fmtMs(ttkMsWithAccuracy)}
+                <div className="mt-3 grid gap-2">
+                  {rangeResults.map((r) => {
+                    const shownTtk = showAccTtk ? r.ttkMsWithAccuracy : r.ttkMs;
+                    return (
+                      <div
+                        key={r.key}
+                        className="flex items-center justify-between rounded-lg border border-neutral-800 bg-black/30 px-3 py-2"
+                      >
+                        <div className="text-sm text-neutral-300">{r.label}</div>
+                        <div className="text-sm font-semibold tabular-nums">
+                          {fmtMs(shownTtk)}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -589,37 +633,51 @@ export default function CodTtkClient({
         </div>
       </div>
 
-      {/* ✅ MOBILE ONLY: sticky bottom TTK bar */}
+      {/* ✅ MOBILE ONLY: sticky bottom TTK bar now shows ranges */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
         <div className="border-t border-neutral-800 bg-black/80 backdrop-blur">
-          <div className="mx-auto max-w-6xl px-6 py-3 flex items-center justify-between gap-4">
+          <div className="mx-auto max-w-6xl px-6 py-2">
             <button
               type="button"
               onClick={() => setMobileTab("results")}
-              className="min-w-0 text-left"
+              className="w-full text-left"
             >
               <div className="text-[11px] text-neutral-400">
-                {selected?.name ?? "—"} • {distanceM}m •{" "}
-                {mode === "wz" ? `WZ (${plates} plates)` : "MP"}
+                {selected?.name ?? "—"} •{" "}
+                {mode === "wz" ? `WZ (${plates} plates)` : "MP"} •{" "}
+                {hitZone === "torso" ? "Torso" : "Headshots"}
+                {showAccTtk ? " • acc" : ""}
               </div>
-              <div className="truncate text-sm font-semibold">
-                TTK: {fmtMs(primaryTtk)}
-                {showAccTtk ? (
-                  <span className="text-xs font-normal text-neutral-400">
-                    {" "}
-                    (acc)
-                  </span>
-                ) : null}
+
+              <div className="mt-1 flex items-center gap-2 overflow-x-auto whitespace-nowrap text-xs leading-tight">
+                {rangeResults.map((r) => {
+                  const shownTtk = showAccTtk ? r.ttkMsWithAccuracy : r.ttkMs;
+                  return (
+                    <div
+                      key={r.key}
+                      className="flex items-center gap-1 rounded-md border border-neutral-800 bg-black/30 px-2 py-1"
+                    >
+                      <span className="opacity-70">{r.label}</span>
+                      <span className="font-semibold tabular-nums">
+                        {isFinite(shownTtk) ? `${Math.round(shownTtk)}ms` : "—"}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setMobileTab(mobileTab === "inputs" ? "results" : "inputs")}
-              className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-neutral-200 hover:bg-white/10"
-            >
-              {mobileTab === "inputs" ? "View results" : "Edit inputs"}
-            </button>
+            <div className="mt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() =>
+                  setMobileTab(mobileTab === "inputs" ? "results" : "inputs")
+                }
+                className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-neutral-200 hover:bg-white/10"
+              >
+                {mobileTab === "inputs" ? "View results" : "Edit inputs"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
