@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
+
 import { getCodWeapons } from "@/lib/codweapons";
 import { getCodAttachments } from "@/lib/codattachments";
 import CodTtkClient from "./CodTtkClient";
+
+export const metadata: Metadata = {
+  title: "Call of Duty TTK Calculator – Warzone & Multiplayer | GamerStation",
+  description:
+    "Calculate time-to-kill (TTK) in Call of Duty for Warzone and Multiplayer. Compare weapons, accuracy, headshots, armor plates, and ranges instantly.",
+};
 
 export default async function CodTtkPage() {
   const [sheetWeaponsRaw, sheetAttachmentsRaw] = await Promise.all([
@@ -34,6 +42,9 @@ export default async function CodTtkPage() {
   }));
 
   return (
-    <CodTtkClient sheetWeapons={sheetWeapons} sheetAttachments={sheetAttachments} />
+    <CodTtkClient
+      sheetWeapons={sheetWeapons}
+      sheetAttachments={sheetAttachments}
+    />
   );
 }

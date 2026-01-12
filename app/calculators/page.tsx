@@ -70,6 +70,18 @@ export default function CalculatorsPage() {
               Burst + DPS/time-window damage calculator.
             </div>
           </Link>
+
+          {/* World of Warcraft */}
+<Link
+  href="/calculators/wow"
+  className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+>
+  <div className="text-sm font-semibold">World of Warcraft</div>
+  <div className="mt-2 text-sm text-neutral-400">
+    PvE & PvP calculators for Mythic+, raids, and arenas.
+  </div>
+</Link>
+
         </div>
       </div>
     </main>
