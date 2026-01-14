@@ -2,6 +2,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import LolClient from "./LolClient";
+import { readPublicJson } from "@/lib/server/readPublicJson";
 
 export const metadata: Metadata = {
   title: "LoL Damage Calculator (Burst & DPS) | GamerStation",
@@ -52,34 +53,6 @@ export type ItemRow = {
 };
 
 /**
- * ✅ Read JSON from /public/data/... (works in dev + Vercel)
- * Uses absolute URL on server (required), relative on client (safe).
- */
-async function readPublicJson<T>(publicPath: string, revalidateSec = 60 * 60 * 6): Promise<T> {
-  const isServer = typeof window === "undefined";
-
-  const base =
-    isServer && process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : isServer
-      ? "http://localhost:3000"
-      : "";
-
-  const url = `${base}${publicPath}`;
-
-  const res = await fetch(url, {
-    next: { revalidate: revalidateSec },
-    cache: "force-cache",
-  });
-
-  if (!res.ok) {
-    throw new Error(`Failed to fetch ${publicPath}: ${res.status}`);
-  }
-
-  return (await res.json()) as T;
-}
-
-/**
  * ✅ Cached "latest patch" getter with safe fallback.
  * - Uses Data Dragon versions endpoint (cached by Next)
  * - Falls back to your local public version.json if Riot fetch fails
@@ -88,7 +61,7 @@ async function getLatestDdragonVersion(): Promise<string> {
   let fallback = "unknown";
 
   try {
-    const local = await readPublicJson<{ version?: string }>("/data/lol/version.json", 60 * 60 * 24);
+    const local = await readPublicJson<{ version?: string }>("data/lol/version.json");
     fallback = local.version ?? fallback;
   } catch {
     // ignore
@@ -110,8 +83,8 @@ async function loadLolIndex(version: string): Promise<{
   patch: string;
   champions: ChampionIndexRow[];
 }> {
-  // ✅ IMPORTANT: read from /public/data/lol/...
-  const json = await readPublicJson<LolChampionFile>("/data/lol/champions_full.json", 60 * 60 * 24);
+  // ✅ Read from disk: /public/data/lol/champions_full.json
+  const json = await readPublicJson<LolChampionFile>("data/lol/champions_full.json");
 
   const patch = version;
 
@@ -143,8 +116,8 @@ async function loadLolIndex(version: string): Promise<{
 }
 
 async function loadLolItems(version: string): Promise<{ patch: string; items: ItemRow[] }> {
-  // ✅ IMPORTANT: read from /public/data/lol/...
-  const json = await readPublicJson<LolItemsFile>("/data/lol/items.json", 60 * 60 * 24);
+  // ✅ Read from disk: /public/data/lol/items.json
+  const json = await readPublicJson<LolItemsFile>("data/lol/items.json");
 
   const patch = version;
 
