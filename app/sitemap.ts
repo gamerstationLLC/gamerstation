@@ -17,6 +17,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/calculators/ttk/fortnite", priority: 0.85 },
     { path: "/calculators/dps/osrs", priority: 0.85 },
 
+    // Roblox hub & calculators
+    { path: "/calculators/roblox", priority: 0.85 },
+    { path: "/calculators/roblox/arsenal", priority: 0.85 },
+    { path: "/calculators/roblox/bloxfruits", priority: 0.8 },
+
     // WoW
     { path: "/calculators/wow", priority: 0.85 },
     { path: "/calculators/wow/pve", priority: 0.8 },

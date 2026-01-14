@@ -1,8 +1,6 @@
 // app/calculators/lol/page.tsx
 import Link from "next/link";
 import type { Metadata } from "next";
-import fs from "node:fs/promises";
-import path from "node:path";
 import LolClient from "./LolClient";
 
 export const metadata: Metadata = {
@@ -35,7 +33,7 @@ export type ChampionIndexRow = {
     spellblock: number;
     spellblockperlevel: number;
 
-    // ✅ ADD for AA / DPS math
+    // ✅ AA / DPS fields
     attackdamage: number;
     attackdamageperlevel: number;
     attackspeed: number;
@@ -54,18 +52,44 @@ export type ItemRow = {
 };
 
 /**
- * ✅ Cached "latest patch" getter with a safe fallback.
+ * ✅ Read JSON from /public/data/... (works in dev + Vercel)
+ * Uses absolute URL on server (required), relative on client (safe).
+ */
+async function readPublicJson<T>(publicPath: string, revalidateSec = 60 * 60 * 6): Promise<T> {
+  const isServer = typeof window === "undefined";
+
+  const base =
+    isServer && process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : isServer
+      ? "http://localhost:3000"
+      : "";
+
+  const url = `${base}${publicPath}`;
+
+  const res = await fetch(url, {
+    next: { revalidate: revalidateSec },
+    cache: "force-cache",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${publicPath}: ${res.status}`);
+  }
+
+  return (await res.json()) as T;
+}
+
+/**
+ * ✅ Cached "latest patch" getter with safe fallback.
  * - Uses Data Dragon versions endpoint (cached by Next)
- * - Falls back to your local data/lol/version.json if Riot fetch fails
+ * - Falls back to your local public version.json if Riot fetch fails
  */
 async function getLatestDdragonVersion(): Promise<string> {
-  const fallbackPath = path.join(process.cwd(), "data", "lol", "version.json");
   let fallback = "unknown";
 
   try {
-    const raw = await fs.readFile(fallbackPath, "utf-8");
-    const json = JSON.parse(raw) as { version?: string };
-    fallback = json.version ?? fallback;
+    const local = await readPublicJson<{ version?: string }>("/data/lol/version.json", 60 * 60 * 24);
+    fallback = local.version ?? fallback;
   } catch {
     // ignore
   }
@@ -74,9 +98,7 @@ async function getLatestDdragonVersion(): Promise<string> {
     const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
       next: { revalidate: 60 * 60 * 6 }, // 6 hours
     });
-
     if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
-
     const versions = (await res.json()) as string[];
     return versions?.[0] ?? fallback;
   } catch {
@@ -88,17 +110,15 @@ async function loadLolIndex(version: string): Promise<{
   patch: string;
   champions: ChampionIndexRow[];
 }> {
-  const filePath = path.join(process.cwd(), "data", "lol", "champions_full.json");
-  const raw = await fs.readFile(filePath, "utf-8");
-  const json = JSON.parse(raw) as LolChampionFile;
+  // ✅ IMPORTANT: read from /public/data/lol/...
+  const json = await readPublicJson<LolChampionFile>("/data/lol/champions_full.json", 60 * 60 * 24);
 
-  // ✅ Patch shown on the page comes from cached DDragon version (auto-updating)
   const patch = version;
 
   const champions: ChampionIndexRow[] = (json.champions ?? [])
     .map((c: any) => ({
-      id: c.id,
-      name: c.name,
+      id: String(c.id),
+      name: String(c.name),
       title: c.title,
       tags: c.tags ?? [],
       partype: c.partype ?? "",
@@ -123,11 +143,9 @@ async function loadLolIndex(version: string): Promise<{
 }
 
 async function loadLolItems(version: string): Promise<{ patch: string; items: ItemRow[] }> {
-  const filePath = path.join(process.cwd(), "data", "lol", "items.json");
-  const raw = await fs.readFile(filePath, "utf-8");
-  const json = JSON.parse(raw) as LolItemsFile;
+  // ✅ IMPORTANT: read from /public/data/lol/...
+  const json = await readPublicJson<LolItemsFile>("/data/lol/items.json", 60 * 60 * 24);
 
-  // ✅ Patch shown on the page comes from cached DDragon version (auto-updating)
   const patch = version;
 
   const SR_MAP_ID = "11";
@@ -152,10 +170,10 @@ async function loadLolItems(version: string): Promise<{ patch: string; items: It
     return allowedByMap && allowedInStore;
   });
 
-  // ✅ purchasable only (your existing filter)
+  // ✅ purchasable only
   const purch = srOnly.filter((x) => x.purchasable);
 
-  // ✅ dedupe by normalized name (keeps the more expensive one if duplicates exist)
+  // ✅ dedupe by normalized name (keep more expensive if dupes)
   const byName = new Map<string, (typeof purch)[number]>();
   for (const it of purch) {
     const key = it.name.trim().toLowerCase();
@@ -177,7 +195,6 @@ async function loadLolItems(version: string): Promise<{ patch: string; items: It
 }
 
 export default async function LolCalculatorPage() {
-  // ✅ Get a cached "latest patch" once and reuse it
   const version = await getLatestDdragonVersion();
 
   const [{ patch, champions }, { items }] = await Promise.all([
@@ -201,8 +218,8 @@ export default async function LolCalculatorPage() {
         </p>
 
         <p className="mt-3 text-neutral-300 max-w-3xl">
-          Choose a champion and see how much damage you can deal in a combo or over a short time window.
-          [Summoner's Rift Only]
+          Choose a champion and see how much damage you can deal in a combo or over a short time
+          window. [Summoner&apos;s Rift Only]
         </p>
 
         <LolClient champions={champions} patch={patch} items={items} />

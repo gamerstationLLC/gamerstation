@@ -13,10 +13,8 @@ import {
   type Potion,
 } from "./osrs-math";
 
-import { ENEMY_PRESETS, type EnemyPreset } from "@/lib/osrs/enemies";
+import type { EnemyPreset } from "@/lib/osrs/enemies";
 import { OSRS_SLOTS, type OsrsItemRow, type OsrsSlot } from "@/lib/osrs/items";
-
-
 
 /* =========================
    Formatting helpers
@@ -57,45 +55,48 @@ type Equipped = Partial<Record<OsrsSlot, OsrsItemRow>>;
 function add(a: number | undefined, b: number | undefined) {
   return (a ?? 0) + (b ?? 0);
 }
-
 /* =========================
-   Slot JSON loader (Option B)
+   Slot JSON loader (PUBLIC)
+   Reads from: /public/data/osrs/items/*.json
 ========================= */
 async function loadItemsForSlot(slot: OsrsSlot): Promise<OsrsItemRow[]> {
-  const normalize = (mod: any): OsrsItemRow[] => {
-    const data = mod?.default ?? mod;
-    if (Array.isArray(data)) return data as OsrsItemRow[];
-    if (data && Array.isArray(data.items)) return data.items as OsrsItemRow[];
-    return [];
-  };
+  const path = `/data/osrs/items/${slot}.json`;
 
-  switch (slot) {
-    case "ammo":
-      return normalize(await import("@/data/osrs/items/ammo.json"));
-    case "body":
-      return normalize(await import("@/data/osrs/items/body.json"));
-    case "cape":
-      return normalize(await import("@/data/osrs/items/cape.json"));
-    case "feet":
-      return normalize(await import("@/data/osrs/items/feet.json"));
-    case "hands":
-      return normalize(await import("@/data/osrs/items/hands.json"));
-    case "head":
-      return normalize(await import("@/data/osrs/items/head.json"));
-    case "legs":
-      return normalize(await import("@/data/osrs/items/legs.json"));
-    case "neck":
-      return normalize(await import("@/data/osrs/items/neck.json"));
-    case "ring":
-      return normalize(await import("@/data/osrs/items/ring.json"));
-    case "shield":
-      return normalize(await import("@/data/osrs/items/shield.json"));
-    case "weapon":
-      return normalize(await import("@/data/osrs/items/weapon.json"));
-    default:
-      return [];
+  try {
+    const res = await fetch(path, { cache: "force-cache" });
+    if (!res.ok) return [];
+
+    const json = await res.json();
+
+    const items =
+      Array.isArray(json)
+        ? (json as OsrsItemRow[])
+        : json && Array.isArray(json.items)
+        ? (json.items as OsrsItemRow[])
+        : [];
+
+    // Remove exact stat duplicates
+    const seen = new Set<string>();
+    return items.filter((it) => {
+      const key = [
+        it.name?.trim().toLowerCase() ?? "",
+        it.slot ?? "",
+        it.attackBonus ?? 0,
+        it.strengthBonus ?? 0,
+        it.rangedStrength ?? 0,
+        it.magicDamagePct ?? 0,
+        it.speedTicks ?? 0,
+      ].join("|");
+
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  } catch {
+    return [];
   }
 }
+
 
 type MobileTab = "user" | "enemies" | "results";
 
@@ -168,102 +169,98 @@ export default function OsrsDpsPage() {
   const targetDefBonusNum = useMemo(() => clamp(toNumOr(targetDefBonus, 100), -200, 400), [targetDefBonus]);
 
   // =========
-// ENEMIES (optimized: lazy-load ALL; no "popular"; compact dropdown; cached)
-// =========
+  // ENEMIES (lazy-load from PUBLIC)
+  // Reads from: /public/data/osrs/enemies.json
+  // =========
+  const CUSTOM_ENEMY: EnemyPreset = {
+    key: "custom",
+    name: "Custom",
+    hp: 150,
+    defLevel: 100,
+    defBonus: 100,
+  };
 
-const CUSTOM_ENEMY: EnemyPreset = {
-  key: "custom",
-  name: "Custom",
-  hp: 150,
-  defLevel: 100,
-  defBonus: 100,
-};
+  const [enemyOptions, setEnemyOptions] = useState<EnemyPreset[]>([CUSTOM_ENEMY]);
+  const [enemiesLoaded, setEnemiesLoaded] = useState(false);
+  const [enemiesLoading, setEnemiesLoading] = useState(false);
+  const [enemiesError, setEnemiesError] = useState<string | null>(null);
 
-const [enemyOptions, setEnemyOptions] = useState<EnemyPreset[]>([CUSTOM_ENEMY]);
-const [enemiesLoaded, setEnemiesLoaded] = useState(false);
-const [enemiesLoading, setEnemiesLoading] = useState(false);
-const [enemiesError, setEnemiesError] = useState<string | null>(null);
+  const [enemyQuery, setEnemyQuery] = useState("");
+  const [enemyOpen, setEnemyOpen] = useState(false);
 
-const [enemyQuery, setEnemyQuery] = useState("");
-const [enemyOpen, setEnemyOpen] = useState(false);
+  const enemyWrapRef = useRef<HTMLDivElement | null>(null);
+  const enemyInputRef = useRef<HTMLInputElement | null>(null);
 
-const enemyWrapRef = useRef<HTMLDivElement | null>(null);
-const enemyInputRef = useRef<HTMLInputElement | null>(null);
+  const enemiesCacheRef = useRef<EnemyPreset[] | null>(null);
 
-const enemiesCacheRef = useRef<EnemyPreset[] | null>(null);
+  async function loadAllEnemies() {
+    if (enemiesLoaded || enemiesLoading) return;
 
-async function loadAllEnemies() {
-  if (enemiesLoaded || enemiesLoading) return;
+    if (enemiesCacheRef.current) {
+      setEnemyOptions(enemiesCacheRef.current);
+      setEnemiesLoaded(true);
+      return;
+    }
 
-  if (enemiesCacheRef.current) {
-    setEnemyOptions(enemiesCacheRef.current);
-    setEnemiesLoaded(true);
-    return;
+    setEnemiesLoading(true);
+    setEnemiesError(null);
+
+    try {
+      const res = await fetch("/data/osrs/enemies/enemies.json", {
+  cache: "no-store",
+});
+
+      const text = await res.text();
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 120)}`);
+      if (!text.trim()) throw new Error("Empty response body");
+
+      const json = JSON.parse(text);
+      const full = Array.isArray(json?.enemies) ? (json.enemies as EnemyPreset[]) : [];
+
+      const merged: EnemyPreset[] = [CUSTOM_ENEMY, ...full.filter((e) => e?.key !== "custom")];
+
+      enemiesCacheRef.current = merged;
+      setEnemyOptions(merged);
+      setEnemiesLoaded(true);
+    } catch (e) {
+      console.error("loadAllEnemies failed:", e);
+      setEnemiesError("Could not load the enemy list.");
+      setEnemyOptions([CUSTOM_ENEMY]);
+      setEnemiesLoaded(false);
+    } finally {
+      setEnemiesLoading(false);
+    }
   }
 
-  setEnemiesLoading(true);
-  setEnemiesError(null);
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function onDocMouseDown(ev: MouseEvent) {
+      const el = enemyWrapRef.current;
+      if (!el) return;
+      if (!el.contains(ev.target as Node)) setEnemyOpen(false);
+    }
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, []);
 
-  try {
-    const res = await fetch("/osrs/enemies.json", { cache: "no-store" });
-    const text = await res.text();
+  const filteredEnemies = useMemo(() => {
+    if (!enemiesLoaded) return [] as EnemyPreset[];
+    const q = enemyQuery.trim().toLowerCase();
+    const base = enemyOptions;
+    const list = !q ? base : base.filter((en: EnemyPreset) => en.name.toLowerCase().includes(q));
+    return list.slice(0, 50);
+  }, [enemyOptions, enemyQuery, enemiesLoaded]);
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 120)}`);
-    if (!text.trim()) throw new Error("Empty response body");
+  function applyEnemyPreset(key: string) {
+    setEnemyKey(key);
 
-    const json = JSON.parse(text);
-    const full = Array.isArray(json?.enemies) ? (json.enemies as EnemyPreset[]) : [];
+    const p = enemyOptions.find((x: EnemyPreset) => x.key === key) ?? CUSTOM_ENEMY;
 
-    const merged: EnemyPreset[] = [CUSTOM_ENEMY, ...full.filter((e) => e?.key !== "custom")];
-
-    enemiesCacheRef.current = merged;
-    setEnemyOptions(merged);
-    setEnemiesLoaded(true);
-  } catch (e) {
-    console.error("loadAllEnemies failed:", e);
-    setEnemiesError("Could not load the enemy list.");
-    setEnemyOptions([CUSTOM_ENEMY]);
-    setEnemiesLoaded(false);
-  } finally {
-    setEnemiesLoading(false);
+    setTargetHp(String(p.hp));
+    setTargetDefLevel(String(p.defLevel));
+    setTargetDefBonus(String(p.defBonus));
   }
-}
-
-
-// Close dropdown when clicking outside
-useEffect(() => {
-  function onDocMouseDown(ev: MouseEvent) {
-    const el = enemyWrapRef.current;
-    if (!el) return;
-    if (!el.contains(ev.target as Node)) setEnemyOpen(false);
-  }
-  document.addEventListener("mousedown", onDocMouseDown);
-  return () => document.removeEventListener("mousedown", onDocMouseDown);
-}, []);
-
-const filteredEnemies = useMemo(() => {
-  // If list hasn't been loaded yet, don't pretend we have "popular" — just show nothing until loaded.
-  if (!enemiesLoaded) return [] as EnemyPreset[];
-
-  const q = enemyQuery.trim().toLowerCase();
-  const base = enemyOptions;
-
-  const list = !q ? base : base.filter((en: EnemyPreset) => en.name.toLowerCase().includes(q));
-
-  // compact dropdown
-  return list.slice(0, 50);
-}, [enemyOptions, enemyQuery, enemiesLoaded]);
-
-function applyEnemyPreset(key: string) {
-  setEnemyKey(key);
-
-  const p = enemyOptions.find((x: EnemyPreset) => x.key === key) ?? CUSTOM_ENEMY;
-
-  setTargetHp(String(p.hp));
-  setTargetDefLevel(String(p.defLevel));
-  setTargetDefBonus(String(p.defBonus));
-}
-
 
   // =========
   // PAPER DOLL / SEARCH (items)
@@ -476,7 +473,7 @@ function applyEnemyPreset(key: string) {
             <MobileTopTab active={mobileTab === "results"} onClick={() => setMobileTab("results")} label="Results" />
           </div>
 
-          {/* Style tabs (always visible, but placed under the mobile tabs) */}
+          {/* Style tabs */}
           <div className="mt-3 flex flex-wrap gap-2 lg:mt-0">
             <Tab active={style === "melee"} onClick={() => setStyle("melee")} label="Melee" />
             <Tab active={style === "ranged"} onClick={() => setStyle("ranged")} label="Ranged" />
@@ -525,7 +522,11 @@ function applyEnemyPreset(key: string) {
               </div>
 
               <div className="mt-4">
-                <CollapsibleHeader title="Player levels" open={openPlayerLevels} onToggle={() => setOpenPlayerLevels((v) => !v)} />
+                <CollapsibleHeader
+                  title="Player levels"
+                  open={openPlayerLevels}
+                  onToggle={() => setOpenPlayerLevels((v) => !v)}
+                />
 
                 {openPlayerLevels && (
                   <div className="mt-2 rounded-xl border border-neutral-800 bg-black/30 p-3">
@@ -544,7 +545,11 @@ function applyEnemyPreset(key: string) {
             <div className="mt-6 rounded-2xl border border-neutral-800 bg-black/40 p-4">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-semibold">Gear</div>
-                <button type="button" onClick={() => setOpenGear((v) => !v)} className="text-xs text-neutral-400 hover:text-white">
+                <button
+                  type="button"
+                  onClick={() => setOpenGear((v) => !v)}
+                  className="text-xs text-neutral-400 hover:text-white"
+                >
                   {openGear ? "Hide" : "Show"}
                 </button>
               </div>
@@ -637,7 +642,6 @@ function applyEnemyPreset(key: string) {
                   <div className="mt-4 rounded-xl border border-neutral-800 bg-black/30 p-3">
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-semibold text-neutral-200">Buffs</div>
-                    
                     </div>
 
                     <div className="mt-3 grid gap-3">
@@ -716,200 +720,219 @@ function applyEnemyPreset(key: string) {
             </div>
           </section>
 
-      {/* RIGHT COLUMN: Enemies + Results (desktop unchanged; mobile tabs switch) */}
-<section
-  className={[
-    "rounded-2xl border border-neutral-800 bg-neutral-950 p-6 h-fit self-start",
-    mobileTab === "user" ? "hidden lg:block" : "block",
-  ].join(" ")}
->
-  {/* ENEMIES */}
-  <div className={mobileTab === "enemies" ? "block" : "hidden lg:block"}>
-    <div className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-semibold">Enemy / Boss</div>
-        <div className="text-xs text-neutral-500">Preset fills Target</div>
-      </div>
-
-      {/* Enemy search + limited dropdown */}
-      <div className="mt-4" ref={enemyWrapRef}>
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-neutral-400">Search enemy</div>
-
-          <button
-            type="button"
-            onClick={async () => {
-              await loadAllEnemies();
-              setEnemyOpen(true);
-              requestAnimationFrame(() => enemyInputRef.current?.focus());
-            }}
-            disabled={enemiesLoading || enemiesLoaded}
-            className="text-xs text-neutral-400 hover:text-white disabled:opacity-50"
+          {/* RIGHT COLUMN: Enemies + Results */}
+          <section
+            className={[
+              "rounded-2xl border border-neutral-800 bg-neutral-950 p-6 h-fit self-start",
+              mobileTab === "user" ? "hidden lg:block" : "block",
+            ].join(" ")}
           >
-            {enemiesLoaded ? "Loaded" : enemiesLoading ? "Loading..." : "Load list"}
-          </button>
-        </div>
+            {/* ENEMIES */}
+            <div className={mobileTab === "enemies" ? "block" : "hidden lg:block"}>
+              <div className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold">Enemy / Boss</div>
+                  <div className="text-xs text-neutral-500">Preset fills Target</div>
+                </div>
 
-        <div className="relative mt-2">
-          <input
-            ref={enemyInputRef}
-            value={enemyQuery}
-            onChange={(e) => {
-              setEnemyQuery(e.target.value);
-              setEnemyOpen(true);
-              if (!enemiesLoaded && !enemiesLoading) loadAllEnemies();
-            }}
-            onFocus={() => {
-              setEnemyOpen(true);
-              if (!enemiesLoaded && !enemiesLoading) loadAllEnemies();
-            }}
-            placeholder="Search enemies..."
-            className="w-full rounded-lg border border-neutral-800 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-600"
-          />
+                {/* Enemy search */}
+                <div className="mt-4" ref={enemyWrapRef}>
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-neutral-400">Search enemy</div>
 
-          {enemyOpen && (
-            <div className="absolute left-0 right-0 z-20 mt-2 max-h-72 overflow-auto rounded-2xl border border-neutral-800 bg-black shadow-xl">
-              <div className="p-2">
-                {!enemiesLoaded && enemiesLoading && (
-                  <div className="rounded-xl border border-neutral-800 bg-black/40 px-3 py-2 text-xs text-neutral-400">
-                    Loading enemies…
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await loadAllEnemies();
+                        setEnemyOpen(true);
+                        requestAnimationFrame(() => enemyInputRef.current?.focus());
+                      }}
+                      disabled={enemiesLoading || enemiesLoaded}
+                      className="text-xs text-neutral-400 hover:text-white disabled:opacity-50"
+                    >
+                      {enemiesLoaded ? "Loaded" : enemiesLoading ? "Loading..." : "Load list"}
+                    </button>
                   </div>
-                )}
 
-                {enemiesLoaded && filteredEnemies.length === 0 && (
-                  <div className="rounded-xl border border-neutral-800 bg-black/40 px-3 py-2 text-xs text-neutral-400">
-                    No matches.
-                  </div>
-                )}
+                  <div className="relative mt-2">
+                    <input
+                      ref={enemyInputRef}
+                      value={enemyQuery}
+                      onChange={(e) => {
+                        setEnemyQuery(e.target.value);
+                        setEnemyOpen(true);
+                        if (!enemiesLoaded && !enemiesLoading) loadAllEnemies();
+                      }}
+                      onFocus={() => {
+                        setEnemyOpen(true);
+                        if (!enemiesLoaded && !enemiesLoading) loadAllEnemies();
+                      }}
+                      placeholder="Search enemies..."
+                      className="w-full rounded-lg border border-neutral-800 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-600"
+                    />
 
-                {enemiesLoaded && filteredEnemies.length > 0 && (
-                  <ul className="space-y-1">
-                    {filteredEnemies.map((en) => (
-                      <li key={en.key}>
-                        <button
-                          type="button"
-                          onMouseDown={(ev) => {
-                            ev.preventDefault();
-                            applyEnemyPreset(en.key);
-                            setEnemyQuery("");
-                            setEnemyOpen(false);
-                          }}
-                          className="w-full rounded-xl border border-transparent px-3 py-2 text-left text-sm hover:border-neutral-800 hover:bg-neutral-950"
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="font-semibold">{en.name}</div>
-                            <div className="text-xs text-neutral-500">
-                              HP {en.hp} • Def {en.defLevel} • Bonus {en.defBonus}
+                    {enemyOpen && (
+                      <div className="absolute left-0 right-0 z-20 mt-2 max-h-72 overflow-auto rounded-2xl border border-neutral-800 bg-black shadow-xl">
+                        <div className="p-2">
+                          {!enemiesLoaded && enemiesLoading && (
+                            <div className="rounded-xl border border-neutral-800 bg-black/40 px-3 py-2 text-xs text-neutral-400">
+                              Loading enemies…
                             </div>
-                          </div>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                          )}
+
+                          {enemiesLoaded && filteredEnemies.length === 0 && (
+                            <div className="rounded-xl border border-neutral-800 bg-black/40 px-3 py-2 text-xs text-neutral-400">
+                              No matches.
+                            </div>
+                          )}
+
+                          {enemiesLoaded && filteredEnemies.length > 0 && (
+                            <ul className="space-y-1">
+                              {filteredEnemies.map((en) => (
+                                <li key={en.key}>
+                                  <button
+                                    type="button"
+                                    onMouseDown={(ev) => {
+                                      ev.preventDefault();
+                                      applyEnemyPreset(en.key);
+                                      setEnemyQuery("");
+                                      setEnemyOpen(false);
+                                    }}
+                                    className="w-full rounded-xl border border-transparent px-3 py-2 text-left text-sm hover:border-neutral-800 hover:bg-neutral-950"
+                                  >
+                                    <div className="flex items-center justify-between gap-3">
+                                      <div className="font-semibold">{en.name}</div>
+                                      <div className="text-xs text-neutral-500">
+                                        HP {en.hp} • Def {en.defLevel} • Bonus {en.defBonus}
+                                      </div>
+                                    </div>
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {enemiesError && <div className="mt-2 text-xs text-red-300">{enemiesError}</div>}
+
+                  {/* Current target */}
+                  <div className="mt-3 rounded-xl border border-neutral-800 bg-black/30 px-4 py-3">
+                    <div className="text-xs text-neutral-400">Current target</div>
+                    <div className="mt-1 text-sm text-neutral-200">
+                      HP <span className="font-semibold">{targetHpNum}</span> • Def{" "}
+                      <span className="font-semibold">{targetDefLevelNum}</span> • Bonus{" "}
+                      <span className="font-semibold">{targetDefBonusNum}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <CollapsibleHeader title="Target" open={openTarget} onToggle={() => setOpenTarget((v) => !v)} />
+                    {openTarget && (
+                      <div className="mt-2 rounded-xl border border-neutral-800 bg-black/30 p-3">
+                        <div className="grid grid-cols-3 gap-3">
+                          <SmallNumberTextField
+                            label="HP"
+                            value={targetHp}
+                            onChange={(v) => {
+                              setEnemyKey("custom");
+                              setTargetHp(v);
+                            }}
+                            min={1}
+                            max={5000}
+                          />
+                          <SmallNumberTextField
+                            label="Def lvl"
+                            value={targetDefLevel}
+                            onChange={(v) => {
+                              setEnemyKey("custom");
+                              setTargetDefLevel(v);
+                            }}
+                            min={1}
+                            max={400}
+                          />
+                          <SmallNumberTextField
+                            label="Def bonus"
+                            value={targetDefBonus}
+                            onChange={(v) => {
+                              setEnemyKey("custom");
+                              setTargetDefBonus(v);
+                            }}
+                            min={-200}
+                            max={400}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5" />
+            </div>
+
+            {/* RESULTS */}
+            <div className={mobileTab === "results" ? "block" : "hidden lg:block"}>
+              <div className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold">Results</div>
+                  <button
+                    type="button"
+                    onClick={() => setOpenResults((v) => !v)}
+                    className="text-xs text-neutral-400 hover:text-white"
+                  >
+                    {openResults ? "Hide" : "Show"}
+                  </button>
+                </div>
+
+                {openResults && (
+                  <>
+                    <div className="mt-4 grid gap-3">
+                      <Row label="Max hit" value={String(result.maxHit)} />
+                      <Row label="Hit chance" value={fmtPct(result.pHit)} />
+                      <Row label="Avg hit (on successful hit)" value={fmt(result.avgHitOnSuccess)} />
+                      <Row label="Expected dmg / attack" value={fmt(result.expectedPerSwing)} />
+                      <Row label="Attack interval" value={`${fmt(result.secondsPerAttack)}s`} />
+                      <Row label="DPS" value={fmt(result.dps)} />
+                      <Row label="Time to kill" value={fmtTime(result.ttkSeconds)} />
+                    </div>
+
+                    <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/40 p-4">
+                      <div className="text-xs text-neutral-500">
+                        v1 baseline model. Later: Slayer/Salve/Void, spec cycles, bolt procs, poison/venom, multi-hit
+                        weapons, powered-staff formulas.
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
-          )}
+          </section>
         </div>
+      </div>
+      {/* Mobile sticky results footer */}
+{mobileTab !== "results" && (
+  <button
+    type="button"
+    onClick={() => setMobileTab("results")}
+    className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-neutral-800 bg-black/90 backdrop-blur"
+  >
+    <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between text-sm">
+      <div className="flex flex-col text-left">
+        <span className="text-xs text-neutral-400">DPS</span>
+        <span className="font-semibold">{fmt(result.dps)}</span>
+      </div>
 
-        {enemiesError && <div className="mt-2 text-xs text-red-300">{enemiesError}</div>}
-
-        {/* Current target */}
-        <div className="mt-3 rounded-xl border border-neutral-800 bg-black/30 px-4 py-3">
-          <div className="text-xs text-neutral-400">Current target</div>
-          <div className="mt-1 text-sm text-neutral-200">
-            HP <span className="font-semibold">{targetHpNum}</span> • Def{" "}
-            <span className="font-semibold">{targetDefLevelNum}</span> • Bonus{" "}
-            <span className="font-semibold">{targetDefBonusNum}</span>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <CollapsibleHeader title="Target" open={openTarget} onToggle={() => setOpenTarget((v) => !v)} />
-          {openTarget && (
-            <div className="mt-2 rounded-xl border border-neutral-800 bg-black/30 p-3">
-              <div className="grid grid-cols-3 gap-3">
-                <SmallNumberTextField
-                  label="HP"
-                  value={targetHp}
-                  onChange={(v) => {
-                    setEnemyKey("custom");
-                    setTargetHp(v);
-                  }}
-                  min={1}
-                  max={5000}
-                />
-                <SmallNumberTextField
-                  label="Def lvl"
-                  value={targetDefLevel}
-                  onChange={(v) => {
-                    setEnemyKey("custom");
-                    setTargetDefLevel(v);
-                  }}
-                  min={1}
-                  max={400}
-                />
-                <SmallNumberTextField
-                  label="Def bonus"
-                  value={targetDefBonus}
-                  onChange={(v) => {
-                    setEnemyKey("custom");
-                    setTargetDefBonus(v);
-                  }}
-                  min={-200}
-                  max={400}
-                />
-              </div>
-            </div>
-          )}
-        </div>
+      <div className="flex flex-col text-right">
+        <span className="text-xs text-neutral-400">TTK</span>
+        <span className="font-semibold">{fmtTime(result.ttkSeconds)}</span>
       </div>
     </div>
+  </button>
+)}
 
-    <div className="mt-5" />
-  </div>
-
-  {/* RESULTS */}
-  <div className={mobileTab === "results" ? "block" : "hidden lg:block"}>
-    <div className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
-      <div className="flex items-center justify-between">
-        <div className="text-sm font-semibold">Results</div>
-        <button
-          type="button"
-          onClick={() => setOpenResults((v) => !v)}
-          className="text-xs text-neutral-400 hover:text-white"
-        >
-          {openResults ? "Hide" : "Show"}
-        </button>
-      </div>
-
-      {openResults && (
-        <>
-          <div className="mt-4 grid gap-3">
-            <Row label="Max hit" value={String(result.maxHit)} />
-            <Row label="Hit chance" value={fmtPct(result.pHit)} />
-            <Row label="Avg hit (on successful hit)" value={fmt(result.avgHitOnSuccess)} />
-            <Row label="Expected dmg / attack" value={fmt(result.expectedPerSwing)} />
-            <Row label="Attack interval" value={`${fmt(result.secondsPerAttack)}s`} />
-            <Row label="DPS" value={fmt(result.dps)} />
-            <Row label="Time to kill" value={fmtTime(result.ttkSeconds)} />
-          </div>
-
-          {/* FIX 2: Correct nesting here */}
-          <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/40 p-4">
-            <div className="text-xs text-neutral-500">
-              v1 baseline model. Later: Slayer/Salve/Void, spec cycles, bolt procs, poison/venom, multi-hit weapons,
-              powered-staff formulas.
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  </div>
-</section>
-
-        </div>
-      </div>
     </main>
   );
 }
@@ -925,7 +948,9 @@ function MobileTopTab({ active, onClick, label }: { active: boolean; onClick: ()
       onClick={onClick}
       className={[
         "rounded-xl border px-3 py-2 text-sm font-semibold transition",
-        active ? "border-neutral-500 bg-neutral-900 text-white" : "border-neutral-800 bg-black text-neutral-300 hover:border-neutral-600 hover:text-white",
+        active
+          ? "border-neutral-500 bg-neutral-900 text-white"
+          : "border-neutral-800 bg-black text-neutral-300 hover:border-neutral-600 hover:text-white",
       ].join(" ")}
     >
       {label}
@@ -973,7 +998,7 @@ function CollapsibleHeader({
   );
 }
 
-/** Level 0–99, digit-only, no stuck zeros, no letters */
+/** Level 0–99, digit-only */
 function L99Field({
   label,
   value,
@@ -1052,7 +1077,7 @@ function SmallNumberTextField({
   );
 }
 
-/** Ordered compact slot buttons, no size changes, only border highlight when equipped, and X to unequip */
+/** Ordered compact slot buttons, with X to unequip */
 function SlotButtonsGrid({
   activeSlot,
   equipped,
@@ -1064,19 +1089,7 @@ function SlotButtonsGrid({
   onSelect: (slot: OsrsSlot) => void;
   onUnequip: (slot: OsrsSlot) => void;
 }) {
-  const ordered: OsrsSlot[] = [
-    "head",
-    "body",
-    "legs",
-    "feet",
-    "neck",
-    "cape",
-    "hands",
-    "ring",
-    "weapon",
-    "ammo",
-    "shield",
-  ];
+  const ordered: OsrsSlot[] = ["head", "body", "legs", "feet", "neck", "cape", "hands", "ring", "weapon", "ammo", "shield"];
 
   return (
     <div className="grid grid-cols-3 gap-2">
@@ -1114,9 +1127,7 @@ function SlotButtonsGrid({
             </div>
 
             {hasItem && (
-              <div className="mt-1 line-clamp-1 text-[11px] font-normal text-neutral-400">
-                {equipped[s.key]?.name}
-              </div>
+              <div className="mt-1 line-clamp-1 text-[11px] font-normal text-neutral-400">{equipped[s.key]?.name}</div>
             )}
           </button>
         );

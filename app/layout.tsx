@@ -14,27 +14,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  // ✅ Critical: makes canonicals/OG URLs absolute and consistent
   metadataBase: new URL("https://gamerstation.gg"),
-
   title: "GamerStation",
   description:
     "Multi-game calculators, stats tools, and competitive gaming utilities.",
 
-  // ✅ Keep icons here (global is perfect)
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-      { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/favicon-512x512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: "/favicon-192x192.png",
-  },
-
-  // ❌ IMPORTANT: no global canonical here
-  // Each page should canonicalize to itself (or set its own canonical)
+  // ✅ IMPORTANT:
+  // Do NOT set metadata.icons here if you're using the App Router icon pipeline.
+  // Next will automatically serve:
+  // - app/favicon.ico      -> /favicon.ico
+  // - app/icon.png         -> /icon.png
+  // - app/apple-icon.png   -> /apple-icon.png
 };
 
 export default function RootLayout({
@@ -46,7 +36,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <div className="min-h-dvh flex flex-col">
-          {/* Main scrollable content */}
           <main className="flex-1">{children}</main>
 
           <footer className="border-t border-white/10 bg-black text-neutral-400 pb-[calc(60px+env(safe-area-inset-bottom))] lg:pb-0">

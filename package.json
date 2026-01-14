@@ -8,7 +8,8 @@
     "lint": "eslint",
     "lol:fetch": "node scripts/fetch-lol-ddragon.mjs",
     "lol:items": "node scripts/fetch-lol-items.mjs",
-    "lol:update": "npm run lol:fetch && npm run lol:items"
+    "lol:update": "npm run lol:fetch && npm run lol:items",
+    "bloxfruits:items": "node scripts/bloxfruits/build-items.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
@@ -21,9 +22,11 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cheerio": "^1.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

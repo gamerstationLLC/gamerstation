@@ -82,6 +82,18 @@ export default function CalculatorsPage() {
   </div>
 </Link>
 
+
+{/* Roblox Calculators */}
+<Link
+  href="/calculators/roblox"
+  className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+>
+  <div className="text-sm font-semibold">Roblox Calculators</div>
+  <div className="mt-2 text-sm text-neutral-400">
+    XP, leveling, and progression tools for top Roblox games.
+  </div>
+</Link>
+
         </div>
       </div>
     </main>

@@ -1,0 +1,2529 @@
+[
+  {
+    "id": "accessories",
+    "name": "Accessories",
+    "type": "accessory",
+    "buffs": {
+      "speedPct": 30,
+      "energyPct": 5,
+      "xpPct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Accessories"
+    }
+  },
+  {
+    "id": "50b-party-hat",
+    "name": "50b Party Hat",
+    "type": "accessory",
+    "buffs": {
+      "xpPct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/50b_Party_Hat"
+    }
+  },
+  {
+    "id": "bandanna-black",
+    "name": "Bandanna (Black)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 80
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bandanna_(Black)"
+    }
+  },
+  {
+    "id": "bandanna-green",
+    "name": "Bandanna (Green)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 80
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bandanna_(Green)"
+    }
+  },
+  {
+    "id": "bandanna-red",
+    "name": "Bandanna (Red)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 80
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bandanna_(Red)"
+    }
+  },
+  {
+    "id": "bear-ears",
+    "name": "Bear Ears",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bear_Ears"
+    }
+  },
+  {
+    "id": "black-cape",
+    "name": "Black Cape",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Black_Cape"
+    }
+  },
+  {
+    "id": "black-spikey-coat",
+    "name": "Black Spikey Coat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 7.5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Black_Spikey_Coat"
+    }
+  },
+  {
+    "id": "blue-spikey-coat",
+    "name": "Blue Spikey Coat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 7.5,
+      "defensePct": 7.5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Blue_Spikey_Coat"
+    }
+  },
+  {
+    "id": "celestial-helmet",
+    "name": "Celestial Helmet",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Celestial_Helmet"
+    }
+  },
+  {
+    "id": "choppa",
+    "name": "Choppa",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 3,
+      "defensePct": 10,
+      "cooldownPct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Choppa"
+    }
+  },
+  {
+    "id": "coat",
+    "name": "Coat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Coat"
+    }
+  },
+  {
+    "id": "cool-shades",
+    "name": "Cool Shades",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 7.5,
+      "speedPct": 17.5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Cool_Shades"
+    }
+  },
+  {
+    "id": "coven-witch-hat",
+    "name": "Coven Witch Hat",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Coven_Witch_Hat"
+    }
+  },
+  {
+    "id": "cupids-coat",
+    "name": "Cupid's Coat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 12.5,
+      "defensePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Cupid's_Coat"
+    }
+  },
+  {
+    "id": "d-s-coat",
+    "name": "D.S. Coat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/D.S._Coat"
+    }
+  },
+  {
+    "id": "dark-coat",
+    "name": "Dark Coat",
+    "type": "accessory",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dark_Coat"
+    }
+  },
+  {
+    "id": "dino-hood",
+    "name": "Dino Hood",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dino_Hood"
+    }
+  },
+  {
+    "id": "divine-cloak",
+    "name": "Divine Cloak",
+    "type": "accessory",
+    "buffs": {
+      "speedPct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Divine_Cloak"
+    }
+  },
+  {
+    "id": "dojo-belt-black",
+    "name": "Dojo Belt (Black)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 16,
+      "defensePct": 16,
+      "speedPct": 70
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dojo_Belt_(Black)"
+    }
+  },
+  {
+    "id": "dojo-belt-blue",
+    "name": "Dojo Belt (Blue)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dojo_Belt_(Blue)"
+    }
+  },
+  {
+    "id": "dojo-belt-green",
+    "name": "Dojo Belt (Green)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 8,
+      "speedPct": 40
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dojo_Belt_(Green)"
+    }
+  },
+  {
+    "id": "dojo-belt-orange",
+    "name": "Dojo Belt (Orange)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 6,
+      "speedPct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dojo_Belt_(Orange)"
+    }
+  },
+  {
+    "id": "dojo-belt-purple",
+    "name": "Dojo Belt (Purple)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 14,
+      "speedPct": 70
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dojo_Belt_(Purple)"
+    }
+  },
+  {
+    "id": "dojo-belt-red",
+    "name": "Dojo Belt (Red)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 12,
+      "speedPct": 60
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dojo_Belt_(Red)"
+    }
+  },
+  {
+    "id": "dojo-belt-white",
+    "name": "Dojo Belt (White)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 2,
+      "speedPct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dojo_Belt_(White)"
+    }
+  },
+  {
+    "id": "dojo-belt-yellow",
+    "name": "Dojo Belt (Yellow)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 4,
+      "speedPct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dojo_Belt_(Yellow)"
+    }
+  },
+  {
+    "id": "dragon-mantle",
+    "name": "Dragon Mantle",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 15,
+      "cooldownPct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dragon_Mantle"
+    }
+  },
+  {
+    "id": "elf-hat",
+    "name": "Elf Hat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 20,
+      "cooldownPct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Elf_Hat"
+    }
+  },
+  {
+    "id": "feathered-visage",
+    "name": "Feathered Visage",
+    "type": "accessory",
+    "buffs": {
+      "speedPct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Feathered_Visage"
+    }
+  },
+  {
+    "id": "frosty-helmet",
+    "name": "Frosty Helmet",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 5,
+      "speedPct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Frosty_Helmet"
+    }
+  },
+  {
+    "id": "ghoul-mask",
+    "name": "Ghoul Mask",
+    "type": "accessory",
+    "buffs": {
+      "speedPct": 35
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Ghoul_Mask"
+    }
+  },
+  {
+    "id": "golden-sunhat",
+    "name": "Golden Sunhat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Golden_Sunhat"
+    }
+  },
+  {
+    "id": "headband-black",
+    "name": "Headband (Black)",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 16,
+      "speedPct": 70
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Headband_(Black)"
+    }
+  },
+  {
+    "id": "headband-blue",
+    "name": "Headband (Blue)",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 8,
+      "speedPct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Headband_(Blue)"
+    }
+  },
+  {
+    "id": "headband-green",
+    "name": "Headband (Green)",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 7,
+      "speedPct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Headband_(Green)"
+    }
+  },
+  {
+    "id": "headband-orange",
+    "name": "Headband (Orange)",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 5,
+      "speedPct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Headband_(Orange)"
+    }
+  },
+  {
+    "id": "headband-purple",
+    "name": "Headband (Purple)",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 10,
+      "speedPct": 40
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Headband_(Purple)"
+    }
+  },
+  {
+    "id": "headband-red",
+    "name": "Headband (Red)",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 12,
+      "speedPct": 60
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Headband_(Red)"
+    }
+  },
+  {
+    "id": "headband-white",
+    "name": "Headband (White)",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 2,
+      "speedPct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Headband_(White)"
+    }
+  },
+  {
+    "id": "headband-yellow",
+    "name": "Headband (Yellow)",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 4,
+      "speedPct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Headband_(Yellow)"
+    }
+  },
+  {
+    "id": "heart-shades",
+    "name": "Heart Shades",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 12.5,
+      "defensePct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Heart_Shades"
+    }
+  },
+  {
+    "id": "holiday-cloak",
+    "name": "Holiday Cloak",
+    "type": "accessory",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Holiday_Cloak"
+    }
+  },
+  {
+    "id": "holy-crown",
+    "name": "Holy Crown",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 5,
+      "defensePct": 5,
+      "energyPct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Holy_Crown"
+    }
+  },
+  {
+    "id": "hunter-cape-black",
+    "name": "Hunter Cape (Black)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 80
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Hunter_Cape_(Black)"
+    }
+  },
+  {
+    "id": "hunter-cape-green",
+    "name": "Hunter Cape (Green)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 80
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Hunter_Cape_(Green)"
+    }
+  },
+  {
+    "id": "hunter-cape-red",
+    "name": "Hunter Cape (Red)",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "speedPct": 80
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Hunter_Cape_(Red)"
+    }
+  },
+  {
+    "id": "jaw-shield",
+    "name": "Jaw Shield",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 12.5,
+      "defensePct": 10,
+      "speedPct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Jaw_Shield"
+    }
+  },
+  {
+    "id": "kitsune-mask",
+    "name": "Kitsune Mask",
+    "type": "accessory",
+    "buffs": {
+      "energyPct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Kitsune_Mask"
+    }
+  },
+  {
+    "id": "kitsune-ribbon",
+    "name": "Kitsune Ribbon",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 10,
+      "speedPct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Kitsune_Ribbon"
+    }
+  },
+  {
+    "id": "lei",
+    "name": "Lei",
+    "type": "accessory",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Lei"
+    }
+  },
+  {
+    "id": "leviathan-crown",
+    "name": "Leviathan Crown",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 35
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Leviathan_Crown"
+    }
+  },
+  {
+    "id": "leviathan-shield",
+    "name": "Leviathan Shield",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Leviathan_Shield"
+    }
+  },
+  {
+    "id": "marine-cap",
+    "name": "Marine Cap",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 7.5,
+      "cooldownPct": -10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Marine_Cap"
+    }
+  },
+  {
+    "id": "musketeer-hat",
+    "name": "Musketeer Hat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 12.5,
+      "cooldownPct": 12.5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Musketeer_Hat"
+    }
+  },
+  {
+    "id": "oni-helmet",
+    "name": "Oni Helmet",
+    "type": "accessory",
+    "buffs": {
+      "speedPct": 30,
+      "cooldownPct": -10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Oni_Helmet"
+    }
+  },
+  {
+    "id": "pale-scarf",
+    "name": "Pale Scarf",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pale_Scarf"
+    }
+  },
+  {
+    "id": "party-hat",
+    "name": "Party Hat",
+    "type": "accessory",
+    "buffs": {
+      "xpPct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Party_Hat"
+    }
+  },
+  {
+    "id": "peppermint-helmet",
+    "name": "Peppermint Helmet",
+    "type": "accessory",
+    "buffs": {
+      "speedPct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Peppermint_Helmet"
+    }
+  },
+  {
+    "id": "pilot-helmet",
+    "name": "Pilot Helmet",
+    "type": "accessory",
+    "buffs": {
+      "speedPct": 130
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pilot_Helmet"
+    }
+  },
+  {
+    "id": "pink-coat",
+    "name": "Pink Coat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pink_Coat"
+    }
+  },
+  {
+    "id": "pretty-helmet",
+    "name": "Pretty Helmet",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "defensePct": 12.5,
+      "speedPct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pretty_Helmet"
+    }
+  },
+  {
+    "id": "pumpkin-mask",
+    "name": "Pumpkin Mask",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 6,
+      "speedPct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pumpkin_Mask"
+    }
+  },
+  {
+    "id": "red-ribbon",
+    "name": "Red Ribbon",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 5,
+      "speedPct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Red_Ribbon"
+    }
+  },
+  {
+    "id": "red-spikey-coat",
+    "name": "Red Spikey Coat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 7.5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Red_Spikey_Coat"
+    }
+  },
+  {
+    "id": "sanguine-cloak",
+    "name": "Sanguine Cloak",
+    "type": "accessory",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Sanguine_Cloak"
+    }
+  },
+  {
+    "id": "santa-hat",
+    "name": "Santa Hat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 12.5,
+      "speedPct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Santa_Hat"
+    }
+  },
+  {
+    "id": "shark-tooth-necklace",
+    "name": "Shark Tooth Necklace",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 25,
+      "speedPct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Shark_Tooth_Necklace"
+    }
+  },
+  {
+    "id": "swan-glasses",
+    "name": "Swan Glasses",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 8,
+      "defensePct": 8,
+      "speedPct": 25,
+      "cooldownPct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Swan_Glasses"
+    }
+  },
+  {
+    "id": "swordsman-hat",
+    "name": "Swordsman Hat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Swordsman_Hat"
+    }
+  },
+  {
+    "id": "t-rex-skull",
+    "name": "T-Rex Skull",
+    "type": "accessory",
+    "buffs": {
+      "defensePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/T-Rex_Skull"
+    }
+  },
+  {
+    "id": "terror-jaw",
+    "name": "Terror Jaw",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "defensePct": 20,
+      "cooldownPct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Terror_Jaw"
+    }
+  },
+  {
+    "id": "tomoe-ring",
+    "name": "Tomoe Ring",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Tomoe_Ring"
+    }
+  },
+  {
+    "id": "top-hat",
+    "name": "Top Hat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 3,
+      "defensePct": 10,
+      "cooldownPct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Top_Hat"
+    }
+  },
+  {
+    "id": "usoaps-hat",
+    "name": "Usoap's Hat",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 7.5,
+      "cooldownPct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Usoap's_Hat"
+    }
+  },
+  {
+    "id": "uzoths-cloak",
+    "name": "Uzoth's Cloak",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 5,
+      "defensePct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Uzoth's_Cloak"
+    }
+  },
+  {
+    "id": "valkyrie-helm",
+    "name": "Valkyrie Helm",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Valkyrie_Helm"
+    }
+  },
+  {
+    "id": "warrior-helmet",
+    "name": "Warrior Helmet",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 12.5,
+      "cooldownPct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Warrior_Helmet"
+    }
+  },
+  {
+    "id": "wyvern-helmet",
+    "name": "Wyvern Helmet",
+    "type": "accessory",
+    "buffs": {
+      "energyPct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Wyvern_Helmet"
+    }
+  },
+  {
+    "id": "zebra-cap",
+    "name": "Zebra Cap",
+    "type": "accessory",
+    "buffs": {
+      "damagePct": 10,
+      "cooldownPct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Zebra_Cap"
+    }
+  },
+  {
+    "id": "swords",
+    "name": "Swords",
+    "type": "sword",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Swords"
+    }
+  },
+  {
+    "id": "bisento",
+    "name": "Bisento",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bisento"
+    }
+  },
+  {
+    "id": "buddy-sword",
+    "name": "Buddy Sword",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Buddy_Sword"
+    }
+  },
+  {
+    "id": "canvander",
+    "name": "Canvander",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Canvander"
+    }
+  },
+  {
+    "id": "cursed-dual-katana",
+    "name": "Cursed Dual Katana",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 7
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Cursed_Dual_Katana"
+    }
+  },
+  {
+    "id": "cutlass",
+    "name": "Cutlass",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Cutlass"
+    }
+  },
+  {
+    "id": "dark-blade",
+    "name": "Dark Blade",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dark_Blade"
+    }
+  },
+  {
+    "id": "dark-dagger",
+    "name": "Dark Dagger",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dark_Dagger"
+    }
+  },
+  {
+    "id": "dragon-trident",
+    "name": "Dragon Trident",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dragon_Trident"
+    }
+  },
+  {
+    "id": "dragonheart",
+    "name": "Dragonheart",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 7
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dragonheart"
+    }
+  },
+  {
+    "id": "dual-katana",
+    "name": "Dual Katana",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dual_Katana"
+    }
+  },
+  {
+    "id": "dual-headed-blade",
+    "name": "Dual-Headed Blade",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dual-Headed_Blade"
+    }
+  },
+  {
+    "id": "fishing-trophy",
+    "name": "Fishing Trophy",
+    "type": "sword",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Fishing_Trophy"
+    }
+  },
+  {
+    "id": "flail",
+    "name": "Flail",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 18
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Flail"
+    }
+  },
+  {
+    "id": "fox-lamp",
+    "name": "Fox Lamp",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 7
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Fox_Lamp"
+    }
+  },
+  {
+    "id": "gravity-blade",
+    "name": "Gravity Blade",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 13
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Gravity_Blade"
+    }
+  },
+  {
+    "id": "hallow-scythe",
+    "name": "Hallow Scythe",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Hallow_Scythe"
+    }
+  },
+  {
+    "id": "iron-mace",
+    "name": "Iron Mace",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Iron_Mace"
+    }
+  },
+  {
+    "id": "katana",
+    "name": "Katana",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Katana"
+    }
+  },
+  {
+    "id": "koko",
+    "name": "Koko",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 13
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Koko"
+    }
+  },
+  {
+    "id": "longsword",
+    "name": "Longsword",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 23
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Longsword"
+    }
+  },
+  {
+    "id": "midnight-blade",
+    "name": "Midnight Blade",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 13
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Midnight_Blade"
+    }
+  },
+  {
+    "id": "oroshi",
+    "name": "Oroshi",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 12
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Oroshi"
+    }
+  },
+  {
+    "id": "pipe",
+    "name": "Pipe",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pipe"
+    }
+  },
+  {
+    "id": "pole-1st-form",
+    "name": "Pole (1st Form)",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pole_(1st_Form)"
+    }
+  },
+  {
+    "id": "pole-2nd-form",
+    "name": "Pole (2nd Form)",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pole_(2nd_Form)"
+    }
+  },
+  {
+    "id": "rengoku",
+    "name": "Rengoku",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Rengoku"
+    }
+  },
+  {
+    "id": "saber",
+    "name": "Saber",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Saber"
+    }
+  },
+  {
+    "id": "saishi",
+    "name": "Saishi",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 12
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Saishi"
+    }
+  },
+  {
+    "id": "shark-anchor",
+    "name": "Shark Anchor",
+    "type": "sword",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Shark_Anchor"
+    }
+  },
+  {
+    "id": "shark-saw",
+    "name": "Shark Saw",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Shark_Saw"
+    }
+  },
+  {
+    "id": "shizu",
+    "name": "Shizu",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Shizu"
+    }
+  },
+  {
+    "id": "soul-cane",
+    "name": "Soul Cane",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Soul_Cane"
+    }
+  },
+  {
+    "id": "spikey-trident",
+    "name": "Spikey Trident",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 7
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Spikey_Trident"
+    }
+  },
+  {
+    "id": "trident",
+    "name": "Trident",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Trident"
+    }
+  },
+  {
+    "id": "triple-dark-blade",
+    "name": "Triple Dark Blade",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 5
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Triple_Dark_Blade"
+    }
+  },
+  {
+    "id": "triple-katana",
+    "name": "Triple Katana",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Triple_Katana"
+    }
+  },
+  {
+    "id": "true-triple-katana",
+    "name": "True Triple Katana",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 13
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/True_Triple_Katana"
+    }
+  },
+  {
+    "id": "tushita",
+    "name": "Tushita",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Tushita"
+    }
+  },
+  {
+    "id": "twin-hooks",
+    "name": "Twin Hooks",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Twin_Hooks"
+    }
+  },
+  {
+    "id": "wardens-sword",
+    "name": "Wardens Sword",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Wardens_Sword"
+    }
+  },
+  {
+    "id": "yama",
+    "name": "Yama",
+    "type": "sword",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Yama"
+    }
+  },
+  {
+    "id": "guns",
+    "name": "Guns",
+    "type": "gun",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Guns"
+    }
+  },
+  {
+    "id": "acidum-rifle",
+    "name": "Acidum Rifle",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Acidum_Rifle"
+    }
+  },
+  {
+    "id": "bazooka",
+    "name": "Bazooka",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bazooka"
+    }
+  },
+  {
+    "id": "bizarre-revolver",
+    "name": "Bizarre Revolver",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bizarre_Revolver"
+    }
+  },
+  {
+    "id": "bizarre-rifle",
+    "name": "Bizarre Rifle",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bizarre_Rifle"
+    }
+  },
+  {
+    "id": "cannon",
+    "name": "Cannon",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 30
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Cannon"
+    }
+  },
+  {
+    "id": "dragonstorm",
+    "name": "Dragonstorm",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 8
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dragonstorm"
+    }
+  },
+  {
+    "id": "dual-flintlock",
+    "name": "Dual Flintlock",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dual_Flintlock"
+    }
+  },
+  {
+    "id": "flintlock",
+    "name": "Flintlock",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Flintlock"
+    }
+  },
+  {
+    "id": "kabucha",
+    "name": "Kabucha",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Kabucha"
+    }
+  },
+  {
+    "id": "magma-blaster",
+    "name": "Magma Blaster",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Magma_Blaster"
+    }
+  },
+  {
+    "id": "musket",
+    "name": "Musket",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Musket"
+    }
+  },
+  {
+    "id": "refined-flintlock",
+    "name": "Refined Flintlock",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Refined_Flintlock"
+    }
+  },
+  {
+    "id": "refined-musket",
+    "name": "Refined Musket",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Refined_Musket"
+    }
+  },
+  {
+    "id": "refined-slingshot",
+    "name": "Refined Slingshot",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Refined_Slingshot"
+    }
+  },
+  {
+    "id": "shotgun",
+    "name": "Shotgun",
+    "type": "gun",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Shotgun"
+    }
+  },
+  {
+    "id": "skull-guitar",
+    "name": "Skull Guitar",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 6
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Skull_Guitar"
+    }
+  },
+  {
+    "id": "slingshot",
+    "name": "Slingshot",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Slingshot"
+    }
+  },
+  {
+    "id": "venom-bow",
+    "name": "Venom Bow",
+    "type": "gun",
+    "buffs": {
+      "damagePct": 10
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Venom_Bow"
+    }
+  },
+  {
+    "id": "blox-fruits",
+    "name": "Blox Fruits",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Blox_Fruits"
+    }
+  },
+  {
+    "id": "barrier",
+    "name": "Barrier",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Barrier"
+    }
+  },
+  {
+    "id": "blade",
+    "name": "Blade",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Blade"
+    }
+  },
+  {
+    "id": "blizzard",
+    "name": "Blizzard",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Blizzard"
+    }
+  },
+  {
+    "id": "bomb",
+    "name": "Bomb",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bomb"
+    }
+  },
+  {
+    "id": "buddha",
+    "name": "Buddha",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 45,
+      "defensePct": 45
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Buddha"
+    }
+  },
+  {
+    "id": "chop",
+    "name": "Chop",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Chop"
+    }
+  },
+  {
+    "id": "control",
+    "name": "Control",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Control"
+    }
+  },
+  {
+    "id": "creation",
+    "name": "Creation",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Creation"
+    }
+  },
+  {
+    "id": "dark",
+    "name": "Dark",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dark"
+    }
+  },
+  {
+    "id": "diamond",
+    "name": "Diamond",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 23,
+      "defensePct": 23
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Diamond"
+    }
+  },
+  {
+    "id": "door",
+    "name": "Door",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Door"
+    }
+  },
+  {
+    "id": "dough",
+    "name": "Dough",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dough"
+    }
+  },
+  {
+    "id": "dragon",
+    "name": "Dragon",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 60,
+      "defensePct": 7
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dragon"
+    }
+  },
+  {
+    "id": "dragon-classic",
+    "name": "Dragon (Classic)",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 65
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dragon_(Classic)"
+    }
+  },
+  {
+    "id": "eagle",
+    "name": "Eagle",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Eagle"
+    }
+  },
+  {
+    "id": "falcon",
+    "name": "Falcon",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Falcon"
+    }
+  },
+  {
+    "id": "flame",
+    "name": "Flame",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Flame"
+    }
+  },
+  {
+    "id": "gas",
+    "name": "Gas",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 50,
+      "defensePct": 50,
+      "speedPct": 33
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Gas"
+    }
+  },
+  {
+    "id": "ghost",
+    "name": "Ghost",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Ghost"
+    }
+  },
+  {
+    "id": "gravity",
+    "name": "Gravity",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Gravity"
+    }
+  },
+  {
+    "id": "ice",
+    "name": "Ice",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Ice"
+    }
+  },
+  {
+    "id": "kilo",
+    "name": "Kilo",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Kilo"
+    }
+  },
+  {
+    "id": "kitsune",
+    "name": "Kitsune",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 20,
+      "defensePct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Kitsune"
+    }
+  },
+  {
+    "id": "leopard",
+    "name": "Leopard",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 10,
+      "defensePct": 10,
+      "speedPct": 67,
+      "cooldownPct": 33
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Leopard"
+    }
+  },
+  {
+    "id": "light",
+    "name": "Light",
+    "type": "fruit",
+    "buffs": {
+      "speedPct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Light"
+    }
+  },
+  {
+    "id": "lightning",
+    "name": "Lightning",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Lightning"
+    }
+  },
+  {
+    "id": "love",
+    "name": "Love",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Love"
+    }
+  },
+  {
+    "id": "magma",
+    "name": "Magma",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Magma"
+    }
+  },
+  {
+    "id": "mammoth",
+    "name": "Mammoth",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Mammoth"
+    }
+  },
+  {
+    "id": "meme",
+    "name": "Meme",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Meme"
+    }
+  },
+  {
+    "id": "pain",
+    "name": "Pain",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pain"
+    }
+  },
+  {
+    "id": "phoenix",
+    "name": "Phoenix",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 15,
+      "defensePct": 15
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Phoenix"
+    }
+  },
+  {
+    "id": "portal",
+    "name": "Portal",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Portal"
+    }
+  },
+  {
+    "id": "quake",
+    "name": "Quake",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Quake"
+    }
+  },
+  {
+    "id": "revive",
+    "name": "Revive",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Revive"
+    }
+  },
+  {
+    "id": "rocket",
+    "name": "Rocket",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Rocket"
+    }
+  },
+  {
+    "id": "rogue",
+    "name": "Rogue",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Rogue"
+    }
+  },
+  {
+    "id": "rubber",
+    "name": "Rubber",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Rubber"
+    }
+  },
+  {
+    "id": "sand",
+    "name": "Sand",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Sand"
+    }
+  },
+  {
+    "id": "shadow",
+    "name": "Shadow",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Shadow"
+    }
+  },
+  {
+    "id": "smoke",
+    "name": "Smoke",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Smoke"
+    }
+  },
+  {
+    "id": "soul",
+    "name": "Soul",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Soul"
+    }
+  },
+  {
+    "id": "sound",
+    "name": "Sound",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Sound"
+    }
+  },
+  {
+    "id": "spider",
+    "name": "Spider",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Spider"
+    }
+  },
+  {
+    "id": "spike",
+    "name": "Spike",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Spike"
+    }
+  },
+  {
+    "id": "spin",
+    "name": "Spin",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Spin"
+    }
+  },
+  {
+    "id": "spirit",
+    "name": "Spirit",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Spirit"
+    }
+  },
+  {
+    "id": "spring",
+    "name": "Spring",
+    "type": "fruit",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Spring"
+    }
+  },
+  {
+    "id": "t-rex",
+    "name": "T-Rex",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 43,
+      "defensePct": 43,
+      "speedPct": 20
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/T-Rex"
+    }
+  },
+  {
+    "id": "tiger",
+    "name": "Tiger",
+    "type": "fruit",
+    "buffs": {
+      "damagePct": 20,
+      "defensePct": 20,
+      "speedPct": 80,
+      "cooldownPct": 33
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Tiger"
+    }
+  },
+  {
+    "id": "venom",
+    "name": "Venom",
+    "type": "fruit",
+    "buffs": {
+      "defensePct": 50
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Venom"
+    }
+  },
+  {
+    "id": "yeti",
+    "name": "Yeti",
+    "type": "fruit",
+    "buffs": {
+      "defensePct": 35,
+      "speedPct": 25,
+      "cooldownPct": 25
+    },
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Yeti"
+    }
+  },
+  {
+    "id": "materials",
+    "name": "Materials",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Materials"
+    }
+  },
+  {
+    "id": "berries",
+    "name": "Berries",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Berries"
+    }
+  },
+  {
+    "id": "alucard-fragment",
+    "name": "Alucard Fragment",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Alucard_Fragment"
+    }
+  },
+  {
+    "id": "angel-wings",
+    "name": "Angel Wings",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Angel_Wings"
+    }
+  },
+  {
+    "id": "azure-ember",
+    "name": "Azure Ember",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Azure_Ember"
+    }
+  },
+  {
+    "id": "blaze-ember",
+    "name": "Blaze Ember",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Blaze_Ember"
+    }
+  },
+  {
+    "id": "blue-icicle-berry",
+    "name": "Blue Icicle Berry",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Blue_Icicle_Berry"
+    }
+  },
+  {
+    "id": "bones",
+    "name": "Bones",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Bones"
+    }
+  },
+  {
+    "id": "candy",
+    "name": "Candy",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Candy"
+    }
+  },
+  {
+    "id": "candy-corn",
+    "name": "Candy Corn",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Candy_Corn"
+    }
+  },
+  {
+    "id": "celestial-token",
+    "name": "Celestial Token",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Celestial_Token"
+    }
+  },
+  {
+    "id": "confetti",
+    "name": "Confetti",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Confetti"
+    }
+  },
+  {
+    "id": "conjured-cocoa",
+    "name": "Conjured Cocoa",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Conjured_Cocoa"
+    }
+  },
+  {
+    "id": "dark-fragment",
+    "name": "Dark Fragment",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dark_Fragment"
+    }
+  },
+  {
+    "id": "demonic-wisp",
+    "name": "Demonic Wisp",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Demonic_Wisp"
+    }
+  },
+  {
+    "id": "dinosaur-bones",
+    "name": "Dinosaur Bones",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dinosaur_Bones"
+    }
+  },
+  {
+    "id": "dragon-egg",
+    "name": "Dragon Egg",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dragon_Egg"
+    }
+  },
+  {
+    "id": "dragon-scale",
+    "name": "Dragon Scale",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Dragon_Scale"
+    }
+  },
+  {
+    "id": "ectoplasm",
+    "name": "Ectoplasm",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Ectoplasm"
+    }
+  },
+  {
+    "id": "electric-wing",
+    "name": "Electric Wing",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Electric_Wing"
+    }
+  },
+  {
+    "id": "fire-feather",
+    "name": "Fire Feather",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Fire_Feather"
+    }
+  },
+  {
+    "id": "fire-flower",
+    "name": "Fire Flower",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Fire_Flower"
+    }
+  },
+  {
+    "id": "fish-tail",
+    "name": "Fish Tail",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Fish_Tail"
+    }
+  },
+  {
+    "id": "fools-gold",
+    "name": "Fool's Gold",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Fool's_Gold"
+    }
+  },
+  {
+    "id": "green-toad-berry",
+    "name": "Green Toad Berry",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Green_Toad_Berry"
+    }
+  },
+  {
+    "id": "gunpowder",
+    "name": "Gunpowder",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Gunpowder"
+    }
+  },
+  {
+    "id": "hearts",
+    "name": "Hearts",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Hearts"
+    }
+  },
+  {
+    "id": "leather",
+    "name": "Leather",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Leather"
+    }
+  },
+  {
+    "id": "leviathan-heart",
+    "name": "Leviathan Heart",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Leviathan_Heart"
+    }
+  },
+  {
+    "id": "leviathan-scale",
+    "name": "Leviathan Scale",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Leviathan_Scale"
+    }
+  },
+  {
+    "id": "magma-ore",
+    "name": "Magma Ore",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Magma_Ore"
+    }
+  },
+  {
+    "id": "meteorite",
+    "name": "Meteorite",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Meteorite"
+    }
+  },
+  {
+    "id": "mini-tusk",
+    "name": "Mini Tusk",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Mini_Tusk"
+    }
+  },
+  {
+    "id": "mirror-fractal",
+    "name": "Mirror Fractal",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Mirror_Fractal"
+    }
+  },
+  {
+    "id": "monster-magnet",
+    "name": "Monster Magnet",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Monster_Magnet"
+    }
+  },
+  {
+    "id": "moonstone",
+    "name": "Moonstone",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Moonstone"
+    }
+  },
+  {
+    "id": "mutant-tooth",
+    "name": "Mutant Tooth",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Mutant_Tooth"
+    }
+  },
+  {
+    "id": "mystic-droplet",
+    "name": "Mystic Droplet",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Mystic_Droplet"
+    }
+  },
+  {
+    "id": "nightmare-catcher",
+    "name": "Nightmare Catcher",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Nightmare_Catcher"
+    }
+  },
+  {
+    "id": "oni-token",
+    "name": "Oni Token",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Oni_Token"
+    }
+  },
+  {
+    "id": "orange-berry",
+    "name": "Orange Berry",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Orange_Berry"
+    }
+  },
+  {
+    "id": "pink-pig-berry",
+    "name": "Pink Pig Berry",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Pink_Pig_Berry"
+    }
+  },
+  {
+    "id": "purple-jelly-berry",
+    "name": "Purple Jelly Berry",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Purple_Jelly_Berry"
+    }
+  },
+  {
+    "id": "radioactive-material",
+    "name": "Radioactive Material",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Radioactive_Material"
+    }
+  },
+  {
+    "id": "red-cherry-berry",
+    "name": "Red Cherry Berry",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Red_Cherry_Berry"
+    }
+  },
+  {
+    "id": "scrap-metal",
+    "name": "Scrap Metal",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Scrap_Metal"
+    }
+  },
+  {
+    "id": "shark-tooth",
+    "name": "Shark Tooth",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Shark_Tooth"
+    }
+  },
+  {
+    "id": "simulation-data",
+    "name": "Simulation Data",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Simulation_Data"
+    }
+  },
+  {
+    "id": "summer-token",
+    "name": "Summer Token",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Summer_Token"
+    }
+  },
+  {
+    "id": "terror-eyes",
+    "name": "Terror Eyes",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Terror_Eyes"
+    }
+  },
+  {
+    "id": "vampire-fang",
+    "name": "Vampire Fang",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Vampire_Fang"
+    }
+  },
+  {
+    "id": "volcanic-magnet",
+    "name": "Volcanic Magnet",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Volcanic_Magnet"
+    }
+  },
+  {
+    "id": "volt-capsule",
+    "name": "Volt Capsule",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Volt_Capsule"
+    }
+  },
+  {
+    "id": "white-cloud-berry",
+    "name": "White Cloud Berry",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/White_Cloud_Berry"
+    }
+  },
+  {
+    "id": "wooden-plank",
+    "name": "Wooden Plank",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Wooden_Plank"
+    }
+  },
+  {
+    "id": "yellow-star-berry",
+    "name": "Yellow Star Berry",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Yellow_Star_Berry"
+    }
+  },
+  {
+    "id": "yeti-fur",
+    "name": "Yeti Fur",
+    "type": "material",
+    "source": {
+      "wikiPage": "https://blox-fruits.fandom.com/wiki/Yeti_Fur"
+    }
+  }
+]
