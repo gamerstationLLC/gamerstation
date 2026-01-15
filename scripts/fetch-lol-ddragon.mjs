@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const OUT_DIR = path.join(process.cwd(), "data", "lol");
+const OUT_DIR = path.join(process.cwd(), "public", "data", "lol");
 
 async function fetchJson(url) {
   const res = await fetch(url, {
@@ -15,7 +15,9 @@ async function main() {
   await fs.mkdir(OUT_DIR, { recursive: true });
 
   console.log("[lol:fetch] Fetching versions...");
-  const versions = await fetchJson("https://ddragon.leagueoflegends.com/api/versions.json");
+  const versions = await fetchJson(
+    "https://ddragon.leagueoflegends.com/api/versions.json"
+  );
   const version = versions[0];
   console.log("[lol:fetch] Using patch:", version);
 
@@ -93,7 +95,8 @@ async function main() {
   );
 
   console.log("[lol:fetch] DONE ✅ saved to:", OUT_DIR);
-  console.log("[lol:fetch] champions_full.json size:",
+  console.log(
+    "[lol:fetch] champions_full.json size:",
     (await fs.stat(path.join(OUT_DIR, "champions_full.json"))).size,
     "bytes"
   );

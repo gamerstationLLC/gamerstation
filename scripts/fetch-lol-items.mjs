@@ -2,7 +2,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const OUT_PATH = path.join(process.cwd(), "data", "lol", "items.json");
+const OUT_PATH = path.join(process.cwd(), "public", "data", "lol", "items.json");
 const SR_MAP_ID = "11"; // Summoner's Rift
 
 async function getLatestPatch() {
