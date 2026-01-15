@@ -118,6 +118,119 @@ type UiMode = "simple" | "advanced";
 type MobileTab = "inputs" | "results";
 type CastKey = "Q" | "W" | "E" | "R" | "AA";
 
+// -------------------------
+// Data Dragon spell types
+// -------------------------
+type DdSpellVar = {
+  coeff?: number[] | number;
+  link?: string;
+  key?: string;
+};
+
+type DdSpell = {
+  name?: string;
+  maxrank?: number;
+  // effect is 1-indexed in practice (effect[1] usually holds a primary array)
+  effect?: (number[] | null)[];
+  vars?: DdSpellVar[];
+};
+
+type DdChampionFull = {
+  spells?: DdSpell[];
+  passive?: { name?: string; description?: string };
+};
+
+type SpellSlot = "Q" | "W" | "E" | "R";
+
+function isNumArray(x: any): x is number[] {
+  return Array.isArray(x) && x.every((v) => typeof v === "number");
+}
+
+// Best-effort: choose a “primary” base array from effect[] (first array that matches maxrank, else first numeric array)
+function pickPrimaryEffectArray(effect: (number[] | null)[] | undefined, maxrank: number) {
+  if (!effect) return null;
+
+  // Prefer: exact length === maxrank
+  for (let i = 0; i < effect.length; i++) {
+    const arr = effect[i];
+    if (isNumArray(arr) && arr.length === maxrank) return arr;
+  }
+
+  // Fallback: first numeric array
+  for (let i = 0; i < effect.length; i++) {
+    const arr = effect[i];
+    if (isNumArray(arr) && arr.length > 0) return arr;
+  }
+
+  return null;
+}
+
+function coeffAtRank(coeff: number[] | number | undefined, rank: number) {
+  if (typeof coeff === "number") return coeff;
+  if (Array.isArray(coeff)) {
+    const idx = clamp(rank - 1, 0, coeff.length - 1);
+    return coeff[idx] ?? 0;
+  }
+  return 0;
+}
+
+// Heuristic damage type inference based on vars links
+function inferDamageType(vars: DdSpellVar[] | undefined): "phys" | "magic" {
+  const links = (vars ?? []).map((v) => (v.link ?? "").toLowerCase());
+  const hasAp = links.some((l) => l.includes("spelldamage") || l.includes("magic"));
+  const hasAd = links.some((l) => l.includes("attackdamage") || l.includes("bonusattackdamage"));
+  // If both exist, default to magic (common for mixed scalings); you can refine later
+  if (hasAd && !hasAp) return "phys";
+  return "magic";
+}
+
+// Compute raw spell damage (very generic):
+// base = chosen effect array value at rank
+// + sum(vars): AP/AD/bonusAD scalings
+function computeSpellRawDamage(opts: {
+  spell: DdSpell | null;
+  rank: number;
+  effAp: number;
+  effAd: number;
+  bonusAd: number;
+}) {
+  const { spell, rank, effAp, effAd, bonusAd } = opts;
+  if (!spell) return { phys: 0, magic: 0, trueDmg: 0, rawTotal: 0 };
+
+  const maxrank = clamp(spell.maxrank ?? 0, 0, 10);
+  if (maxrank <= 0) return { phys: 0, magic: 0, trueDmg: 0, rawTotal: 0 };
+
+  const r = clamp(rank, 1, maxrank);
+
+  const baseArr = pickPrimaryEffectArray(spell.effect ?? undefined, maxrank);
+  const base = baseArr ? (baseArr[clamp(r - 1, 0, baseArr.length - 1)] ?? 0) : 0;
+
+  let scaling = 0;
+
+  for (const v of spell.vars ?? []) {
+    const link = (v.link ?? "").toLowerCase();
+    const c = coeffAtRank(v.coeff, r);
+
+    if (!Number.isFinite(c) || c === 0) continue;
+
+    if (link.includes("spelldamage")) {
+      scaling += c * effAp;
+    } else if (link.includes("bonusattackdamage")) {
+      scaling += c * bonusAd;
+    } else if (link.includes("attackdamage")) {
+      scaling += c * effAd;
+    } else {
+      // ignore other scalings for now (hp, mana, etc.)
+    }
+  }
+
+  const rawTotal = Math.max(0, base + scaling);
+
+  const dmgType = inferDamageType(spell.vars);
+  if (dmgType === "phys") return { phys: rawTotal, magic: 0, trueDmg: 0, rawTotal };
+  return { phys: 0, magic: rawTotal, trueDmg: 0, rawTotal };
+}
+
 export default function LolClient({
   champions,
   patch,
@@ -176,7 +289,8 @@ export default function LolClient({
 
   // ✅ Passive knobs allow blank
   const [onHitFlatMagic, setOnHitFlatMagic] = useState<Num>(0);
-  const [onHitPctTargetMaxHpPhys, setOnHitPctTargetMaxHpPhys] = useState<Num>(0);
+  const [onHitPctTargetMaxHpPhys, setOnHitPctTargetMaxHpPhys] =
+    useState<Num>(0);
   const [critDamageMult, setCritDamageMult] = useState<Num>(2.0);
 
   // ✅ Simple controls allow blank
@@ -187,7 +301,7 @@ export default function LolClient({
   // ==============================
   // Rotation / Combo (Advanced Mode)
   // ==============================
-  const [useRotation, setUseRotation] = useState(false); // empty so Advanced Mode stays unchanged unless enabled
+  const [useRotation, setUseRotation] = useState(false);
   const [rotation, setRotation] = useState<CastKey[]>([]);
 
   function addCast(k: CastKey) {
@@ -208,6 +322,77 @@ export default function LolClient({
   function clearRotation() {
     setRotation([]);
   }
+
+  // ==============================
+  // ✅ Data Dragon full champion spell fetch
+  // ==============================
+  const [ddFull, setDdFull] = useState<DdChampionFull | null>(null);
+  const [ddLoading, setDdLoading] = useState(false);
+  const [ddErr, setDdErr] = useState<string>("");
+
+  // Spell ranks for Q/W/E/R (needed to compute base arrays)
+  const [spellRanks, setSpellRanks] = useState<Record<SpellSlot, number>>({
+    Q: 1,
+    W: 1,
+    E: 1,
+    R: 1,
+  });
+
+  // map spells by slot
+  const spellBySlot = useMemo(() => {
+    const spells = ddFull?.spells ?? [];
+    return {
+      Q: spells[0] ?? null,
+      W: spells[1] ?? null,
+      E: spells[2] ?? null,
+      R: spells[3] ?? null,
+    } as Record<SpellSlot, DdSpell | null>;
+  }, [ddFull]);
+
+  // When selected champion changes: fetch their spell data
+  useEffect(() => {
+    let alive = true;
+
+    async function run() {
+      if (!selectedId || !patch) {
+        setDdFull(null);
+        return;
+      }
+
+      setDdLoading(true);
+      setDdErr("");
+
+      try {
+        const url = `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion/${selectedId}.json`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`Data Dragon fetch failed (${res.status})`);
+
+        const json = await res.json();
+        const champ = json?.data?.[selectedId] ?? null;
+
+        if (!alive) return;
+
+        setDdFull({
+          spells: champ?.spells ?? [],
+          passive: champ?.passive ?? null,
+        });
+
+        // Reset ranks to 1 on champ change (safe default)
+        setSpellRanks({ Q: 1, W: 1, E: 1, R: 1 });
+      } catch (e: any) {
+        if (!alive) return;
+        setDdFull(null);
+        setDdErr(e?.message ? String(e.message) : "Failed to load champion spells.");
+      } finally {
+        if (alive) setDdLoading(false);
+      }
+    }
+
+    run();
+    return () => {
+      alive = false;
+    };
+  }, [selectedId, patch]);
 
   const selected = useMemo(
     () => champions.find((c) => c.id === selectedId),
@@ -364,7 +549,14 @@ export default function LolClient({
 
   const effAd = Number.isFinite(champAd) ? champAd + totals.ad : NaN;
   const effAp = totals.ap; // items-only for now
-  const effAs = Number.isFinite(champAs) ? champAs * (1 + totals.asPct / 100) : NaN;
+  const effAs = Number.isFinite(champAs)
+    ? champAs * (1 + totals.asPct / 100)
+    : NaN;
+
+  const bonusAd = useMemo(() => {
+    if (!Number.isFinite(effAd) || !Number.isFinite(champAd)) return 0;
+    return Math.max(0, effAd - champAd);
+  }, [effAd, champAd]);
 
   // ✅ Apply penetration to target defenses
   const targetArmorAfterPen = useMemo(() => {
@@ -409,41 +601,27 @@ export default function LolClient({
   const oneAutoRaw = useMemo(() => {
     if (!Number.isFinite(effAd)) return NaN;
     const base = effAd * expectedCritMult;
-    const onHitPhysFromPct = (clamp(ohPct, 0, 50) / 100) * clamp(tHP, 0, 999999);
+    const onHitPhysFromPct =
+      (clamp(ohPct, 0, 50) / 100) * clamp(tHP, 0, 999999);
     return base + onHitPhysFromPct;
   }, [effAd, expectedCritMult, ohPct, tHP]);
 
   const oneAutoPost = useMemo(() => {
     const physPart = Number.isFinite(physMult) ? oneAutoRaw * physMult : NaN;
     const magicPart =
-      Number.isFinite(magicMult) && Number.isFinite(ohMagic) ? ohMagic * magicMult : 0;
+      Number.isFinite(magicMult) && Number.isFinite(ohMagic)
+        ? ohMagic * magicMult
+        : 0;
     return physPart + magicPart;
   }, [oneAutoRaw, physMult, ohMagic, magicMult]);
 
   // ==============================
-  // Rotation / Combo raw totals
-  // (minimal: ability budget split across Q/W/E/R casts, AA uses your existing AA math)
+  // ✅ Rotation / Combo using Data Dragon spells
   // ==============================
   const rotationRaw = useMemo(() => {
     if (!useRotation || rotation.length === 0) {
       return { phys: 0, magic: 0, trueDmg: 0 };
     }
-
-    // Total "ability budget" in raw damage
-    // - burst: use advBurst* directly
-    // - dps: use advDps* over the window (so order matters within the window)
-    const win = Math.max(0, advWindow);
-
-    const abilityBudgetPhys = mode === "burst" ? advBurstPhys : advDpsPhys * win;
-    const abilityBudgetMagic = mode === "burst" ? advBurstMagic : advDpsMagic * win;
-    const abilityBudgetTrue = mode === "burst" ? advBurstTrue : advDpsTrue * win;
-
-    // Count ability casts (Q/W/E/R only)
-    const abilityCasts = rotation.filter((k) => k !== "AA").length;
-
-    const perAbilityPhys = abilityCasts > 0 ? abilityBudgetPhys / abilityCasts : 0;
-    const perAbilityMagic = abilityCasts > 0 ? abilityBudgetMagic / abilityCasts : 0;
-    const perAbilityTrue = abilityCasts > 0 ? abilityBudgetTrue / abilityCasts : 0;
 
     // AA raw components
     const aaPhysRaw = Number.isFinite(oneAutoRaw) ? oneAutoRaw : 0;
@@ -459,31 +637,48 @@ export default function LolClient({
         phys += aaPhysRaw;
         magic += aaMagicRaw;
         trueDmg += aaTrueRaw;
-      } else {
-        phys += perAbilityPhys;
-        magic += perAbilityMagic;
-        trueDmg += perAbilityTrue;
+        continue;
       }
+
+      const slot = cast as SpellSlot;
+      const spell = spellBySlot[slot];
+      const rank = spellRanks[slot] ?? 1;
+
+      const dmg = computeSpellRawDamage({
+        spell,
+        rank,
+        effAp: Number.isFinite(effAp) ? effAp : 0,
+        effAd: Number.isFinite(effAd) ? effAd : 0,
+        bonusAd,
+      });
+
+      phys += dmg.phys;
+      magic += dmg.magic;
+      trueDmg += dmg.trueDmg;
     }
 
     return { phys, magic, trueDmg };
   }, [
     useRotation,
     rotation,
-    mode,
-    advWindow,
-    advBurstPhys,
-    advBurstMagic,
-    advBurstTrue,
-    advDpsPhys,
-    advDpsMagic,
-    advDpsTrue,
+    spellBySlot,
+    spellRanks,
+    effAp,
+    effAd,
+    bonusAd,
     oneAutoRaw,
     ohMagic,
   ]);
 
+  // ✅ Advanced mode: lock to Combos only
+  useEffect(() => {
+    if (uiMode === "advanced") setMode("burst");
+  }, [uiMode]);
+
   // ---------- Advanced math (post-mitigation) ----------
-  // If rotation is enabled, swap the raw inputs feeding the same resist math:
+  // If rotation is enabled, feed rotation totals into the same resist math.
+  // - Burst: treat rotationRaw as the burst packet.
+  // - DPS: convert rotationRaw into per-second by dividing by window.
   const advPhysForMath =
     useRotation && rotation.length > 0
       ? mode === "burst"
@@ -533,8 +728,6 @@ export default function LolClient({
   const timeToKill =
     Number.isFinite(dpsPost) && dpsPost > 0 ? tHP / dpsPost : NaN;
 
-  // If rotation is enabled in DPS mode, window damage should reflect the ordered sequence.
-  // Since adv*ForMath is "per-second" in DPS mode, multiplying by window reconstructs the total.
   const windowDamage =
     Number.isFinite(dpsPost) && Number.isFinite(advWindow) && advWindow > 0
       ? dpsPost * advWindow
@@ -559,7 +752,9 @@ export default function LolClient({
     : NaN;
 
   const simpleBurstPct =
-    Number.isFinite(simpleBurstPost) && tHP > 0 ? (simpleBurstPost / tHP) * 100 : NaN;
+    Number.isFinite(simpleBurstPost) && tHP > 0
+      ? (simpleBurstPost / tHP) * 100
+      : NaN;
 
   const simpleDpsPost =
     (Number.isFinite(inferredAaDps) && Number.isFinite(physMult)
@@ -598,9 +793,12 @@ export default function LolClient({
         if (simpleBurstPost >= tHP) {
           return { status: "✅ Killable", detail: `Burst kills (${killLabel}).`, hint: "" };
         }
-        return { status: "❌ Not killable", detail: `Burst doesn't kill (${killLabel}).`, hint: "" };
+        return {
+          status: "❌ Not killable",
+          detail: `Burst doesn't kill (${killLabel}).`,
+          hint: "",
+        };
       } else {
-        // DPS/Window
         if (!Number.isFinite(simpleTimeToKill) || !Number.isFinite(sWindow) || sWindow <= 0) {
           return { status: "—", detail: "Set a window (sec).", hint: "" };
         }
@@ -619,32 +817,14 @@ export default function LolClient({
       }
     }
 
-    // ADVANCED
-    if (mode === "burst") {
-      if (!Number.isFinite(burstPost)) {
-        return { status: "—", detail: "Not enough data.", hint: "" };
-      }
-      if (burstPost >= tHP) {
-        return { status: "✅ Killable", detail: `Burst kills (${killLabel}).`, hint: "" };
-      }
-      return { status: "❌ Not killable", detail: `Burst doesn't kill (${killLabel}).`, hint: "" };
-    } else {
-      if (!Number.isFinite(timeToKill) || !Number.isFinite(advWindow) || advWindow <= 0) {
-        return { status: "—", detail: "Set a window (sec).", hint: "" };
-      }
-      if (timeToKill <= advWindow) {
-        return {
-          status: "✅ Killable",
-          detail: `Kills in ~${fmt(timeToKill, 2)}s (${killLabel}).`,
-          hint: "",
-        };
-      }
-      return {
-        status: "❌ Not killable",
-        detail: `Needs ~${fmt(timeToKill, 2)}s (${killLabel}).`,
-        hint: "",
-      };
+    // ADVANCED (locked to burst)
+    if (!Number.isFinite(burstPost)) {
+      return { status: "—", detail: "Not enough data.", hint: "" };
     }
+    if (burstPost >= tHP) {
+      return { status: "✅ Killable", detail: `Burst kills (${killLabel}).`, hint: "" };
+    }
+    return { status: "❌ Not killable", detail: `Burst doesn't kill (${killLabel}).`, hint: "" };
   }, [
     tHP,
     uiMode,
@@ -652,69 +832,72 @@ export default function LolClient({
     simpleBurstPost,
     simpleTimeToKill,
     sWindow,
-    mode,
     burstPost,
-    timeToKill,
-    advWindow,
     killLabel,
-    // ✅ add these so status updates when rotation changes
-    useRotation,
-    rotation,
   ]);
 
   // ----------------------------
   // ✅ Sticky "Killable" bar numbers
   // ----------------------------
   const stickyModeLabel =
-    uiMode === "simple"
-      ? simpleType === "burst"
-        ? "Burst"
-        : "DPS"
-      : mode === "burst"
-      ? "Burst"
-      : "DPS";
+    uiMode === "simple" ? (simpleType === "burst" ? "Burst" : "DPS") : "Burst";
 
   const stickyDamage =
     uiMode === "simple"
       ? simpleType === "burst"
         ? simpleBurstPost
         : simpleWindowDamage
-      : mode === "burst"
-      ? burstPost
-      : windowDamage;
+      : burstPost;
 
   const stickyPct =
     uiMode === "simple"
       ? simpleType === "burst"
         ? simpleBurstPct
         : simpleWindowPct
-      : mode === "burst"
-      ? burstPct
-      : Number.isFinite(windowDamage) && tHP > 0
-      ? (windowDamage / tHP) * 100
-      : NaN;
+      : burstPct;
 
   // ----------------------------
   // ✅ Top sticky Burst/DPS switch (mobile)
-  // - In Simple: controls simpleType
-  // - In Advanced: controls mode
   // ----------------------------
-  const currentFightMode: Mode = uiMode === "simple" ? simpleType : mode;
+  const currentFightMode: Mode = uiMode === "simple" ? simpleType : "burst";
   const setFightMode = (m: Mode) => {
     if (uiMode === "simple") setSimpleType(m);
-    else setMode(m);
+    // Advanced is locked to Combos
   };
 
-  // ----------------------------
-  // Layout wrapper
-  // - Add bottom padding so sticky bar doesn't cover content on mobile
-  // ----------------------------
+  // ✅ Reset Results (does NOT touch champion, target, or items)
+  function resetResults() {
+    // Advanced knobs
+    setBurstPhysRaw(300);
+    setBurstMagicRaw(200);
+    setBurstTrueRaw(0);
+
+    setDpsPhysRaw(200);
+    setDpsMagicRaw(0);
+    setDpsTrueRaw(0);
+    setWindowSec(6);
+
+    setOnHitFlatMagic(0);
+    setOnHitPctTargetMaxHpPhys(0);
+    setCritDamageMult(2.0);
+
+    // Rotation (advanced)
+    setUseRotation(false);
+    clearRotation();
+    setSpellRanks({ Q: 1, W: 1, E: 1, R: 1 });
+    setMode("burst");
+
+    // Simple knobs
+    setSimpleType("burst");
+    setSimpleWindow(6);
+    setSimpleAAs(6);
+  }
+
   return (
-    <div className="pb- lg:pb-0">
+    <div className="pb-28 lg:pb-0">
       {/* ✅ Mobile sticky header: Tabs + Burst/DPS */}
       <div className="lg:hidden sticky top-0 z-40 border-b border-neutral-800 bg-black/80 backdrop-blur">
         <div className="mx-auto max-w-xl px-3 py-1.5">
-          {/* Tabs */}
           <div className="flex gap-2">
             <button
               type="button"
@@ -749,31 +932,44 @@ export default function LolClient({
             </button>
           </div>
 
-          {/* Burst/DPS toggle (more compact + secondary) */}
-          <div className="mt-1.5 grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setFightMode("burst")}
-              className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold ${
-                currentFightMode === "burst"
-                  ? "border-neutral-600 bg-neutral-900 text-white"
-                  : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-              }`}
-            >
-              Combos
-            </button>
-            <button
-              type="button"
-              onClick={() => setFightMode("dps")}
-              className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold ${
-                currentFightMode === "dps"
-                  ? "border-neutral-600 bg-neutral-900 text-white"
-                  : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-              }`}
-            >
-              Damage Over Time
-            </button>
-          </div>
+          {/* ✅ Advanced: remove DOT selection from mobile sticky header */}
+          {uiMode === "simple" ? (
+            <div className="mt-1.5 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setFightMode("burst")}
+                className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold ${
+                  currentFightMode === "burst"
+                    ? "border-neutral-600 bg-neutral-900 text-white"
+                    : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+                }`}
+              >
+                Combos
+              </button>
+              <button
+                type="button"
+                onClick={() => setFightMode("dps")}
+                className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold ${
+                  currentFightMode === "dps"
+                    ? "border-neutral-600 bg-neutral-900 text-white"
+                    : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
+                }`}
+              >
+                Damage Over Time
+              </button>
+            </div>
+          ) : (
+            <div className="mt-1.5">
+              <button
+                type="button"
+                className="w-full rounded-lg border border-neutral-600 bg-neutral-900 px-2.5 py-1 text-[11px] font-semibold text-white"
+                disabled
+                title="Advanced mode uses Combos only"
+              >
+                Combos
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -820,17 +1016,14 @@ export default function LolClient({
             </button>
 
             <div className="mt-2 text-xs text-neutral-400">
-              HP {fmt(champHp, 0)} • Armor {fmt(champArmor, 0)} • MR{" "}
-              {fmt(champMr, 0)}
+              HP {fmt(champHp, 0)} • Armor {fmt(champArmor, 0)} • MR {fmt(champMr, 0)}
             </div>
 
             {showChampMobile && (
               <div className="mt-3 space-y-3">
                 <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
                   <span className="text-sm text-neutral-300">Title</span>
-                  <span className="font-semibold text-neutral-200">
-                    {selected?.title ?? "—"}
-                  </span>
+                  <span className="font-semibold text-neutral-200">{selected?.title ?? "—"}</span>
                 </div>
 
                 <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
@@ -842,110 +1035,6 @@ export default function LolClient({
               </div>
             )}
           </div>
-
-          {/* ============================== */}
-          {/* Rotation / Combo (Advanced) */}
-          {/* ============================== */}
-          {uiMode === "advanced" && (
-            <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-sm font-semibold">Rotation / Combo</div>
-                  <div className="text-xs text-neutral-500">
-                    Choose the order of casts (Q/W/E/R, autos optional)
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setUseRotation((v) => {
-                      const next = !v;
-                      if (!next) clearRotation();
-                      return next;
-                    });
-                  }}
-                  className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
-                    useRotation
-                      ? "border-neutral-500 bg-neutral-900 text-white"
-                      : "border-neutral-800 bg-black text-neutral-300 hover:border-neutral-600"
-                  }`}
-                >
-                  {useRotation ? "On" : "Off"}
-                </button>
-              </div>
-
-              {useRotation && (
-                <>
-                  {/* Add cast buttons */}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {(["Q", "W", "E", "R", "AA"] as CastKey[]).map((k) => (
-                      <button
-                        key={k}
-                        type="button"
-                        onClick={() => addCast(k)}
-                        className="rounded-lg border border-neutral-800 bg-black px-3 py-1.5 text-xs font-semibold text-neutral-200 hover:border-neutral-600"
-                      >
-                        {k}
-                      </button>
-                    ))}
-
-                    <button
-                      type="button"
-                      onClick={clearRotation}
-                      className="ml-auto rounded-lg border border-neutral-800 bg-black px-3 py-1.5 text-xs font-semibold text-neutral-400 hover:border-neutral-600 hover:text-neutral-200"
-                    >
-                      Clear
-                    </button>
-                  </div>
-
-                  {/* Rotation list */}
-                  <div className="mt-3 space-y-2">
-                    {rotation.length === 0 && (
-                      <div className="text-xs text-neutral-500">
-                        No casts added yet.
-                      </div>
-                    )}
-
-                    {rotation.map((k, i) => (
-                      <div
-                        key={`${k}-${i}`}
-                        className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2"
-                      >
-                        <div className="text-sm font-semibold w-8">{k}</div>
-
-                        <div className="ml-auto flex gap-1">
-                          <button
-                            type="button"
-                            onClick={() => moveCast(i, -1)}
-                            disabled={i === 0}
-                            className="rounded border border-neutral-800 px-2 py-0.5 text-xs disabled:opacity-40"
-                          >
-                            ↑
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => moveCast(i, 1)}
-                            disabled={i === rotation.length - 1}
-                            className="rounded border border-neutral-800 px-2 py-0.5 text-xs disabled:opacity-40"
-                          >
-                            ↓
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeCastAt(i)}
-                            className="rounded border border-neutral-800 px-2 py-0.5 text-xs text-red-400 hover:border-red-500"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
 
           {/* Champion picker */}
           <div className="mt-6">
@@ -970,8 +1059,7 @@ export default function LolClient({
             </select>
 
             <div className="mt-2 text-xs text-neutral-500">
-              Loaded{" "}
-              <span className="text-neutral-300 font-semibold">{champions.length}</span>{" "}
+              Loaded <span className="text-neutral-300 font-semibold">{champions.length}</span>{" "}
               champions • Data Dragon patch{" "}
               <span className="text-neutral-300 font-semibold">{patch}</span>
             </div>
@@ -980,6 +1068,22 @@ export default function LolClient({
               Showing {filtered.length} results (type to filter). Selected:{" "}
               <span className="text-neutral-300 font-semibold">{selected?.name ?? "—"}</span>
             </div>
+
+            {/* ✅ Spell data status */}
+            {uiMode === "advanced" && (
+              <div className="mt-2 text-xs text-neutral-500">
+                Spells:{" "}
+                {ddLoading ? (
+                  <span className="text-neutral-300 font-semibold">Loading…</span>
+                ) : ddErr ? (
+                  <span className="text-red-400 font-semibold">{ddErr}</span>
+                ) : ddFull?.spells?.length ? (
+                  <span className="text-neutral-300 font-semibold">Loaded</span>
+                ) : (
+                  <span className="text-neutral-400">—</span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Level */}
@@ -1027,7 +1131,6 @@ export default function LolClient({
               </div>
             </div>
 
-            {/* ✅ Target Champion + Target Level */}
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="text-sm text-neutral-300">Champion:</label>
@@ -1095,7 +1198,6 @@ export default function LolClient({
               </div>
             </div>
 
-            {/* ✅ Advanced-only custom target stats */}
             {uiMode === "advanced" && (
               <>
                 <div className="mt-4 grid gap-4 sm:grid-cols-3">
@@ -1316,9 +1418,7 @@ export default function LolClient({
                     onChange={(e) => setNum(setOnHitFlatMagic, 0, 9999)(e.target.value)}
                     className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                   />
-                  <div className="mt-1 text-xs text-neutral-500">
-                    Applied per auto (mitigated by MR).
-                  </div>
+                  <div className="mt-1 text-xs text-neutral-500">Applied per auto (mitigated by MR).</div>
                 </div>
 
                 <div>
@@ -1326,9 +1426,7 @@ export default function LolClient({
                   <input
                     type="number"
                     value={onHitPctTargetMaxHpPhys}
-                    onChange={(e) =>
-                      setNum(setOnHitPctTargetMaxHpPhys, 0, 50)(e.target.value)
-                    }
+                    onChange={(e) => setNum(setOnHitPctTargetMaxHpPhys, 0, 50)(e.target.value)}
                     className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                   />
                   <div className="mt-1 text-xs text-neutral-500">
@@ -1345,9 +1443,7 @@ export default function LolClient({
                     onChange={(e) => setNum(setCritDamageMult, 1.0, 5.0)(e.target.value)}
                     className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                   />
-                  <div className="mt-1 text-xs text-neutral-500">
-                    Default is 2.00 (expected crit).
-                  </div>
+                  <div className="mt-1 text-xs text-neutral-500">Default is 2.00 (expected crit).</div>
                 </div>
               </div>
             </div>
@@ -1387,7 +1483,6 @@ export default function LolClient({
                 </button>
               </div>
 
-              {/* ✅ Fixed-height slot so Burst/DPS doesn't change card height */}
               <div className="mt-4 min-h-[88px]">
                 {simpleType === "burst" ? (
                   <div>
@@ -1423,35 +1518,173 @@ export default function LolClient({
             <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
               <div className="text-sm font-semibold">Mode</div>
 
-              <div className="mt-3 grid grid-cols-2 gap-2">
+              {/* ✅ Removed "Damage Over Time" button above Rotation/Combo */}
+              <div className="mt-3">
                 <button
                   type="button"
                   onClick={() => setMode("burst")}
-                  className={`rounded-xl border px-3 py-2 text-center text-sm font-semibold ${
-                    mode === "burst"
-                      ? "border-neutral-500 bg-neutral-900"
-                      : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-                  }`}
+                  className="w-full rounded-xl border border-neutral-500 bg-neutral-900 px-3 py-2 text-center text-sm font-semibold text-white"
                 >
                   Combos
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setMode("dps")}
-                  className={`rounded-xl border px-3 py-2 text-center text-sm font-semibold ${
-                    mode === "dps"
-                      ? "border-neutral-500 bg-neutral-900"
-                      : "border-neutral-800 bg-black text-neutral-400 hover:border-neutral-600"
-                  }`}
-                >
-                  Damage Over Time
                 </button>
               </div>
 
               <div className="mt-3 text-xs text-neutral-500">
-                Advanced = manual damage buckets. Pen applied automatically. Crit expectation used in AA helpers.
+                Advanced = Combos only. Rotation/Combo damage counts toward your total automatically.
               </div>
+            </div>
+          )}
+
+          {/* ✅✅✅ MOVED: Rotation / Combo (Advanced) now UNDER the mode buttons */}
+          {uiMode === "advanced" && (
+            <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-semibold">Rotation / Combo</div>
+                  <div className="text-xs text-neutral-500">
+                    Choose cast order. Q/W/E/R uses Data Dragon (best-effort), AA uses your AA math.
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUseRotation((v) => {
+                      const next = !v;
+                      if (!next) clearRotation();
+                      return next;
+                    });
+                  }}
+                  className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
+                    useRotation
+                      ? "border-neutral-500 bg-neutral-900 text-white"
+                      : "border-neutral-800 bg-black text-neutral-300 hover:border-neutral-600"
+                  }`}
+                >
+                  {useRotation ? "On" : "Off"}
+                </button>
+              </div>
+
+              {/* Spell rank controls */}
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {(["Q", "W", "E", "R"] as SpellSlot[]).map((slot) => {
+                  const sp = spellBySlot[slot];
+                  const max = clamp(sp?.maxrank ?? (slot === "R" ? 3 : 5), 1, 10);
+                  const val = clamp(spellRanks[slot] ?? 1, 1, max);
+
+                  return (
+                    <div key={slot} className="rounded-xl border border-neutral-800 bg-black px-3 py-2">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-neutral-400">{slot}</div>
+                        <div className="text-xs text-neutral-500">
+                          Rank <span className="text-neutral-200 font-semibold">{val}</span> / {max}
+                        </div>
+                      </div>
+
+                      <div className="mt-1 text-xs text-neutral-300 font-semibold truncate">
+                        {sp?.name ?? "—"}
+                      </div>
+
+                      <input
+                        type="range"
+                        min={1}
+                        max={max}
+                        value={val}
+                        onChange={(e) => {
+                          const n = Number(e.target.value);
+                          setSpellRanks((prev) => ({ ...prev, [slot]: n }));
+                        }}
+                        className="mt-2 w-full"
+                        disabled={!sp}
+                      />
+
+                      {!sp && (
+                        <div className="mt-1 text-[11px] text-neutral-500">
+                          Spell data not loaded yet.
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {useRotation && (
+                <>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {(["Q", "W", "E", "R", "AA"] as CastKey[]).map((k) => (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => addCast(k)}
+                        className="rounded-lg border border-neutral-800 bg-black px-3 py-1.5 text-xs font-semibold text-neutral-200 hover:border-neutral-600"
+                      >
+                        {k}
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={clearRotation}
+                      className="ml-auto rounded-lg border border-neutral-800 bg-black px-3 py-1.5 text-xs font-semibold text-neutral-400 hover:border-neutral-600 hover:text-neutral-200"
+                    >
+                      Clear
+                    </button>
+                  </div>
+
+                  <div className="mt-3 space-y-2">
+                    {rotation.length === 0 && (
+                      <div className="text-xs text-neutral-500">No casts added yet.</div>
+                    )}
+
+                    {rotation.map((k, i) => (
+                      <div
+                        key={`${k}-${i}`}
+                        className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2"
+                      >
+                        <div className="text-sm font-semibold w-8">{k}</div>
+
+                        <div className="ml-auto flex gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveCast(i, -1)}
+                            disabled={i === 0}
+                            className="rounded border border-neutral-800 px-2 py-0.5 text-xs disabled:opacity-40"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveCast(i, 1)}
+                            disabled={i === rotation.length - 1}
+                            className="rounded border border-neutral-800 px-2 py-0.5 text-xs disabled:opacity-40"
+                          >
+                            ↓
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeCastAt(i)}
+                            className="rounded border border-neutral-800 px-2 py-0.5 text-xs text-red-400 hover:border-red-500"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-3 text-xs text-neutral-500">
+                    Rotation raw total:{" "}
+                    <span className="text-neutral-300 font-semibold">
+                      {Math.round(rotationRaw.phys + rotationRaw.magic + rotationRaw.trueDmg)}
+                    </span>{" "}
+                    (phys {Math.round(rotationRaw.phys)} / magic {Math.round(rotationRaw.magic)})
+                  </div>
+
+                  <div className="mt-1 text-[11px] text-neutral-500">
+                    Note: Data Dragon spell parsing is best-effort. Some spells may need champion-specific tuning.
+                  </div>
+                </>
+              )}
             </div>
           )}
         </section>
@@ -1462,7 +1695,6 @@ export default function LolClient({
             uiMode === "simple" ? "h-full" : "self-start"
           } ${mobileTab !== "results" ? "hidden lg:flex" : ""}`}
         >
-          {/* Desktop-only Selected champion (kept unchanged) */}
           <div className="hidden lg:flex items-center justify-between">
             <h2 className="text-lg font-semibold">Selected champion</h2>
           </div>
@@ -1509,38 +1741,45 @@ export default function LolClient({
           {/* Results */}
           <div
             ref={resultsRef}
-            className={`mt-13.5 rounded-2xl border border-neutral-800 bg-black p-3 ${
+            className={`mt-6 rounded-2xl border border-neutral-800 bg-black p-3 ${
               uiMode === "simple" ? "min-h-[240px]" : ""
             }`}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <div className="text-sm font-semibold">Results</div>
-              <div className="text-xs text-neutral-500">
-                {uiMode === "simple" ? (
-                  <>
-                    Mode:{" "}
-                    <span className="text-neutral-300 font-semibold">
-                      {simpleType === "burst" ? "Burst" : "Damage Over Time"}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    Mode:{" "}
-                    <span className="text-neutral-300 font-semibold">
-                      {mode === "burst" ? "Burst" : "Damage Over Time"}
-                    </span>
-                  </>
-                )}
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={resetResults}
+                  className="rounded-lg border border-neutral-800 bg-black px-2.5 py-1 text-[11px] font-semibold text-neutral-200 hover:border-neutral-600"
+                  title="Resets damage inputs, windows, crit/on-hit, and rotation (does not touch champion/target/items)."
+                >
+                  Reset Results
+                </button>
+
+                <div className="text-xs text-neutral-500">
+                  {uiMode === "simple" ? (
+                    <>
+                      Mode:{" "}
+                      <span className="text-neutral-300 font-semibold">
+                        {simpleType === "burst" ? "Burst" : "Damage Over Time"}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      Mode:{" "}
+                      <span className="text-neutral-300 font-semibold">Burst</span>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* ✅ Kill Check (est.) */}
             <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-4 py-3">
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold text-neutral-300">Kill Check (est.)</div>
-                <div className="text-[11px] text-neutral-500">
-                  {hasItems ? "With items" : "No items"}
-                </div>
+                <div className="text-[11px] text-neutral-500">{hasItems ? "With items" : "No items"}</div>
               </div>
 
               <div className="mt-2 flex items-center justify-between">
@@ -1555,7 +1794,6 @@ export default function LolClient({
               </div>
             </div>
 
-            {/* ✅✅✅ ADDED: Cost in G (only change in Results UI) */}
             {totalGoldG > 0 && (
               <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-4 py-3">
                 <div className="flex items-center justify-between">
@@ -1569,9 +1807,7 @@ export default function LolClient({
 
             {uiMode === "advanced" && (
               <div className="mt-4 rounded-xl border border-neutral-800 bg-black px-3 py-3">
-                <div className="text-xs font-semibold text-neutral-300">
-                  Effective stats (champ + items)
-                </div>
+                <div className="text-xs font-semibold text-neutral-300">Effective stats (champ + items)</div>
 
                 <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
                   <div className="flex justify-between">
@@ -1592,9 +1828,7 @@ export default function LolClient({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">Crit</span>
-                    <span className="text-neutral-200 font-semibold">
-                      {fmt(totals.critChancePct, 0)}%
-                    </span>
+                    <span className="text-neutral-200 font-semibold">{fmt(totals.critChancePct, 0)}%</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-neutral-500">AA DPS</span>
@@ -1630,9 +1864,7 @@ export default function LolClient({
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
                       <span className="text-sm text-neutral-300">Damage (autos, window)</span>
-                      <span className="font-semibold text-neutral-200">
-                        {fmt(simpleWindowDamage, 0)}
-                      </span>
+                      <span className="font-semibold text-neutral-200">{fmt(simpleWindowDamage, 0)}</span>
                     </div>
                     <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
                       <span className="text-sm text-neutral-300">Time to kill (est.)</span>
@@ -1649,175 +1881,92 @@ export default function LolClient({
               </>
             ) : (
               <>
-                {/* ADVANCED RESULTS */}
-                {mode === "burst" ? (
-                  <>
-                    <div className="mt-3 flex items-center justify-between gap-2">
-                      <div className="text-xs text-neutral-500">
-                        One AA (post-mitigation):{" "}
+                {/* ADVANCED RESULTS (Burst only) */}
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <div className="text-xs text-neutral-500">
+                    One AA (post-mitigation):{" "}
+                    <span className="text-neutral-300 font-semibold">
+                      {Number.isFinite(oneAutoPost) ? fmt(oneAutoPost, 0) : "—"}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={addOneAutoToBurst}
+                    disabled={!Number.isFinite(oneAutoRaw)}
+                    className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
+                  >
+                    Add 1 AA
+                  </button>
+                </div>
+
+                {/* Only show manual buckets when rotation is off */}
+                {!useRotation && (
+                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div>
+                      <label className="text-sm text-neutral-300">Raw Physical</label>
+                      <input
+                        type="number"
+                        value={burstPhysRaw}
+                        onChange={(e) => setNum(setBurstPhysRaw, 0, 999999)(e.target.value)}
+                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                      />
+                      <div className="mt-1 text-xs text-neutral-500">
+                        After armor:{" "}
                         <span className="text-neutral-300 font-semibold">
-                          {Number.isFinite(oneAutoPost) ? fmt(oneAutoPost, 0) : "—"}
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={addOneAutoToBurst}
-                        disabled={!Number.isFinite(oneAutoRaw)}
-                        className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
-                      >
-                        Add 1 AA
-                      </button>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                      <div>
-                        <label className="text-sm text-neutral-300">Raw Physical</label>
-                        <input
-                          type="number"
-                          value={burstPhysRaw}
-                          onChange={(e) => setNum(setBurstPhysRaw, 0, 999999)(e.target.value)}
-                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                        />
-                        <div className="mt-1 text-xs text-neutral-500">
-                          After armor:{" "}
-                          <span className="text-neutral-300 font-semibold">
-                            {Number.isFinite(physMult) ? fmt(num0(burstPhysRaw) * physMult, 0) : "—"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-sm text-neutral-300">Raw Magic</label>
-                        <input
-                          type="number"
-                          value={burstMagicRaw}
-                          onChange={(e) => setNum(setBurstMagicRaw, 0, 999999)(e.target.value)}
-                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                        />
-                        <div className="mt-1 text-xs text-neutral-500">
-                          After MR:{" "}
-                          <span className="text-neutral-300 font-semibold">
-                            {Number.isFinite(magicMult) ? fmt(num0(burstMagicRaw) * magicMult, 0) : "—"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-sm text-neutral-300">True Damage</label>
-                        <input
-                          type="number"
-                          value={burstTrueRaw}
-                          onChange={(e) => setNum(setBurstTrueRaw, 0, 999999)(e.target.value)}
-                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                        />
-                        <div className="mt-1 text-xs text-neutral-500">Not reduced by resists</div>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                        <span className="text-sm text-neutral-300">Total (post-mitigation)</span>
-                        <span className="font-semibold text-neutral-200">{fmt(burstPost, 0)}</span>
-                      </div>
-                      <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                        <span className="text-sm text-neutral-300">% of Target HP</span>
-                        <span className="font-semibold text-neutral-200">
-                          {Number.isFinite(burstPct) ? `${fmt(burstPct, 1)}%` : "—"}
+                          {Number.isFinite(physMult) ? fmt(num0(burstPhysRaw) * physMult, 0) : "—"}
                         </span>
                       </div>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="mt-3 flex items-center justify-between gap-2">
-                      <div className="text-xs text-neutral-500">
-                        Expected AA DPS (raw):{" "}
+
+                    <div>
+                      <label className="text-sm text-neutral-300">Raw Magic</label>
+                      <input
+                        type="number"
+                        value={burstMagicRaw}
+                        onChange={(e) => setNum(setBurstMagicRaw, 0, 999999)(e.target.value)}
+                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                      />
+                      <div className="mt-1 text-xs text-neutral-500">
+                        After MR:{" "}
                         <span className="text-neutral-300 font-semibold">
-                          {Number.isFinite(inferredAaDps) ? fmt(inferredAaDps, 1) : "—"}
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={useAaDpsAsPhys}
-                        disabled={!Number.isFinite(inferredAaDps)}
-                        className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
-                      >
-                        Use AA DPS
-                      </button>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-4">
-                      <div>
-                        <label className="text-sm text-neutral-300">Phys DPS (raw)</label>
-                        <input
-                          type="number"
-                          value={dpsPhysRaw}
-                          onChange={(e) => setNum(setDpsPhysRaw, 0, 999999)(e.target.value)}
-                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm text-neutral-300">Magic DPS (raw)</label>
-                        <input
-                          type="number"
-                          value={dpsMagicRaw}
-                          onChange={(e) => setNum(setDpsMagicRaw, 0, 999999)(e.target.value)}
-                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm text-neutral-300">True DPS</label>
-                        <input
-                          type="number"
-                          value={dpsTrueRaw}
-                          onChange={(e) => setNum(setDpsTrueRaw, 0, 999999)(e.target.value)}
-                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-sm text-neutral-300">Window (sec)</label>
-                        <input
-                          type="number"
-                          value={windowSec}
-                          onChange={(e) => setNum(setWindowSec, 0, 120)(e.target.value)}
-                          className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="mt-3 text-xs text-neutral-500">
-                      Post-mitigation DPS:{" "}
-                      <span className="text-neutral-300 font-semibold">{fmt(dpsPost, 1)}</span>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                        <span className="text-sm text-neutral-300">Damage (autos, window)</span>
-                        <span className="font-semibold text-neutral-200">{fmt(windowDamage, 0)}</span>
-                      </div>
-                      <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                        <span className="text-sm text-neutral-300">Time to kill (est.)</span>
-                        <span className="font-semibold text-neutral-200">
-                          {Number.isFinite(timeToKill) ? `${fmt(timeToKill, 2)}s` : "—"}
+                          {Number.isFinite(magicMult) ? fmt(num0(burstMagicRaw) * magicMult, 0) : "—"}
                         </span>
                       </div>
                     </div>
-                  </>
+
+                    <div>
+                      <label className="text-sm text-neutral-300">True Damage</label>
+                      <input
+                        type="number"
+                        value={burstTrueRaw}
+                        onChange={(e) => setNum(setBurstTrueRaw, 0, 999999)(e.target.value)}
+                        className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
+                      />
+                      <div className="mt-1 text-xs text-neutral-500">Not reduced by resists</div>
+                    </div>
+                  </div>
                 )}
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+                    <span className="text-sm text-neutral-300">Total (post-mitigation)</span>
+                    <span className="font-semibold text-neutral-200">{fmt(burstPost, 0)}</span>
+                  </div>
+                  <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+                    <span className="text-sm text-neutral-300">% of Target HP</span>
+                    <span className="font-semibold text-neutral-200">
+                      {Number.isFinite(burstPct) ? `${fmt(burstPct, 1)}%` : "—"}
+                    </span>
+                  </div>
+                </div>
               </>
             )}
 
-            {/* Small legend */}
             <div className="mt-4 text-[11px] leading-relaxed text-neutral-500">
               <span className="font-semibold text-neutral-400">Legend:</span>{" "}
-              HP = Health, AD = Attack Damage, AP = Ability Power, AS = Attack Speed, MR = Magic
-              Resist, AA = Auto Attack, DPS = Damage per Second, TTK = Time to Kill, Pen =
-              Penetration (Armor/MR)
+              HP = Health, AD = Attack Damage, AP = Ability Power, AS = Attack Speed, MR = Magic Resist, AA = Auto Attack,
+              DPS = Damage per Second, TTK = Time to Kill, Pen = Penetration (Armor/MR)
             </div>
           </div>
         </section>
@@ -1832,9 +1981,7 @@ export default function LolClient({
               <span className="text-neutral-200 font-semibold truncate">{killCheck.status}</span>
             </div>
             <div className="text-xs text-neutral-500">
-              Dmg{" "}
-              <span className="text-neutral-200 font-semibold">{fmt(stickyDamage, 0)}</span>{" "}
-              {" • "}
+              Dmg <span className="text-neutral-200 font-semibold">{fmt(stickyDamage, 0)}</span> {" • "}
               <span className="text-neutral-200 font-semibold">
                 {Number.isFinite(stickyPct) ? `${fmt(stickyPct, 1)}%` : "—"}
               </span>{" "}

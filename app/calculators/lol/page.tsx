@@ -21,7 +21,7 @@ type LolItemsFile = {
 };
 
 export type ChampionIndexRow = {
-  id: string;
+  id: string; // Data Dragon champion "id" (e.g., "Aatrox")
   name: string;
   title?: string;
   partype?: string;
@@ -88,6 +88,10 @@ async function loadLolIndex(version: string): Promise<{
 
   const patch = version;
 
+  // IMPORTANT:
+  // Your champions_full.json should store the Data Dragon champion "id"
+  // (e.g., "Aatrox", "Ahri") in c.id so the client can fetch:
+  // /cdn/<patch>/data/en_US/champion/<id>.json
   const champions: ChampionIndexRow[] = (json.champions ?? [])
     .map((c: any) => ({
       id: String(c.id),
