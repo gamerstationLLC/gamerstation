@@ -31,6 +31,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/calculators/wow/pve/mythic-plus", priority: 0.75 },
     { path: "/calculators/wow/pve/uptime", priority: 0.75 },
 
+    // Games / Call of Duty
+    { path: "/games/cod", priority: 0.85 },
+    { path: "/games/cod/meta-loadouts", priority: 0.9 },
+
     // Legal / misc
     { path: "/terms", priority: 0.3 },
     { path: "/privacy", priority: 0.3 },
