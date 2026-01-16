@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { CodWeaponRow } from "@/lib/codweapons";
 import { type CodAttachmentRow } from "@/lib/codattachments";
@@ -73,6 +74,15 @@ function normalizeTypeToClass(t: string): WeaponClass | null {
   return null;
 }
 
+// Normalize for matching query -> weapon names
+function norm(s: string) {
+  return (s || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[^a-z0-9\s\-]/g, "");
+}
+
 // ✅ uses flat dmg buckets (10/25/50) instead of a damage_profile array
 function damageAtMeters(weapon: UIWeapon | undefined, meters: number) {
   if (!weapon) return 0;
@@ -103,6 +113,8 @@ export default function CodTtkClient({
   sheetWeapons: CodWeaponRow[];
   sheetAttachments?: CodAttachmentRow[];
 }) {
+  const searchParams = useSearchParams();
+
   const [weaponClass, setWeaponClass] = useState<WeaponClass>("smg");
 
   // ✅ MOBILE ONLY tab state
@@ -110,6 +122,27 @@ export default function CodTtkClient({
 
   // ✅ NEW: hit-zone toggle (torso default)
   const [hitZone, setHitZone] = useState<"torso" | "headshots">("torso");
+
+  // ✅ Build a full lookup across ALL weapons (unfiltered)
+  const allWeaponLookup = useMemo(() => {
+    const rows = sheetWeapons ?? [];
+    return rows
+      .map((w: any) => {
+        const id = String(w.weapon_id ?? "").trim();
+        const name = String(w.weapon_name ?? "").trim();
+        const cls = normalizeTypeToClass(String(w.weapon_type ?? ""));
+        if (!id || !name || !cls) return null;
+
+        return {
+          id,
+          name,
+          cls,
+          nameNorm: norm(name),
+          idNorm: norm(id),
+        };
+      })
+      .filter(Boolean) as { id: string; name: string; cls: WeaponClass; nameNorm: string; idNorm: string }[];
+  }, [sheetWeapons]);
 
   // ✅ map sheet rows -> UIWeapon (expects dmg10/dmg25/dmg50 on each row)
   const weapons: UIWeapon[] = useMemo(() => {
@@ -140,7 +173,49 @@ export default function CodTtkClient({
 
   const [weaponId, setWeaponId] = useState<string>("");
 
+  // ✅ Apply deep-link only once
+  const appliedDeepLinkRef = useRef(false);
+
   useEffect(() => {
+    if (appliedDeepLinkRef.current) return;
+
+    const weaponParamRaw = searchParams.get("weapon") || "";
+    const weaponIdRaw = searchParams.get("weaponId") || "";
+
+    const weaponParam = norm(weaponParamRaw);
+    const weaponIdParam = norm(weaponIdRaw);
+
+    if (!weaponParam && !weaponIdParam) return;
+    if (allWeaponLookup.length === 0) return;
+
+    // Try match by weaponId first (if provided), else by name
+    let match =
+      (weaponIdParam
+        ? allWeaponLookup.find((w) => w.idNorm === weaponIdParam)
+        : null) ||
+      (weaponParam
+        ? allWeaponLookup.find((w) => w.nameNorm === weaponParam) ||
+          allWeaponLookup.find((w) => w.nameNorm.includes(weaponParam)) ||
+          allWeaponLookup.find((w) => weaponParam.includes(w.nameNorm))
+        : null);
+
+    if (!match) return;
+
+    appliedDeepLinkRef.current = true;
+
+    // Set class first so the weapon appears in the filtered dropdown
+    setWeaponClass(match.cls);
+
+    // Then set weapon id
+    setWeaponId(match.id);
+
+    // (Optional UX) jump to results on mobile if desired:
+    // setMobileTab("results");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, allWeaponLookup.length]);
+
+  useEffect(() => {
+    if (appliedDeepLinkRef.current) return;
     if (weapons.length === 0) {
       setWeaponId("");
       return;
@@ -191,6 +266,7 @@ export default function CodTtkClient({
 
   // prevent holding an invalid barrel ID when switching weapons
   useEffect(() => {
+    if (appliedDeepLinkRef.current) return;
     setBarrelId("");
   }, [selected?.id]);
 
@@ -297,10 +373,10 @@ export default function CodTtkClient({
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center justify-between">
           <Link
-            href="/calculators"
+            href="/games/cod"
             className="text-sm text-neutral-300 hover:text-white"
           >
-            ← Back to calculators
+            ← Back to Call of Duty
           </Link>
           <div className="text-sm text-neutral-400">Call of Duty • TTK</div>
         </header>
