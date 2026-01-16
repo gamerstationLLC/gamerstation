@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { getCodWeapons } from "@/lib/codweapons";
 import { getCodAttachments } from "@/lib/codattachments";
@@ -42,9 +43,11 @@ export default async function CodTtkPage() {
   }));
 
   return (
-    <CodTtkClient
-      sheetWeapons={sheetWeapons}
-      sheetAttachments={sheetAttachments}
-    />
+    <Suspense fallback={null}>
+      <CodTtkClient
+        sheetWeapons={sheetWeapons}
+        sheetAttachments={sheetAttachments}
+      />
+    </Suspense>
   );
 }
