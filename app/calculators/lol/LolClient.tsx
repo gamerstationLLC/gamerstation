@@ -130,6 +130,7 @@ type DdSpellVar = {
 type DdSpell = {
   name?: string;
   maxrank?: number;
+  tooltip?: string;
   // effect is 1-indexed in practice (effect[1] usually holds a primary array)
   effect?: (number[] | null)[];
   vars?: DdSpellVar[];
@@ -142,19 +143,81 @@ type DdChampionFull = {
 
 type SpellSlot = "Q" | "W" | "E" | "R";
 
-function isNumArray(x: any): x is number[] {
-  return Array.isArray(x) && x.every((v) => typeof v === "number");
+// -------------------------
+// Champion-specific overrides (minimal, scalable)
+// -------------------------
+// Some champions have spells where Data Dragon's primary values represent a *single tick / dagger / bolt*
+// rather than a full cast's total. In those cases we apply a multiplier so the Rotation/Combo totals
+// are not wildly undercounted.
+//
+// Keep this list small and only add entries when you confirm a champion is mis-modeled.
+const CHAMP_SPELL_MULTIPLIER: Record<string, Partial<Record<SpellSlot, number>>> = {
+  // Katarina R (Death Lotus): Data Dragon values are per dagger; assume full channel on one target.
+  Katarina: { R: 15 },
+};
+
+function spellCastMultiplier(champId: string, slot: SpellSlot) {
+  const m = CHAMP_SPELL_MULTIPLIER[champId]?.[slot];
+  return typeof m === "number" && Number.isFinite(m) && m > 0 ? m : 1;
 }
 
-// Best-effort: choose a “primary” base array from effect[] (first array that matches maxrank, else first numeric array)
+function isNumArray(x: any): x is number[] {
+  return Array.isArray(x) && x.every((v) => typeof v === "number" && Number.isFinite(v));
+}
+
+function avg(arr: number[]) {
+  if (!arr.length) return 0;
+  return arr.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+function isMostlyNonDecreasing(arr: number[]) {
+  let bad = 0;
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] < arr[i - 1]) bad++;
+  }
+  return bad <= Math.max(1, Math.floor(arr.length / 3));
+}
+
+function isIntegerish(n: number) {
+  return Number.isFinite(n) && Math.abs(n - Math.round(n)) < 1e-6;
+}
+
+// Best-effort: choose a “damage-like” base array from effect[]
+// We score arrays that:
+// - match maxrank
+// - are positive
+// - trend upward with rank (damage often increases; cooldown usually decreases)
+// - have larger magnitude
 function pickPrimaryEffectArray(effect: (number[] | null)[] | undefined, maxrank: number) {
   if (!effect) return null;
 
-  // Prefer: exact length === maxrank
+  let best: number[] | null = null;
+  let bestScore = -Infinity;
+
   for (let i = 0; i < effect.length; i++) {
     const arr = effect[i];
-    if (isNumArray(arr) && arr.length === maxrank) return arr;
+    if (!isNumArray(arr) || arr.length !== maxrank) continue;
+
+    const a = arr.map((x) => (Number.isFinite(x) ? x : 0));
+    const maxVal = Math.max(...a);
+    const minVal = Math.min(...a);
+    const mean = avg(a);
+
+    // Ignore clearly non-damage arrays
+    if (maxVal <= 0) continue;
+
+    const nonDecreasing = isMostlyNonDecreasing(a) ? 1 : 0;
+
+    // Score favors bigger + increasing arrays
+    const score = mean + maxVal * 0.25 + nonDecreasing * 15 - (minVal < 0 ? 10 : 0);
+
+    if (score > bestScore) {
+      bestScore = score;
+      best = a;
+    }
   }
+
+  if (best) return best;
 
   // Fallback: first numeric array
   for (let i = 0; i < effect.length; i++) {
@@ -163,6 +226,110 @@ function pickPrimaryEffectArray(effect: (number[] | null)[] | undefined, maxrank
   }
 
   return null;
+}
+
+// Best-effort: pick a “hit count / tick count” array when Data Dragon encodes multi-hit spells.
+// We only consider arrays that:
+// - match maxrank
+// - look like small integers (2..30)
+function pickHitCountEffectArray(
+  effect: (number[] | null)[] | undefined,
+  maxrank: number,
+  damageArr: number[] | null
+) {
+  if (!effect) return null;
+
+  let best: number[] | null = null;
+  let bestScore = -Infinity;
+
+  for (let i = 0; i < effect.length; i++) {
+    const arr = effect[i];
+    if (!isNumArray(arr) || arr.length !== maxrank) continue;
+    if (damageArr && arr === damageArr) continue;
+
+    const a = arr.map((x) => (Number.isFinite(x) ? x : 0));
+    const maxVal = Math.max(...a);
+    const minVal = Math.min(...a);
+    const mean = avg(a);
+
+    // Must look like a count
+    if (minVal < 1 || maxVal > 30) continue;
+    if (!a.every(isIntegerish)) continue;
+
+    const nonDecreasing = isMostlyNonDecreasing(a) ? 1 : 0;
+
+    // Prefer slightly larger counts, and stable/increasing
+    const score = mean + nonDecreasing * 5;
+
+    if (score > bestScore) {
+      bestScore = score;
+      best = a;
+    }
+  }
+
+  return best;
+}
+
+function textLooksMultiHit(tooltip?: string, name?: string) {
+  const t = `${name ?? ""} ${tooltip ?? ""}`.toLowerCase();
+  // Very common multi-hit / DoT / channel words
+  return (
+    t.includes("over ") ||
+    t.includes("per second") ||
+    t.includes("each second") ||
+    t.includes("each hit") ||
+    t.includes("dagger") ||
+    t.includes("bolts") ||
+    t.includes("shots") ||
+    t.includes("strikes") ||
+    t.includes("waves") ||
+    t.includes("ticks") ||
+    t.includes("channel")
+  );
+}
+
+
+// -------------------------
+// Champion-specific overrides
+// -------------------------
+// Data Dragon gives us numbers, but it does NOT encode stateful rules (ticks, dagger pickups, detonations, etc.)
+// Keep this layer tiny: prefer generic Data Dragon parsing, and only override counts where needed.
+type SpellOverride = {
+  // Multiply the base spell damage by a count (e.g., channel ticks, multi-hit ult)
+  hitMult?: number;
+
+  // Add an extra "proc" packet as a fraction of the computed base spell damage.
+  // Example: addMagicMult: 0.75 means "add ~75% of this spell's magic damage again".
+  // This is intentionally conservative and only used for champs whose damage is stateful
+  // (daggers, marks, detonations) and not represented as a single packet in Data Dragon.
+  addPhysMult?: number;
+  addMagicMult?: number;
+  addTrueMult?: number;
+};
+
+type ChampionOverrides = {
+  // keyed by spell slot (Q/W/E/R)
+  Q?: SpellOverride;
+  W?: SpellOverride;
+  E?: SpellOverride;
+  R?: SpellOverride;
+};
+
+const CHAMPION_OVERRIDES: Record<string, ChampionOverrides> = {
+  // Katarina: Death Lotus is multi-hit. Data Dragon damage values are per-dagger.
+  // Assume full channel on ONE target.
+  Katarina: {
+    // Bouncing Blade's meaningful damage is split between the initial hit and dagger pickup.
+    // Approximation: assume you pick up ONE dagger from Q.
+    Q: { addMagicMult: 0.75 },
+    R: { hitMult: 15 },
+  },
+};
+
+function getSpellOverride(championId: string, slot: SpellSlot): SpellOverride | null {
+  const o = CHAMPION_OVERRIDES[championId];
+  if (!o) return null;
+  return (o as any)[slot] ?? null;
 }
 
 function coeffAtRank(coeff: number[] | number | undefined, rank: number) {
@@ -224,7 +391,14 @@ function computeSpellRawDamage(opts: {
     }
   }
 
-  const rawTotal = Math.max(0, base + scaling);
+  // If Data Dragon encodes per-hit damage for a multi-hit spell, we can sometimes find a hit-count array.
+  // This is intentionally conservative: only apply when the tooltip/name looks multi-hit.
+  const hitArr = pickHitCountEffectArray(spell.effect ?? undefined, maxrank, baseArr);
+  const hitCount = hitArr ? (hitArr[clamp(r - 1, 0, hitArr.length - 1)] ?? 1) : 1;
+  const useHits = hitArr && textLooksMultiHit(spell.tooltip, spell.name);
+
+  const perHit = Math.max(0, base + scaling);
+  const rawTotal = useHits ? perHit * clamp(hitCount, 1, 50) : perHit;
 
   const dmgType = inferDamageType(spell.vars);
   if (dmgType === "phys") return { phys: rawTotal, magic: 0, trueDmg: 0, rawTotal };
@@ -652,9 +826,17 @@ export default function LolClient({
         bonusAd,
       });
 
-      phys += dmg.phys;
-      magic += dmg.magic;
-      trueDmg += dmg.trueDmg;
+      const ov = getSpellOverride(selectedId, slot);
+      const mult = clamp(ov?.hitMult ?? 1, 0, 1000);
+
+      const addPhysMult = clamp(ov?.addPhysMult ?? 0, 0, 10);
+      const addMagicMult = clamp(ov?.addMagicMult ?? 0, 0, 10);
+      const addTrueMult = clamp(ov?.addTrueMult ?? 0, 0, 10);
+
+      // Base packet (with hitMult) + optional extra proc packet(s) as a fraction of base.
+      phys += dmg.phys * mult * (1 + addPhysMult);
+      magic += dmg.magic * mult * (1 + addMagicMult);
+      trueDmg += dmg.trueDmg * mult * (1 + addTrueMult);
     }
 
     return { phys, magic, trueDmg };
