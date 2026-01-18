@@ -3,7 +3,6 @@ import fs from "node:fs/promises";
 import path from "node:path";
 
 export const runtime = "nodejs";
-export const revalidate = 60 * 60 * 6; // 6 hours
 
 async function readFallbackVersion(): Promise<string> {
   try {
