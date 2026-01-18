@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { ChampionIndexRow, ItemRow } from "./page";
 
 function clamp(n: number, min: number, max: number) {
@@ -429,6 +430,20 @@ export default function LolClient({
   // Champion picker
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(champions[0]?.id ?? "");
+
+  const searchParams = useSearchParams();
+
+  // ✅ Import champion from URL: /calculators/lol?champion=Ahri
+  useEffect(() => {
+    const fromUrl = searchParams.get("champion")?.trim();
+    if (!fromUrl) return;
+
+    if (!champions.some((c) => c.id === fromUrl)) return;
+    if (fromUrl === selectedId) return;
+
+    setSelectedId(fromUrl);
+    setQuery("");
+  }, [searchParams, champions, selectedId]);
 
   // Level
   const [level, setLevel] = useState<number>(1);

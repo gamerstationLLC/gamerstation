@@ -68,7 +68,7 @@ export default function Home() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-neutral-300 sm:text-xs">
               <span className="h-2 w-2 rounded-full bg-white/70" />
-              Live calculators • fast results • clean UI
+              Live calculators • Fast results • Clean UI
             </div>
 
             <h2 className="mt-5 text-xl font-bold tracking-tight sm:text-3xl">
@@ -146,20 +146,24 @@ export default function Home() {
                 </Link>
 
                 <Link
-                  href="/calculators/dps/osrs"
-                  className="rounded-2xl border border-white/10 bg-black/40 p-4 hover:border-white/20 sm:p-5"
-                >
-                  <div className="text-sm font-semibold">OSRS DPS Calculator</div>
-                  <div className="mt-2 text-xs text-neutral-400">
-                    Old School RuneScape DPS calculator with gear, prayers, and combat styles.
-                  </div>
-                </Link>
+  href="/calculators/lol/champions"
+  className="rounded-2xl border border-white/10 bg-black/40 p-4 hover:border-white/20 sm:p-5"
+>
+  <div className="text-sm font-semibold">LoL Champion Index</div>
+  <div className="mt-2 text-xs text-neutral-400">
+    Search champions to view base stats, scaling, and ability numbers.
+  </div>
+  <div className="mt-2 text-xs text-neutral-400">
+    Jump directly into the damage calculator with a champion selected.
+  </div>
+</Link>
+
               </div>
 
               <div className="mt-4 rounded-2xl border border-white/10 bg-black/30 p-4 sm:mt-6">
                 <div className="text-xs text-neutral-400">Coming next</div>
                 <ul className="mt-2 space-y-1 text-sm text-neutral-200">
-                  <li>• World of Warcraft calculator (PvP and PvE)</li>
+                  <li>• Minecraft damage calc</li>
                   <li>• Compare multiple weapons (COD and Fortnite)</li>
                   <li>• XP calculator for OSRS</li>
                 </ul>
