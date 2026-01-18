@@ -1,51 +1,88 @@
 import type { MetadataRoute } from "next";
+import fs from "node:fs/promises";
+import path from "node:path";
+
+/**
+ * ✅ Fully automatic sitemap
+ * - Scans /app for page.tsx / page.ts
+ * - Skips app/api, route groups, private folders, dynamic segments
+ */
 
 const SITE_URL = "https://gamerstation.gg";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const routes: Array<{
-    path: string;
-    priority: number;
-  }> = [
-    // Home & hubs
-    { path: "", priority: 1.0 },
-    { path: "/calculators", priority: 0.9 },
+type ChangeFreq = "daily" | "weekly" | "monthly";
 
-    // Core calculators
-    { path: "/calculators/lol", priority: 0.85 },
-    { path: "/calculators/ttk/cod", priority: 0.85 },
-    { path: "/calculators/ttk/fortnite", priority: 0.85 },
-    { path: "/calculators/dps/osrs", priority: 0.85 },
+function isRouteGroup(name: string) {
+  return name.startsWith("(") && name.endsWith(")");
+}
 
-    // Roblox hub & calculators
-    { path: "/calculators/roblox", priority: 0.85 },
-    { path: "/calculators/roblox/arsenal", priority: 0.85 },
-    { path: "/calculators/roblox/bloxfruits", priority: 0.8 },
+function isDynamic(name: string) {
+  return name.startsWith("[") && name.endsWith("]");
+}
 
-    // WoW
-    { path: "/calculators/wow", priority: 0.85 },
-    { path: "/calculators/wow/pve", priority: 0.8 },
+async function hasPage(dir: string) {
+  try {
+    await fs.access(path.join(dir, "page.tsx"));
+    return true;
+  } catch {}
+  try {
+    await fs.access(path.join(dir, "page.ts"));
+    return true;
+  } catch {}
+  return false;
+}
 
-    // WoW PvE subtools
-    { path: "/calculators/wow/pve/stat-impact", priority: 0.75 },
-    { path: "/calculators/wow/pve/mythic-plus", priority: 0.75 },
-    { path: "/calculators/wow/pve/uptime", priority: 0.75 },
+async function walkApp(
+  dir: string,
+  urlParts: string[],
+  out: string[]
+) {
+  const base = path.basename(dir);
 
-    // Games / Call of Duty
-    { path: "/games/cod", priority: 0.85 },
-    { path: "/games/cod/meta-loadouts", priority: 0.9 },
+  if (base.startsWith(".") || base.startsWith("_")) return;
+  if (urlParts[0] === "api") return;
+  if (isDynamic(base)) return;
 
-    // Legal / misc
-    { path: "/terms", priority: 0.3 },
-    { path: "/privacy", priority: 0.3 },
-    { path: "/contact", priority: 0.3 },
-    { path: "/disclaimer", priority: 0.3 },
-  ];
+  if (await hasPage(dir)) {
+    out.push(urlParts.length ? "/" + urlParts.join("/") : "");
+  }
 
-  return routes.map(({ path, priority }) => ({
-    url: `${SITE_URL}${path}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly",
-    priority,
-  }));
+  const entries = await fs.readdir(dir, { withFileTypes: true });
+  for (const e of entries) {
+    if (!e.isDirectory()) continue;
+
+    const nextParts = isRouteGroup(e.name)
+      ? urlParts
+      : [...urlParts, e.name];
+
+    await walkApp(path.join(dir, e.name), nextParts, out);
+  }
+}
+
+function rulesFor(pathname: string) {
+  if (pathname === "") return { priority: 1.0, changeFrequency: "daily" as ChangeFreq };
+  if (pathname === "/calculators") return { priority: 0.95, changeFrequency: "weekly" as ChangeFreq };
+  if (pathname.startsWith("/calculators")) return { priority: 0.85, changeFrequency: "weekly" as ChangeFreq };
+  if (pathname.startsWith("/games")) return { priority: 0.8, changeFrequency: "monthly" as ChangeFreq };
+  return { priority: 0.7, changeFrequency: "weekly" as ChangeFreq };
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const appDir = path.join(process.cwd(), "app");
+  const paths: string[] = [];
+
+  await walkApp(appDir, [], paths);
+
+  const unique = Array.from(new Set(paths)).sort();
+  const now = new Date();
+
+  return unique.map((p) => {
+    const r = rulesFor(p);
+    return {
+      url: SITE_URL + p,
+      lastModified: now,
+      changeFrequency: r.changeFrequency,
+      priority: r.priority,
+    };
+  });
 }
