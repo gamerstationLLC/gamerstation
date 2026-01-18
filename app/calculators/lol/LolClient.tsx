@@ -433,19 +433,23 @@ export default function LolClient({
 
   const searchParams = useSearchParams();
 
-  // ✅ Import champion from URL: /calculators/lol?champion=Ahri
-  useEffect(() => {
-    const fromUrl = searchParams.get("champion")?.trim();
-    if (!fromUrl) return;
+  // ✅ Import champion from URL once: /calculators/lol?champion=Ahri
+// IMPORTANT: only apply on first mount so the dropdown doesn't "lock" to the URL value.
+const didInitFromUrl = useRef(false);
 
-    if (!champions.some((c) => c.id === fromUrl)) return;
-    if (fromUrl === selectedId) return;
+useEffect(() => {
+  if (didInitFromUrl.current) return;
+  didInitFromUrl.current = true;
 
-    setSelectedId(fromUrl);
-    setQuery("");
-  }, [searchParams, champions, selectedId]);
+  const fromUrl = searchParams.get("champion")?.trim();
+  if (!fromUrl) return;
 
-  // Level
+  if (!champions.some((c) => c.id === fromUrl)) return;
+
+  setSelectedId(fromUrl);
+  setQuery("");
+}, [searchParams, champions]);
+// Level
   const [level, setLevel] = useState<number>(1);
 
   // ✅ Target inputs allow blank
