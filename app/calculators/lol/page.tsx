@@ -4,19 +4,16 @@ import type { Metadata } from "next";
 import LolClient from "./LolClient";
 import { readPublicJson } from "@/lib/server/readPublicJson";
 
-// ✅ Ensure Node runtime (so fs-based readPublicJson is always safe)
-export const runtime = "nodejs";
-
-// ✅ Safety: avoid build-time prerender failures if network/files hiccup
-// (You can remove this later if you want full SSG again.)
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 export const metadata: Metadata = {
   title: "LoL Damage Calculator (Burst & DPS) | GamerStation",
   description:
     "Calculate burst damage, DPS, and time-to-kill in League of Legends using official Riot Data Dragon values. Simple and Advanced modes supported.",
 };
+
+// ✅ Segment config (VALID)
+export const revalidate = 60 * 60 * 6; // 6 hours
+// ❌ DO NOT export dynamic="force-dynamic" with revalidate
+// ❌ Do NOT use revalidate=0 here (it conflicts with caching intent and can trigger invalid segment config)
 
 type LolChampionFile = {
   version?: string;
@@ -77,10 +74,8 @@ async function getLatestDdragonVersion(): Promise<string> {
 
   try {
     const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
-      // cache-ish (even though we forced dynamic, this is still fine)
       next: { revalidate: 60 * 60 * 6 }, // 6 hours
     });
-
     if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
     const versions = (await res.json()) as string[];
     return versions?.[0] ?? fallback;
@@ -93,14 +88,8 @@ async function loadLolIndex(version: string): Promise<{
   patch: string;
   champions: ChampionIndexRow[];
 }> {
-  let json: LolChampionFile = { champions: [] };
-
-  // ✅ Never allow disk read/parse to crash the whole page build
-  try {
-    json = await readPublicJson<LolChampionFile>("data/lol/champions_full.json");
-  } catch {
-    json = { champions: [] };
-  }
+  // ✅ Read from disk: /public/data/lol/champions_full.json
+  const json = await readPublicJson<LolChampionFile>("data/lol/champions_full.json");
 
   const patch = version;
 
@@ -119,27 +108,21 @@ async function loadLolIndex(version: string): Promise<{
         spellblock: Number(c.stats?.spellblock ?? 0),
         spellblockperlevel: Number(c.stats?.spellblockperlevel ?? 0),
 
+        // ✅ Make AA usable
         attackdamage: Number(c.stats?.attackdamage ?? 0),
         attackdamageperlevel: Number(c.stats?.attackdamageperlevel ?? 0),
         attackspeed: Number(c.stats?.attackspeed ?? 0),
         attackspeedperlevel: Number(c.stats?.attackspeedperlevel ?? 0),
       },
     }))
-    .filter((c) => c.id && c.name)
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return { patch, champions };
 }
 
 async function loadLolItems(version: string): Promise<{ patch: string; items: ItemRow[] }> {
-  let json: LolItemsFile = { data: {} };
-
-  // ✅ Never allow disk read/parse to crash the whole page build
-  try {
-    json = await readPublicJson<LolItemsFile>("data/lol/items.json");
-  } catch {
-    json = { data: {} };
-  }
+  // ✅ Read from disk: /public/data/lol/items.json
+  const json = await readPublicJson<LolItemsFile>("data/lol/items.json");
 
   const patch = version;
   const SR_MAP_ID = "11";
