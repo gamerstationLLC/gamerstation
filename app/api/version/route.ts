@@ -21,7 +21,7 @@ export async function GET() {
   try {
     const res = await fetch(
       "https://ddragon.leagueoflegends.com/api/versions.json",
-      { next: { revalidate: 60 * 60 * 6 } } as any
+      { next: { revalidate: 21600 } }
     );
 
     if (!res.ok) throw new Error("Failed to fetch versions");

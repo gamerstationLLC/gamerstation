@@ -43,9 +43,3 @@ node_modules/
 .next/
 .env*
 
-# Experimental / unused API routes
-app/api/lol/
-app/api/version/
-
-# Unused LoL helpers (not wired yet)
-lib/lol/

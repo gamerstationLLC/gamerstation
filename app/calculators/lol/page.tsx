@@ -1,6 +1,8 @@
 // app/calculators/lol/page.tsx
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Suspense } from "react";
+
 import LolClient from "./LolClient";
 import { readPublicJson } from "@/lib/server/readPublicJson";
 
@@ -11,9 +13,7 @@ export const metadata: Metadata = {
 };
 
 // ✅ Segment config (VALID)
-export const revalidate = 60 * 60 * 6; // 6 hours
-// ❌ DO NOT export dynamic="force-dynamic" with revalidate
-// ❌ Do NOT use revalidate=0 here (it conflicts with caching intent and can trigger invalid segment config)
+export const revalidate = 21600; // 6 hours
 
 type LolChampionFile = {
   version?: string;
@@ -74,7 +74,7 @@ async function getLatestDdragonVersion(): Promise<string> {
 
   try {
     const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
-      next: { revalidate: 60 * 60 * 6 }, // 6 hours
+      next: { revalidate: 21600 }, // 6 hours
     });
     if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
     const versions = (await res.json()) as string[];
@@ -167,6 +167,19 @@ async function loadLolItems(version: string): Promise<{ patch: string; items: It
   return { patch, items };
 }
 
+function LoadingShell() {
+  return (
+    <main className="min-h-screen bg-black text-white px-6 py-12">
+      <div className="mx-auto max-w-6xl">
+        <div className="h-4 w-40 rounded bg-white/10" />
+        <div className="mt-8 h-10 w-[min(560px,100%)] rounded bg-white/10" />
+        <div className="mt-4 h-4 w-[min(720px,100%)] rounded bg-white/10" />
+        <div className="mt-10 h-[520px] w-full rounded-xl bg-white/5" />
+      </div>
+    </main>
+  );
+}
+
 export default async function LolCalculatorPage() {
   const version = await getLatestDdragonVersion();
 
@@ -195,7 +208,10 @@ export default async function LolCalculatorPage() {
           window. [Summoner&apos;s Rift Only]
         </p>
 
-        <LolClient champions={champions} patch={patch} items={items} />
+        {/* ✅ Required by Next when LolClient uses useSearchParams() */}
+        <Suspense fallback={<LoadingShell />}>
+          <LolClient champions={champions} patch={patch} items={items} />
+        </Suspense>
       </div>
     </main>
   );

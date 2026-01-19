@@ -19,7 +19,13 @@ type ChampionsFullFile = {
 };
 
 async function readChampionsFull(): Promise<ChampionsFullFile> {
-  const p = path.join(process.cwd(), "public", "data", "lol", "champions_full.json");
+  const p = path.join(
+    process.cwd(),
+    "public",
+    "data",
+    "lol",
+    "champions_full.json"
+  );
   const raw = await fs.readFile(p, "utf-8");
   return JSON.parse(raw) as ChampionsFullFile;
 }
@@ -35,12 +41,31 @@ async function readPatchFallback(): Promise<string | undefined> {
   }
 }
 
-function normalizeSlug(s: string) {
+/**
+ * ✅ Safe normalizer
+ * - never throws
+ * - trims + lowercases
+ * - returns "" when input isn't a valid string
+ */
+function normalizeSlug(s: unknown) {
+  if (typeof s !== "string") return "";
   return s.trim().toLowerCase();
 }
 
-function findChampionBySlug(champions: ChampionRow[], slug: string): ChampionRow | null {
+/**
+ * ✅ Next can pass params as a Promise in newer builds (“sync dynamic APIs”)
+ * This unpacks it safely for both cases.
+ */
+async function unwrapParams<T>(maybePromise: T | Promise<T>): Promise<T> {
+  return await Promise.resolve(maybePromise);
+}
+
+function findChampionBySlug(
+  champions: ChampionRow[],
+  slug: unknown
+): ChampionRow | null {
   const wanted = normalizeSlug(slug);
+  if (!wanted) return null;
 
   const byId = champions.find((c) => normalizeSlug(c.id) === wanted);
   if (byId) return byId;
@@ -49,7 +74,9 @@ function findChampionBySlug(champions: ChampionRow[], slug: string): ChampionRow
   return byName ?? null;
 }
 
-function toBaseStats(stats: Record<string, number> | undefined): ChampionBaseStats {
+function toBaseStats(
+  stats: Record<string, number> | undefined
+): ChampionBaseStats {
   const n = (k: string) => Number(stats?.[k] ?? 0);
   return {
     hp: n("hp"),
@@ -79,19 +106,26 @@ function toBaseStats(stats: Record<string, number> | undefined): ChampionBaseSta
  * ✅ Dynamic metadata per champion page (SEO)
  * Example: /calculators/lol/champions/aatrox
  */
-export async function generateMetadata(
-  { params }: { params: { slug: string } }
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  // Next may pass params as a Promise in some builds
+  params: { slug?: string } | Promise<{ slug?: string }>;
+}): Promise<Metadata> {
+  const resolved = await unwrapParams(params);
+  const slug = normalizeSlug(resolved?.slug);
+  if (!slug) return { robots: { index: false, follow: false } };
+
   let file: ChampionsFullFile | null = null;
   try {
     file = await readChampionsFull();
   } catch {}
 
   const champions = file?.champions ?? [];
-  const champ = findChampionBySlug(champions, params.slug);
+  const champ = findChampionBySlug(champions, slug);
 
   const patch = file?.version ?? (await readPatchFallback()) ?? "latest";
-  const safeName = champ?.name ?? params.slug;
+  const safeName = champ?.name ?? slug;
   const safeTitle = champ?.title ? ` — ${champ.title}` : "";
 
   const title = `${safeName}${safeTitle} Stats by Level (Patch ${patch}) | GamerStation`;
@@ -99,7 +133,7 @@ export async function generateMetadata(
     `View ${safeName} base stats and per-level scaling for HP, armor, MR, AD, and attack speed. ` +
     `Patch ${patch}. Not affiliated with or endorsed by Riot Games.`;
 
-  const canonical = `/calculators/lol/champions/${normalizeSlug(params.slug)}`;
+  const canonical = `/calculators/lol/champions/${slug}`;
 
   return {
     title,
@@ -137,14 +171,19 @@ export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   }
 }
 
-export const revalidate = 60 * 60 * 6; // 6 hours
+export default async function LolChampionPage({
+  params,
+}: {
+  // Same deal here—defensive typing to handle Promise params
+  params: { slug?: string } | Promise<{ slug?: string }>;
+}) {
+  const resolved = await unwrapParams(params);
+  const slug = normalizeSlug(resolved?.slug);
+  if (!slug) return notFound();
 
-export default async function LolChampionPage(
-  { params }: { params: { slug: string } }
-) {
   const file = await readChampionsFull().catch(() => null);
   const champions = file?.champions ?? [];
-  const champ = findChampionBySlug(champions, params.slug);
+  const champ = findChampionBySlug(champions, slug);
 
   if (!champ) return notFound();
 

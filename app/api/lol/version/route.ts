@@ -21,12 +21,13 @@ export async function GET() {
   try {
     const res = await fetch(
       "https://ddragon.leagueoflegends.com/api/versions.json",
-      { next: { revalidate: 60 * 60 * 6 } } as any
+      { next: { revalidate: 21600 } }
     );
 
     if (!res.ok) throw new Error("Failed to fetch versions");
 
     const versions = (await res.json()) as string[];
+
     return NextResponse.json({
       version: versions[0] ?? fallbackVersion,
       fallbackUsed: false,
