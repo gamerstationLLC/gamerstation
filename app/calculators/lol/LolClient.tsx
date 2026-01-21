@@ -134,12 +134,18 @@ type DdSpell = {
   tooltip?: string;
   // effect is 1-indexed in practice (effect[1] usually holds a primary array)
   effect?: (number[] | null)[];
+  // effectBurn mirrors effect but as human-readable strings like "10/30/50/70/90".
+  // Some spells have effect arrays that are null/0 while effectBurn contains the values.
+  effectBurn?: (string | null)[];
   vars?: DdSpellVar[];
 };
 
 type DdChampionFull = {
+  key?: string;
   spells?: DdSpell[];
   passive?: { name?: string; description?: string };
+  // CommunityDragon-style calculation map (keys referenced from tooltip placeholders like {{ qdamage }})
+  spellCalculations?: Record<string, any>;
 };
 
 type SpellSlot = "Q" | "W" | "E" | "R";
@@ -290,6 +296,110 @@ function textLooksMultiHit(tooltip?: string, name?: string) {
 }
 
 
+// Prefer using tooltip-referenced effect keys ({{ e1 }}, {{ e2 }}, etc.) when available.
+// Many spells have multiple effect arrays (damage, cooldown, cost). The tooltip often points
+// to the correct damage array via e# placeholders.
+function pickEffectArrayFromTooltip(
+  effect: (number[] | null)[] | undefined,
+  tooltip: string | undefined,
+  maxrank: number
+) {
+  if (!effect || !tooltip) return null;
+  const t = tooltip.toLowerCase();
+  const matches = Array.from(t.matchAll(/\{\{\s*e(\d+)\s*\}\}/g));
+  if (!matches.length) return null;
+
+  // preserve order of first appearance
+  const seen = new Set<number>();
+  const keys: number[] = [];
+  for (const m of matches) {
+    const n = Number(m[1]);
+    if (!Number.isFinite(n)) continue;
+    const k = Math.trunc(n);
+    if (k < 0 || k >= effect.length) continue;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    keys.push(k);
+  }
+
+  for (const k of keys) {
+    const arr = effect[k];
+    if (Array.isArray(arr) && arr.length === maxrank && arr.every((v) => typeof v === 'number' && Number.isFinite(v))) {
+      const maxVal = Math.max(...arr);
+      if (maxVal > 0) return arr;
+    }
+  }
+
+  return null;
+}
+
+function parseEffectBurnArray(burn: string | null, maxrank: number): number[] | null {
+  if (!burn) return null;
+  const parts = String(burn)
+    .split("/")
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (!parts.length) return null;
+  const nums: number[] = [];
+  for (const p of parts) {
+    // Data Dragon burn strings are usually plain numbers; be permissive.
+    const n = Number(p.replace(/[^0-9.+-]/g, ""));
+    if (!Number.isFinite(n)) return null;
+    nums.push(n);
+  }
+  if (nums.length !== maxrank) return null;
+  return nums;
+}
+
+function pickBurnArrayFromTooltip(
+  effectBurn: (string | null)[] | undefined,
+  tooltip: string | undefined,
+  maxrank: number
+) {
+  if (!effectBurn || !tooltip) return null;
+  const t = tooltip.toLowerCase();
+  const matches = Array.from(t.matchAll(/\{\{\s*e(\d+)\s*\}\}/g));
+  if (!matches.length) return null;
+
+  const seen = new Set<number>();
+  const keys: number[] = [];
+  for (const m of matches) {
+    const n = Number(m[1]);
+    if (!Number.isFinite(n)) continue;
+    const k = Math.trunc(n);
+    if (k < 0 || k >= effectBurn.length) continue;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    keys.push(k);
+  }
+
+  for (const k of keys) {
+    const arr = parseEffectBurnArray(effectBurn[k], maxrank);
+    if (arr && Math.max(...arr) > 0) return arr;
+  }
+
+  return null;
+}
+
+function pickPrimaryBurnArray(effectBurn: (string | null)[] | undefined, maxrank: number) {
+  if (!effectBurn) return null;
+  let best: number[] | null = null;
+  let bestScore = -Infinity;
+  for (let i = 0; i < effectBurn.length; i++) {
+    const arr = parseEffectBurnArray(effectBurn[i], maxrank);
+    if (!arr) continue;
+    const mean = avg(arr);
+    const nonDecreasing = isMostlyNonDecreasing(arr) ? 1 : 0;
+    const score = mean + nonDecreasing * 5;
+    if (score > bestScore) {
+      bestScore = score;
+      best = arr;
+    }
+  }
+  return best;
+}
+
+
 // -------------------------
 // Champion-specific overrides
 // -------------------------
@@ -332,6 +442,50 @@ function getSpellOverride(championId: string, slot: SpellSlot): SpellOverride | 
   if (!o) return null;
   return (o as any)[slot] ?? null;
 }
+// -------------------------
+// External spell base/type overrides (loaded from /public/data/lol/spells_overrides.json)
+// Only used when DDragon base arrays are null/empty.
+// JSON shape supports both champion "id" (e.g. "Aatrox") and champion numeric "key" (e.g. "266"), and Q/W/E/R keys.
+// Example:
+// { "266": { "Q": { "type":"phys", "base":[10,20,30,40,50] } } }
+type ExternalSpellOverride = {
+  type?: "phys" | "magic" | "true";
+  base?: number[];
+};
+type ExternalOverridesJson = Record<string, Partial<Record<SpellSlot, ExternalSpellOverride>>>;
+
+function normalizeNumArray(arr: any, maxrank: number): number[] | null {
+  if (!Array.isArray(arr)) return null;
+  const out = arr
+    .slice(0, maxrank)
+    .map((v) => Number(v))
+    .map((v) => (Number.isFinite(v) ? v : 0));
+  return out.length ? out : null;
+}
+
+function getExternalOverride(
+  overrides: ExternalOverridesJson | null | undefined,
+  champId: string,
+  champKey: string | number | null | undefined,
+  slot: SpellSlot,
+  maxrank: number
+): { base: number[] | null; type: "phys" | "magic" | "true" | null } {
+  if (!overrides) return { base: null, type: null };
+  const keyStr = champKey == null ? "" : String(champKey);
+
+  const node =
+    (overrides as any)?.[champId] ??
+    (keyStr ? (overrides as any)?.[keyStr] : null) ??
+    (overrides as any)?.[String(champId)] ??
+    null;
+
+  const slotNode = node ? (node as any)[slot] : null;
+  const base = normalizeNumArray(slotNode?.base, maxrank);
+  const t = slotNode?.type;
+  const type = t === "phys" || t === "magic" || t === "true" ? t : null;
+  return { base, type };
+}
+
 
 function coeffAtRank(coeff: number[] | number | undefined, rank: number) {
   if (typeof coeff === "number") return coeff;
@@ -352,6 +506,24 @@ function inferDamageType(vars: DdSpellVar[] | undefined): "phys" | "magic" {
   return "magic";
 }
 
+function inferMaxRank(spell: DdSpell | null) {
+  if (!spell) return 0;
+  const mr = (spell as any).maxrank;
+  if (typeof mr === "number" && Number.isFinite(mr) && mr > 0) return Math.trunc(mr);
+
+  // Fallback: infer from effect arrays if maxrank is missing.
+  const eff = (spell as any).effect as (number[] | null)[] | undefined;
+  if (Array.isArray(eff)) {
+    let best = 0;
+    for (const a of eff) {
+      if (Array.isArray(a) && a.length > best) best = a.length;
+    }
+    if (best > 0) return best;
+  }
+
+  return 0;
+}
+
 // Compute raw spell damage (very generic):
 // base = chosen effect array value at rank
 // + sum(vars): AP/AD/bonusAD scalings
@@ -361,16 +533,42 @@ function computeSpellRawDamage(opts: {
   effAp: number;
   effAd: number;
   bonusAd: number;
+  // External overrides (only used when base arrays are missing)
+  baseOverride?: number[] | null;
+  typeOverride?: "phys" | "magic" | "true" | null;
 }) {
-  const { spell, rank, effAp, effAd, bonusAd } = opts;
+  const { spell, rank, effAp, effAd, bonusAd, baseOverride, typeOverride } = opts;
   if (!spell) return { phys: 0, magic: 0, trueDmg: 0, rawTotal: 0 };
 
-  const maxrank = clamp(spell.maxrank ?? 0, 0, 10);
+  // Data Dragon almost always provides maxrank, but some champion JSON variants or custom
+  // objects can omit it. Infer from effect arrays if needed.
+  const inferredMax = inferMaxRank(spell);
+  const maxrank = clamp(inferredMax || 0, 0, 10);
   if (maxrank <= 0) return { phys: 0, magic: 0, trueDmg: 0, rawTotal: 0 };
 
   const r = clamp(rank, 1, maxrank);
 
-  const baseArr = pickPrimaryEffectArray(spell.effect ?? undefined, maxrank);
+  // Prefer tooltip-referenced effect arrays first; fallback to heuristic scoring.
+  // If numeric effect arrays are missing/empty, fall back to effectBurn strings.
+  let baseArr =
+    pickEffectArrayFromTooltip(spell.effect ?? undefined, spell.tooltip, maxrank) ||
+    pickPrimaryEffectArray(spell.effect ?? undefined, maxrank);
+
+  if (!baseArr || (Array.isArray(baseArr) && baseArr.every((v) => v === 0))) {
+    baseArr =
+      pickBurnArrayFromTooltip(spell.effectBurn ?? undefined, spell.tooltip, maxrank) ||
+      pickPrimaryBurnArray(spell.effectBurn ?? undefined, maxrank);
+  }
+
+  // External override: if we still don't have a usable base array, use overrides (slot-based)
+  if (
+    (!baseArr || (Array.isArray(baseArr) && baseArr.every((v) => v === 0))) &&
+    Array.isArray(baseOverride) &&
+    baseOverride.length
+  ) {
+    baseArr = baseOverride;
+  }
+
   const base = baseArr ? (baseArr[clamp(r - 1, 0, baseArr.length - 1)] ?? 0) : 0;
 
   let scaling = 0;
@@ -401,9 +599,146 @@ function computeSpellRawDamage(opts: {
   const perHit = Math.max(0, base + scaling);
   const rawTotal = useHits ? perHit * clamp(hitCount, 1, 50) : perHit;
 
-  const dmgType = inferDamageType(spell.vars);
+  const forced = typeOverride;
+  const dmgType = forced ?? inferDamageType(spell.vars);
+  if (dmgType === "true") return { phys: 0, magic: 0, trueDmg: rawTotal, rawTotal };
   if (dmgType === "phys") return { phys: rawTotal, magic: 0, trueDmg: 0, rawTotal };
   return { phys: 0, magic: rawTotal, trueDmg: 0, rawTotal };
+}
+
+
+// ==============================
+// CommunityDragon tooltip-calculation parsing (works for ALL champs)
+// ==============================
+
+// Extract first damage placeholder key from tooltip, preferring typed tags.
+function extractCalcKeyFromTooltip(tooltip?: string): { key: string; dmg: "phys" | "magic" | "true" } | null {
+  if (!tooltip) return null;
+  const t = String(tooltip);
+
+  const typed = [
+    { tag: "physicalDamage", dmg: "phys" as const },
+    { tag: "magicDamage", dmg: "magic" as const },
+    { tag: "trueDamage", dmg: "true" as const },
+  ];
+
+  for (const { tag, dmg } of typed) {
+    // match: <physicalDamage> ... {{ qdamage }} ... </physicalDamage>
+    const re = new RegExp(`<${tag}>[\\s\\S]*?\\{\\{\\s*([a-zA-Z0-9_]+)\\s*\\}\\}[\\s\\S]*?<\\/${tag}>`, "i");
+    const m = re.exec(t);
+    if (m?.[1]) return { key: m[1], dmg };
+  }
+
+  // fallback: first {{ key }}
+  const m2 = /\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/.exec(t);
+  if (m2?.[1]) return { key: m2[1], dmg: "magic" }; // unknown → treat as magic by default
+  return null;
+}
+
+function pickRankedNumber(val: any, rank: number): number {
+  if (typeof val === "number" && Number.isFinite(val)) return val;
+  if (Array.isArray(val)) {
+    const i = clamp(rank - 1, 0, val.length - 1);
+    const n = val[i];
+    return typeof n === "number" && Number.isFinite(n) ? n : 0;
+  }
+  return 0;
+}
+
+// Best-effort evaluator for CommunityDragon "spellCalculations" entries.
+// Supports the common pattern: base values per rank + coefficients that scale with AP/AD/bonusAD.
+function evalCdCalculation(
+  calc: any,
+  rank: number,
+  stats: { ap: number; ad: number; bonusAd: number }
+): number {
+  if (!calc) return 0;
+
+  // 1) Base values (most common)
+  // Common shapes:
+  // - { values: [10,20,30,40,50], ... }
+  // - { values: [[10,20,30,40,50]], ... }  (nested)
+  // - { values: { "1": 10, "2": 20, ... } }
+  let base = 0;
+
+  const values = (calc as any).values ?? (calc as any).value ?? null;
+  if (Array.isArray(values)) {
+    if (values.length && Array.isArray(values[0])) {
+      // nested arrays: pick first numeric row that looks ranked
+      let row: any[] | null = null;
+      for (const r of values) {
+        if (Array.isArray(r) && r.some((x) => typeof x === "number")) {
+          row = r;
+          break;
+        }
+      }
+      base = row ? pickRankedNumber(row, rank) : 0;
+    } else {
+      base = pickRankedNumber(values, rank);
+    }
+  } else if (values && typeof values === "object") {
+    const arr = Object.keys(values)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((k) => (values as any)[k]);
+    base = pickRankedNumber(arr, rank);
+  }
+
+  // 2) Coefficients (AP/AD scalings)
+  let scaling = 0;
+  const coeffs = (calc as any).coefficients;
+  if (Array.isArray(coeffs)) {
+    for (const c of coeffs) {
+      const coef = pickRankedNumber((c as any).coefficient ?? (c as any).coeff ?? (c as any).value, rank);
+      if (!Number.isFinite(coef) || coef === 0) continue;
+
+      const rawKey = String((c as any).scaling ?? (c as any).stat ?? (c as any).link ?? "").toLowerCase();
+
+      if (rawKey.includes("bonus") && rawKey.includes("attack")) {
+        scaling += coef * stats.bonusAd;
+      } else if (rawKey.includes("attack") || rawKey.includes("ad")) {
+        scaling += coef * stats.ad;
+      } else if (rawKey.includes("ability") || rawKey.includes("spell") || rawKey.includes("magic") || rawKey.includes("ap")) {
+        scaling += coef * stats.ap;
+      } else {
+        // unknown coefficient type → ignore (keeps us safe)
+      }
+    }
+  }
+
+  const out = base + scaling;
+  return Number.isFinite(out) ? Math.max(0, out) : 0;
+}
+
+// CommunityDragon-aware spell raw damage.
+// It looks for the first damage placeholder in the tooltip (e.g., {{ qdamage }})
+// then evaluates ddFull.spellCalculations[qdamage] with AP/AD/bonusAD.
+function computeSpellRawDamageFromCd(opts: {
+  ddFull: DdChampionFull | null;
+  spell: DdSpell | null;
+  slot: SpellSlot;
+  rank: number;
+  effAp: number;
+  effAd: number;
+  bonusAd: number;
+}) {
+  const { ddFull, spell, rank, effAp, effAd, bonusAd } = opts;
+  if (!ddFull || !spell) return null;
+
+  const calcRef = extractCalcKeyFromTooltip(spell.tooltip);
+  if (!calcRef?.key) return null;
+
+  const calc = ddFull.spellCalculations?.[calcRef.key];
+  const raw = evalCdCalculation(calc, rank, {
+    ap: Number.isFinite(effAp) ? effAp : 0,
+    ad: Number.isFinite(effAd) ? effAd : 0,
+    bonusAd: Number.isFinite(bonusAd) ? bonusAd : 0,
+  });
+
+  if (!(raw > 0)) return null;
+
+  if (calcRef.dmg === "phys") return { phys: raw, magic: 0, trueDmg: 0, rawTotal: raw };
+  if (calcRef.dmg === "true") return { phys: 0, magic: 0, trueDmg: raw, rawTotal: raw };
+  return { phys: 0, magic: raw, trueDmg: 0, rawTotal: raw };
 }
 
 export default function LolClient({
@@ -432,6 +767,27 @@ export default function LolClient({
   const [selectedId, setSelectedId] = useState(champions[0]?.id ?? "");
 
   const searchParams = useSearchParams();
+
+  // External overrides (slot-based): loaded once, never triggers rerenders
+  const externalOverridesRef = useRef<ExternalOverridesJson | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/data/lol/spells_overrides.json", { cache: "no-store" });
+        if (!res.ok) return;
+        const json = (await res.json()) as ExternalOverridesJson;
+        if (!cancelled) externalOverridesRef.current = json;
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
 
   // ✅ Import champion from URL once: /calculators/lol?champion=Ahri
 // IMPORTANT: only apply on first mount so the dropdown doesn't "lock" to the URL value.
@@ -556,18 +912,34 @@ useEffect(() => {
       setDdErr("");
 
       try {
-        const url = `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion/${selectedId}.json`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`Data Dragon fetch failed (${res.status})`);
+        // Prefer CommunityDragon via our API route (has spellCalculations so abilities can show damage).
+        const champKey = (champions as any[]).find((c) => c.id === selectedId)?.key as string | undefined;
 
-        const json = await res.json();
-        const champ = json?.data?.[selectedId] ?? null;
+        let champ: any = null;
+
+        if (champKey) {
+          const cdRes = await fetch(`/api/lol/champion/${champKey}`, { cache: "no-store" });
+          if (cdRes.ok) {
+            champ = await cdRes.json();
+          }
+        }
+
+        // Fallback: Data Dragon champion json (may not include numeric damage, but keeps UI stable).
+        if (!champ) {
+          const url = `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion/${selectedId}.json`;
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`Champion fetch failed (${res.status})`);
+          const json = await res.json();
+          champ = json?.data?.[selectedId] ?? null;
+        }
 
         if (!alive) return;
 
         setDdFull({
+          key: champ?.key ?? null,
           spells: champ?.spells ?? [],
           passive: champ?.passive ?? null,
+          spellCalculations: champ?.spellCalculations ?? champ?.spellcalculations ?? null,
         });
 
         // Reset ranks to 1 on champ change (safe default)
@@ -811,39 +1183,66 @@ useEffect(() => {
   // ==============================
   // ✅ Rotation / Combo using Data Dragon spells
   // ==============================
-  const rotationRaw = useMemo(() => {
-    if (!useRotation || rotation.length === 0) {
-      return { phys: 0, magic: 0, trueDmg: 0 };
-    }
+  
+  // Detailed per-cast packets (for UI) + totals.
+  const rotationSteps = useMemo(() => {
+    if (!useRotation || rotation.length === 0) return [] as {
+      key: CastKey;
+      phys: number;
+      magic: number;
+      trueDmg: number;
+      rawTotal: number;
+    }[];
 
     // AA raw components
     const aaPhysRaw = Number.isFinite(oneAutoRaw) ? oneAutoRaw : 0;
     const aaMagicRaw = Math.max(0, ohMagic);
     const aaTrueRaw = 0;
 
-    let phys = 0;
-    let magic = 0;
-    let trueDmg = 0;
+    const steps: {
+      key: CastKey;
+      phys: number;
+      magic: number;
+      trueDmg: number;
+      rawTotal: number;
+    }[] = [];
 
     for (const cast of rotation) {
       if (cast === "AA") {
-        phys += aaPhysRaw;
-        magic += aaMagicRaw;
-        trueDmg += aaTrueRaw;
+        const phys = aaPhysRaw;
+        const magic = aaMagicRaw;
+        const trueDmg = aaTrueRaw;
+        steps.push({ key: cast, phys, magic, trueDmg, rawTotal: phys + magic + trueDmg });
         continue;
       }
 
       const slot = cast as SpellSlot;
       const spell = spellBySlot[slot];
       const rank = spellRanks[slot] ?? 1;
+      const champKey = (ddFull as any)?.key ?? (ddFull as any)?.data?.[selectedId]?.key ?? (selected as any)?.key ?? null;
+      const ext = getExternalOverride(externalOverridesRef.current, selectedId, champKey, slot, inferMaxRank(spell));
 
-      const dmg = computeSpellRawDamage({
+      const dmgCd = computeSpellRawDamageFromCd({
+        ddFull,
         spell,
+        slot,
         rank,
         effAp: Number.isFinite(effAp) ? effAp : 0,
         effAd: Number.isFinite(effAd) ? effAd : 0,
         bonusAd,
       });
+
+      const dmg =
+        dmgCd && dmgCd.rawTotal > 0 ? dmgCd :
+        computeSpellRawDamage({
+          spell,
+          rank,
+          baseOverride: ext.base,
+          typeOverride: ext.type,
+          effAp: Number.isFinite(effAp) ? effAp : 0,
+          effAd: Number.isFinite(effAd) ? effAd : 0,
+          bonusAd,
+        });
 
       const ov = getSpellOverride(selectedId, slot);
       const mult = clamp(ov?.hitMult ?? 1, 0, 1000);
@@ -852,13 +1251,14 @@ useEffect(() => {
       const addMagicMult = clamp(ov?.addMagicMult ?? 0, 0, 10);
       const addTrueMult = clamp(ov?.addTrueMult ?? 0, 0, 10);
 
-      // Base packet (with hitMult) + optional extra proc packet(s) as a fraction of base.
-      phys += dmg.phys * mult * (1 + addPhysMult);
-      magic += dmg.magic * mult * (1 + addMagicMult);
-      trueDmg += dmg.trueDmg * mult * (1 + addTrueMult);
+      const phys = dmg.phys * mult * (1 + addPhysMult);
+      const magic = dmg.magic * mult * (1 + addMagicMult);
+      const trueDmg = dmg.trueDmg * mult * (1 + addTrueMult);
+
+      steps.push({ key: cast, phys, magic, trueDmg, rawTotal: phys + magic + trueDmg });
     }
 
-    return { phys, magic, trueDmg };
+    return steps;
   }, [
     useRotation,
     rotation,
@@ -869,7 +1269,24 @@ useEffect(() => {
     bonusAd,
     oneAutoRaw,
     ohMagic,
+    ddFull,
+    selectedId,
   ]);
+
+
+  const rotationRaw = useMemo(() => {
+    if (!useRotation || rotationSteps.length === 0) return { phys: 0, magic: 0, trueDmg: 0 };
+    let phys = 0;
+    let magic = 0;
+    let trueDmg = 0;
+    for (const s of rotationSteps) {
+      phys += s.phys;
+      magic += s.magic;
+      trueDmg += s.trueDmg;
+    }
+    return { phys, magic, trueDmg };
+  }, [useRotation, rotationSteps]);
+
 
   // ✅ Advanced mode: lock to Combos only
   useEffect(() => {
@@ -902,7 +1319,8 @@ useEffect(() => {
       ? advBurstMagic
       : advDpsMagic;
 
-  const advTrueForMath =
+
+ const advTrueForMath =
     useRotation && rotation.length > 0
       ? mode === "burst"
         ? rotationRaw.trueDmg
@@ -1837,12 +2255,26 @@ useEffect(() => {
                       <div className="text-xs text-neutral-500">No casts added yet.</div>
                     )}
 
-                    {rotation.map((k, i) => (
+                    {rotation.map((k, i) => {
+                      const s = rotationSteps[i];
+                      const raw = s ? s.rawTotal : 0;
+                      const phys = s ? s.phys : 0;
+                      const magic = s ? s.magic : 0;
+                      return (
                       <div
                         key={`${k}-${i}`}
                         className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2"
                       >
                         <div className="text-sm font-semibold w-8">{k}</div>
+
+                        <div className="flex flex-col leading-tight">
+                          <div className="text-xs text-neutral-300 font-semibold">
+                            {raw > 0 ? `${Math.round(raw)} raw` : "—"}
+                          </div>
+                          <div className="text-[11px] text-neutral-500">
+                            {raw > 0 ? `phys ${Math.round(phys)} / magic ${Math.round(magic)}` : ""}
+                          </div>
+                        </div>
 
                         <div className="ml-auto flex gap-1">
                           <button
@@ -1870,7 +2302,8 @@ useEffect(() => {
                           </button>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div className="mt-3 text-xs text-neutral-500">

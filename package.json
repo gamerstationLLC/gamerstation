@@ -2,6 +2,7 @@
   "name": "gamerstation",
   "private": true,
   "scripts": {
+    "lol:overrides": "node scripts/gen_spells_overrides.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
