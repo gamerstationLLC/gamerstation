@@ -46,10 +46,10 @@ export default function ChampionPickerClient({ champions }: { champions: Champio
       {/* Left-aligned back link */}
       <div className="flex items-center justify-between">
         <Link
-          href="/"
+          href="/calculators/lol/hub"
           className="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-white hover:underline"
         >
-          <span aria-hidden>←</span> Back to Home
+          <span aria-hidden>←</span> Back to Hub
         </Link>
       </div>
 

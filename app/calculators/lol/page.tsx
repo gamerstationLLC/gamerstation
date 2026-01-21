@@ -191,8 +191,8 @@ export default async function LolCalculatorPage() {
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
-        <Link href="/calculators" className="text-sm text-neutral-300 hover:text-white">
-          ← Back to Calculators
+        <Link href="/calculators/lol/hub" className="text-sm text-neutral-300 hover:text-white">
+          ← Back to Hub
         </Link>
 
         <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">

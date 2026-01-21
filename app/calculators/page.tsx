@@ -11,9 +11,7 @@ export default function CalculatorsPage() {
         </header>
 
         <h1 className="mt-8 text-4xl font-bold">Calculators</h1>
-        <p className="mt-3 text-neutral-300">
-          Pick a tool to get started.
-        </p>
+        <p className="mt-3 text-neutral-300">Pick a tool to get started.</p>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
           {/* DPS (generic / legacy) */}
@@ -62,38 +60,36 @@ export default function CalculatorsPage() {
 
           {/* League of Legends */}
           <Link
-            href="/calculators/lol"
+            href="/calculators/lol/hub"
             className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
           >
             <div className="text-sm font-semibold">League of Legends</div>
             <div className="mt-2 text-sm text-neutral-400">
-              Burst + DPS/time-window damage calculator.
+              Burst + AP/AD stat impact calculators.
             </div>
           </Link>
 
           {/* World of Warcraft */}
-<Link
-  href="/calculators/wow"
-  className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
->
-  <div className="text-sm font-semibold">World of Warcraft</div>
-  <div className="mt-2 text-sm text-neutral-400">
-    PvE & PvP calculators for Mythic+, raids, and arenas.
-  </div>
-</Link>
+          <Link
+            href="/calculators/wow"
+            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">World of Warcraft</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              PvE & PvP calculators for Mythic+, raids, and arenas.
+            </div>
+          </Link>
 
-
-{/* Roblox Calculators */}
-<Link
-  href="/calculators/roblox"
-  className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
->
-  <div className="text-sm font-semibold">Roblox Calculators</div>
-  <div className="mt-2 text-sm text-neutral-400">
-    XP, leveling, and progression tools for top Roblox games.
-  </div>
-</Link>
-
+          {/* Roblox Calculators */}
+          <Link
+            href="/calculators/roblox"
+            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">Roblox Calculators</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              XP, leveling, and progression tools for top Roblox games.
+            </div>
+          </Link>
         </div>
       </div>
     </main>
