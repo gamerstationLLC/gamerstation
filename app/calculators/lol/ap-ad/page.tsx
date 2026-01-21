@@ -28,11 +28,9 @@ async function readFirstJson<T>(candidates: string[]): Promise<T | null> {
 }
 
 function normalizeChampionRows(data: any): ChampionRow[] {
-  // Accept either an array, or {data: {...}} / {champions: [...]}
   if (Array.isArray(data)) return data as ChampionRow[];
 
   if (data?.data && typeof data.data === "object") {
-    // DDragon-style: { data: { Aatrox: {...}, Ahri: {...} } }
     return Object.values(data.data) as ChampionRow[];
   }
 
@@ -42,11 +40,9 @@ function normalizeChampionRows(data: any): ChampionRow[] {
 }
 
 function normalizeItemRows(data: any): ItemRow[] {
-  // Accept array, or {data: {...}}, or {items: [...]}
   if (Array.isArray(data)) return data as ItemRow[];
 
   if (data?.data && typeof data.data === "object") {
-    // Some item datasets are keyed objects
     return Object.values(data.data) as ItemRow[];
   }
 
@@ -56,7 +52,6 @@ function normalizeItemRows(data: any): ItemRow[] {
 }
 
 async function loadPatch(): Promise<string> {
-  // Try your local patch files first; fallback to "latest"
   const v =
     (await readFirstJson<any>([
       "public/data/lol/versions.json",
@@ -76,7 +71,6 @@ async function loadPatch(): Promise<string> {
 export default async function Page() {
   const patch = await loadPatch();
 
-  // Champions (try common locations)
   const championsRaw =
     (await readFirstJson<any>([
       "public/data/lol/champions_index.json",
@@ -85,14 +79,12 @@ export default async function Page() {
       "data/lol/champions_index.json",
       "data/lol/champions.json",
       "data/lol/champions_full.json",
-      // DDragon-ish fallback:
       "public/data/lol/ddragon/championFull.json",
       "public/data/lol/ddragon/champion.json",
     ])) ?? null;
 
   const champions = normalizeChampionRows(championsRaw);
 
-  // Items (try common locations)
   const itemsRaw =
     (await readFirstJson<any>([
       "public/data/lol/items.json",
@@ -102,7 +94,6 @@ export default async function Page() {
       "data/lol/items.json",
       "data/lol/items_index.json",
       "data/lol/items_full.json",
-      // DDragon-ish fallback:
       "public/data/lol/ddragon/item.json",
       "public/data/lol/ddragon/items.json",
     ])) ?? null;
@@ -120,12 +111,30 @@ export default async function Page() {
       </div>
 
       <div className="mx-auto max-w-6xl px-6 py-12">
-        {/* Matches hub vibe (top-left, subtle) */}
+        {/* Top-left back link (matches LoL calc vibe) */}
         <Link href="/calculators/lol/hub" className="text-sm text-neutral-300 hover:text-white">
           ← Back to Hub
         </Link>
 
-        <div className="mt-6">
+        {/* ✅ Hero header (matches your LoL Damage Calculator style) */}
+        <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
+          League of Legends AP / AD Stat Impact
+        </h1>
+
+        <p className="mt-2 text-sm text-neutral-400 italic">
+          Not affiliated with, endorsed by, or sponsored by Riot Games.
+        </p>
+
+        <p className="mt-3 text-neutral-300 max-w-3xl">
+          See exactly how much{" "}
+          <span className="text-white font-semibold">+10 Ability Power</span> or{" "}
+          <span className="text-white font-semibold">+10 Attack Damage</span> changes your{" "}
+          <span className="text-white font-semibold">real damage after Armor &amp; Magic Resist</span>.
+          Perfect for item decisions, build optimization, and breakpoint checks.
+        </p>
+
+        {/* Calculator */}
+        <div className="mt-10">
           <ApAdClient champions={champions} patch={patch} items={items} />
         </div>
       </div>

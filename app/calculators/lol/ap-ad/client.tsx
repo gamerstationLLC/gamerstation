@@ -473,13 +473,7 @@ export default function ApAdClient({
     <div className="pb-24 lg:pb-0">
       {/* ✅ Back to hub (top-left) */}
       <div className="mb-6 flex items-center">
-  <Link
-    href="/calculators/lol/hub"
-    className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-neutral-200"
-  >
-    <span aria-hidden>←</span>
-    <span>Back to LoL Hub</span>
-  </Link>
+ 
 </div>
 
       {/* Mobile sticky header */}
