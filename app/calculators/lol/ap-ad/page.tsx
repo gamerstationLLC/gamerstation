@@ -2,10 +2,17 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import Link from "next/link";
+import { Suspense } from "react";
 import ApAdClient, { type ChampionRow } from "./client";
 
 export type ItemRow = Record<string, any>;
 export type SpellsOverrides = Record<string, any>;
+
+/**
+ * If your client uses useSearchParams(), Next may require a Suspense boundary.
+ * Keeping this page dynamic also prevents build-time prerender failures when data files are missing.
+ */
+export const dynamic = "force-dynamic";
 
 async function readJson<T>(absPath: string): Promise<T> {
   const raw = await fs.readFile(absPath, "utf-8");
@@ -30,25 +37,15 @@ async function readFirstJson<T>(candidates: string[]): Promise<T | null> {
 
 function normalizeChampionRows(data: any): ChampionRow[] {
   if (Array.isArray(data)) return data as ChampionRow[];
-
-  if (data?.data && typeof data.data === "object") {
-    return Object.values(data.data) as ChampionRow[];
-  }
-
+  if (data?.data && typeof data.data === "object") return Object.values(data.data) as ChampionRow[];
   if (Array.isArray(data?.champions)) return data.champions as ChampionRow[];
-
   return [];
 }
 
 function normalizeItemRows(data: any): ItemRow[] {
   if (Array.isArray(data)) return data as ItemRow[];
-
-  if (data?.data && typeof data.data === "object") {
-    return Object.values(data.data) as ItemRow[];
-  }
-
+  if (data?.data && typeof data.data === "object") return Object.values(data.data) as ItemRow[];
   if (Array.isArray(data?.items)) return data.items as ItemRow[];
-
   return [];
 }
 
@@ -101,7 +98,7 @@ export default async function Page() {
 
   const items = normalizeItemRows(itemsRaw);
 
-  // ✅ Load spell overrides (numeric truth for spell damage)
+  // Load spell overrides (numeric truth for spell damage)
   const overrides =
     (await readFirstJson<SpellsOverrides>([
       "public/data/lol/spells_overrides.json",
@@ -133,16 +130,18 @@ export default async function Page() {
           Not affiliated with, endorsed by, or sponsored by Riot Games.
         </p>
 
-        <p className="mt-3 text-neutral-300 max-w-3xl">
+        <p className="mt-3 max-w-3xl text-neutral-300">
           See exactly how much{" "}
-          <span className="text-white font-semibold">+10 Ability Power</span> or{" "}
-          <span className="text-white font-semibold">+10 Attack Damage</span> changes your{" "}
-          <span className="text-white font-semibold">real damage after Armor &amp; Magic Resist</span>.
+          <span className="font-semibold text-white">+10 Ability Power</span> or{" "}
+          <span className="font-semibold text-white">+10 Attack Damage</span> changes your{" "}
+          <span className="font-semibold text-white">real damage after Armor &amp; Magic Resist</span>.
           Perfect for item decisions, build optimization, and breakpoint checks.
         </p>
 
         <div className="mt-10">
-          <ApAdClient champions={champions} patch={patch} items={items} overrides={overrides} />
+          <Suspense fallback={<div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 text-sm text-neutral-300">Loading calculator…</div>}>
+            <ApAdClient champions={champions} patch={patch} items={items} overrides={overrides} />
+          </Suspense>
         </div>
       </div>
     </main>
