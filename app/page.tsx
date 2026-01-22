@@ -174,11 +174,37 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="mt-16 border-t border-neutral-800 pt-6 text-center text-xs text-neutral-500">
-          GamerStation is not affiliated with or endorsed by Activision, Epic Games, or any game publishers.
-          <br />
-          All trademarks belong to their respective owners.
-        </footer>
+        
+        {/* ✅ Homepage-only footer (keeps compliance without polluting every page) */}
+<footer className="mt-16 border-t border-neutral-800 pt-6 text-center text-xs text-neutral-500">
+  <div className="space-y-3">
+    <p>
+      GamerStation is not affiliated with or endorsed by Activision, Epic Games,
+      Riot Games, or any game publishers. All trademarks belong to their
+      respective owners.
+    </p>
+
+    <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
+      <Link className="hover:text-white" href="/privacy">
+        Privacy
+      </Link>
+      <Link className="hover:text-white" href="/terms">
+        Terms
+      </Link>
+      <Link className="hover:text-white" href="/contact">
+        Contact
+      </Link>
+      <Link className="hover:text-white" href="/disclaimer">
+        Disclaimer
+      </Link>
+    </div>
+
+    <p className="text-[11px] text-neutral-600">
+      © {new Date().getFullYear()} GamerStation
+    </p>
+  </div>
+</footer>
+
       </div>
     </main>
   );

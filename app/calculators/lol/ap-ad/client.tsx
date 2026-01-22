@@ -11,14 +11,13 @@ type Stats = {
   armorperlevel?: number;
   spellblock?: number;
   spellblockperlevel?: number;
-
   attackdamage?: number;
   attackdamageperlevel?: number;
 };
 
 export type ChampionRow = {
   key?: string | number;
-  id: string; // "Aatrox" style
+  id: string;
   name: string;
   title?: string;
   tags?: string[];
@@ -58,31 +57,179 @@ const setNum =
   };
 
 function damageMultiplierFromResist(resist: number) {
-  // Standard LoL-style multiplier
   if (!Number.isFinite(resist)) return NaN;
   if (resist >= 0) return 100 / (100 + resist);
   return 2 - 100 / (100 - resist);
 }
 
-function getStatAtLevel(base?: number, perLevel?: number, lvl?: number) {
-  const b = Number(base ?? 0);
-  const p = Number(perLevel ?? 0);
+function pickNumber(obj: any, keys: string[]): number | undefined {
+  if (!obj || typeof obj !== "object") return undefined;
+  for (const k of keys) {
+    const v = obj[k];
+    const n = Number(v);
+    if (Number.isFinite(n)) return n;
+  }
+  return undefined;
+}
+
+/**
+ * Returns {value, hasInput} so we can distinguish
+ * "real 0" vs "we didn't find stat keys at all".
+ */
+function getStatAtLevelMaybe(
+  base: number | undefined,
+  perLevel: number | undefined,
+  lvl: number
+): { value: number; hasInput: boolean } {
+  const hasBase = Number.isFinite(Number(base));
+  const hasPer = Number.isFinite(Number(perLevel));
+  const hasInput = hasBase || hasPer;
+
+  const b = hasBase ? Number(base) : 0;
+  const p = hasPer ? Number(perLevel) : 0;
   const L = clamp(Number(lvl ?? 1), 1, 18);
-  return b + p * (L - 1);
+
+  return { value: b + p * (L - 1), hasInput };
+}
+
+/**
+ * ✅ Normalize stats across MANY schemas:
+ * - DDragon (hp/hpperlevel/etc)
+ * - alt common (hpBase/hpGrowth, armorBase/armorGrowth, mrBase/mrGrowth)
+ * - camelCase (attackDamageBase, spellBlock, etc)
+ */
+function normalizeStats(raw: any): Stats {
+  // try to locate stats object
+  const s =
+    raw?.stats ??
+    raw?.data?.stats ??
+    raw?.data?.champion?.stats ??
+    raw?.champion?.stats ??
+    raw?.champion ??
+    raw?.statsBase ??
+    null;
+
+  const obj = s && typeof s === "object" ? s : raw && typeof raw === "object" ? raw : {};
+
+  const hp = pickNumber(obj, [
+    "hp",
+    "HP",
+    "health",
+    "baseHp",
+    "baseHP",
+    "baseHealth",
+    "hpBase",
+    "healthBase",
+    "baseHealthRegen", // harmless if present
+  ]);
+
+  const hpperlevel = pickNumber(obj, [
+    "hpperlevel",
+    "hpPerLevel",
+    "healthperlevel",
+    "healthPerLevel",
+    "hp_per_level",
+    "hpGrowth",
+    "healthGrowth",
+  ]);
+
+  const armor = pickNumber(obj, [
+    "armor",
+    "Armor",
+    "baseArmor",
+    "armorBase",
+    "defense",
+    "defenseBase",
+  ]);
+
+  const armorperlevel = pickNumber(obj, [
+    "armorperlevel",
+    "armorPerLevel",
+    "armor_per_level",
+    "armorGrowth",
+    "defenseGrowth",
+  ]);
+
+  // MR / spellblock
+  const spellblock = pickNumber(obj, [
+    "spellblock",
+    "spellBlock",
+    "spellblockBase",
+    "spellBlockBase",
+    "mr",
+    "MR",
+    "magicresist",
+    "magicResist",
+    "magicResistance",
+    "baseMR",
+    "mrBase",
+    "magicResistBase",
+  ]);
+
+  const spellblockperlevel = pickNumber(obj, [
+    "spellblockperlevel",
+    "spellBlockPerLevel",
+    "spellblock_per_level",
+    "mrperlevel",
+    "mrPerLevel",
+    "mrGrowth",
+    "magicresistperlevel",
+    "magicResistPerLevel",
+    "magicResistGrowth",
+  ]);
+
+  // AD
+  const attackdamage = pickNumber(obj, [
+    "attackdamage",
+    "attackDamage",
+    "ad",
+    "AD",
+    "basead",
+    "baseAD",
+    "baseAttackDamage",
+    "attackDamageBase",
+    "attackdamageBase",
+  ]);
+
+  const attackdamageperlevel = pickNumber(obj, [
+    "attackdamageperlevel",
+    "attackDamagePerLevel",
+    "adperlevel",
+    "adPerLevel",
+    "attackdamage_per_level",
+    "attackDamageGrowth",
+    "attackdamageGrowth",
+  ]);
+
+  return {
+    hp,
+    hpperlevel,
+    armor,
+    armorperlevel,
+    spellblock,
+    spellblockperlevel,
+    attackdamage,
+    attackdamageperlevel,
+  };
 }
 
 function safeChampions(champions: ChampionRow[]): ChampionRow[] {
   const arr = Array.isArray(champions) ? champions : [];
   return arr
     .filter(Boolean)
-    .map((c) => ({
-      ...c,
-      id: String((c as any)?.id ?? ""),
-      name: String((c as any)?.name ?? (c as any)?.id ?? ""),
-      title: (c as any)?.title,
-      tags: Array.isArray((c as any)?.tags) ? (c as any).tags : [],
-      stats: (c as any)?.stats ?? {},
-    }))
+    .map((c: any) => {
+      const id = String(c?.id ?? c?.slug ?? c?.key ?? "").trim();
+      const name = String(c?.name ?? c?.id ?? c?.slug ?? "").trim();
+
+      return {
+        ...c,
+        id,
+        name,
+        title: c?.title,
+        tags: Array.isArray(c?.tags) ? c.tags : [],
+        stats: normalizeStats(c),
+      } as ChampionRow;
+    })
     .filter((c) => c.id && c.name);
 }
 
@@ -142,31 +289,32 @@ function asNumber(x: any): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-/**
- * Extract AP/AD bonuses from common item schemas.
- * Supports Data Dragon-style keys and a few common alternates.
- */
 function extractApAdFromItemRaw(raw: any): { ap: number; ad: number } {
   let ap = 0;
   let ad = 0;
 
-  // Data Dragon: item.stats.{FlatMagicDamageMod, FlatPhysicalDamageMod}
   const stats = raw?.stats ?? raw?.data?.stats ?? raw?.item?.stats ?? null;
   if (stats && typeof stats === "object") {
-    ap += asNumber(stats.FlatMagicDamageMod ?? stats.flatMagicDamageMod ?? stats.abilityPower ?? stats.ap);
+    ap += asNumber(
+      stats.FlatMagicDamageMod ??
+        stats.flatMagicDamageMod ??
+        stats.abilityPower ??
+        stats.ap
+    );
     ad += asNumber(
-      stats.FlatPhysicalDamageMod ?? stats.flatPhysicalDamageMod ?? stats.attackDamage ?? stats.ad
+      stats.FlatPhysicalDamageMod ??
+        stats.flatPhysicalDamageMod ??
+        stats.attackDamage ??
+        stats.ad
     );
   }
 
-  // Sometimes CommunityDragon-ish structures may store bonuses under "effects" or "simpleStats"
   const simpleStats = raw?.simpleStats ?? raw?.data?.simpleStats ?? null;
   if (simpleStats && typeof simpleStats === "object") {
     ap += asNumber(simpleStats.ap ?? simpleStats.abilityPower);
     ad += asNumber(simpleStats.ad ?? simpleStats.attackDamage);
   }
 
-  // As a last-resort, check direct fields (rare)
   ap += asNumber(raw?.ap ?? raw?.abilityPower);
   ad += asNumber(raw?.ad ?? raw?.attackDamage);
 
@@ -180,7 +328,7 @@ export default function ApAdClient({
 }: {
   champions: ChampionRow[];
   patch: string;
-  items?: ItemRow[]; // optional
+  items?: ItemRow[];
 }) {
   const champArray: ChampionRow[] = useMemo(() => safeChampions(champions), [champions]);
   const itemArray: UiItem[] = useMemo(() => safeItems(items ?? []), [items]);
@@ -201,7 +349,7 @@ export default function ApAdClient({
   const [damageType, setDamageType] = useState<DamageType>("magic");
   const [apRatio, setApRatio] = useState<Num>(0.6);
   const [adRatio, setAdRatio] = useState<Num>(0);
-  const [bonusAdRatio, setBonusAdRatio] = useState<Num>(0); // advanced only
+  const [bonusAdRatio, setBonusAdRatio] = useState<Num>(0);
 
   // Collapsed by default
   const [damageOpen, setDamageOpen] = useState<boolean>(false);
@@ -210,11 +358,13 @@ export default function ApAdClient({
   // Attacker
   // ----------------------------
   const [attackerQuery, setAttackerQuery] = useState("");
-  const [attackerChampionId, setAttackerChampionId] = useState<string>(""); // "" = Manual
+  const [attackerChampionId, setAttackerChampionId] = useState<string>("");
   const [attackerLevel, setAttackerLevel] = useState<number>(9);
   const [attackerAp, setAttackerAp] = useState<Num>(0);
   const [attackerAd, setAttackerAd] = useState<Num>(0);
-  const [attackerBonusAd, setAttackerBonusAd] = useState<Num>(0); // advanced only
+  const [attackerBonusAd, setAttackerBonusAd] = useState<Num>(0);
+
+  const [attackerAdTouched, setAttackerAdTouched] = useState(false);
 
   const attackerFiltered = useMemo(() => {
     const q = attackerQuery.trim().toLowerCase();
@@ -227,9 +377,6 @@ export default function ApAdClient({
       .slice(0, 60);
   }, [champArray, attackerQuery]);
 
-  const [attackerAdTouched, setAttackerAdTouched] = useState(false);
-
-  // Auto-select first match if typing excludes current selection
   useEffect(() => {
     const q = attackerQuery.trim();
     if (!q) return;
@@ -244,22 +391,21 @@ export default function ApAdClient({
     return champArray.find((c) => c.id === attackerChampionId) ?? null;
   }, [champArray, attackerChampionId]);
 
-  // Auto-fill attacker base AD from champ stats at level (only if user didn't manually edit AD)
   useEffect(() => {
     if (!attackerChampion) return;
 
-    const ad = getStatAtLevel(
+    const { value: ad, hasInput } = getStatAtLevelMaybe(
       attackerChampion.stats?.attackdamage,
       attackerChampion.stats?.attackdamageperlevel,
       attackerLevel
     );
 
+    if (!hasInput) return;
     if (!attackerAdTouched) setAttackerAd(Math.round(ad));
   }, [attackerChampion, attackerLevel, attackerAdTouched]);
 
   // ----------------------------
-  // Item selector (Attacker section)
-  // Now DOES modify effective AP/AD
+  // Items
   // ----------------------------
   const [itemQuery, setItemQuery] = useState("");
   const [selectedItemKeys, setSelectedItemKeys] = useState<string[]>([]);
@@ -297,12 +443,16 @@ export default function ApAdClient({
   // Target
   // ----------------------------
   const [targetQuery, setTargetQuery] = useState("");
-  const [targetChampionId, setTargetChampionId] = useState<string>(""); // "" = custom
+  const [targetChampionId, setTargetChampionId] = useState<string>("");
   const [targetLevel, setTargetLevel] = useState<number>(9);
 
   const [targetHp, setTargetHp] = useState<Num>(2000);
   const [targetArmor, setTargetArmor] = useState<Num>(80);
   const [targetMr, setTargetMr] = useState<Num>(60);
+
+  const [targetHpTouched, setTargetHpTouched] = useState(false);
+  const [targetArmorTouched, setTargetArmorTouched] = useState(false);
+  const [targetMrTouched, setTargetMrTouched] = useState(false);
 
   const targetFiltered = useMemo(() => {
     const q = targetQuery.trim().toLowerCase();
@@ -328,21 +478,25 @@ export default function ApAdClient({
     return champArray.find((c) => c.id === targetChampionId) ?? null;
   }, [champArray, targetChampionId]);
 
+  // ✅ when picking a new target champ, allow auto-overwrite again
+  useEffect(() => {
+    if (!targetChampionId) return;
+    setTargetHpTouched(false);
+    setTargetArmorTouched(false);
+    setTargetMrTouched(false);
+  }, [targetChampionId]);
+
   useEffect(() => {
     if (!targetChampion) return;
 
-    const hp = getStatAtLevel(targetChampion.stats?.hp, targetChampion.stats?.hpperlevel, targetLevel);
-    const armor = getStatAtLevel(targetChampion.stats?.armor, targetChampion.stats?.armorperlevel, targetLevel);
-    const mr = getStatAtLevel(
-      targetChampion.stats?.spellblock,
-      targetChampion.stats?.spellblockperlevel,
-      targetLevel
-    );
+    const hp = getStatAtLevelMaybe(targetChampion.stats?.hp, targetChampion.stats?.hpperlevel, targetLevel);
+    const armor = getStatAtLevelMaybe(targetChampion.stats?.armor, targetChampion.stats?.armorperlevel, targetLevel);
+    const mr = getStatAtLevelMaybe(targetChampion.stats?.spellblock, targetChampion.stats?.spellblockperlevel, targetLevel);
 
-    setTargetHp(Math.round(hp));
-    setTargetArmor(Math.round(armor));
-    setTargetMr(Math.round(mr));
-  }, [targetChampion, targetLevel]);
+    if (hp.hasInput && !targetHpTouched) setTargetHp(Math.round(hp.value));
+    if (armor.hasInput && !targetArmorTouched) setTargetArmor(Math.round(armor.value));
+    if (mr.hasInput && !targetMrTouched) setTargetMr(Math.round(mr.value));
+  }, [targetChampion, targetLevel, targetHpTouched, targetArmorTouched, targetMrTouched]);
 
   function setTargetToCustom() {
     setTargetChampionId("");
@@ -357,7 +511,6 @@ export default function ApAdClient({
 
   const AP = AP_base + itemBonuses.ap;
 
-  // Treat item flat AD as bonus AD; it also increases total AD
   const totalAD = totalAD_base + itemBonuses.ad;
   const bonusAD = (uiMode === "advanced" ? bonusAD_base : 0) + itemBonuses.ad;
 
@@ -445,6 +598,9 @@ export default function ApAdClient({
     setTargetHp(2000);
     setTargetArmor(80);
     setTargetMr(60);
+    setTargetHpTouched(false);
+    setTargetArmorTouched(false);
+    setTargetMrTouched(false);
 
     setUiMode("simple");
     setMobileTab("inputs");
@@ -458,23 +614,20 @@ export default function ApAdClient({
 
   const resistLabel = damageType === "phys" ? "vs Armor" : damageType === "magic" ? "vs MR" : "true dmg";
 
-  const damageSummary = useMemo(() => {
-    const b = Math.max(0, num0(baseDamage));
-    const ar = num0(apRatio);
-    const dr = num0(adRatio);
-    const br = uiMode === "advanced" ? num0(bonusAdRatio) : 0;
-
-    const bits = [`Base ${Math.round(b)}`, damageTypeLabel(damageType), `AP×${fmt(ar, 2)}`, `AD×${fmt(dr, 2)}`];
-    if (uiMode === "advanced") bits.push(`bAD×${fmt(br, 2)}`);
-    return bits.join(" • ");
-  }, [baseDamage, apRatio, adRatio, bonusAdRatio, uiMode, damageType]);
-
+  // ----------------------------
+  // UI (your existing UI below)
+  // ----------------------------
   return (
     <div className="pb-24 lg:pb-0">
       {/* ✅ Back to hub (top-left) */}
       <div className="mb-6 flex items-center">
- 
-</div>
+        <Link
+          href="/calculators/lol/hub"
+          className="rounded-full border border-neutral-800 bg-black px-3 py-1.5 text-xs font-semibold text-neutral-200 hover:border-neutral-600"
+        >
+          ← Back to LoL Hub
+        </Link>
+      </div>
 
       {/* Mobile sticky header */}
       <div className="lg:hidden sticky top-0 z-40 border-b border-neutral-800 bg-black/80 backdrop-blur">
@@ -589,7 +742,6 @@ export default function ApAdClient({
               </div>
             </div>
 
-            {/* Champion search/select */}
             <div className="mt-3">
               <label className="text-sm text-neutral-300">Champion</label>
               <input
@@ -621,7 +773,6 @@ export default function ApAdClient({
               </div>
             </div>
 
-            {/* Level + AP/AD */}
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="text-sm text-neutral-300">Level</label>
@@ -770,11 +921,6 @@ export default function ApAdClient({
                 </div>
               </div>
             </div>
-
-            <div className="mt-3 text-xs text-neutral-500">
-              Auto-fill here is for <span className="text-neutral-200 font-semibold">stats</span> (like AD at level),
-              not spell base/ratios.
-            </div>
           </div>
 
           {/* Target */}
@@ -839,6 +985,7 @@ export default function ApAdClient({
                   type="number"
                   value={targetHp}
                   onChange={(e) => {
+                    setTargetHpTouched(true);
                     if (targetChampionId) setTargetToCustom();
                     setNum(setTargetHp, 1, 999999)(e.target.value);
                   }}
@@ -859,6 +1006,7 @@ export default function ApAdClient({
                   type="number"
                   value={targetArmor}
                   onChange={(e) => {
+                    setTargetArmorTouched(true);
                     if (targetChampionId) setTargetToCustom();
                     setNum(setTargetArmor, -999, 9999)(e.target.value);
                   }}
@@ -879,6 +1027,7 @@ export default function ApAdClient({
                   type="number"
                   value={targetMr}
                   onChange={(e) => {
+                    setTargetMrTouched(true);
                     if (targetChampionId) setTargetToCustom();
                     setNum(setTargetMr, -999, 9999)(e.target.value);
                   }}
@@ -926,7 +1075,6 @@ export default function ApAdClient({
             <span className="text-neutral-200 font-semibold">{Math.round(totalAD)}</span> AD
           </div>
 
-          {/* Stat impact */}
           <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
             <div className="flex items-center justify-between">
               <div className="text-sm font-semibold">+10 Stat Impact (post-mitigation)</div>
@@ -954,7 +1102,6 @@ export default function ApAdClient({
             </div>
           </div>
 
-          {/* Current packet */}
           <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
             <div className="text-sm font-semibold">Current damage (post-mitigation)</div>
 
@@ -982,7 +1129,9 @@ export default function ApAdClient({
             </div>
           </div>
 
-          <div className="mt-6 text-[11px] text-neutral-500">Legend: AP = Ability Power, AD = Attack Damage, MR = Magic Resist.</div>
+          <div className="mt-6 text-[11px] text-neutral-500">
+            Legend: AP = Ability Power, AD = Attack Damage, MR = Magic Resist.
+          </div>
         </section>
       </div>
 
