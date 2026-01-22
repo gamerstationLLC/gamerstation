@@ -5,6 +5,7 @@ import Link from "next/link";
 import ApAdClient, { type ChampionRow } from "./client";
 
 export type ItemRow = Record<string, any>;
+export type SpellsOverrides = Record<string, any>;
 
 async function readJson<T>(absPath: string): Promise<T> {
   const raw = await fs.readFile(absPath, "utf-8");
@@ -13,7 +14,7 @@ async function readJson<T>(absPath: string): Promise<T> {
 
 /**
  * Tries several candidate locations so you don't have to perfectly match my guess.
- * Put your items file in ONE of these places (or add your path to the list).
+ * Put your file in ONE of these places (or add your path to the list).
  */
 async function readFirstJson<T>(candidates: string[]): Promise<T | null> {
   for (const rel of candidates) {
@@ -100,6 +101,15 @@ export default async function Page() {
 
   const items = normalizeItemRows(itemsRaw);
 
+  // ✅ Load spell overrides (numeric truth for spell damage)
+  const overrides =
+    (await readFirstJson<SpellsOverrides>([
+      "public/data/lol/spells_overrides.json",
+      "data/lol/spells_overrides.json",
+      "public/data/lol/overrides/spells_overrides.json",
+      "data/lol/overrides/spells_overrides.json",
+    ])) ?? {};
+
   return (
     <main className="relative min-h-screen text-white">
       {/* Hub-style black background */}
@@ -111,12 +121,10 @@ export default async function Page() {
       </div>
 
       <div className="mx-auto max-w-6xl px-6 py-12">
-        {/* Top-left back link (matches LoL calc vibe) */}
         <Link href="/calculators/lol/hub" className="text-sm text-neutral-300 hover:text-white">
           ← Back to Hub
         </Link>
 
-        {/* ✅ Hero header (matches your LoL Damage Calculator style) */}
         <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
           League of Legends AP / AD Stat Impact
         </h1>
@@ -133,9 +141,8 @@ export default async function Page() {
           Perfect for item decisions, build optimization, and breakpoint checks.
         </p>
 
-        {/* Calculator */}
         <div className="mt-10">
-          <ApAdClient champions={champions} patch={patch} items={items} />
+          <ApAdClient champions={champions} patch={patch} items={items} overrides={overrides} />
         </div>
       </div>
     </main>
