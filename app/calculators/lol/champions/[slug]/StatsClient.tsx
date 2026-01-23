@@ -27,6 +27,26 @@ export type ChampionBaseStats = {
   critperlevel: number;
 };
 
+type AbilityKey = "P" | "Q" | "W" | "E" | "R";
+
+export type ChampionAbility = {
+  key: AbilityKey;
+  name: string;
+  summary?: string;
+
+  scalars?: Array<{
+    label: string;
+    values: number[];
+    suffix?: string;
+    precision?: number;
+  }>;
+
+  cooldown?: number[];
+  cost?: number[];
+  scalingText?: string[];
+  damageType?: "physical" | "magic" | "true" | "mixed";
+};
+
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
 }
@@ -49,12 +69,28 @@ function attackSpeedAtLevel(baseAS: number, asPerLevelPct: number, level: number
   return baseAS * (1 + (asPerLevelPct / 100) * (level - 1));
 }
 
+function abilityMaxRank(key: AbilityKey) {
+  if (key === "R") return 3;
+  if (key === "P") return 1;
+  return 5;
+}
+
+function isNumericAbility(ab: ChampionAbility) {
+  return !!ab.scalars?.some((s) => Array.isArray(s.values) && s.values.length > 0);
+}
+
+function getAtRank(arr: number[] | undefined, rank: number) {
+  if (!arr?.length) return null;
+  return arr[Math.min(rank - 1, arr.length - 1)] ?? null;
+}
+
 export default function StatsClient({
   championId,
   championName,
   patch,
   calcHref,
   stats,
+  abilities,
   defaultLevel = 1,
 }: {
   championId: string;
@@ -62,9 +98,27 @@ export default function StatsClient({
   patch: string;
   calcHref: string;
   stats: ChampionBaseStats;
+  abilities: ChampionAbility[];
   defaultLevel?: number;
 }) {
   const [level, setLevel] = useState(() => clamp(defaultLevel, 1, 18));
+
+  // ✅ START COLLAPSED: everything closed by default
+  const [open, setOpen] = useState<Record<AbilityKey, boolean>>({
+    P: false,
+    Q: false,
+    W: false,
+    E: false,
+    R: false,
+  });
+
+  const [abilityRanks, setAbilityRanks] = useState<Record<AbilityKey, number>>(() => ({
+    P: 1,
+    Q: 1,
+    W: 1,
+    E: 1,
+    R: 1,
+  }));
 
   const computed = useMemo(() => {
     const L = level;
@@ -83,11 +137,22 @@ export default function StatsClient({
     };
   }, [level, stats]);
 
+  // Order defensively: P Q W E R
+  const abilityList = useMemo(() => {
+    const order: AbilityKey[] = ["P", "Q", "W", "E", "R"];
+    const map = new Map(abilities.map((a) => [a.key, a]));
+    return order.map((k) => map.get(k)).filter(Boolean) as ChampionAbility[];
+  }, [abilities]);
+
+  const coveredCount = useMemo(() => {
+    return abilityList.filter((ab) => ab.key !== "P" && isNumericAbility(ab)).length;
+  }, [abilityList]);
+
   return (
     <section className="mt-6 space-y-4">
-      {/* Top bar: Back link LEFT (requested) */}
+      {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <Link
             href="/calculators/lol/champions"
             className="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-white hover:underline"
@@ -95,13 +160,18 @@ export default function StatsClient({
             <span aria-hidden>←</span> Back to Champion Index
           </Link>
 
-          <span className="hidden sm:inline text-neutral-600">•</span>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-300">
+            <span className="hidden sm:inline text-neutral-700">•</span>
 
-          <div className="text-sm text-neutral-300">
-            <span className="font-semibold text-white">{championName}</span>
-            <span className="opacity-70"> ({championId})</span>
-            <span className="ml-2 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] text-neutral-300">
-              Patch {patch}
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-white">{championName}</span>
+              <span className="opacity-70">({championId})</span>
+            </div>
+
+            {/* Patch badge */}
+            <span className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-neutral-400">
+              <span className="opacity-70">Patch</span>
+              <span className="font-semibold text-neutral-200">{patch}</span>
             </span>
           </div>
         </div>
@@ -109,20 +179,19 @@ export default function StatsClient({
         <div className="sm:text-right">
           <Link
             href={calcHref}
-            className="inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200"
+            className="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200 sm:w-auto"
           >
             Open LoL Damage Calc (import {championId})
           </Link>
         </div>
       </div>
 
-      {/* “not a wiki” short intro */}
       <p className="max-w-3xl text-sm text-neutral-300">
         Base stats and per-level scaling. For real fight math (items, resists, combos), use the
         calculator.
       </p>
 
-      {/* Slider card */}
+      {/* Stats card */}
       <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -194,6 +263,187 @@ export default function StatsClient({
           Note: Attack speed uses base AS × (1 + growth% × (level−1)).
         </div>
       </div>
+
+      {/* Abilities */}
+      <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-semibold">Abilities</div>
+              <span className="rounded-full border border-white/10 bg-black/30 px-2 py-0.5 text-[11px] text-neutral-400">
+                {coveredCount}/4 damage mapped
+              </span>
+            </div>
+            <div className="mt-1 text-xs text-neutral-400">
+              Descriptions from Data Dragon. Damage numbers from your overrides when available.
+            </div>
+          </div>
+
+          <div className="text-xs text-neutral-400">
+            Use ranks while testing combos in the{" "}
+            <Link href={calcHref} className="text-neutral-200 hover:text-white hover:underline">
+              damage calculator
+            </Link>
+            .
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3">
+          {abilityList.map((ab) => {
+            const maxR = ab.key === "R" ? 3 : ab.key === "P" ? 1 : 5;
+            const rank = ab.key === "P" ? 1 : clamp(abilityRanks[ab.key] ?? 1, 1, maxR);
+            const isOpen = open[ab.key] ?? false;
+
+            const cdVal = getAtRank(ab.cooldown, rank);
+            const costVal = getAtRank(ab.cost, rank);
+
+            const hasNumbers = isNumericAbility(ab);
+
+            return (
+              <div key={ab.key} className="rounded-2xl border border-white/10 bg-black/30">
+                {/* Clickable header */}
+                <button
+                  type="button"
+                  onClick={() => setOpen((prev) => ({ ...prev, [ab.key]: !isOpen }))}
+                  className="w-full p-4 text-left"
+                  aria-expanded={isOpen}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-start gap-2">
+                        <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-neutral-100">
+                          {ab.key}
+                        </span>
+
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <div className="truncate text-sm font-semibold text-neutral-100">
+                              {ab.name}
+                            </div>
+
+                            {ab.key !== "P" ? (
+                              <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-neutral-300">
+                                Rank {rank}/{maxR}
+                              </span>
+                            ) : (
+                              <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-neutral-300">
+                                Passive
+                              </span>
+                            )}
+
+                            {hasNumbers ? (
+                              <span className="rounded-full border border-white/10 bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-200">
+                                numbers
+                              </span>
+                            ) : (
+                              <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-neutral-400">
+                                utility / not mapped
+                              </span>
+                            )}
+                          </div>
+
+                          {ab.summary ? (
+                            <div className="mt-1 line-clamp-2 text-xs text-neutral-300">
+                              {ab.summary}
+                            </div>
+                          ) : (
+                            <div className="mt-1 text-xs text-neutral-500">—</div>
+                          )}
+
+                          {(cdVal !== null || costVal !== null || ab.damageType) && (
+                            <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-neutral-300">
+                              {cdVal !== null ? (
+                                <Pill>
+                                  CD:{" "}
+                                  <span className="font-semibold text-white">{fmt(cdVal, 1)}s</span>
+                                </Pill>
+                              ) : null}
+                              {costVal !== null ? (
+                                <Pill>
+                                  Cost:{" "}
+                                  <span className="font-semibold text-white">{fmt(costVal, 0)}</span>
+                                </Pill>
+                              ) : null}
+                              {ab.damageType ? <Pill>{ab.damageType}</Pill> : null}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-1 shrink-0 text-neutral-400">
+                      <span className="inline-flex items-center gap-2 text-[11px]">
+                        <span className="hidden sm:inline">{isOpen ? "Collapse" : "Expand"}</span>
+                        <span aria-hidden className="text-lg leading-none">
+                          {isOpen ? "▾" : "▸"}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </button>
+
+                {/* Expandable body */}
+                {isOpen ? (
+                  <div className="border-t border-white/10 px-4 pb-4 pt-3">
+                    {ab.key !== "P" ? (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <div className="mr-2 text-[11px] text-neutral-400">Rank</div>
+                        {Array.from({ length: maxR }, (_, i) => i + 1).map((r) => {
+                          const active = r === rank;
+                          return (
+                            <button
+                              key={r}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setAbilityRanks((prev) => ({ ...prev, [ab.key]: r }));
+                              }}
+                              className={
+                                active
+                                  ? "rounded-xl border border-white/10 bg-white px-2.5 py-1 text-[11px] font-semibold text-black"
+                                  : "rounded-xl border border-white/10 bg-black/30 px-2.5 py-1 text-[11px] text-neutral-200 hover:bg-white/10"
+                              }
+                            >
+                              {r}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+
+                    {ab.scalars?.length ? (
+                      <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                        {ab.scalars.map((s) => {
+                          const idx = Math.min(rank - 1, s.values.length - 1);
+                          const val = s.values.length ? s.values[idx] : NaN;
+                          const precision = s.precision ?? 0;
+                          const suffix = s.suffix ?? "";
+
+                          return (
+                            <div
+                              key={s.label}
+                              className="rounded-2xl border border-white/10 bg-black/30 p-3"
+                            >
+                              <div className="text-[11px] text-neutral-400">{s.label}</div>
+                              <div className="mt-1 text-sm font-semibold text-neutral-100">
+                                {Number.isFinite(val) ? `${fmt(val, precision)}${suffix}` : "—"}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="mt-3 text-xs text-neutral-500">
+                        No damage numbers tracked for this ability yet (utility / not overridden).
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </section>
   );
 }
@@ -204,5 +454,13 @@ function Stat({ label, value }: { label: string; value: string }) {
       <div className="text-[11px] text-neutral-400">{label}</div>
       <div className="mt-1 text-sm font-semibold text-neutral-100">{value}</div>
     </div>
+  );
+}
+
+function Pill({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">
+      {children}
+    </span>
   );
 }
