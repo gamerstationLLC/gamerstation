@@ -65,7 +65,7 @@ export default async function ChampionsPickerPage() {
   return (
     <main className="mx-auto max-w-5xl px-4 py-8 text-white">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold">LoL Champion Picker</h1>
+        <h1 className="text-2xl font-semibold">LoL Champion Index</h1>
         <p className="mt-1 text-sm opacity-80">
           Search a champion to open their stats page. Patch:{" "}
           <span className="font-medium">{patch}</span>

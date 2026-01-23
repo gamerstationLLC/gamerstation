@@ -97,7 +97,7 @@ export default function HubClient() {
             href="/calculators/lol/champions"
             className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
           >
-            <div className="text-sm font-semibold">Champions Browser</div>
+            <div className="text-sm font-semibold">Champions Index</div>
             <div className="mt-2 text-sm text-neutral-400">
               Browse champions and stats on LoL.
     
