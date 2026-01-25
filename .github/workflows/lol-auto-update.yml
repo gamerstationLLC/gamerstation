@@ -9,9 +9,14 @@ concurrency:
   group: lol-auto-update
   cancel-in-progress: true
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   lol:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,13 +43,7 @@ jobs:
           restore-keys: |
             lol-riot-cache-v1
 
-      - name: Update LoL base data + items
-        run: npm run lol:update:data
-
-      - name: Update spells overrides
-        run: npm run lol:update:overrides
-
-      - name: Update meta builds
+      - name: Update ALL LoL data (data + overrides + meta + finalize)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           RIOT_REGION: americas
@@ -63,21 +62,15 @@ jobs:
           PATCH_MAJOR_MINOR_ONLY: "1"
           REPROCESS_SEEDS: "1"
           CACHE_SCAN_LIMIT: "0"
-        run: npm run lol:update:meta
+        run: npm run lol:update:all
 
-      - name: Commit updates (if changed)
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # adjust if your scripts write elsewhere, but this is usually correct:
-          git add public/data/lol
-          git add scripts/riot/cache/state || true
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git commit -m "chore(lol): automated refresh"
-          git push
+      - name: Create Pull Request (if changed)
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(lol): automated refresh"
+          title: "chore(lol): automated refresh"
+          body: "Automated LoL data refresh (base data, overrides, meta builds)."
+          branch: "bot/lol-auto-update"
+          delete-branch: true
+          add-paths: |
+            public/data/lol
