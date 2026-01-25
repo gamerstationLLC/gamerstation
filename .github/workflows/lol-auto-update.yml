@@ -48,6 +48,12 @@ jobs:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           RIOT_REGION: americas
 
+          # ✅ seed discovery (fixes "No bootstrap seeds available")
+          RIOT_PLATFORM: na1
+          LADDER_QUEUE: RANKED_SOLO_5x5
+          LADDER_TIER: challenger
+          LADDER_MAX: "250"
+
           # crawl knobs
           MAX_MATCHES_PER_RUN: "20000"
           MAX_NEW_PUUIDS_PER_RUN: "4000"

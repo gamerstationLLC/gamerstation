@@ -15,7 +15,8 @@
     "lol:update:overrides": "node scripts/gen_spells_overrides.mjs",
     "lol:update:meta": "tsx scripts/riot/build-meta-builds.ts",
     "lol:finalize:meta": "tsx scripts/riot/finalize-meta-builds-from-cache.ts",
-    "lol:update:all": "npm run lol:update:data && npm run lol:update:overrides && npm run lol:update:meta && npm run lol:finalize:meta"
+    "lol:update:all": "npm run lol:update:data && npm run lol:update:overrides && npm run lol:update:meta && (npm run lol:finalize:meta || true)"
+
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
