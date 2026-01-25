@@ -47,22 +47,17 @@ const PATCH_MAJOR_MINOR_ONLY = String(process.env.PATCH_MAJOR_MINOR_ONLY || "1")
 const CACHE_SCAN_LIMIT = Number(process.env.CACHE_SCAN_LIMIT || 0);
 const ALLOW_LOW_SAMPLE_FALLBACK = String(process.env.ALLOW_LOW_SAMPLE_FALLBACK || "0") === "1";
 
-// ✅ NEW: ladder bootstrap knobs
-// queue for ladder listing (league-v4 expects these exact strings)
+// ✅ Ladder bootstrap knobs
 type LadderQueue = "RANKED_SOLO_5x5" | "RANKED_FLEX_SR";
 const LADDER_QUEUE = (process.env.LADDER_QUEUE || "RANKED_SOLO_5x5").trim() as LadderQueue;
 
-// tier controls which league endpoint is used
 type LadderTier = "challenger" | "grandmaster" | "master";
 const LADDER_TIER = (process.env.LADDER_TIER || "challenger").trim().toLowerCase() as LadderTier;
 
-// how many ladder players to take as initial bootstrap PUUIDs
 const LADDER_MAX_PLAYERS = Number(process.env.LADDER_MAX_PLAYERS || 250);
-
-// whether to reprocess bootstrap PUUIDs even if seen
 const REPROCESS_BOOTSTRAP = String(process.env.REPROCESS_BOOTSTRAP || "0") === "1";
 
-// ✅ optional: seed via match ids/urls (regional-only) — still useful if ladder is blocked
+// ✅ optional: seed via match ids/urls (regional-only)
 const SEED_MATCH_IDS = String(process.env.SEED_MATCH_IDS || "")
   .split(",")
   .map((s) => s.trim())
@@ -547,7 +542,11 @@ type LeagueList = {
   tier?: string;
   name?: string;
   queue?: string;
-  entries?: Array<{ summonerId: string; summonerName?: string; leaguePoints?: number }>;
+  entries?: Array<{
+    summonerId?: string;
+    summonerName?: string;
+    leaguePoints?: number;
+  }>;
 };
 
 type SummonerDTO = {
@@ -573,11 +572,16 @@ async function fetchSummonerById(encSummonerId: string): Promise<SummonerDTO> {
   return (await fetchPlatformJson(url)) as SummonerDTO;
 }
 
+// ✅ fallback that saves you when summonerId is missing/empty in the ladder payload
+async function fetchSummonerByName(summonerName: string): Promise<SummonerDTO> {
+  const url = `${riotPlatformBase()}/lol/summoner/v4/summoners/by-name/${encodeURIComponent(summonerName)}`;
+  return (await fetchPlatformJson(url)) as SummonerDTO;
+}
+
 async function ladderBootstrapPuuids(): Promise<string[]> {
   const league = await fetchLadderLeague();
   const entries = Array.isArray(league.entries) ? league.entries : [];
 
-  // sort by LP desc (if present) and take top N
   entries.sort((a, b) => Number(b.leaguePoints || 0) - Number(a.leaguePoints || 0));
   const top = entries.slice(0, Math.max(0, LADDER_MAX_PLAYERS));
 
@@ -588,14 +592,30 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
   const puuids: string[] = [];
   let ok = 0;
   let fail = 0;
+  let missingId = 0;
+  let missingName = 0;
+  let usedByName = 0;
 
-  // simple sequential to stay safe on rate limits (429 logic already inside fetch)
   for (const e of top) {
     const sid = String(e?.summonerId || "").trim();
-    if (!sid) continue;
+    const sname = String(e?.summonerName || "").trim();
+
     try {
-      const s = await fetchSummonerById(sid);
-      const pu = String(s?.puuid || "").trim();
+      let dto: SummonerDTO | null = null;
+
+      if (sid) {
+        dto = await fetchSummonerById(sid);
+      } else {
+        missingId++;
+        if (!sname) {
+          missingName++;
+          continue;
+        }
+        usedByName++;
+        dto = await fetchSummonerByName(sname);
+      }
+
+      const pu = String(dto?.puuid || "").trim();
       if (pu) {
         puuids.push(pu);
         ok++;
@@ -604,11 +624,16 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
       }
     } catch (err: any) {
       fail++;
-      console.warn(`[ladder] summoner fetch failed: ${sid.slice(0, 6)}… ${err?.message || err}`);
+      console.warn(`[ladder] summoner resolve failed: ${sname || sid}: ${err?.message || err}`);
     }
   }
 
-  console.log(`[ladder] puuids resolved: ok=${ok} fail=${fail} unique=${new Set(puuids).size}`);
+  console.log(
+    `[ladder] puuids resolved: ok=${ok} fail=${fail} missingId=${missingId} missingName=${missingName} byName=${usedByName} unique=${new Set(
+      puuids
+    ).size}`
+  );
+
   return Array.from(new Set(puuids));
 }
 
@@ -627,10 +652,7 @@ type BuildParts = {
 
 type Leaf = { games: number; wins: number; build: BuildParts };
 
-type FinalizeAgg = Record<
-  string,
-  Record<string, Partial<Record<FinalizeRole, Record<string, Leaf>>>>
->;
+type FinalizeAgg = Record<string, Record<string, Partial<Record<FinalizeRole, Record<string, Leaf>>>>>;
 
 function patchMajor(gameVersion: string | undefined): number | null {
   if (!gameVersion) return null;
@@ -766,12 +788,7 @@ function finalizeBuildSig(b: BuildParts): string {
   return `b=${bPart}|c=${cPart}`;
 }
 
-function topBuildsForRole(
-  roleMap: Record<string, Leaf>,
-  minDisplaySample: number,
-  bayesK: number,
-  priorWinrate: number
-) {
+function topBuildsForRole(roleMap: Record<string, Leaf>, minDisplaySample: number, bayesK: number, priorWinrate: number) {
   const entries = Object.entries(roleMap)
     .map(([sig, leaf]) => {
       const games = leaf.games;
@@ -838,8 +855,11 @@ async function finalizeOutputsFromCache() {
   const bootSet = await loadBootSet(repoRoot);
 
   const files = await listJsonFiles(cacheMatchesDir, CACHE_SCAN_LIMIT);
+
+  // ✅ IMPORTANT: do NOT throw if empty (this was causing “finalize step” failures in CI)
   if (!files.length) {
-    console.warn("No cached matches found at:", cacheMatchesDir);
+    console.warn("[finalize] No cached matches found at:", cacheMatchesDir);
+    console.warn("[finalize] Skipping finalize (outputs unchanged).");
     return;
   }
 
@@ -926,6 +946,7 @@ async function finalizeOutputsFromCache() {
   await writeFinalizeOut(OUT_RANKED_PATH, rankedQueues, rankedAgg, minPatchMajor);
   await writeFinalizeOut(OUT_CASUAL_PATH, casualQueues, casualAgg, minPatchMajor);
 
+
   console.log(`[finalize] Wrote: ${OUT_RANKED_PATH}`);
   console.log(`[finalize] Wrote: ${OUT_CASUAL_PATH}`);
 }
@@ -962,11 +983,11 @@ async function main() {
   } catch (e: any) {
     console.warn(
       `[ladder] bootstrap failed: ${e?.message || e}\n` +
-        "You can still seed via SEED_MATCH_IDS / SEED_MATCH_URLS in .env.local if ladder endpoints are blocked."
+        "You can still seed via SEED_MATCH_IDS / SEED_MATCH_URLS if ladder endpoints are blocked."
     );
   }
 
-  // Optional extra seeding from match ids/urls (still handy as a backup)
+  // Optional backup seeding from match ids/urls
   const fromUrls = parseMatchIdsFromUrls(SEED_MATCH_URLS);
   const matchSeedIds = Array.from(new Set([...SEED_MATCH_IDS, ...fromUrls]));
   if (matchSeedIds.length) {
@@ -1100,7 +1121,6 @@ async function main() {
   await writeJson(PUUID_CURSORS_PATH, puuidCursors);
   await writeJson(AGG_STATE_PATH, agg);
 
-  // finalize step (writes meta_builds_ranked.json + meta_builds_casual.json from cached matches)
   await finalizeOutputsFromCache();
 
   console.log("Done.");
