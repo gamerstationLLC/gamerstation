@@ -13,7 +13,6 @@ const CACHE_MATCHES_DIR = path.join(CACHE_DIR, "matches");
 const CACHE_TIMELINES_DIR = path.join(CACHE_DIR, "timelines");
 const CACHE_STATE_DIR = path.join(CACHE_DIR, "state");
 
-const SEEDS_PATH = path.join(ROOT, "scripts", "riot", "seeds.json");
 const SEEN_MATCH_IDS_PATH = path.join(CACHE_STATE_DIR, "seen_match_ids.json");
 const SEEN_PUUIDS_PATH = path.join(CACHE_STATE_DIR, "seen_puuids.json");
 const AGG_STATE_PATH = path.join(CACHE_STATE_DIR, "agg_state.json");
@@ -24,7 +23,12 @@ const OUT_CASUAL_PATH = path.join(ROOT, "public", "data", "lol", "meta_builds_ca
 
 // env
 const RIOT_API_KEY = process.env.RIOT_API_KEY || "";
-const RIOT_REGION = (process.env.RIOT_REGION || "americas").trim(); // match-v5 + riot account
+
+// ✅ regional (match-v5 + account-v1)
+const RIOT_REGION = (process.env.RIOT_REGION || "americas").trim();
+
+// ✅ platform (league-v4 + summoner-v4)
+const RIOT_PLATFORM = (process.env.RIOT_PLATFORM || "na1").trim();
 
 const MAX_MATCHES_PER_RUN = Number(process.env.MAX_MATCHES_PER_RUN || 2500);
 const MAX_NEW_PUUIDS_PER_RUN = Number(process.env.MAX_NEW_PUUIDS_PER_RUN || 250);
@@ -38,12 +42,27 @@ const BAYES_K = Number(process.env.BAYES_K || 100);
 const PRIOR_WINRATE = Number(process.env.PRIOR_WINRATE || 0.5);
 
 const PATCH_MAJOR_MINOR_ONLY = String(process.env.PATCH_MAJOR_MINOR_ONLY || "1") !== "0";
-const REPROCESS_SEEDS = String(process.env.REPROCESS_SEEDS || "1") === "1";
 
+// cache scan / fallback knobs
 const CACHE_SCAN_LIMIT = Number(process.env.CACHE_SCAN_LIMIT || 0);
 const ALLOW_LOW_SAMPLE_FALLBACK = String(process.env.ALLOW_LOW_SAMPLE_FALLBACK || "0") === "1";
 
-// ✅ NEW: seed via match ids/urls (regional-only)
+// ✅ NEW: ladder bootstrap knobs
+// queue for ladder listing (league-v4 expects these exact strings)
+type LadderQueue = "RANKED_SOLO_5x5" | "RANKED_FLEX_SR";
+const LADDER_QUEUE = (process.env.LADDER_QUEUE || "RANKED_SOLO_5x5").trim() as LadderQueue;
+
+// tier controls which league endpoint is used
+type LadderTier = "challenger" | "grandmaster" | "master";
+const LADDER_TIER = (process.env.LADDER_TIER || "challenger").trim().toLowerCase() as LadderTier;
+
+// how many ladder players to take as initial bootstrap PUUIDs
+const LADDER_MAX_PLAYERS = Number(process.env.LADDER_MAX_PLAYERS || 250);
+
+// whether to reprocess bootstrap PUUIDs even if seen
+const REPROCESS_BOOTSTRAP = String(process.env.REPROCESS_BOOTSTRAP || "0") === "1";
+
+// ✅ optional: seed via match ids/urls (regional-only) — still useful if ladder is blocked
 const SEED_MATCH_IDS = String(process.env.SEED_MATCH_IDS || "")
   .split(",")
   .map((s) => s.trim())
@@ -63,17 +82,13 @@ console.log(
   "[env] RIOT_API_KEY:",
   process.env.RIOT_API_KEY ? `present len=${process.env.RIOT_API_KEY.length}` : "MISSING"
 );
-console.log("[env] RIOT_REGION:", RIOT_REGION);
-console.log("[env] Seeds: SEED_MATCH_IDS:", SEED_MATCH_IDS.length, "SEED_MATCH_URLS:", SEED_MATCH_URLS.length);
-console.log("[note] Platform endpoints are not used in this script (works even if your key gets 403 on na1).");
+console.log("[env] RIOT_REGION (match-v5):", RIOT_REGION);
+console.log("[env] RIOT_PLATFORM (league/summoner):", RIOT_PLATFORM);
+console.log("[env] LADDER_TIER/QUEUE/MAX:", LADDER_TIER, LADDER_QUEUE, LADDER_MAX_PLAYERS);
+console.log("[env] Seed extras: SEED_MATCH_IDS:", SEED_MATCH_IDS.length, "SEED_MATCH_URLS:", SEED_MATCH_URLS.length);
 
 const QUEUE_RANKED = 420;
 const QUEUES_CASUAL = new Set<number>([400, 430]);
-
-type SeedsFile = {
-  riotIds?: Array<{ gameName: string; tagLine: string }>; // kept for compatibility (unused)
-  puuids?: string[];
-};
 
 type SeenMatchIdsState = { ids: string[] };
 type SeenPuuidsState = { puuids: string[] };
@@ -101,33 +116,6 @@ type AggState = {
 
 type Role = "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY";
 
-type OutputMetaBuilds = {
-  generatedAt: string;
-  queues: number[];
-  useTimeline: boolean;
-  patchMajorMinorOnly: boolean;
-  minSample: number;
-  minDisplaySample: number;
-  bayesK: number;
-  priorWinrate: number;
-  patches: {
-    [patch: string]: {
-      [champId: string]: {
-        [role: string]: {
-          boots: number | null;
-          core: number[];
-          games: number;
-          wins: number;
-          winrate: number;
-          score: number;
-          buildSig: string;
-          lowSample?: boolean;
-        };
-      };
-    };
-  };
-};
-
 function assertEnv() {
   if (!RIOT_API_KEY || !RIOT_API_KEY.startsWith("RGAPI-")) {
     throw new Error("Missing/invalid RIOT_API_KEY. Put it in .env.local as RIOT_API_KEY=RGAPI-...");
@@ -139,15 +127,6 @@ async function ensureDirs() {
   await fs.mkdir(CACHE_MATCHES_DIR, { recursive: true });
   await fs.mkdir(CACHE_TIMELINES_DIR, { recursive: true });
   await fs.mkdir(CACHE_STATE_DIR, { recursive: true });
-
-  try {
-    await fs.access(SEEDS_PATH);
-  } catch {
-    const template: SeedsFile = { riotIds: [], puuids: [] };
-    await fs.mkdir(path.dirname(SEEDS_PATH), { recursive: true });
-    await fs.writeFile(SEEDS_PATH, JSON.stringify(template, null, 2), "utf-8");
-    console.log(`Created seeds file at: ${SEEDS_PATH}`);
-  }
 
   await ensureJson(SEEN_MATCH_IDS_PATH, { ids: [] } satisfies SeenMatchIdsState);
   await ensureJson(SEEN_PUUIDS_PATH, { puuids: [] } satisfies SeenPuuidsState);
@@ -183,8 +162,16 @@ function riotRegionalBase() {
   return `https://${RIOT_REGION}.api.riotgames.com`;
 }
 
-async function fetchRegionalJson(url: string, opts?: { retries?: number }): Promise<any> {
+function riotPlatformBase() {
+  return `https://${RIOT_PLATFORM}.api.riotgames.com`;
+}
+
+async function fetchJsonWithRetry(
+  url: string,
+  opts?: { retries?: number; kind?: "regional" | "platform" }
+): Promise<any> {
   const retries = opts?.retries ?? 5;
+  const kind = opts?.kind ?? "regional";
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     const res = await fetch(url, {
@@ -197,27 +184,35 @@ async function fetchRegionalJson(url: string, opts?: { retries?: number }): Prom
     if (res.status === 429) {
       const ra = res.headers.get("Retry-After");
       const waitMs = ra ? Number(ra) * 1000 : 1200 + attempt * 800;
-      console.log(`429 rate limited (regional). Waiting ${waitMs}ms then retrying...`);
+      console.log(`429 rate limited (${kind}). Waiting ${waitMs}ms then retrying...`);
       await sleep(waitMs);
       continue;
     }
 
     if (res.status >= 500 && attempt < retries) {
       const waitMs = 800 + attempt * 600;
-      console.log(`${res.status} server error (regional). Waiting ${waitMs}ms then retrying...`);
+      console.log(`${res.status} server error (${kind}). Waiting ${waitMs}ms then retrying...`);
       await sleep(waitMs);
       continue;
     }
 
     if (!res.ok) {
       const txt = await res.text().catch(() => "");
-      throw new Error(`Regional fetch failed: ${res.status} ${url}\n${txt}`);
+      throw new Error(`${kind} fetch failed: ${res.status} ${url}\n${txt}`);
     }
 
     return res.json();
   }
 
-  throw new Error(`Regional fetch failed after retries: ${url}`);
+  throw new Error(`${opts?.kind || "fetch"} failed after retries: ${url}`);
+}
+
+async function fetchRegionalJson(url: string, opts?: { retries?: number }) {
+  return fetchJsonWithRetry(url, { retries: opts?.retries, kind: "regional" });
+}
+
+async function fetchPlatformJson(url: string, opts?: { retries?: number }) {
+  return fetchJsonWithRetry(url, { retries: opts?.retries, kind: "platform" });
 }
 
 // Match-v5 ids (regional, paged)
@@ -520,7 +515,6 @@ function shouldIngestQueue(queueId: number) {
 function parseMatchIdsFromUrls(urls: string[]): string[] {
   const ids: string[] = [];
   for (const u of urls) {
-    // Common pattern: ".../matches/NA1_1234567890" or contains "NA1_..."
     const m = u.match(/([A-Z]{2,4}1?_\d{6,})/);
     if (m?.[1]) ids.push(m[1]);
   }
@@ -546,29 +540,96 @@ async function seedPuuidsFromMatchIds(matchIds: string[]): Promise<string[]> {
   return Array.from(new Set(puuids));
 }
 
+// ===============================
+// ✅ Ladder bootstrap (league-v4 + summoner-v4 -> PUUIDs)
+// ===============================
+type LeagueList = {
+  tier?: string;
+  name?: string;
+  queue?: string;
+  entries?: Array<{ summonerId: string; summonerName?: string; leaguePoints?: number }>;
+};
+
+type SummonerDTO = {
+  id?: string;
+  puuid?: string;
+  name?: string;
+};
+
+async function fetchLadderLeague(): Promise<LeagueList> {
+  const base = riotPlatformBase();
+  const q = encodeURIComponent(LADDER_QUEUE);
+
+  let url: string;
+  if (LADDER_TIER === "grandmaster") url = `${base}/lol/league/v4/grandmasterleagues/by-queue/${q}`;
+  else if (LADDER_TIER === "master") url = `${base}/lol/league/v4/masterleagues/by-queue/${q}`;
+  else url = `${base}/lol/league/v4/challengerleagues/by-queue/${q}`;
+
+  return (await fetchPlatformJson(url)) as LeagueList;
+}
+
+async function fetchSummonerById(encSummonerId: string): Promise<SummonerDTO> {
+  const url = `${riotPlatformBase()}/lol/summoner/v4/summoners/${encodeURIComponent(encSummonerId)}`;
+  return (await fetchPlatformJson(url)) as SummonerDTO;
+}
+
+async function ladderBootstrapPuuids(): Promise<string[]> {
+  const league = await fetchLadderLeague();
+  const entries = Array.isArray(league.entries) ? league.entries : [];
+
+  // sort by LP desc (if present) and take top N
+  entries.sort((a, b) => Number(b.leaguePoints || 0) - Number(a.leaguePoints || 0));
+  const top = entries.slice(0, Math.max(0, LADDER_MAX_PLAYERS));
+
+  console.log(
+    `[ladder] ${LADDER_TIER} ${LADDER_QUEUE}: entries=${entries.length}, using=${top.length} (top LP)`
+  );
+
+  const puuids: string[] = [];
+  let ok = 0;
+  let fail = 0;
+
+  // simple sequential to stay safe on rate limits (429 logic already inside fetch)
+  for (const e of top) {
+    const sid = String(e?.summonerId || "").trim();
+    if (!sid) continue;
+    try {
+      const s = await fetchSummonerById(sid);
+      const pu = String(s?.puuid || "").trim();
+      if (pu) {
+        puuids.push(pu);
+        ok++;
+      } else {
+        fail++;
+      }
+    } catch (err: any) {
+      fail++;
+      console.warn(`[ladder] summoner fetch failed: ${sid.slice(0, 6)}… ${err?.message || err}`);
+    }
+  }
+
+  console.log(`[ladder] puuids resolved: ok=${ok} fail=${fail} unique=${new Set(puuids).size}`);
+  return Array.from(new Set(puuids));
+}
 
 // ===============================
 // Finalize outputs from cached Match-V5 JSONs
-// (replaces the old "transfer/aggregate -> UI" step that could produce noisy patch buckets / low-sample builds)
 // ===============================
 
 type FinalizeRole = "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY";
 
 type BuildParts = {
   boots: number | null;
-  core: number[]; // up to 3
-  items: number[]; // boots + core (display)
-  summoners: number[]; // display only
+  core: number[];
+  items: number[];
+  summoners: number[];
 };
 
 type Leaf = { games: number; wins: number; build: BuildParts };
 
 type FinalizeAgg = Record<
-  string, // patchKey (e.g. "16+")
-  Record<
-    string, // champId
-    Partial<Record<FinalizeRole, Record<string, Leaf>>> // role -> sig -> leaf
-  >
+  string,
+  Record<string, Partial<Record<FinalizeRole, Record<string, Leaf>>>>
 >;
 
 function patchMajor(gameVersion: string | undefined): number | null {
@@ -726,7 +787,6 @@ function topBuildsForRole(
         score: Number(score.toFixed(6)),
       };
     })
-    // ✅ suppress low sample entirely so 1-game 100% never appears in UI
     .filter((x) => x.games >= minDisplaySample)
     .sort((a, b) => {
       if (b.games !== a.games) return b.games - a.games;
@@ -869,11 +929,11 @@ async function finalizeOutputsFromCache() {
   console.log(`[finalize] Wrote: ${OUT_RANKED_PATH}`);
   console.log(`[finalize] Wrote: ${OUT_CASUAL_PATH}`);
 }
+
 async function main() {
   assertEnv();
   await ensureDirs();
 
-  const seeds = await readJson<SeedsFile>(SEEDS_PATH);
   let seenMatchIds = await readJson<SeenMatchIdsState>(SEEN_MATCH_IDS_PATH);
   let seenPuuidsState = await readJson<SeenPuuidsState>(SEEN_PUUIDS_PATH);
   const agg = await readJson<AggState>(AGG_STATE_PATH);
@@ -889,18 +949,24 @@ async function main() {
   const cacheIngested = await scanCacheAndIngest(agg);
   console.log(`Ingested cached matches this run: ${cacheIngested}`);
 
+  // ✅ Bootstrap PUUID queue from ladder instead of seeds.json
   const puuidQueue: string[] = [];
-  const seedPuuids = new Set<string>();
+  const bootstrapPuuids = new Set<string>();
 
-  // seeds.puuids (manual)
-  for (const p of seeds.puuids || (seeds as any).puuids || []) {
-    const pu = String(p || "").trim();
-    if (!pu) continue;
-    seedPuuids.add(pu);
-    puuidQueue.push(pu);
+  try {
+    const ladderPuuids = await ladderBootstrapPuuids();
+    for (const pu of ladderPuuids) {
+      bootstrapPuuids.add(pu);
+      puuidQueue.push(pu);
+    }
+  } catch (e: any) {
+    console.warn(
+      `[ladder] bootstrap failed: ${e?.message || e}\n` +
+        "You can still seed via SEED_MATCH_IDS / SEED_MATCH_URLS in .env.local if ladder endpoints are blocked."
+    );
   }
 
-  // ✅ seed via match IDs / urls
+  // Optional extra seeding from match ids/urls (still handy as a backup)
   const fromUrls = parseMatchIdsFromUrls(SEED_MATCH_URLS);
   const matchSeedIds = Array.from(new Set([...SEED_MATCH_IDS, ...fromUrls]));
   if (matchSeedIds.length) {
@@ -908,20 +974,20 @@ async function main() {
     const puuids = await seedPuuidsFromMatchIds(matchSeedIds);
     console.log(`Seeded ${puuids.length} unique puuids from match ids.`);
     for (const pu of puuids) {
-      seedPuuids.add(pu);
+      bootstrapPuuids.add(pu);
       puuidQueue.push(pu);
     }
   }
 
-  // dedupe
+  // dedupe queue
   const uniqueQueue = Array.from(new Set(puuidQueue));
   puuidQueue.length = 0;
   puuidQueue.push(...uniqueQueue);
 
-  console.log(`Seed queue initialized with ${puuidQueue.length} puuids.`);
+  console.log(`Bootstrap queue initialized with ${puuidQueue.length} puuids.`);
   if (!puuidQueue.length) {
     console.log(
-      "No seeds available. Add at least one PUUID in scripts/riot/seeds.json OR provide SEED_MATCH_IDS/SEED_MATCH_URLS in .env.local."
+      "No bootstrap seeds available. Set RIOT_PLATFORM + LADDER_TIER/LADDER_QUEUE, or provide SEED_MATCH_IDS/SEED_MATCH_URLS."
     );
   }
 
@@ -932,10 +998,10 @@ async function main() {
     if (matchesProcessed >= MAX_MATCHES_PER_RUN) break;
 
     const puuid = puuidQueue.shift()!;
-    const isSeed = seedPuuids.has(puuid);
+    const isBootstrap = bootstrapPuuids.has(puuid);
 
-    if (!isSeed && seenPuuids.has(puuid)) continue;
-    if (isSeed && !REPROCESS_SEEDS && seenPuuids.has(puuid)) continue;
+    if (!isBootstrap && seenPuuids.has(puuid)) continue;
+    if (isBootstrap && !REPROCESS_BOOTSTRAP && seenPuuids.has(puuid)) continue;
 
     const start = Number(puuidCursors[puuid] || 0);
 
@@ -1033,9 +1099,8 @@ async function main() {
   await writeJson(SEEN_PUUIDS_PATH, { puuids: Array.from(seenPuuids) } satisfies SeenPuuidsState);
   await writeJson(PUUID_CURSORS_PATH, puuidCursors);
   await writeJson(AGG_STATE_PATH, agg);
-  // ---- Output finalize step ----
-  // Instead of "transfering" the incremental agg_state into a single-best-build-per-role structure (which could create
-  // noisy patch buckets and low-sample 100% winrate previews), we now finalize from cached matches.
+
+  // finalize step (writes meta_builds_ranked.json + meta_builds_casual.json from cached matches)
   await finalizeOutputsFromCache();
 
   console.log("Done.");
