@@ -10,10 +10,16 @@
     "lol:fetch": "node scripts/fetch-lol-ddragon.mjs",
     "lol:items": "node scripts/fetch-lol-items.mjs",
     "lol:update": "npm run lol:fetch && npm run lol:items",
-    "bloxfruits:items": "node scripts/bloxfruits/build-items.mjs"
+    "bloxfruits:items": "node scripts/bloxfruits/build-items.mjs",
+    "lol:update:data": "node scripts/fetch-lol-ddragon.mjs && node scripts/fetch-lol-items.mjs",
+    "lol:update:overrides": "node scripts/gen_spells_overrides.mjs",
+    "lol:finalize:meta": "tsx scripts/riot/finalize-meta-builds-from-cache.ts",
+    "lol:update:meta": "tsx scripts/riot/build-meta-builds.ts && npm run lol:finalize:meta",
+    "lol:update:all": "npm run lol:update:data && npm run lol:update:overrides && npm run lol:update:meta"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
+    "dotenv": "^17.2.3",
     "next": "16.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3"

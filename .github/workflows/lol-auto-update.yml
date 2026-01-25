@@ -1,0 +1,83 @@
+name: Auto Update LoL Data
+
+on:
+  schedule:
+    - cron: "15 */6 * * *" # every 6 hours
+  workflow_dispatch: {}
+
+concurrency:
+  group: lol-auto-update
+  cancel-in-progress: true
+
+jobs:
+  lol:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Cache Riot data
+        uses: actions/cache@v4
+        with:
+          path: |
+            scripts/riot/cache/matches
+            scripts/riot/cache/timelines
+            scripts/riot/cache/state
+          key: lol-riot-cache-v1
+          restore-keys: |
+            lol-riot-cache-v1
+
+      - name: Update LoL base data + items
+        run: npm run lol:update:data
+
+      - name: Update spells overrides
+        run: npm run lol:update:overrides
+
+      - name: Update meta builds
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
+          RIOT_REGION: americas
+
+          # crawl knobs
+          MAX_MATCHES_PER_RUN: "20000"
+          MAX_NEW_PUUIDS_PER_RUN: "4000"
+          MATCHES_PER_PUUID: "100"
+
+          # output knobs
+          USE_TIMELINE: "0"
+          MIN_DISPLAY_SAMPLE: "25"
+          ALLOW_LOW_SAMPLE_FALLBACK: "0"
+          BAYES_K: "100"
+          PRIOR_WINRATE: "0.5"
+          PATCH_MAJOR_MINOR_ONLY: "1"
+          REPROCESS_SEEDS: "1"
+          CACHE_SCAN_LIMIT: "0"
+        run: npm run lol:update:meta
+
+      - name: Commit updates (if changed)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # adjust if your scripts write elsewhere, but this is usually correct:
+          git add public/data/lol
+          git add scripts/riot/cache/state || true
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(lol): automated refresh"
+          git push

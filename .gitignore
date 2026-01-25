@@ -43,3 +43,5 @@ node_modules/
 .next/
 .env*
 
+# Riot meta-build cache (do NOT commit)
+scripts/riot/cache/
