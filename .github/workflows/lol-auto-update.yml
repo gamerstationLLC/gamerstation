@@ -15,7 +15,6 @@ permissions:
 jobs:
   lol:
     runs-on: ubuntu-latest
-    timeout-minutes: 300   # ← 5 hour hard limit added
 
     steps:
       - name: Checkout
@@ -68,7 +67,10 @@ jobs:
           PATCH_MAJOR_MINOR_ONLY: "1"
           REPROCESS_BOOTSTRAP: "1"
           CACHE_SCAN_LIMIT: "0"
-        run: npm run lol:update:all
+        run: |
+          set -e
+          # Soft timeout: stop crawl at ~4h59m so commit & push can run
+          timeout 17940 npm run lol:update:all || true
 
       - name: Commit & push (if changed)
         run: |
