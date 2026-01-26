@@ -11,7 +11,6 @@ concurrency:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   lol:
@@ -48,13 +47,13 @@ jobs:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           RIOT_REGION: americas
 
-          # ✅ seed discovery (fixes "No bootstrap seeds available")
+          # seed discovery
           RIOT_PLATFORM: na1
           LADDER_QUEUE: RANKED_SOLO_5x5
           LADDER_TIER: challenger
-          LADDER_MAX: "250"
+          LADDER_MAX_PLAYERS: "250"
 
-          # crawl knobs
+          # crawl knobs (these are VERY aggressive; fine if you’re okay with long backoffs)
           MAX_MATCHES_PER_RUN: "20000"
           MAX_NEW_PUUIDS_PER_RUN: "4000"
           MATCHES_PER_PUUID: "100"
@@ -66,17 +65,21 @@ jobs:
           BAYES_K: "100"
           PRIOR_WINRATE: "0.5"
           PATCH_MAJOR_MINOR_ONLY: "1"
-          REPROCESS_SEEDS: "1"
+          REPROCESS_BOOTSTRAP: "1"
           CACHE_SCAN_LIMIT: "0"
         run: npm run lol:update:all
 
-      - name: Create Pull Request (if changed)
-        uses: peter-evans/create-pull-request@v6
-        with:
-          commit-message: "chore(lol): automated refresh"
-          title: "chore(lol): automated refresh"
-          body: "Automated LoL data refresh (base data, overrides, meta builds)."
-          branch: "bot/lol-auto-update"
-          delete-branch: true
-          add-paths: |
-            public/data/lol
+      - name: Commit & push (if changed)
+        run: |
+          git status --porcelain
+          if [ -z "$(git status --porcelain public/data/lol)" ]; then
+            echo "No changes in public/data/lol. Skipping commit."
+            exit 0
+          fi
+
+          git config user.name "gamerstation-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add public/data/lol
+          git commit -m "chore(lol): automated refresh"
+          git push
