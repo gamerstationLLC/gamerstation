@@ -42,6 +42,26 @@ jobs:
           restore-keys: |
             lol-riot-cache-v1
 
+      # 🔥 KEEP ONLY LAST 90 DAYS OF MATCH DATA
+      - name: Prune old Riot cache (90 days)
+        run: |
+          echo "Pruning Riot cache older than 90 days..."
+
+          CUTOFF=$(date -d "90 days ago" +%s)
+
+          for DIR in scripts/riot/cache/matches scripts/riot/cache/timelines; do
+            if [ -d "$DIR" ]; then
+              find "$DIR" -type f -name "*.json" | while read file; do
+                mtime=$(stat -c %Y "$file")
+                if [ "$mtime" -lt "$CUTOFF" ]; then
+                  rm "$file"
+                fi
+              done
+            fi
+          done
+
+          echo "Cache pruning complete."
+
       - name: Update ALL LoL data (data + overrides + meta + finalize)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
@@ -76,7 +96,6 @@ jobs:
         run: |
           set -e
 
-          # Only commit if LoL output changed
           if [ -z "$(git status --porcelain public/data/lol)" ]; then
             echo "No changes in public/data/lol. Skipping commit."
             exit 0
