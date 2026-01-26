@@ -87,4 +87,4 @@ jobs:
 
           git add public/data/lol
           git commit -m "chore(lol): automated refresh"
-          git push
+          git push origin main

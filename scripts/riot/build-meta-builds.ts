@@ -894,114 +894,152 @@ async function writeFinalizeOut(outPath: string, queues: number[], agg: Finalize
   await fs.writeFile(outPath, JSON.stringify(obj, null, 2), "utf-8");
 }
 
-async function finalizeOutputsFromCache() {
-  const repoRoot = process.cwd();
-  const cacheMatchesDir = CACHE_MATCHES_DIR;
-
+async function finalizeOutputsFromAggState(agg: AggState) {
   const rankedQueues = [QUEUE_RANKED];
   const casualQueues = Array.from(QUEUES_CASUAL);
 
   const minPatchMajor = Number(process.env.MIN_PATCH_MAJOR || 16);
-  const patchKey = `${minPatchMajor}+`;
 
-  const bootSet = await loadBootSet(repoRoot);
-
-  const files = await listJsonFiles(cacheMatchesDir, CACHE_SCAN_LIMIT);
-
-  // ✅ IMPORTANT: do NOT throw if empty (this was causing “finalize step” failures in CI)
-  if (!files.length) {
-    console.warn("[finalize] No cached matches found at:", cacheMatchesDir);
-    console.warn("[finalize] Skipping finalize (outputs unchanged).");
-    return;
-  }
-
-  const rankedAgg: FinalizeAgg = {};
-  const casualAgg: FinalizeAgg = {};
-
-  const debug = {
-    filesRead: 0,
-    jsonParseFail: 0,
-    noInfo: 0,
-    queueNotTracked: 0,
-    patchTooOld: 0,
-    noParticipants: 0,
-    badChamp: 0,
-    badRole: 0,
-    keptParticipants: 0,
+  // We’ll output builds per *patch string* already in agg (e.g. "15.1", "15.2")
+  // but only keep patches whose major >= minPatchMajor
+  const rankedOut: any = {
+    generatedAt: new Date().toISOString(),
+    queues: rankedQueues,
+    useTimeline: USE_TIMELINE,
+    patchMajorMinorOnly: PATCH_MAJOR_MINOR_ONLY,
+    minSample: MIN_SAMPLE,
+    minDisplaySample: MIN_DISPLAY_SAMPLE,
+    bayesK: BAYES_K,
+    priorWinrate: PRIOR_WINRATE,
+    minPatchMajor,
+    patches: {} as Record<string, any>,
   };
 
-  for (const fp of files) {
-    let match: any = null;
-    try {
-      const raw = await fs.readFile(fp, "utf-8");
-      match = JSON.parse(raw);
-    } catch {
-      debug.jsonParseFail += 1;
-      continue;
-    }
+  const casualOut: any = {
+    generatedAt: new Date().toISOString(),
+    queues: casualQueues,
+    useTimeline: USE_TIMELINE,
+    patchMajorMinorOnly: PATCH_MAJOR_MINOR_ONLY,
+    minSample: MIN_SAMPLE,
+    minDisplaySample: MIN_DISPLAY_SAMPLE,
+    bayesK: BAYES_K,
+    priorWinrate: PRIOR_WINRATE,
+    minPatchMajor,
+    patches: {} as Record<string, any>,
+  };
 
-    debug.filesRead += 1;
+  const debug = {
+    patchesTotal: 0,
+    patchesKept: 0,
+    bucketsRanked: 0,
+    bucketsCasual: 0,
+  };
 
-    const info = match?.info;
-    if (!info) {
-      debug.noInfo += 1;
-      continue;
-    }
+  const majorOfPatchKey = (patchKey: string): number | null => {
+    // patchKey like "15.1" or "15.1.123"
+    const m = String(patchKey).match(/^(\d+)\./);
+    if (!m) return null;
+    const n = Number(m[1]);
+    return Number.isFinite(n) ? n : null;
+  };
 
-    const q = Number(info.queueId || 0);
-    const tracked = rankedQueues.includes(q) || casualQueues.includes(q);
-    if (!tracked) {
-      debug.queueNotTracked += 1;
-      continue;
-    }
+  // Helper: choose top builds for a given roleBucket (sig -> AggBucket)
+  function topFromRoleBucket(roleBucket: Record<string, AggBucket>) {
+    const entries = Object.entries(roleBucket || {})
+      .map(([sig, b]) => {
+        const games = Number(b?.games || 0);
+        const wins = Number(b?.wins || 0);
+        const winrate = games > 0 ? wins / games : 0;
+        const score = bayesWr(wins, games); // your bayes wr
+        return {
+          buildSig: sig,
+          boots: b?.boots ?? null,
+          core: Array.isArray(b?.core) ? b.core : [],
+          games,
+          wins,
+          winrate: Number(winrate.toFixed(4)),
+          score: Number(score.toFixed(6)),
+          lowSample: games < MIN_DISPLAY_SAMPLE,
+        };
+      })
+      .filter((x) => x.games >= MIN_DISPLAY_SAMPLE)
+      .sort((a, b) => {
+        // Primary: games desc, secondary: score desc (you can swap if you prefer)
+        if (b.games !== a.games) return b.games - a.games;
+        return b.score - a.score;
+      });
 
-    const major = patchMajor(info.gameVersion);
-    if (!major || major < minPatchMajor) {
-      debug.patchTooOld += 1;
-      continue;
-    }
+    return entries.slice(0, 10);
+  }
 
-    const participants = Array.isArray(info.participants) ? info.participants : [];
-    if (!participants.length) {
-      debug.noParticipants += 1;
-      continue;
-    }
+  for (const [patchKey, queuesObj] of Object.entries(agg || {})) {
+    debug.patchesTotal += 1;
 
-    for (const p of participants) {
-      const champId = Number(p?.championId || 0);
-      if (!champId) {
-        debug.badChamp += 1;
-        continue;
+    const major = majorOfPatchKey(patchKey);
+    if (!major || major < minPatchMajor) continue;
+
+    debug.patchesKept += 1;
+
+    // ranked
+    const rankedQueueObj = queuesObj?.[String(QUEUE_RANKED)] || null;
+    if (rankedQueueObj) {
+      for (const [champId, rolesObj] of Object.entries(rankedQueueObj)) {
+        for (const [role, roleBucket] of Object.entries(rolesObj as any)) {
+          const top = topFromRoleBucket(roleBucket as Record<string, AggBucket>);
+          if (!top.length) continue;
+
+          rankedOut.patches[patchKey] ||= {};
+          rankedOut.patches[patchKey][champId] ||= {};
+          rankedOut.patches[patchKey][champId][role] = top;
+
+          debug.bucketsRanked += 1;
+        }
       }
+    }
 
-      const role = normPos(p?.teamPosition);
-      if (!role) {
-        debug.badRole += 1;
-        continue;
+    // casual (queue 400/430)
+    for (const q of casualQueues) {
+      const qObj = queuesObj?.[String(q)] || null;
+      if (!qObj) continue;
+
+      for (const [champId, rolesObj] of Object.entries(qObj)) {
+        for (const [role, roleBucket] of Object.entries(rolesObj as any)) {
+          const top = topFromRoleBucket(roleBucket as Record<string, AggBucket>);
+          if (!top.length) continue;
+
+          casualOut.patches[patchKey] ||= {};
+          casualOut.patches[patchKey][champId] ||= {};
+          casualOut.patches[patchKey][champId][role] = top;
+
+          debug.bucketsCasual += 1;
+        }
       }
-
-      const build = extractBootsAndCore(p, bootSet);
-      if (!build.core.length && !build.boots) continue;
-
-      const sig = finalizeBuildSig(build);
-      const win = Boolean(p?.win);
-
-      debug.keptParticipants += 1;
-
-      if (rankedQueues.includes(q)) incFinalize(rankedAgg, patchKey, champId, role, sig, win, build);
-      if (casualQueues.includes(q)) incFinalize(casualAgg, patchKey, champId, role, sig, win, build);
     }
   }
 
-  console.log("[finalize] DEBUG:", debug);
+  console.log("[finalize-from-agg] DEBUG:", debug);
 
-  await writeFinalizeOut(OUT_RANKED_PATH, rankedQueues, rankedAgg, minPatchMajor);
-  await writeFinalizeOut(OUT_CASUAL_PATH, casualQueues, casualAgg, minPatchMajor);
+  // ✅ Never nuke ranked output
+  const rankedHasAny = Object.keys(rankedOut.patches || {}).length > 0;
+  if (!rankedHasAny) {
+    throw new Error("[finalize-from-agg] Ranked patches empty — refusing to overwrite output");
+  }
 
+  await fs.mkdir(path.dirname(OUT_RANKED_PATH), { recursive: true });
+  await fs.writeFile(OUT_RANKED_PATH, JSON.stringify(rankedOut, null, 2), "utf-8");
+  console.log(`[finalize-from-agg] Wrote: ${OUT_RANKED_PATH}`);
 
-  console.log(`[finalize] Wrote: ${OUT_RANKED_PATH}`);
-  console.log(`[finalize] Wrote: ${OUT_CASUAL_PATH}`);
+  // ✅ Casual: only overwrite if there is data
+  const casualHasAny = Object.keys(casualOut.patches || {}).length > 0;
+  if (!casualHasAny) {
+    console.warn("[finalize-from-agg] Casual empty — keeping previous file (no overwrite).");
+  } else {
+    await fs.mkdir(path.dirname(OUT_CASUAL_PATH), { recursive: true });
+    await fs.writeFile(OUT_CASUAL_PATH, JSON.stringify(casualOut, null, 2), "utf-8");
+    console.log(`[finalize-from-agg] Wrote: ${OUT_CASUAL_PATH}`);
+  }
 }
+
 
 async function main() {
   assertEnv();
@@ -1173,7 +1211,8 @@ async function main() {
   await writeJson(PUUID_CURSORS_PATH, puuidCursors);
   await writeJson(AGG_STATE_PATH, agg);
 
-  await finalizeOutputsFromCache();
+  await finalizeOutputsFromAggState(agg);
+
 
   console.log("Done.");
   console.log(`Processed matches this run: ${matchesProcessed} (budget=${MAX_MATCHES_PER_RUN})`);
