@@ -534,19 +534,16 @@ async function seedPuuidsFromMatchIds(matchIds: string[]): Promise<string[]> {
 
   return Array.from(new Set(puuids));
 }
-
 // ===============================
 // ✅ Ladder bootstrap (league-v4 + summoner-v4 -> PUUIDs)
 // ===============================
+type LeagueEntryAny = Record<string, any>;
+
 type LeagueList = {
   tier?: string;
   name?: string;
   queue?: string;
-  entries?: Array<{
-    summonerId?: string;
-    summonerName?: string;
-    leaguePoints?: number;
-  }>;
+  entries?: LeagueEntryAny[];
 };
 
 type SummonerDTO = {
@@ -557,12 +554,14 @@ type SummonerDTO = {
 
 async function fetchLadderLeague(): Promise<LeagueList> {
   const base = riotPlatformBase();
-  const q = encodeURIComponent(LADDER_QUEUE);
+
+  // ✅ don't encode the queue in the path
+  const queuePath = LADDER_QUEUE; // "RANKED_SOLO_5x5" | "RANKED_FLEX_SR"
 
   let url: string;
-  if (LADDER_TIER === "grandmaster") url = `${base}/lol/league/v4/grandmasterleagues/by-queue/${q}`;
-  else if (LADDER_TIER === "master") url = `${base}/lol/league/v4/masterleagues/by-queue/${q}`;
-  else url = `${base}/lol/league/v4/challengerleagues/by-queue/${q}`;
+  if (LADDER_TIER === "grandmaster") url = `${base}/lol/league/v4/grandmasterleagues/by-queue/${queuePath}`;
+  else if (LADDER_TIER === "master") url = `${base}/lol/league/v4/masterleagues/by-queue/${queuePath}`;
+  else url = `${base}/lol/league/v4/challengerleagues/by-queue/${queuePath}`;
 
   return (await fetchPlatformJson(url)) as LeagueList;
 }
@@ -572,17 +571,29 @@ async function fetchSummonerById(encSummonerId: string): Promise<SummonerDTO> {
   return (await fetchPlatformJson(url)) as SummonerDTO;
 }
 
-// ✅ fallback that saves you when summonerId is missing/empty in the ladder payload
 async function fetchSummonerByName(summonerName: string): Promise<SummonerDTO> {
   const url = `${riotPlatformBase()}/lol/summoner/v4/summoners/by-name/${encodeURIComponent(summonerName)}`;
   return (await fetchPlatformJson(url)) as SummonerDTO;
+}
+
+function pickFirstString(obj: any, keys: string[]): string {
+  for (const k of keys) {
+    const v = obj?.[k];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return "";
 }
 
 async function ladderBootstrapPuuids(): Promise<string[]> {
   const league = await fetchLadderLeague();
   const entries = Array.isArray(league.entries) ? league.entries : [];
 
-  entries.sort((a, b) => Number(b.leaguePoints || 0) - Number(a.leaguePoints || 0));
+  console.log("[ladder] league keys:", league ? Object.keys(league as any) : "NONE");
+  console.log("[ladder] entries length:", entries.length);
+  console.log("[ladder] sample entry keys:", entries[0] ? Object.keys(entries[0] as any) : "NONE");
+  console.log("[ladder] sample entry:", entries[0] ?? null);
+
+  entries.sort((a, b) => Number(b?.leaguePoints || 0) - Number(a?.leaguePoints || 0));
   const top = entries.slice(0, Math.max(0, LADDER_MAX_PLAYERS));
 
   console.log(
@@ -596,21 +607,55 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
   let missingName = 0;
   let usedByName = 0;
 
-  for (const e of top) {
-    const sid = String(e?.summonerId || "").trim();
-    const sname = String(e?.summonerName || "").trim();
+  let loggedSample = false;
+
+  for (const anyE of top) {
+    // ✅ IMPORTANT: Riot ladder endpoints now provide puuid directly
+    const directPuuid = pickFirstString(anyE, ["puuid", "playerPuuid", "player_puuid"]);
+    if (directPuuid) {
+      puuids.push(directPuuid);
+      ok++;
+      continue;
+    }
+
+    // Fallback: older shapes that require summoner-v4 resolve
+    const sid = pickFirstString(anyE, [
+      "summonerId",
+      "summonerID",
+      "encryptedSummonerId",
+      "encryptedSummonerID",
+      "summoner_id",
+      "playerOrTeamId",
+      "playerOrTeamID",
+      "player_or_team_id",
+      "id",
+    ]);
+
+    const sname = pickFirstString(anyE, [
+      "summonerName",
+      "summonername",
+      "summoner_name",
+      "playerOrTeamName",
+      "player_or_team_name",
+      "name",
+    ]);
+
+    if (!sid && !sname) {
+      missingId++;
+      missingName++;
+      if (!loggedSample) {
+        loggedSample = true;
+        console.warn("[ladder] entry missing BOTH puuid + (id/name). Full sample:", anyE);
+        console.warn("[ladder] entry keys:", Object.keys(anyE || {}));
+      }
+      continue;
+    }
 
     try {
       let dto: SummonerDTO | null = null;
 
-      if (sid) {
-        dto = await fetchSummonerById(sid);
-      } else {
-        missingId++;
-        if (!sname) {
-          missingName++;
-          continue;
-        }
+      if (sid) dto = await fetchSummonerById(sid);
+      else {
         usedByName++;
         dto = await fetchSummonerByName(sname);
       }
@@ -628,14 +673,21 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
     }
   }
 
+  const unique = Array.from(new Set(puuids));
+
   console.log(
-    `[ladder] puuids resolved: ok=${ok} fail=${fail} missingId=${missingId} missingName=${missingName} byName=${usedByName} unique=${new Set(
-      puuids
-    ).size}`
+    `[ladder] puuids resolved: ok=${ok} fail=${fail} missingId=${missingId} missingName=${missingName} byName=${usedByName} unique=${unique.length}`
   );
 
-  return Array.from(new Set(puuids));
+  if (unique.length === 0) {
+    throw new Error(
+      `[ladder] bootstrap produced 0 PUUIDs. Your ladder entries contain neither "puuid" nor any resolvable summoner id/name.`
+    );
+  }
+
+  return unique;
 }
+
 
 // ===============================
 // Finalize outputs from cached Match-V5 JSONs
