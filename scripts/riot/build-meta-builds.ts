@@ -56,6 +56,8 @@ const LADDER_TIER = (process.env.LADDER_TIER || "challenger").trim().toLowerCase
 
 const LADDER_MAX_PLAYERS = Number(process.env.LADDER_MAX_PLAYERS || 250);
 const REPROCESS_BOOTSTRAP = String(process.env.REPROCESS_BOOTSTRAP || "0") === "1";
+const CACHE_MAX_AGE_DAYS = Number(process.env.CACHE_MAX_AGE_DAYS || 90);
+
 
 // ✅ optional: seed via match ids/urls (regional-only)
 const SEED_MATCH_IDS = String(process.env.SEED_MATCH_IDS || "")
@@ -152,6 +154,36 @@ async function writeJson(p: string, data: any) {
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
+
+async function pruneCacheByMtime(dir: string, maxAgeDays: number) {
+  const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
+  const cutoff = Date.now() - maxAgeMs;
+
+  let entries: string[] = [];
+  try {
+    entries = await fs.readdir(dir);
+  } catch {
+    return;
+  }
+
+  let removed = 0;
+  for (const name of entries) {
+    if (!name.endsWith(".json")) continue;
+    const fp = path.join(dir, name);
+    try {
+      const st = await fs.stat(fp);
+      if (st.mtimeMs < cutoff) {
+        await fs.unlink(fp);
+        removed++;
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  console.log(`[cache] Pruned ${removed} files from ${dir} older than ${maxAgeDays} days`);
+}
+
 
 function riotRegionalBase() {
   return `https://${RIOT_REGION}.api.riotgames.com`;
@@ -1044,6 +1076,12 @@ async function finalizeOutputsFromAggState(agg: AggState) {
 async function main() {
   assertEnv();
   await ensureDirs();
+
+ await pruneCacheByMtime(CACHE_MATCHES_DIR, CACHE_MAX_AGE_DAYS);
+if (USE_TIMELINE) {
+  await pruneCacheByMtime(CACHE_TIMELINES_DIR, CACHE_MAX_AGE_DAYS);
+}
+
 
   let seenMatchIds = await readJson<SeenMatchIdsState>(SEEN_MATCH_IDS_PATH);
   let seenPuuidsState = await readJson<SeenPuuidsState>(SEEN_PUUIDS_PATH);
