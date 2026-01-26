@@ -15,6 +15,7 @@ permissions:
 jobs:
   lol:
     runs-on: ubuntu-latest
+    timeout-minutes: 300   # ← 5 hour hard limit added
 
     steps:
       - name: Checkout
