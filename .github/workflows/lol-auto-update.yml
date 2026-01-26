@@ -47,13 +47,13 @@ jobs:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           RIOT_REGION: americas
 
-          # seed discovery
+          # ladder bootstrap
           RIOT_PLATFORM: na1
           LADDER_QUEUE: RANKED_SOLO_5x5
           LADDER_TIER: challenger
           LADDER_MAX_PLAYERS: "250"
 
-          # crawl knobs (these are VERY aggressive; fine if you’re okay with long backoffs)
+          # crawl knobs (aggressive; expect 429 backoffs sometimes)
           MAX_MATCHES_PER_RUN: "20000"
           MAX_NEW_PUUIDS_PER_RUN: "4000"
           MATCHES_PER_PUUID: "100"
@@ -71,7 +71,9 @@ jobs:
 
       - name: Commit & push (if changed)
         run: |
-          git status --porcelain
+          set -e
+
+          # Only commit if LoL output changed
           if [ -z "$(git status --porcelain public/data/lol)" ]; then
             echo "No changes in public/data/lol. Skipping commit."
             exit 0
