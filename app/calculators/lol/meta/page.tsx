@@ -37,9 +37,9 @@ export default function Page() {
           </Link>
         </div>
 
-        <h1 className="mt-6 text-3xl font-semibold tracking-tight">Current Meta</h1>
+        <h1 className="mt-6 text-3xl font-semibold tracking-tight">Current LoL Meta</h1>
         <p className="mt-2 text-sm text-white/65">
-          Toggle Ranked vs Casual, filter by patch and role, then expand champions to see boots + core build.
+          Best League of Legends builds, items, and meta champions for the current patch — ranked by real match data.
         </p>
 
         <div className="mt-6">

@@ -41,13 +41,30 @@ type MetaJson = {
   patches: Record<string, Record<string, Partial<Record<Role, MetaRoleEntry[]>>>>;
 };
 
+type ItemData = {
+  name?: string;
+  plaintext?: string;
+  description?: string;
+  gold?: { total?: number };
+  image?: { full?: string };
+  from?: string[];
+  into?: string[];
+  tags?: string[];
+  stats?: Record<string, number>;
+};
+
 type ItemsDdragon = {
   version?: string;
-  data?: Record<
-    string,
-    { name?: string; plaintext?: string; image?: { full?: string }; tags?: string[] }
-  >;
+  data?: Record<string, ItemData>;
 };
+
+function stripHtml(html: string) {
+  return String(html)
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
 
 function cx(...parts: Array<string | false | null | undefined>) {
   return parts.filter(Boolean).join(" ");
@@ -132,19 +149,29 @@ export default function MetaClient() {
 
   const [meta, setMeta] = useState<MetaJson | null>(null);
   const [champions, setChampions] = useState<ChampionRow[]>([]);
-  const [itemsById, setItemsById] = useState<Map<number, string>>(new Map());
+  const [itemsById, setItemsById] = useState<Map<number, ItemData>>(new Map());
 
   const [ddVersion, setDdVersion] = useState<string>("");
 
   const [patch, setPatch] = useState<string>("");
   const [role, setRole] = useState<RoleFilter>("ALL");
   const [q, setQ] = useState<string>("");
-
-  const [showItemNames, setShowItemNames] = useState<boolean>(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   // copy feedback
   const [copiedKey, setCopiedKey] = useState<string>("");
+
+  // ✅ mobile item tap feedback (since hover tooltips don't work on iOS)
+  const [itemToast, setItemToast] = useState<{ id: number; text: string } | null>(null);
+
+  // ✅ per-champ selected item (for showing only the name of what you tapped)
+  const [selectedItemByChamp, setSelectedItemByChamp] = useState<Record<string, number | null>>({});
+
+  // ✅ per-champ active role for the expanded view (shows only one role at a time)
+  const [activeRoleByChamp, setActiveRoleByChamp] = useState<Record<string, Role>>({});
+
+  // ✅ per-champ selected item in the expanded view (shows full info panel)
+  const [selectedExpandedItemByChamp, setSelectedExpandedItemByChamp] = useState<Record<string, number | null>>({});
 
   const CHAMPS_URL = "/data/lol/champions_index.json";
   const ITEMS_URL = "/data/lol/items.json";
@@ -171,12 +198,12 @@ export default function MetaClient() {
       if (!alive) return;
 
       if (itemsRaw?.data) {
-        const m = new Map<number, string>();
+        const m = new Map<number, ItemData>();
         for (const [k, v2] of Object.entries(itemsRaw.data)) {
           const id = Number(k);
           if (!Number.isFinite(id) || id <= 0) continue;
-          const nm = v2?.name ? String(v2.name) : "";
-          if (nm) m.set(id, nm);
+          const item: ItemData = v2 ? (v2 as ItemData) : {};
+          if (item && item.name) m.set(id, item);
         }
         setItemsById(m);
       }
@@ -243,10 +270,57 @@ export default function MetaClient() {
     return meta.patches?.[patch] || ({} as any);
   }, [meta, patch]);
 
+  type VisibleCard = {
+    champKey: string;
+    champId: string;
+    name: string;
+    title?: string;
+    roleMap: Partial<Record<Role, MetaRoleEntry[]>>;
+    roleSummaries: Array<{ role: Role; entry: MetaRoleEntry }>;
+  };
+
+  // Champions shown in the list (search + optional role filter)
+  const visibleCards = useMemo<VisibleCard[]>(() => {
+    if (!meta || !patch) return [];
+
+    const needle = q.trim().toLowerCase();
+    const rows: VisibleCard[] = champions.map((c) => {
+      const champKey = String(c.key);
+      return {
+        champKey,
+        champId: c.id,
+        name: c.name,
+        title: c.title,
+        roleMap: (patchChampMap?.[champKey] || {}) as Partial<Record<Role, MetaRoleEntry[]>>,
+        roleSummaries: (['TOP','JUNGLE','MIDDLE','BOTTOM','UTILITY'] as Role[])
+          .map((r) => {
+            const arr = (patchChampMap?.[champKey] as Partial<Record<Role, MetaRoleEntry[]> | undefined>)?.[r];
+            const best = arr && arr.length ? arr[0] : null;
+            return best ? { role: r, entry: best } : null;
+          })
+          .filter(Boolean) as Array<{ role: Role; entry: MetaRoleEntry }>,
+      };
+    });
+
+    const filteredByQuery = needle
+      ? rows.filter((c) => {
+          const hay = `${c.name} ${c.champId} ${c.title || ""}`.toLowerCase();
+          return hay.includes(needle);
+        })
+      : rows;
+
+    if (role === "ALL") return filteredByQuery;
+
+    // If a global role filter is selected, only show champs that actually have any builds for that role.
+    return filteredByQuery.filter((c) => {
+      const arr = c.roleMap[role];
+      return Array.isArray(arr) && arr.length > 0;
+    });
+  }, [meta, patch, champions, patchChampMap, q, role]);
+
   function itemLabel(id: number) {
-    if (!showItemNames) return String(id);
-    const nm = itemsById.get(id);
-    return nm ? nm : String(id);
+    const item = itemsById.get(id);
+    return item?.name ? String(item.name) : String(id);
   }
 
   function bestBuildForRole(roleBuilds: MetaRoleEntry[] | undefined) {
@@ -302,13 +376,7 @@ export default function MetaClient() {
 
   function itemsToText(ids: number[]) {
     if (!ids.length) return "—";
-    if (!showItemNames) return ids.map(String).join(", ");
-    return ids
-      .map((id) => {
-        const nm = itemsById.get(id);
-        return nm ? `${nm} (${id})` : String(id);
-      })
-      .join(", ");
+    return ids.map((id) => itemsById.get(id)?.name ?? String(id)).join(", ");
   }
 
   function buildShareText(args: {
@@ -354,6 +422,14 @@ export default function MetaClient() {
     } catch {
       // no-op
     }
+  }
+
+  // ✅ helper: show item name on tap (mobile) WITHOUT toggling expand
+  function showItemNameToast(id: number) {
+    const nm = itemsById.get(id)?.name ?? String(id);
+    const text = nm ? `${nm} (${id})` : String(id);
+    setItemToast({ id, text });
+    window.setTimeout(() => setItemToast(null), 1200);
   }
 
   function roleEntryUi(
@@ -426,8 +502,66 @@ export default function MetaClient() {
     );
   }
 
-  // ✅ FIXED: wraps the image (no forced pill/circle), and the row wraps on mobile.
-  function BuildPreview({ roleLabel, entry }: { roleLabel: string; entry: MetaRoleEntry }) {
+  // ✅ FIXED: items are tappable, stopPropagation prevents the card from expanding when you tap an item.
+  // Also adds a small toast so iOS users can actually SEE the name.
+  
+function BuildPreviewList({
+  summaries,
+  version,
+}: {
+  summaries: Array<{ role: Role; entry: MetaRoleEntry }>;
+  version: string;
+}) {
+  const v = version || "16.1.1";
+
+  return (
+    <div className="mt-2 space-y-2">
+      {summaries.map(({ role, entry }) => (
+        <div key={role} className="space-y-1">
+          <div className="flex items-center gap-2">
+            <div className="shrink-0 text-xs font-semibold text-white/65">
+              {shortRole(role)}
+            </div>
+            <div className="shrink-0 text-xs text-white/55">
+              {formatPct(entry.winrate)} · {entry.games} games
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {entry.boots ? (
+              <img
+                src={itemIconUrl(v, entry.boots)}
+                alt="Boots"
+                className="h-7 w-7 rounded-md object-cover"
+                loading="lazy"
+              />
+            ) : null}
+
+            {entry.core.map((id, idx) => (
+              <img
+                key={`${role}-${id}-${idx}`}
+                src={itemIconUrl(v, id)}
+                alt={`Core item ${idx + 1}`}
+                className="h-7 w-7 rounded-md object-cover"
+                loading="lazy"
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BuildPreview({
+    roleLabel,
+    entry,
+    champKey,
+  }: {
+    roleLabel: string;
+    entry: MetaRoleEntry;
+    champKey: string;
+  }) {
     const v = ddVersion || "16.1.1";
     const boots = entry.boots ? entry.boots : null;
     const core = Array.isArray(entry.core) ? entry.core : [];
@@ -436,77 +570,59 @@ export default function MetaClient() {
       (x) => Number.isFinite(x) && x > 0
     ) as number[];
 
+    const selected = selectedItemByChamp[champKey] ?? null;
+    const selectedName = selected ? itemsById.get(selected)?.name : "";
+
     return (
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <div className="shrink-0 text-xs font-semibold text-white/65">{roleLabel}</div>
+        <div className="shrink-0 text-xs text-white/55">{formatPct(entry.winrate)} · {entry.games} games</div>
 
         <div className="flex flex-wrap items-center gap-1.5">
           {previewItems.length ? (
-            previewItems.map((id) => (
-              <div key={id} className="group relative">
-                <span className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.02] p-0.5">
+            previewItems.map((id) => {
+              const nm = itemsById.get(id)?.name ?? String(id);
+              const isSelected = selected === id;
+
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setSelectedItemByChamp((prev) => ({
+                      ...prev,
+                      [champKey]: prev[champKey] === id ? null : id,
+                    }));
+                  }}
+                  className={cx(
+                    "group relative grid place-items-center rounded-lg border bg-white/[0.02] p-0.5",
+                    isSelected ? "border-white/30" : "border-white/10 hover:border-white/20"
+                  )}
+                  title={nm}
+                >
                   <img
                     src={itemIconUrl(v, id)}
-                    alt={String(id)}
-                    className="h-6 w-6 rounded-md bg-white/[0.02] object-contain sm:h-7 sm:w-7"
+                    alt={nm}
+                    className="h-7 w-7 rounded-md object-cover"
                     loading="lazy"
                   />
-                </span>
-
-                <div className="pointer-events-none absolute left-1/2 top-full z-10 mt-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-white/10 bg-black px-2 py-1 text-[11px] text-white/80 shadow-lg group-hover:block">
-                  {showItemNames
-                    ? itemLabel(id)
-                    : `${id}${itemsById.get(id) ? ` • ${itemsById.get(id)}` : ""}`}
-                </div>
-              </div>
-            ))
+                </button>
+              );
+            })
           ) : (
-            <div className="text-xs text-white/45">No item data</div>
+            <div className="text-xs text-white/45">—</div>
           )}
         </div>
 
-        <div className="ml-auto flex items-center gap-2 text-xs text-white/60">
-          <span className="text-white/80">{formatPct(entry.winrate)}</span>
-          <span className="text-white/40">{entry.games}g</span>
-        </div>
+        {selectedName ? (
+          <div className="min-w-0 truncate text-xs text-white/75">{selectedName}</div>
+        ) : null}
       </div>
     );
   }
 
-  const championCards = useMemo(() => {
-    const entries = Object.entries(patchChampMap || {});
-    const search = q.trim().toLowerCase();
-
-    const filtered = entries.filter(([champKey]) => {
-      const c = champByKey.get(champKey);
-      const name = (c?.name || "").toLowerCase();
-      const id = (c?.id || "").toLowerCase();
-      if (!search) return true;
-      return name.includes(search) || id.includes(search) || champKey.includes(search);
-    });
-
-    filtered.sort((a, b) => {
-      const ca = champByKey.get(a[0])?.name || a[0];
-      const cb = champByKey.get(b[0])?.name || b[0];
-      return ca.localeCompare(cb);
-    });
-
-    return filtered.map(([champKey, roleMap]) => {
-      const c = champByKey.get(champKey);
-      return {
-        champKey,
-        name: c?.name || champKey,
-        title: c?.title || "",
-        id: c?.id || champKey,
-        roleMap: (roleMap || {}) as Partial<Record<Role, MetaRoleEntry[]>>,
-      };
-    });
-  }, [patchChampMap, champByKey, q]);
-
-  const visibleCards = useMemo(() => {
-    if (role === "ALL") return championCards;
-    return championCards.filter((c) => Boolean(bestBuildForRole(c.roleMap?.[role] as any)));
-  }, [championCards, role]);
 
   function setAllExpanded(next: boolean) {
     const obj: Record<string, boolean> = {};
@@ -517,25 +633,19 @@ export default function MetaClient() {
   const headerBadges = useMemo(() => {
     if (!meta) return null;
 
-    const modeLabel =
-      mode === "ranked"
-        ? `Ranked (Q${meta.queues?.[0] ?? 420})`
-        : `Casual (Q${meta.queues?.join(",") || "400,430"})`;
+    
+
 
     return (
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/60">
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
           Patch {patch || "—"}
         </span>
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
-          {modeLabel}
-        </span>
+        
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
           Min display {meta.minDisplaySample}
         </span>
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
-          Timeline {meta.useTimeline ? "ON" : "OFF"}
-        </span>
+        
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
           Generated {formatGeneratedAtStable(meta.generatedAt)}
         </span>
@@ -609,21 +719,6 @@ export default function MetaClient() {
               </button>
 
               <div className="mx-2 hidden h-6 w-px bg-white/10 lg:block" />
-
-              <label className="col-span-2 flex items-center justify-between gap-2 text-sm text-white/70 lg:col-span-1 lg:justify-start">
-                Patch
-                <select
-                  value={patch}
-                  onChange={(e) => setPatch(e.target.value)}
-                  className="w-40 rounded-lg border border-white/10 bg-black px-2 py-1 text-sm text-white outline-none lg:w-auto"
-                >
-                  {patchOptions.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </label>
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:flex-row lg:items-center">
@@ -665,15 +760,6 @@ export default function MetaClient() {
             >
               Collapse all
             </button>
-
-            <label className="col-span-2 flex w-full items-center gap-2 rounded-lg border border-white/10 bg-transparent px-3 py-2 text-sm text-white/80 lg:col-span-1 lg:w-auto">
-              <input
-                type="checkbox"
-                checked={showItemNames}
-                onChange={(e) => setShowItemNames(e.target.checked)}
-              />
-              Show item names
-            </label>
           </div>
         </div>
 
@@ -696,8 +782,13 @@ export default function MetaClient() {
           const hasSig = champHasAnySigData(c.roleMap);
           const best = pickBestSigEntry(c.roleMap);
 
-          const canCopy = canUseClipboard() && !!best;
-          const copyToastKey = `${c.champKey}-best`;
+          const rolesAll: Role[] = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
+          const rolesWithData = rolesAll.filter((r) => bestBuildForRole(c.roleMap[r]));
+          const activeRole = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData[0];
+          const activeEntry = activeRole ? bestBuildForRole(c.roleMap[activeRole]) : null;
+
+          const canCopy = canUseClipboard() && (!!activeEntry || !!best);
+          const copyToastKey = `${c.champKey}-${activeRole || "best"}`;
 
           return (
             <div key={c.champKey} className="border-b border-white/10 last:border-b-0">
@@ -715,10 +806,16 @@ export default function MetaClient() {
               >
                 <div className="flex min-w-0 gap-3">
                   <img
-                    src={champIconUrl(vForIcons, c.id)}
+                    src={champIconUrl(vForIcons, c.champId)}
                     alt={c.name}
                     className="mt-0.5 h-9 w-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.02] object-cover sm:h-10 sm:w-10"
                     loading="lazy"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      // prevent infinite loop
+                      img.onerror = null;
+                      img.src = champIconUrl("16.1.1", c.champId);
+                    }}
                   />
 
                   <div className="min-w-0">
@@ -729,70 +826,222 @@ export default function MetaClient() {
                       ) : null}
                     </div>
 
-                    <div className="mt-0.5 text-xs text-white/45">
-                      {hasSig ? "Stat-sig build available" : "No stat-sig data yet"} • key{" "}
-                      {c.champKey}
-                    </div>
+                   
+                    {c.roleSummaries.length ? (
+                      <BuildPreviewList summaries={c.roleSummaries} version={ddVersion || "16.1.1"} />
 
-                    {best ? (
-                      <BuildPreview roleLabel={shortRole(best.role)} entry={best.entry} />
                     ) : (
                       <div className="mt-2 text-xs text-white/45">
-                        No builds ≥ {meta?.minDisplaySample ?? "—"} games for this champ on this patch.
+                        No builds ≥ {meta?.minDisplaySample ?? "—"} games for this champ on this
+                        patch.
                       </div>
                     )}
                   </div>
                 </div>
 
                 <div className="shrink-0 pt-1">
-                  <div className="flex items-center gap-2">
-                    {canCopy ? (
+                  <div className="flex flex-col items-end gap-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleCard(c.champKey);
+                      }}
+                      className="rounded-lg border border-white/10 bg-transparent px-2.5 py-1.5 text-xs text-white/80 hover:border-white/20 hover:text-white"
+                      title={isOpen ? "Hide build" : "View build"}
+                    >
+                      {isOpen ? "Hide build ▴" : "View build ▾"}
+                    </button>
+
+                    {isOpen && canCopy ? (
                       <button
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          if (!best) return;
+                          const entryToCopy = activeEntry ?? best?.entry;
+                          const roleToCopy = activeRole ?? best?.role;
+                          if (!entryToCopy || !roleToCopy) return;
                           const text = buildShareText({
                             champName: c.name,
-                            champId: c.id,
+                            champId: c.champId,
                             champKey: c.champKey,
-                            role: best.role,
-                            entry: best.entry,
+                            role: roleToCopy,
+                            entry: entryToCopy,
                           });
                           copyBuildText(text, copyToastKey);
                         }}
                         className="rounded-lg border border-white/10 bg-transparent px-2.5 py-1.5 text-xs text-white/80 hover:border-white/20 hover:text-white"
-                        title="Copy best build + link"
+                        title="Copy build + link"
                       >
                         {copiedKey === copyToastKey ? "Copied" : "Copy"}
                       </button>
                     ) : null}
-
-                    <div className="text-xs text-white/60">{isOpen ? "Collapse" : "Expand"}</div>
                   </div>
                 </div>
               </div>
 
               {isOpen ? (
                 <div className="bg-black px-4 pb-4 pt-3">
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-                    {(["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[]).map((r) => (
-                      <div key={r} className="space-y-2">
-                        <div className="text-xs font-semibold text-white/70">{shortRole(r)}</div>
+                  {(() => {
+                    const rolesAll: Role[] = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
+                    const rolesWithData = rolesAll.filter((r) => bestBuildForRole(c.roleMap[r]));
+                    if (!rolesWithData.length) {
+                      return (
+                        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-xs text-white/45">
+                          No data yet
+                        </div>
+                      );
+                    }
 
-                        {roleEntryUi(
-                          c.roleMap[r],
-                          { champKey: c.champKey, champId: c.id, champName: c.name },
-                          r
-                        ) ?? (
-                          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-xs text-white/45">
-                            No data yet
+                    const active = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData[0];
+                    const entry = bestBuildForRole(c.roleMap[active])!;
+
+                    const wr = formatPct(entry.winrate);
+                    const sig = isStatSig(entry);
+
+                    const allItems = [
+                      ...(entry.boots ? [entry.boots] : []),
+                      ...(Array.isArray(entry.core) ? entry.core : []),
+                      ...(Array.isArray(entry.items) ? entry.items : []),
+                    ]
+                      .filter((x) => Number.isFinite(x) && x > 0)
+                      .map((x) => Number(x));
+
+                    // de-dupe while keeping order
+                    const seen = new Set<number>();
+                    const uniqItems = allItems.filter((id) => {
+                      if (seen.has(id)) return false;
+                      seen.add(id);
+                      return true;
+                    });
+
+                    const selectedItem = selectedExpandedItemByChamp[c.champKey] ?? uniqItems[0] ?? null;
+                    const selectedObj = selectedItem ? itemsById.get(selectedItem) : undefined;
+
+                    return (
+                      <div className="space-y-3">
+                        {/* Role tabs — only show roles that actually have data */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          {rolesWithData.map((r) => {
+                            const isActive = r === active;
+                            return (
+                              <button
+                                key={r}
+                                type="button"
+                                onClick={() =>
+                                  setActiveRoleByChamp((prev) => ({
+                                    ...prev,
+                                    [c.champKey]: r,
+                                  }))
+                                }
+                                className={cx(
+                                  "rounded-full border px-3 py-1 text-xs font-semibold",
+                                  isActive
+                                    ? "border-white/25 bg-white/[0.06] text-white"
+                                    : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:text-white"
+                                )}
+                              >
+                                {shortRole(r)}
+                              </button>
+                            );
+                          })}
+
+                          <div className="ml-auto flex items-center gap-2 text-xs text-white/55">
+                            {!sig ? (
+                              <span
+                                className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55"
+                                title={`Low sample: fewer than ${meta?.minDisplaySample ?? 0} games. Small samples can show inflated winrates.`}
+                              >
+                                low sample
+                              </span>
+                            ) : null}
+                            <span className="text-white/60">{wr}</span>
+                            <span>{entry.games} games</span>
+
+                            
                           </div>
-                        )}
+                        </div>
+
+                        {/* Items row */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          {uniqItems.map((id) => {
+                            const nm = itemsById.get(id)?.name ?? String(id);
+                            const isSelected = selectedItem === id;
+
+                            return (
+                              <button
+                                key={id}
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setSelectedExpandedItemByChamp((prev) => ({
+                                    ...prev,
+                                    [c.champKey]: prev[c.champKey] === id ? null : id,
+                                  }));
+                                }}
+                                className={cx(
+                                  "group relative grid place-items-center rounded-lg border bg-white/[0.02] p-0.5",
+                                  isSelected ? "border-white/30" : "border-white/10 hover:border-white/20"
+                                )}
+                                title={nm}
+                              >
+                                <img
+                                  src={itemIconUrl(ddVersion || "16.1.1", id)}
+                                  alt={nm}
+                                  className="h-10 w-10 rounded-md object-cover"
+                                  loading="lazy"
+                                />
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Selected item info */}
+                        {selectedItem && selectedObj ? (
+                          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="truncate text-sm font-semibold text-white/90">
+                                  {selectedObj.name ?? selectedItem}
+                                </div>
+                                {selectedObj.plaintext ? (
+                                  <div className="mt-0.5 text-xs text-white/55">
+                                    {selectedObj.plaintext}
+                                  </div>
+                                ) : null}
+                              </div>
+
+                              {typeof selectedObj.gold?.total === "number" ? (
+                                <div className="shrink-0 rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/60">
+                                  {selectedObj.gold.total}g
+                                </div>
+                              ) : null}
+                            </div>
+
+                            {selectedObj.description ? (
+                              <div className="mt-2 text-xs leading-relaxed text-white/70">
+                                {stripHtml(selectedObj.description)}
+                              </div>
+                            ) : null}
+
+                            {selectedObj.stats && Object.keys(selectedObj.stats).length ? (
+                              <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2">
+                                {Object.entries(selectedObj.stats).map(([k, v]) => (
+                                  <div key={k} className="text-[11px] text-white/60">
+                                    <span className="text-white/45">{k}:</span>{" "}
+                                    <span className="text-white/75">{String(v)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : null}
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })()}
                 </div>
               ) : null}
             </div>
