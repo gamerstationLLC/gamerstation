@@ -7,7 +7,7 @@ on:
 
 concurrency:
   group: lol-auto-update
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
