@@ -1,6 +1,10 @@
 // scripts/riot/finalize-meta-builds-from-cache.ts
 // Offline finalize: reads cached Match-V5 JSONs and writes meta_builds_{ranked,casual}.json
-// ✅ combine all patches >=16 into single "16+" bucket + suppress low-sample (prevents 1-game 100% previews)
+// ✅ SAFETY: will NEVER wipe existing outputs.
+//    - We compute "new" results from cache
+//    - Then MERGE them into the existing output JSONs
+//    - If a champ/role has no new data this run, we KEEP the old data
+//    - If computed output is empty, we DO NOT write anything
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -12,7 +16,13 @@ type RiotMatch = {
     participants?: Array<{
       championId?: number;
       teamPosition?: string;
-      item0?: number; item1?: number; item2?: number; item3?: number; item4?: number; item5?: number; item6?: number;
+      item0?: number;
+      item1?: number;
+      item2?: number;
+      item3?: number;
+      item4?: number;
+      item5?: number;
+      item6?: number;
       summoner1Id?: number;
       summoner2Id?: number;
       win?: boolean;
@@ -24,25 +34,43 @@ type Role = "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY";
 
 type BuildParts = {
   boots: number | null;
-  core: number[];      // up to 3
-  items: number[];     // boots + core (display)
+  core: number[]; // up to 3
+  items: number[]; // boots + core (display)
   summoners: number[]; // display only
 };
 
 type Leaf = { games: number; wins: number; build: BuildParts };
 
-type Agg = Record<
-  string, // patchKey ("16+")
-  Record<
-    string, // champId
-    Partial<Record<Role, Record<string, Leaf>>> // role -> sig -> leaf
-  >
->;
+// Agg: patchKey -> champId -> role -> sig -> leaf
+type Agg = Record<string, Record<string, Partial<Record<Role, Record<string, Leaf>>>>>;
 
-/**
- * NOTE: patchMajorMinor is unused in this file; safe to delete.
- * (Leaving it out avoids lint/ts warnings.)
- */
+// Output JSON shape (what your client reads)
+type OutBuild = {
+  buildSig: string;
+  boots: number | null;
+  core: number[];
+  items: number[];
+  summoners: number[];
+  games: number;
+  wins: number;
+  winrate: number;
+  score: number;
+};
+
+type OutJson = {
+  generatedAt: string;
+  queues: number[];
+  useTimeline: boolean;
+  patchMajorMinorOnly: boolean;
+  minSample: number;
+  minDisplaySample: number;
+  bayesK: number;
+  priorWinrate: number;
+  minPatchMajor: number;
+  patches: Record<string, Record<string, Partial<Record<Role, OutBuild[]>>>>;
+};
+
+// -------------------- helpers --------------------
 
 function patchMajor(gameVersion: string | undefined): number | null {
   if (!gameVersion) return null;
@@ -63,7 +91,13 @@ function normPos(pos: string | undefined): Role | null {
 }
 
 async function listJsonFiles(dir: string): Promise<string[]> {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
+  let entries: any[] = [];
+  try {
+    entries = await fs.readdir(dir, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+
   const out: string[] = [];
   for (const e of entries) {
     const p = path.join(dir, e.name);
@@ -79,15 +113,7 @@ function bayesScore(wins: number, games: number, k: number, prior: number) {
   return a / (a + b);
 }
 
-function inc(
-  agg: Agg,
-  patchKey: string,
-  champId: number,
-  role: Role,
-  sig: string,
-  win: boolean,
-  build: BuildParts
-) {
+function inc(agg: Agg, patchKey: string, champId: number, role: Role, sig: string, win: boolean, build: BuildParts) {
   const p = (agg[patchKey] ||= {});
   const c = (p[String(champId)] ||= {});
   const r = (c[role] ||= {});
@@ -143,7 +169,10 @@ function extractBootsAndCore(p: any, bootSet: Set<number>): BuildParts {
 
   let boots: number | null = null;
   for (const id of items) {
-    if (bootSet.has(id)) { boots = id; break; }
+    if (bootSet.has(id)) {
+      boots = id;
+      break;
+    }
   }
 
   const core: number[] = [];
@@ -157,10 +186,7 @@ function extractBootsAndCore(p: any, bootSet: Set<number>): BuildParts {
     .filter((x) => x > 0)
     .sort((a, b) => a - b);
 
-  const displayItems = [
-    ...(boots ? [boots] : []),
-    ...core,
-  ].filter((x) => x > 0);
+  const displayItems = ([...(boots ? [boots] : []), ...core] as number[]).filter((x) => x > 0);
 
   return { boots, core, items: displayItems, summoners };
 }
@@ -171,12 +197,7 @@ function buildSig(b: BuildParts): string {
   return `b=${bPart}|c=${cPart}`;
 }
 
-function topBuildsForRole(
-  roleMap: Record<string, Leaf>,
-  minDisplaySample: number,
-  bayesK: number,
-  priorWinrate: number
-) {
+function topBuildsForRole(roleMap: Record<string, Leaf>, minDisplaySample: number, bayesK: number, priorWinrate: number) {
   const entries = Object.entries(roleMap)
     .map(([sig, leaf]) => {
       const games = leaf.games;
@@ -188,11 +209,11 @@ function topBuildsForRole(
         ...leaf.build,
         games,
         wins,
-        winrate,
-        score,
+        winrate: Number(winrate.toFixed(4)),
+        score: Number(score.toFixed(6)),
       };
     })
-    // ✅ suppress low sample entirely so 1-game 100% never appears anywhere
+    // suppress low sample entirely (so 1–9 game 100% never shows)
     .filter((x) => x.games >= minDisplaySample)
     .sort((a, b) => {
       if (b.games !== a.games) return b.games - a.games;
@@ -202,47 +223,122 @@ function topBuildsForRole(
   return entries.slice(0, 10);
 }
 
-async function writeOut(outPath: string, queues: number[], agg: Agg) {
-  const obj = {
-    generatedAt: new Date().toISOString(),
-    queues,
-    useTimeline: false,
-    patchMajorMinorOnly: false,
-    minSample: 200,
-    minDisplaySample: 10,
-    bayesK: 100,
-    priorWinrate: 0.5,
-    minPatchMajor: 16,
-    patches: {} as any,
+function computedHasAnyPatches(obj: OutJson): boolean {
+  const patches = obj.patches || {};
+  for (const pk of Object.keys(patches)) {
+    const champs = patches[pk] || {};
+    if (Object.keys(champs).length > 0) return true;
+  }
+  return false;
+}
+
+async function readJsonIfExists<T>(p: string): Promise<T | null> {
+  try {
+    const raw = await fs.readFile(p, "utf-8");
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Merge rule (your requirement: "only add to it"):
+ * - Keep EVERYTHING that already exists in the file.
+ * - If we have new computed data for a given patch/champ/role, overwrite that role with the new list
+ *   (because it represents the best/current top builds).
+ * - If computed has no data for that champ/role, keep the old one (so we never wipe).
+ */
+function mergeOutputs(existing: OutJson | null, computed: OutJson): OutJson {
+  if (!existing) return computed;
+
+  const out: OutJson = {
+    ...existing,
+    // refresh header fields from computed (keeps metadata accurate)
+    generatedAt: computed.generatedAt,
+    queues: computed.queues,
+    useTimeline: computed.useTimeline,
+    patchMajorMinorOnly: computed.patchMajorMinorOnly,
+    minSample: computed.minSample,
+    minDisplaySample: computed.minDisplaySample,
+    bayesK: computed.bayesK,
+    priorWinrate: computed.priorWinrate,
+    minPatchMajor: computed.minPatchMajor,
+    patches: { ...(existing.patches || {}) },
   };
 
-  for (const [patchKey, champs] of Object.entries(agg)) {
-    obj.patches[patchKey] = {};
-    for (const [champId, roles] of Object.entries(champs)) {
-      obj.patches[patchKey][champId] = {};
-      for (const [role, sigMap] of Object.entries(roles as any)) {
-        const top = topBuildsForRole(
-          sigMap as Record<string, Leaf>,
-          obj.minDisplaySample,
-          obj.bayesK,
-          obj.priorWinrate
-        );
-        if (top.length) obj.patches[patchKey][champId][role] = top;
+  // Union patches/champs/roles, with computed overwriting only where it has data
+  for (const [patchKey, champs] of Object.entries(computed.patches || {})) {
+    out.patches[patchKey] ||= {};
+    for (const [champId, roles] of Object.entries(champs || {})) {
+      out.patches[patchKey]![champId] ||= {};
+      for (const [role, builds] of Object.entries(roles as any)) {
+        if (Array.isArray(builds) && builds.length > 0) {
+          (out.patches[patchKey]![champId] as any)[role] = builds;
+        }
       }
     }
   }
 
-  await fs.mkdir(path.dirname(outPath), { recursive: true });
-  await fs.writeFile(outPath, JSON.stringify(obj, null, 2), "utf-8");
+  return out;
 }
+
+async function buildComputedOut(params: {
+  queues: number[];
+  agg: Agg;
+  useTimeline: boolean;
+  patchMajorMinorOnly: boolean;
+  minSample: number;
+  minDisplaySample: number;
+  bayesK: number;
+  priorWinrate: number;
+  minPatchMajor: number;
+}): Promise<OutJson> {
+  const obj: OutJson = {
+    generatedAt: new Date().toISOString(),
+    queues: params.queues,
+    useTimeline: params.useTimeline,
+    patchMajorMinorOnly: params.patchMajorMinorOnly,
+    minSample: params.minSample,
+    minDisplaySample: params.minDisplaySample,
+    bayesK: params.bayesK,
+    priorWinrate: params.priorWinrate,
+    minPatchMajor: params.minPatchMajor,
+    patches: {},
+  };
+
+  for (const [patchKey, champs] of Object.entries(params.agg)) {
+    obj.patches[patchKey] = {};
+    for (const [champId, roles] of Object.entries(champs)) {
+      obj.patches[patchKey]![champId] = {};
+      for (const [role, sigMap] of Object.entries(roles as any)) {
+        const top = topBuildsForRole(sigMap as Record<string, Leaf>, params.minDisplaySample, params.bayesK, params.priorWinrate);
+        if (top.length) (obj.patches[patchKey]![champId] as any)[role] = top;
+      }
+    }
+  }
+
+  return obj;
+}
+
+// -------------------- main --------------------
 
 async function main() {
   const repoRoot = process.cwd();
   const cacheMatchesDir = path.join(repoRoot, "scripts", "riot", "cache", "matches");
   const outDir = path.join(repoRoot, "public", "data", "lol");
 
+  // queues
   const rankedQueues = [420];
   const casualQueues = [400, 430];
+
+  // knobs (env driven; safe defaults)
+  const MIN_DISPLAY_SAMPLE = Number(process.env.MIN_DISPLAY_SAMPLE || 10);
+  const BAYES_K = Number(process.env.BAYES_K || 100);
+  const PRIOR_WINRATE = Number(process.env.PRIOR_WINRATE || 0.5);
+  const MIN_PATCH_MAJOR = Number(process.env.MIN_PATCH_MAJOR || 16);
+
+  // you’re bucketizing into one patch key
+  const patchKey = `${MIN_PATCH_MAJOR}+`;
 
   const bootSet = await loadBootSet(repoRoot);
 
@@ -254,8 +350,6 @@ async function main() {
 
   const rankedAgg: Agg = {};
   const casualAgg: Agg = {};
-
-  const patchKey = "16+";
 
   const debug = {
     filesRead: 0,
@@ -295,7 +389,7 @@ async function main() {
     }
 
     const major = patchMajor(info.gameVersion);
-    if (!major || major < 16) {
+    if (!major || major < MIN_PATCH_MAJOR) {
       debug.patchTooOld += 1;
       continue;
     }
@@ -308,10 +402,16 @@ async function main() {
 
     for (const p of participants) {
       const champId = Number(p?.championId || 0);
-      if (!champId) { debug.badChamp += 1; continue; }
+      if (!champId) {
+        debug.badChamp += 1;
+        continue;
+      }
 
       const role = normPos(p?.teamPosition);
-      if (!role) { debug.badRole += 1; continue; }
+      if (!role) {
+        debug.badRole += 1;
+        continue;
+      }
 
       const build = extractBootsAndCore(p, bootSet);
       if (!build.core.length && !build.boots) continue;
@@ -326,12 +426,59 @@ async function main() {
     }
   }
 
-  console.log("DEBUG:", debug);
+  console.log("[finalize] DEBUG:", debug);
 
-  await writeOut(path.join(outDir, "meta_builds_ranked.json"), rankedQueues, rankedAgg);
-  await writeOut(path.join(outDir, "meta_builds_casual.json"), casualQueues, casualAgg);
+  // Build computed outputs
+  const computedRanked = await buildComputedOut({
+    queues: rankedQueues,
+    agg: rankedAgg,
+    useTimeline: false,
+    patchMajorMinorOnly: false,
+    minSample: 200,
+    minDisplaySample: MIN_DISPLAY_SAMPLE,
+    bayesK: BAYES_K,
+    priorWinrate: PRIOR_WINRATE,
+    minPatchMajor: MIN_PATCH_MAJOR,
+  });
 
-  console.log('Wrote meta_builds_ranked.json and meta_builds_casual.json (patch key "16+")');
+  const computedCasual = await buildComputedOut({
+    queues: casualQueues,
+    agg: casualAgg,
+    useTimeline: false,
+    patchMajorMinorOnly: false,
+    minSample: 200,
+    minDisplaySample: MIN_DISPLAY_SAMPLE,
+    bayesK: BAYES_K,
+    priorWinrate: PRIOR_WINRATE,
+    minPatchMajor: MIN_PATCH_MAJOR,
+  });
+
+  // ✅ If computed is empty, refuse to write (prevents nukes)
+  if (!computedHasAnyPatches(computedRanked) || !computedHasAnyPatches(computedCasual)) {
+    console.warn("[finalize] Computed outputs look empty. Refusing to overwrite existing files.");
+    process.exit(0);
+  }
+
+  const rankedPath = path.join(outDir, "meta_builds_ranked.json");
+  const casualPath = path.join(outDir, "meta_builds_casual.json");
+
+  // Read existing outputs
+  const existingRanked = await readJsonIfExists<OutJson>(rankedPath);
+  const existingCasual = await readJsonIfExists<OutJson>(casualPath);
+
+  // ✅ Merge so we ONLY ADD / never wipe
+  const mergedRanked = mergeOutputs(existingRanked, computedRanked);
+  const mergedCasual = mergeOutputs(existingCasual, computedCasual);
+
+  await fs.mkdir(path.dirname(rankedPath), { recursive: true });
+  await fs.writeFile(rankedPath, JSON.stringify(mergedRanked, null, 2), "utf-8");
+
+  await fs.mkdir(path.dirname(casualPath), { recursive: true });
+  await fs.writeFile(casualPath, JSON.stringify(mergedCasual, null, 2), "utf-8");
+
+  console.log(`[finalize] Wrote (merged): ${rankedPath}`);
+  console.log(`[finalize] Wrote (merged): ${casualPath}`);
+  console.log(`[finalize] Patch bucket key: "${patchKey}" (major >= ${MIN_PATCH_MAJOR})`);
 }
 
 main().catch((e) => {
