@@ -1,3 +1,4 @@
+# .github/workflows/lol-auto-update.yml
 name: Auto Update LoL Data
 
 on:
@@ -38,23 +39,24 @@ jobs:
             scripts/riot/cache/matches
             scripts/riot/cache/timelines
             scripts/riot/cache/state
-          key: lol-riot-cache-v1
+          key: lol-riot-cache-v1-${{ runner.os }}
           restore-keys: |
+            lol-riot-cache-v1-${{ runner.os }}
             lol-riot-cache-v1
 
-      # 🔥 KEEP ONLY LAST 90 DAYS OF MATCH DATA
+      # 🔥 KEEP ONLY LAST 90 DAYS OF MATCH DATA (repo cache)
       - name: Prune old Riot cache (90 days)
         run: |
+          set -e
           echo "Pruning Riot cache older than 90 days..."
-
           CUTOFF=$(date -d "90 days ago" +%s)
 
           for DIR in scripts/riot/cache/matches scripts/riot/cache/timelines; do
             if [ -d "$DIR" ]; then
-              find "$DIR" -type f -name "*.json" | while read file; do
-                mtime=$(stat -c %Y "$file")
+              find "$DIR" -type f -name "*.json" | while read -r file; do
+                mtime=$(stat -c %Y "$file" 2>/dev/null || echo 0)
                 if [ "$mtime" -lt "$CUTOFF" ]; then
-                  rm "$file"
+                  rm -f "$file"
                 fi
               done
             fi
@@ -62,7 +64,15 @@ jobs:
 
           echo "Cache pruning complete."
 
-      - name: Update ALL LoL data (data + overrides + meta + finalize)
+      # 1) Always update ddragon data + items (fast & deterministic)
+      - name: Update LoL static data (ddragon + items)
+        run: npm run lol:update
+
+      - name: Update LoL overrides
+        run: npm run lol:update:overrides
+
+      # 2) Crawl (can be long). If it hits timeout, we still want finalize to run.
+      - name: Crawl Riot matches into cache/state (soft timeout)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           RIOT_REGION: americas
@@ -73,29 +83,54 @@ jobs:
           LADDER_TIER: challenger
           LADDER_MAX_PLAYERS: "250"
 
-          # crawl knobs (aggressive; expect 429 backoffs sometimes)
+          # crawl knobs
           MAX_MATCHES_PER_RUN: "20000"
           MAX_NEW_PUUIDS_PER_RUN: "4000"
           MATCHES_PER_PUUID: "100"
 
-          # output knobs
+          # pipeline knobs
           USE_TIMELINE: "0"
+          REPROCESS_BOOTSTRAP: "1"
+          CACHE_SCAN_LIMIT: "0"
+          CACHE_MAX_AGE_DAYS: "90"
+
+          # (finalize-related but harmless here)
           MIN_DISPLAY_SAMPLE: "25"
-          ALLOW_LOW_SAMPLE_FALLBACK: "0"
           BAYES_K: "100"
           PRIOR_WINRATE: "0.5"
           PATCH_MAJOR_MINOR_ONLY: "1"
-          REPROCESS_BOOTSTRAP: "1"
-          CACHE_SCAN_LIMIT: "0"
+          ALLOW_LOW_SAMPLE_FALLBACK: "0"
         run: |
           set -e
-          # Soft timeout: stop crawl at ~4h59m so commit & push can run
-          timeout 17940 npm run lol:update:all || true
 
+          # 4h 59m soft timeout so finalize/commit can still run
+          timeout 17940 npm run lol:update:meta || EC=$?
+          EC=${EC:-0}
+
+          # timeout returns 124; treat as "ok, partial crawl"
+          if [ "$EC" -ne 0 ] && [ "$EC" -ne 124 ]; then
+            echo "Crawl failed with exit code $EC"
+            exit "$EC"
+          fi
+
+          echo "Crawl completed (or timed out safely). Continuing..."
+
+      # 3) Finalize ALWAYS runs (build outputs from cache/state)
+      - name: Finalize meta builds outputs from cache
+        if: always()
+        env:
+          MIN_DISPLAY_SAMPLE: "25"
+          BAYES_K: "100"
+          PRIOR_WINRATE: "0.5"
+          MIN_PATCH_MAJOR: "16"
+        run: npm run lol:finalize:meta
+
+      # 4) Commit outputs if changed
       - name: Commit & push (if changed)
         run: |
           set -e
 
+          # only commit changes in public/data/lol (ddragon, overrides, meta outputs)
           if [ -z "$(git status --porcelain public/data/lol)" ]; then
             echo "No changes in public/data/lol. Skipping commit."
             exit 0
@@ -106,4 +141,7 @@ jobs:
 
           git add public/data/lol
           git commit -m "chore(lol): automated refresh"
+
+          # safety: in case remote moved (shouldn't with concurrency, but harmless)
+          git pull --rebase origin main || true
           git push origin main

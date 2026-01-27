@@ -1249,7 +1249,6 @@ if (USE_TIMELINE) {
   await writeJson(PUUID_CURSORS_PATH, puuidCursors);
   await writeJson(AGG_STATE_PATH, agg);
 
-  await finalizeOutputsFromAggState(agg);
 
 
   console.log("Done.");

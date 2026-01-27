@@ -1,6 +1,6 @@
 // scripts/riot/finalize-meta-builds-from-cache.ts
 // Offline finalize: reads cached Match-V5 JSONs and writes meta_builds_{ranked,casual}.json
-// ✅ FIX: combine all patches >=16 into single "16+" bucket + suppress low-sample (prevents 1-game 100% previews)
+// ✅ combine all patches >=16 into single "16+" bucket + suppress low-sample (prevents 1-game 100% previews)
 
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -39,12 +39,11 @@ type Agg = Record<
   >
 >;
 
-function patchMajorMinor(gameVersion: string | undefined): string | null {
-  if (!gameVersion) return null;
-  const m = String(gameVersion).match(/^(\d+)\.(\d+)/);
-  if (!m) return null;
-  return `${m[1]}.${m[2]}`;
-}
+/**
+ * NOTE: patchMajorMinor is unused in this file; safe to delete.
+ * (Leaving it out avoids lint/ts warnings.)
+ */
+
 function patchMajor(gameVersion: string | undefined): number | null {
   if (!gameVersion) return null;
   const m = String(gameVersion).match(/^(\d+)\./);
@@ -330,8 +329,6 @@ async function main() {
   console.log("DEBUG:", debug);
 
   await writeOut(path.join(outDir, "meta_builds_ranked.json"), rankedQueues, rankedAgg);
-  await writeOut(path.join(outDir, "meta_builds_casual.json"), casualQueues, rankedAgg); // <-- (intentionally wrong? no)
-  // FIX: write casualAgg (not rankedAgg)
   await writeOut(path.join(outDir, "meta_builds_casual.json"), casualQueues, casualAgg);
 
   console.log('Wrote meta_builds_ranked.json and meta_builds_casual.json (patch key "16+")');
