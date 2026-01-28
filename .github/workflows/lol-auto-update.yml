@@ -130,18 +130,17 @@ jobs:
         run: |
           set -e
 
-          # only commit changes in public/data/lol (ddragon, overrides, meta outputs)
-          if [ -z "$(git status --porcelain public/data/lol)" ]; then
-            echo "No changes in public/data/lol. Skipping commit."
-            exit 0
-          fi
-
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
+          # Stage only what you intend to publish
           git add public/data/lol
-          git commit -m "chore(lol): automated refresh"
 
-          # safety: in case remote moved (shouldn't with concurrency, but harmless)
-          git pull --rebase origin main || true
+          # If nothing staged, exit cleanly
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(lol): automated refresh"
           git push origin main
