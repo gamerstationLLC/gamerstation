@@ -33,6 +33,7 @@ jobs:
         run: npm ci
 
       - name: Cache Riot data
+        id: riot_cache
         uses: actions/cache@v4
         with:
           path: |
@@ -43,6 +44,12 @@ jobs:
           restore-keys: |
             lol-riot-cache-v1-${{ runner.os }}
             lol-riot-cache-v1
+
+      # ✅ Useful early signal: did we restore cache?
+      - name: Debug - Cache hit
+        run: |
+          echo "cache-hit=${{ steps.riot_cache.outputs.cache-hit }}"
+          du -sh scripts/riot/cache/* 2>/dev/null || true
 
       # 🔥 KEEP ONLY LAST 90 DAYS OF MATCH DATA (repo cache)
       - name: Prune old Riot cache (90 days)
@@ -63,6 +70,7 @@ jobs:
           done
 
           echo "Cache pruning complete."
+          du -sh scripts/riot/cache/* 2>/dev/null || true
 
       # 1) Always update ddragon data + items (fast & deterministic)
       - name: Update LoL static data (ddragon + items)
@@ -124,6 +132,23 @@ jobs:
           PRIOR_WINRATE: "0.5"
           MIN_PATCH_MAJOR: "16"
         run: npm run lol:finalize:meta
+
+      # ✅ Debug *after* crawl+finalize, right before commit: what will be committed?
+      - name: Debug - What will be committed
+        if: always()
+        run: |
+          echo "== State counts =="
+          node -e "const fs=require('fs'); const p='scripts/riot/cache/state/seen_match_ids.json'; if(fs.existsSync(p)){const j=JSON.parse(fs.readFileSync(p,'utf8')); console.log('seen_match_ids', Array.isArray(j)?j.length:Object.keys(j).length);} else console.log('seen_match_ids missing');"
+          node -e "const fs=require('fs'); const p='scripts/riot/cache/state/seen_puuids.json'; if(fs.existsSync(p)){const j=JSON.parse(fs.readFileSync(p,'utf8')); console.log('seen_puuids', Array.isArray(j)?j.length:Object.keys(j).length);} else console.log('seen_puuids missing');"
+
+          echo "== Output sizes =="
+          ls -lh public/data/lol/meta_builds_ranked.json public/data/lol/meta_builds_casual.json || true
+
+          echo "== Git status (public/data/lol) =="
+          git status --porcelain public/data/lol || true
+
+          echo "== Diffstat (public/data/lol) =="
+          git diff --stat -- public/data/lol || true
 
       # 4) Commit outputs if changed
       - name: Commit & push (if changed)
