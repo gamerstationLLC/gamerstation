@@ -606,7 +606,7 @@ export default function ArsenalClient() {
 
       {/* MOBILE sticky results footer */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40">
-        <div className="border-t border-neutral-900 bg-black/85 backdrop-blur px-4 py-3">
+        <div className="border-t border-neutral-900 bg-black/85 backdrop-blur ios-glass px-4 py-3">
           <div className="mx-auto max-w-xl flex items-center justify-between gap-4">
             <div className="min-w-0">
               <div className="text-[11px] text-neutral-400">Body / shot</div>

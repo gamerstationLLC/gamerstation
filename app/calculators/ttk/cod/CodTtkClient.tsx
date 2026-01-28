@@ -396,7 +396,7 @@ export default function CodTtkClient({
 
         {/* ✅ MOBILE ONLY: sticky Inputs/Results tabs */}
         <div className="lg:hidden sticky top-0 z-40 -mx-6 mt-6 px-6">
-          <div className="rounded-2xl border border-neutral-800 bg-black/70 backdrop-blur">
+          <div className="rounded-2xl border border-neutral-800 bg-black/70 backdrop-blur ios-glass">
             <div className="flex gap-2 p-2">
               <button
                 type="button"

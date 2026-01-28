@@ -1,24 +1,74 @@
 @import "tailwindcss";
+/* =========================================================
+   GamerStation Global Theme + Reusable UI Primitives
+   Safari/iOS-safe (prevents “pitch black” + weird blur rendering)
+   ========================================================= */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Layers */
+  --bg-base: #050505;
+  --bg-surface: #121212;
+  --bg-raised: #1a1a1a;
 
-  /* equivalents of your old @theme inline vars */
+  /* Borders */
+  --border-subtle: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.12);
+
+  /* Text */
+  --text-primary: rgba(255,255,255,0.92);
+  --text-muted: rgba(255,255,255,0.65);
+
+  /* Accents */
+  --accent: #4f8cff;
+  --danger: #ff4d4f;
+
+  /* Back-compat */
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* ✅ Helps Safari form controls + translucency render consistently */
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+/* === Card primitives (default) === */
+.gs-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+}
+
+.gs-panel {
+  background: var(--bg-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+}
+
+.gs-muted {
+  color: var(--text-muted);
+}
+
+/* =========================================================
+   iOS Safari fix: “glass” surfaces that otherwise go pitch black.
+   Apply class `ios-glass` to ONLY the elements you want lifted
+   (e.g., sticky tabs bar, sticky bottom bar).
+   ========================================================= */
+@supports (-webkit-touch-callout: none) {
+  .ios-glass {
+    /* lift off OLED black */
+    background-color: rgba(255,255,255,0.06) !important;
+    border-color: rgba(255,255,255,0.10) !important;
+
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
 }

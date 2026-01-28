@@ -803,7 +803,7 @@ export default function StatImpactClient() {
       {/* Sticky results footer (compact + chips) */}
       <div className="sticky bottom-3 z-20 sm:hidden">
         <div className="mx-auto max-w-5xl px-2">
-          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/90 backdrop-blur px-3 py-2">
+          <div className="rounded-2xl border border-neutral-800 bg-neutral-950/90 backdrop-blur ios-glass px-3 py-2">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="text-[10px] text-neutral-500">Most important</div>

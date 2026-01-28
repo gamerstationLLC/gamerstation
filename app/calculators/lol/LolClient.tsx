@@ -1515,7 +1515,8 @@ useEffect(() => {
   return (
     <div className="pb-28 lg:pb-0">
       {/* ✅ Mobile sticky header: Tabs + Burst/DPS */}
-      <div className="lg:hidden sticky top-0 z-40 border-b border-neutral-800 bg-black/80 backdrop-blur">
+      <div className="lg:hidden sticky top-0 z-40 border-b border-neutral-800 bg-black/80 backdrop-blur ios-glass">
+
         <div className="mx-auto max-w-xl px-3 py-1.5">
           <div className="flex gap-2">
             <button

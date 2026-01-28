@@ -465,7 +465,8 @@ export default function OsrsDpsPage() {
         </div>
 
         {/* MOBILE sticky bar (tabs + style) */}
-        <div className="mt-6 sticky top-0 z-30 -mx-6 px-6 py-3 bg-black/85 backdrop-blur border-b border-neutral-800 lg:static lg:bg-transparent lg:backdrop-blur-0 lg:border-b-0 lg:mx-0 lg:px-0">
+       <div className="mt-6 sticky top-0 z-30 -mx-6 px-6 py-3 bg-black/85 backdrop-blur border-b border-neutral-800 ios-glass lg:static lg:bg-transparent lg:backdrop-blur-0 lg:border-b-0 lg:mx-0 lg:px-0">
+
           {/* Mobile section tabs (User / Enemies / Results) */}
           <div className="flex gap-2 lg:hidden">
             <MobileTopTab active={mobileTab === "user"} onClick={() => setMobileTab("user")} label="User" />
