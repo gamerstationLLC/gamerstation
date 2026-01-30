@@ -1,0 +1,98 @@
+name: Update LoL Leaderboards
+
+on:
+  schedule:
+    - cron: "0 * * * *"   
+
+  workflow_dispatch: {}
+
+concurrency:
+  group: lol-leaderboards-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  leaderboards:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      # 1) Build leaderboards JSON (base pass)
+      - name: Build LoL leaderboards
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
+          LEADERBOARD_TOP_N: "50"
+          LEADERBOARD_CONCURRENCY: "3"
+          LEADERBOARD_GAP_MS: "300"
+          LEADERBOARD_MATCH_IDS_COUNT: "2"
+          LEADERBOARD_REQ_MIN_GAP_MS: "250"
+        run: |
+          set -e
+          npm run lol:leaderboards
+
+      # 2) Finalize leaderboards JSON (fill summonerId/profileIconId/level)
+      - name: Finalize LoL leaderboards (transfer summoner data)
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
+          LEADERBOARD_FINALIZE_CONCURRENCY: "2"
+          LEADERBOARD_FINALIZE_REQ_MIN_GAP_MS: "200"
+          LEADERBOARD_FINALIZE_GAP_MS: "200"
+          # optional:
+          # LEADERBOARD_DEBUG: "1"
+        run: |
+          set -e
+          npm run lol:finalize:leaderboards
+
+      # 3) Debug (what changed)
+      - name: Debug - Output + git diff
+        if: always()
+        run: |
+          echo "== Output sample =="
+          ls -lah public/data/lol/leaderboards || true
+          find public/data/lol/leaderboards -maxdepth 3 -type f -name "*.json" | head -n 20 || true
+
+          echo "== Git status (leaderboards) =="
+          git status --porcelain public/data/lol/leaderboards || true
+
+          echo "== Diffstat (leaderboards) =="
+          git diff --stat -- public/data/lol/leaderboards || true
+
+          echo "== One file preview (first 60 lines) =="
+          PREVIEW_FILE="$(find public/data/lol/leaderboards -type f -name "*.json" | head -n 1)"
+          if [ -n "$PREVIEW_FILE" ]; then
+            echo "Preview: $PREVIEW_FILE"
+            head -n 60 "$PREVIEW_FILE" || true
+          fi
+
+      # 4) Commit outputs if changed
+      - name: Commit & push (if changed)
+        run: |
+          set -e
+
+          git config user.name "gamerstation-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          git add public/data/lol/leaderboards
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(lol): refresh leaderboards"
+          git push origin main

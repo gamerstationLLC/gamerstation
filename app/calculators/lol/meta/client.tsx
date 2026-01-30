@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useMemo, useState } from "react";
 
 type MetaMode = "ranked" | "casual";
@@ -450,57 +452,72 @@ export default function MetaClient() {
 
     const canCopy = canUseClipboard() && !!champCtx && !!roleCtx;
 
-    return (
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-sm font-semibold text-white/90">{wr}</div>
+   return (
+  <div
+    className="
+      relative rounded-xl border border-white/15
+      bg-gradient-to-b from-white/[0.06] to-black/60
+      ring-1 ring-white/10
+      shadow-[0_0_0_1px_rgba(255,255,255,0.06),_0_0_32px_rgba(0,255,255,0.10)]
+      p-3
+    "
+  >
+    <div className="flex items-center justify-between gap-2">
+      <div className="text-sm font-semibold text-white/95">{wr}</div>
 
-          <div className="flex items-center gap-2">
-            {!sig ? (
-              <span
-                className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55"
-                title={`Low sample: fewer than ${meta?.minDisplaySample ?? 0} games. Small samples can show inflated winrates.`}
-              >
-                low sample
-              </span>
-            ) : null}
-            <div className="text-xs text-white/55">{games}g</div>
+      <div className="flex items-center gap-2">
+        {!sig ? (
+          <span
+            className="rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[10px] text-white/70"
+            title={`Low sample: fewer than ${meta?.minDisplaySample ?? 0} games. Small samples can show inflated winrates.`}
+          >
+            low sample
+          </span>
+        ) : null}
 
-            {canCopy ? (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const text = buildShareText({
-                    champName: champCtx!.champName,
-                    champId: champCtx!.champId,
-                    champKey: champCtx!.champKey,
-                    role: roleCtx!,
-                    entry,
-                  });
-                  copyBuildText(text, `${champCtx!.champKey}-${roleCtx!}`);
-                }}
-                className="ml-1 rounded-md border border-white/10 bg-white/[0.02] px-2 py-1 text-[11px] text-white/75 hover:border-white/20 hover:text-white"
-                title="Copy build + link"
-              >
-                {copiedKey === `${champCtx!.champKey}-${roleCtx!}` ? "Copied" : "Copy"}
-              </button>
-            ) : null}
-          </div>
-        </div>
+        <div className="text-xs text-white/60">{games}g</div>
 
-        <div className="mt-2 text-xs text-white/65">
-          <div>
-            <span className="text-white/45">Boots:</span> {boots}
-          </div>
-          <div className="mt-1">
-            <span className="text-white/45">Core:</span> {core}
-          </div>
-        </div>
+        {canCopy ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const text = buildShareText({
+                champName: champCtx!.champName,
+                champId: champCtx!.champId,
+                champKey: champCtx!.champKey,
+                role: roleCtx!,
+                entry,
+              });
+              copyBuildText(text, `${champCtx!.champKey}-${roleCtx!}`);
+            }}
+            className="
+              ml-1 rounded-md border border-white/20
+              bg-black/60 px-2 py-1 text-[11px] text-white/85
+              transition
+              hover:border-cyan-400 hover:text-white
+              hover:shadow-[0_0_12px_rgba(0,255,255,0.55)]
+            "
+            title="Copy build + link"
+          >
+            {copiedKey === `${champCtx!.champKey}-${roleCtx!}` ? "Copied" : "Copy"}
+          </button>
+        ) : null}
       </div>
-    );
-  }
+    </div>
+
+    <div className="mt-2 text-xs text-white/70">
+      <div>
+        <span className="text-white/45">Boots:</span> {boots}
+      </div>
+      <div className="mt-1">
+        <span className="text-white/45">Core:</span> {core}
+      </div>
+    </div>
+  </div>
+)};
+
 
   // ✅ FIXED: items are tappable, stopPropagation prevents the card from expanding when you tap an item.
   // Also adds a small toast so iOS users can actually SEE the name.
@@ -689,9 +706,30 @@ function BuildPreview({
     setExpanded((prev) => ({ ...prev, [champKey]: !prev[champKey] }));
   }
 
+
+  
   return (
+    <div>
+    <div className="mt- flex items-center gap-4">
+  <a
+    href="/tools"
+    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
+  >
+    <span aria-hidden>←</span>
+    <span>Tools</span>
+  </a>
+
+  <a
+    href="/calculators/lol/hub"
+    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
+  >
+    <span aria-hidden>←</span>
+    <span>LoL Hub</span>
+  </a>
+</div>
+
     <div className="space-y-4">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-2">
             <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-2">
@@ -1050,4 +1088,4 @@ function BuildPreview({
       </div>
     </div>
   );
-}
+</div>)}

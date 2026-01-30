@@ -72,3 +72,138 @@ body {
     backdrop-filter: blur(10px);
   }
 }
+
+@media (hover: none) {
+  .group:active > div {
+    opacity: 1 !important;
+  }
+}
+
+@layer utilities {
+  .gs-title-sweep {
+    position: relative;
+    --gs-dur: 6.8s;     /* ✅ slower overall cycle */
+    --gs-line-h: 3px;
+    --gs-gap: 10px;
+  }
+
+  /* line expands from CENTER outward */
+  .gs-title-sweep::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--gs-gap) * -1);
+    height: var(--gs-line-h);
+    border-radius: 9999px;
+
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow:
+      0 0 12px rgba(255,255,255,0.20),
+      0 0 28px rgba(255,255,255,0.12);
+
+    /* start hidden */
+    opacity: 0;
+    transform-origin: center center; /* ✅ center-out */
+    transform: scaleX(0);
+    will-change: transform, opacity;
+
+    /* ✅ smoother feel: avoid the “ease-in-out pop” at start */
+    animation: gs-underline-center var(--gs-dur) linear infinite;
+  }
+
+  /* ✅ FIX: remove stutter by removing the scaleX jump.
+     Keep it hidden, then fade in while still at 0 width,
+     then expand smoothly 0 -> 1. */
+  @keyframes gs-underline-center {
+    /* invisible pause */
+    0% {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    /* stay hidden */
+    25% {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+
+    /* fade in while still at 0 (prevents a "pop") */
+    30% {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    34% {
+      opacity: 1;
+      transform: scaleX(0);
+    }
+
+    /* expand outward (single fluent motion) */
+    82% {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    /* hold briefly */
+    90% {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    /* fade out + reset */
+    100% {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+  }
+
+  /* Logo glows ONCE near completion of underline */
+  .gs-logo-hit {
+    --gs-dur: 6.8s; /* ✅ match duration */
+    animation: gs-logo-pulse var(--gs-dur) ease-in-out infinite;
+    will-change: box-shadow, filter, transform;
+  }
+
+  @keyframes gs-logo-pulse {
+    /* calm */
+    0%, 74% {
+      filter: saturate(1);
+      transform: translateZ(0) scale(1);
+      box-shadow: 0 0 40px rgba(0,255,255,0.15);
+    }
+
+    /* ramp */
+    84% {
+      box-shadow: 0 0 50px rgba(0,255,255,0.22);
+    }
+
+    /* peak glow (single pulse) */
+    90% {
+      filter: saturate(1.18);
+      transform: translateZ(0) scale(1.025);
+      box-shadow:
+        0 0 85px rgba(0,255,255,0.45),
+        0 0 22px rgba(255,255,255,0.10);
+    }
+
+    /* settle */
+    95% {
+      filter: saturate(1.06);
+      transform: translateZ(0) scale(1);
+      box-shadow: 0 0 46px rgba(0,255,255,0.20);
+    }
+
+    100% {
+      filter: saturate(1);
+      transform: translateZ(0) scale(1);
+      box-shadow: 0 0 40px rgba(0,255,255,0.15);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gs-title-sweep::after,
+    .gs-logo-hit {
+      animation: none !important;
+    }
+  }
+}

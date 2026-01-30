@@ -6,19 +6,20 @@ export default function CodHubPage() {
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <header className="mb-10 flex items-center justify-between">
-          <Link
-            href="/calculators"
-            className="text-sm text-neutral-300 hover:text-white"
-          >
-            ← Back to calculators
-          </Link>
+          <a
+  href="/calculators"
+  className="
+    ml-auto rounded-xl border border-neutral-700
+    bg-black-950/70 px-4 py-2 text-sm text-neutral-200
+    transition
+    hover:border-neutral-500 hover:bg-neutral-900/70
+    shadow-[0_0_20px_rgba(0,255,255,0.08)]
+  "
+>
+  Calculators
+</a>
 
-          <Link
-            href="/"
-            className="text-sm text-neutral-300 hover:text-white"
-          >
-            Home
-          </Link>
+          
         </header>
 
         {/* Title */}

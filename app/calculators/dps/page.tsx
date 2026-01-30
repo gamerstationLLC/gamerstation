@@ -39,12 +39,8 @@ export default function DpsPage() {
     <main className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-5xl px-6 py-12">
         <header className="flex items-center justify-between">
-          <Link
-            href="/calculators"
-            className="text-sm text-neutral-300 hover:text-white"
-          >
-            ← Back to Calculators
-          </Link>
+        
+
           <div className="text-sm text-neutral-500">Universal DPS</div>
         </header>
 

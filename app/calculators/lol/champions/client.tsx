@@ -1,16 +1,15 @@
 // app/calculators/lol/champions/client.tsx
 "use client";
 
-import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export type ChampionRow = {
   id: string; // "Lux" (Data Dragon id)
   name: string; // "Lux"
   title: string; // "the Lady of Luminosity"
   tags: string[];
-  // icon intentionally omitted
 };
 
 function slugifyChampion(input: string) {
@@ -21,7 +20,11 @@ function slugifyChampion(input: string) {
     .replace(/^-+|-+$/g, "");
 }
 
-export default function ChampionPickerClient({ champions }: { champions: ChampionRow[] }) {
+export default function ChampionPickerClient({
+  champions,
+}: {
+  champions: ChampionRow[];
+}) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -42,27 +45,38 @@ export default function ChampionPickerClient({ champions }: { champions: Champio
   }
 
   return (
-    <section className="space-y-4">
-      {/* Left-aligned back link */}
-      <div className="flex items-center justify-between">
-        <Link
-          href="/calculators/lol/hub"
-          className="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-white hover:underline"
-        >
-          <span aria-hidden>←</span> Back to Hub
-        </Link>
-      </div>
+    <section className="mt-3">
+
+     <div className="mt-2 flex items-center gap-4">
+  <a
+    href="/tools"
+    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
+  >
+    <span aria-hidden>←</span>
+    <span>Tools</span>
+  </a>
+
+  <a
+    href="/calculators/lol/hub"
+    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
+  >
+    <span aria-hidden>←</span>
+    <span>LoL Hub</span>
+  </a>
+</div>
+
 
       {/* Search */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative w-full">
           <input
             ref={inputRef}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search a champion (e.g., Lux, Katarina, Jinx)…"
-            className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 outline-none placeholder:text-white/40 focus:border-white/25"
+            className="w-full rounded-2xl border border-neutral-800 bg-black/70 px-4 py-3 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-neutral-600"
           />
+
           {q && (
             <button
               type="button"
@@ -70,7 +84,7 @@ export default function ChampionPickerClient({ champions }: { champions: Champio
                 setQ("");
                 inputRef.current?.focus();
               }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl border border-white/15 bg-white/5 px-3 py-1 text-sm hover:bg-white/10"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl border border-neutral-800 bg-black/70 px-3 py-1 text-sm text-neutral-200 transition hover:border-neutral-600 hover:bg-black/90"
             >
               Clear
             </button>
@@ -78,31 +92,32 @@ export default function ChampionPickerClient({ champions }: { champions: Champio
         </div>
       </div>
 
-      <div className="text-sm opacity-80">
-        Showing <span className="font-medium">{filtered.length}</span> champion
-        {filtered.length === 1 ? "" : "s"}
+      <div className="mt-3 text-sm text-neutral-400">
+        Showing{" "}
+        <span className="font-medium text-neutral-200">{filtered.length}</span>{" "}
+        champion{filtered.length === 1 ? "" : "s"}
       </div>
 
-      {/* Results (no images) */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Results */}
+      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((c) => (
           <button
             key={c.id}
             type="button"
             onClick={() => goToChampion(c)}
-            className="group rounded-2xl border border-white/15 bg-white/5 p-3 text-left hover:bg-white/10"
+            className="group rounded-2xl border border-neutral-800 bg-black/60 p-4 text-left transition hover:border-neutral-600 hover:bg-black/75"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <div className="truncate font-semibold">{c.name}</div>
-                <div className="truncate text-xs opacity-70">{c.title}</div>
+                <div className="truncate text-sm font-semibold">{c.name}</div>
+                <div className="truncate text-xs text-neutral-400">{c.title}</div>
 
                 {!!c.tags?.length && (
-                  <div className="mt-2 flex flex-wrap gap-1">
+                  <div className="mt-3 flex flex-wrap gap-1">
                     {c.tags.slice(0, 3).map((t) => (
                       <span
                         key={t}
-                        className="rounded-full border border-white/15 px-2 py-0.5 text-[11px] opacity-80"
+                        className="rounded-full border border-neutral-800 bg-black/50 px-2 py-0.5 text-[11px] text-neutral-300"
                       >
                         {t}
                       </span>
@@ -111,7 +126,9 @@ export default function ChampionPickerClient({ champions }: { champions: Champio
                 )}
               </div>
 
-              <div className="text-sm opacity-60 group-hover:opacity-90">→</div>
+              <div className="text-sm text-neutral-500 transition group-hover:text-neutral-200">
+                →
+              </div>
             </div>
           </button>
         ))}

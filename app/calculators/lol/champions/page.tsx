@@ -1,5 +1,6 @@
 // app/calculators/lol/champions/page.tsx
 import type { Metadata } from "next";
+import Link from "next/link";
 import ChampionPickerClient, { type ChampionRow } from "./client";
 
 export const metadata: Metadata = {
@@ -50,10 +51,8 @@ async function getChampionIndex(version: string): Promise<ChampionRow[]> {
     name: c.name,
     title: c.title,
     tags: c.tags ?? [],
-    icon: `${DD_BASE}/cdn/${version}/img/champion/${c.id}.png`,
   }));
 
-  // nice default ordering
   rows.sort((a, b) => a.name.localeCompare(b.name));
   return rows;
 }
@@ -63,16 +62,54 @@ export default async function ChampionsPickerPage() {
   const champions = await getChampionIndex(patch);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8 text-white">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold">LoL Champion Index</h1>
-        <p className="mt-1 text-sm opacity-80">
-          Search a champion to open their stats page. Patch:{" "}
-          <span className="font-medium">{patch}</span>
-        </p>
+    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+      {/* Ambient background */}
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-0 opacity-[0.10]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+          }}
+        />
+        <div className="absolute -top-40 left-1/2 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute top-1/3 -left-32 h-[420px] w-[420px] rounded-full bg-white/8 blur-3xl" />
+        <div className="absolute -bottom-40 right-0 h-[520px] w-[520px] rounded-full bg-white/8 blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black" />
       </div>
 
-      <ChampionPickerClient champions={champions} />
+      <div className="relative px-6 py-16">
+        <div className="mx-auto max-w-5xl">
+          {/* Header */}
+          <header className="mb-8 flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+              <img
+                src="/gs-logo-v2.png"
+                alt="GamerStation"
+                className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
+              />
+              <span className="text-lg font-black tracking-tight">
+                GamerStation<span className="align-super text-[0.6em]">™</span>
+              </span>
+            </Link>
+
+            
+          </header>
+
+          <h1 className="mt-2 text-4xl font-bold tracking-tight">
+            LoL Champion Index
+          </h1>
+          <p className="mt-3 text-neutral-300">
+            Search a champion to open their stats page. Patch:{" "}
+            <span className="font-medium text-white">{patch}</span>
+          </p>
+
+          <div className="mt-10">
+            <ChampionPickerClient champions={champions} />
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

@@ -343,6 +343,7 @@ async function main() {
   const bootSet = await loadBootSet(repoRoot);
 
   const files = await listJsonFiles(cacheMatchesDir);
+  
   if (!files.length) {
     console.error("No cached matches found at:", cacheMatchesDir);
     process.exit(1);
@@ -362,6 +363,11 @@ async function main() {
     badRole: 0,
     keptParticipants: 0,
   };
+
+  if (debug) {
+  console.log("[debug] found files:");
+  for (const f of files) console.log(" -", f);
+}
 
   for (const fp of files) {
     let match: RiotMatch | null = null;

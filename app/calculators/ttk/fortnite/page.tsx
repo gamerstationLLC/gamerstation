@@ -102,12 +102,18 @@ export default function FortniteTTKPage() {
       "
     >
       <div className="mx-auto max-w-6xl">
-        <Link
-          href="/calculators"
-          className="text-sm text-neutral-300 hover:text-white"
-        >
-          ← Back to Calculators
-        </Link>
+       <a
+  href="/calculators"
+  className="
+    ml-auto rounded-xl border border-neutral-700
+    bg-black-950/70 px-4 py-2 text-sm text-neutral-200
+    transition
+    hover:border-neutral-500 hover:bg-neutral-900/70
+    shadow-[0_0_20px_rgba(0,255,255,0.08)]
+  "
+>
+  Calculators
+</a>
 
         <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
           Fortnite TTK Calculator

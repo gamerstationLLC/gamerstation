@@ -451,10 +451,22 @@ export default function OsrsDpsPage() {
     <main className="min-h-screen bg-black text-white px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center justify-between">
-          <Link href="/calculators" className="text-sm text-neutral-300 hover:text-white">
-            ← Back to calculators
-          </Link>
+          
           <div className="text-sm text-neutral-400">OSRS • DPS</div>
+           <a
+  href="/calculators"
+  className="
+    ml-auto rounded-xl border border-neutral-800
+    bg-black px-4 py-2 text-sm text-neutral-200
+    transition
+    hover:border-grey-400
+   
+    hover:text-white
+    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+  "
+>
+  Calculators
+</a>
         </header>
 
         <div className="mt-8">

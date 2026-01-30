@@ -10,25 +10,44 @@ export default function TermsPage() {
   const lastUpdated = "January 2, 2026";
 
   return (
-    
-    <main className="min-h-screen bg-black text-white px-6 py-16">
-      
-      {/* Back to home */}
-     <div className="mb-8 flex">
-  <div className="mx-25 w-full max-w-3xl">
-    <Link
-      href="/"
-      className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 transition hover:border-white/20 hover:text-white"
-    >
-      <span className="text-sm">←</span>
-      Back to Home
-    </Link>
-  </div>
-</div>
     <main className="min-h-screen bg-black text-white px-6 py-16">
       <div className="mx-auto max-w-3xl">
+        {/* Centered glowing logo (matches Disclaimer + Contact) */}
+        <div className="flex justify-center mb-10">
+          <Link href="/" className="inline-flex items-center group">
+            <span className="relative transition-all duration-300">
+              {/* ambient halo */}
+              <span
+                aria-hidden
+                className="
+                  absolute -inset-3 -z-10 rounded-3xl
+                  bg-cyan-400/20 blur-lg
+                  transition-all duration-300
+                  group-hover:bg-cyan-400/45
+                  group-hover:blur-2xl
+                "
+              />
+
+              <img
+                src="/gs-logo-v2.png"
+                alt="GamerStation"
+                className="
+                  h-14 w-auto rounded-2xl
+                  bg-black p-1
+                  shadow-[0_0_40px_rgba(0,255,255,0.25)]
+                  transition-all duration-300
+                  group-hover:shadow-[0_0_80px_rgba(0,255,255,0.55)]
+                  group-hover:scale-[1.05]
+                "
+              />
+            </span>
+          </Link>
+        </div>
+
         <h1 className="text-4xl font-semibold tracking-tight">Terms of Service</h1>
-        <p className="mt-3 text-sm text-neutral-400">Last updated: {lastUpdated}</p>
+        <p className="mt-3 text-sm text-neutral-400">
+          Last updated: {lastUpdated}
+        </p>
 
         <section className="mt-10 space-y-4 text-neutral-200 leading-relaxed">
           <p>
@@ -86,7 +105,6 @@ export default function TermsPage() {
           </p>
         </section>
       </div>
-    </main>
     </main>
   );
 }
