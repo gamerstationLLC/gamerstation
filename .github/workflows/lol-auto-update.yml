@@ -111,9 +111,9 @@ jobs:
         run: |
           set -e
 
-          # 4h 59m soft timeout so finalize/commit can still run
+          # ✅ Capture exit code safely even with set -e
+          EC=0
           timeout 17940 npm run lol:update:meta || EC=$?
-          EC=${EC:-0}
 
           # timeout returns 124; treat as "ok, partial crawl"
           if [ "$EC" -ne 0 ] && [ "$EC" -ne 124 ]; then
@@ -150,8 +150,9 @@ jobs:
           echo "== Diffstat (public/data/lol) =="
           git diff --stat -- public/data/lol || true
 
-      # 4) Commit outputs if changed
+      # 4) Commit outputs if changed (ALWAYS attempt, even if crawl failed)
       - name: Commit & push (if changed)
+        if: always()
         run: |
           set -e
 
