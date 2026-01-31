@@ -17,17 +17,13 @@ type HeroStatsRow = {
 };
 
 /**
- * Canonical slug: kebab-case, stable.
- * - Prefer OpenDota `name` (npc_dota_hero_xxx) because localized_name can differ wildly (Io/wisp, etc.)
- * - Convert underscores -> hyphens
- * - Safe URL chars only
+ * Normalize to kebab-case, safe URL chars only.
  */
-function heroSlugFromRow(r: Pick<HeroStatsRow, "name" | "localized_name">) {
-  const base = (r.name || r.localized_name || "").toString().trim().toLowerCase();
-
+function slugify(input: string) {
+  const base = (input || "").toString().trim().toLowerCase();
   return base
     .replace(/^npc_dota_hero_/, "")
-    .replace(/_/g, "-") // ✅ key fix
+    .replace(/_/g, "-")
     .replace(/['"]/g, "")
     .replace(/&/g, "and")
     .replace(/[^a-z0-9-]+/g, "-")
@@ -36,16 +32,47 @@ function heroSlugFromRow(r: Pick<HeroStatsRow, "name" | "localized_name">) {
 }
 
 /**
- * Normalize incoming route slug so we can accept legacy underscore URLs too.
+ * Canonical slug: stable OpenDota internal `name`.
+ * Example: npc_dota_hero_magnataur -> magnataur
+ */
+function heroSlugFromRow(r: Pick<HeroStatsRow, "name" | "localized_name">) {
+  return slugify(r.name || r.localized_name || "");
+}
+
+/**
+ * Friendly slug: based on localized_name.
+ * Example: "Magnus" -> magnus
+ */
+function localizedSlugFromRow(r: Pick<HeroStatsRow, "localized_name">) {
+  return slugify(r.localized_name || "");
+}
+
+/**
+ * Normalize incoming route slug so we accept:
+ * - underscores, extra hyphens
+ * - raw internal names with prefix
  */
 function normalizeSlugParam(slug: string) {
-  return (slug || "")
-    .toString()
-    .trim()
-    .toLowerCase()
-    .replace(/_/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
+  return slugify(slug || "");
+}
+
+/**
+ * Optional aliases for the handful of heroes where people commonly use a different name.
+ * Key = incoming slug users might type, value = canonical internal slug.
+ *
+ * This is intentionally SMALL — only for truly common mismatches.
+ */
+const HERO_ALIASES: Record<string, string> = {
+  // OpenDota internal: wisp, localized: Io
+  io: "wisp",
+  // Commonly typed
+  nevermore: "shadow-fiend",
+  // If you want more later, add them here:
+  // "furion": "natures-prophet",
+};
+
+function resolveAlias(wanted: string) {
+  return HERO_ALIASES[wanted] ?? wanted;
 }
 
 function clampMin0(n: number) {
@@ -180,16 +207,27 @@ const getPatchCached = cache(async (): Promise<string> => {
   }
 });
 
+/**
+ * ✅ Robust hero lookup:
+ * - matches canonical internal slug (magnataur)
+ * - matches friendly localized slug (magnus)
+ * - matches raw internal name pasted (npc_dota_hero_magnataur)
+ * - optional alias map (io -> wisp, etc.)
+ */
 async function getHeroBySlug(slug: string) {
   const result = await getHeroStatsCached();
   if (result.state !== "ok") return { hero: null as HeroStatsRow | null, result };
 
-  const wanted = normalizeSlugParam(slug);
+  const wantedRaw = normalizeSlugParam(slug);
+  const wanted = resolveAlias(wantedRaw);
 
   const hero =
+    // ✅ canonical internal name slug (best for stability)
     result.rows.find((r) => heroSlugFromRow(r) === wanted) ??
-    // Extra tolerance: sometimes people copy raw internal name w/ prefix
-    result.rows.find((r) => heroSlugFromRow(r) === normalizeSlugParam((r.name || "").toString())) ??
+    // ✅ friendly localized slug
+    result.rows.find((r) => localizedSlugFromRow(r) === wantedRaw) ??
+    // ✅ tolerate raw internal name pasted or odd formatting
+    result.rows.find((r) => normalizeSlugParam(r.name || "") === wanted) ??
     null;
 
   return { hero, result };
@@ -372,7 +410,6 @@ export default async function DotaHeroPage({
   const proPick = clampMin0(Number(hero.pro_pick ?? 0));
   const proWin = clampMin0(Number(hero.pro_win ?? 0));
   const proBan = clampMin0(Number(hero.pro_ban ?? 0));
-  const proWr = proPick ? proWin / proPick : 0;
 
   // Aggregate bracket stats
   const bracketAgg = BRACKETS.map((b) => {
@@ -566,10 +603,7 @@ export default async function DotaHeroPage({
                       <RowKV label="Presence" value={fmtInt(proPresence)} />
                       <RowKV label="Ban share" value={pct01(proBanShare)} />
                       <RowKV label="Pick share" value={pct01(proPickShare)} />
-                      <RowKV
-                        label="Pick : Ban"
-                        value={`${(Math.round(pickToBan * 100) / 100).toFixed(2)}×`}
-                      />
+                      <RowKV label="Pick : Ban" value={`${(Math.round(pickToBan * 100) / 100).toFixed(2)}×`} />
                     </div>
 
                     <div className="mt-3 text-xs text-neutral-500">
@@ -602,15 +636,11 @@ export default async function DotaHeroPage({
                     <div className="mt-3 grid gap-2 text-sm">
                       <RowKV
                         label="Best"
-                        value={
-                          bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "—"
-                        }
+                        value={bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "—"}
                       />
                       <RowKV
                         label="Worst"
-                        value={
-                          worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "—"
-                        }
+                        value={worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "—"}
                       />
                     </div>
 
@@ -627,8 +657,7 @@ export default async function DotaHeroPage({
                         <div key={b.label} className="flex items-center justify-between">
                           <div className="font-medium text-neutral-100">{b.label}</div>
                           <div className="text-right tabular-nums text-neutral-200">
-                            {fmtInt(b.picks)}{" "}
-                            <span className="text-neutral-500">({(b.share * 100).toFixed(1)}%)</span>
+                            {fmtInt(b.picks)} <span className="text-neutral-500">({(b.share * 100).toFixed(1)}%)</span>
                           </div>
                         </div>
                       ))}
@@ -663,13 +692,10 @@ export default async function DotaHeroPage({
                     <div key={b.label} className="flex items-center justify-between text-sm">
                       <div className="font-medium text-neutral-100">{b.label}</div>
                       <div className="text-right tabular-nums text-neutral-200">
-                        {fmtInt(b.picks)}{" "}
-                        <span className="text-neutral-500">({(b.share * 100).toFixed(1)}%)</span>{" "}
+                        {fmtInt(b.picks)} <span className="text-neutral-500">({(b.share * 100).toFixed(1)}%)</span>{" "}
                         <span className="text-neutral-500">•</span>{" "}
                         <span
-                          className={
-                            b.wr >= 0.52 ? "text-green-300" : b.wr <= 0.48 ? "text-red-300" : "text-neutral-200"
-                          }
+                          className={b.wr >= 0.52 ? "text-green-300" : b.wr <= 0.48 ? "text-red-300" : "text-neutral-200"}
                         >
                           {(b.wr * 100).toFixed(1)}%
                         </span>
