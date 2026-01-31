@@ -66,7 +66,7 @@ const HERO_ALIASES: Record<string, string> = {
   // OpenDota internal: wisp, localized: Io
   io: "wisp",
   // Commonly typed
-  nevermore: "shadow-fiend",
+  "shadow-fiend": "nevermore",
   // If you want more later, add them here:
   // "furion": "natures-prophet",
 };
