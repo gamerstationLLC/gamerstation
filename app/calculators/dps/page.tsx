@@ -44,11 +44,33 @@ export default function DpsPage() {
           <div className="text-sm text-neutral-500">Universal DPS</div>
         </header>
 
-        <h1 className="mt-6 text-3xl font-bold">DPS Calculator</h1>
-        <p className="mt-2 max-w-2xl text-neutral-300">
-          Works for most games. Enter damage + RPM, optionally include accuracy
-          and crits.
-        </p>
+        <div className="flex items-start justify-between gap-6">
+  {/* Left text */}
+  <div>
+    <h1 className="mt-6 text-3xl font-bold">DPS Calculator</h1>
+
+    <p className="mt-2 max-w-2xl text-neutral-300">
+      Works for most games. Enter damage + RPM, optionally include accuracy
+      and crits.
+    </p>
+  </div>
+
+  {/* Right button / calc trigger */}
+  <a
+    href="/calculators"
+    className="
+      ml-auto mt-6 rounded-xl border border-neutral-800
+      bg-black px-4 py-2 text-sm text-neutral-200
+      transition
+      hover:border-neutral
+      hover:text-white
+      hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+    "
+  >
+    Calculators
+  </a>
+</div>
+
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           {/* Inputs */}

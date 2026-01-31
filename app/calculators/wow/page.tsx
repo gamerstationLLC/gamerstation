@@ -2,35 +2,51 @@ import Link from "next/link";
 
 export default function WoWPage() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
-      <div className="mx-auto max-w-5xl">
-        <header className="flex items-center justify-between">
-          <a
-  href="/calculators"
-  className="
-    ml-auto rounded-xl border border-neutral-700
-    bg-black-950/70 px-4 py-2 text-sm text-neutral-200
-    transition
-    hover:border-neutral-500 hover:bg-neutral-900/70
-    shadow-[0_0_20px_rgba(0,255,255,0.08)]
-  "
->
-  Calculators
-</a>
+    <main className="min-h-screen bg-black text-white">
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-10 sm:py-16">
+        {/* Header row */}
+        <header className="flex items-center justify-end">
+          <Link
+            href="/calculators"
+            className="
+              inline-flex items-center justify-center
+              rounded-xl border border-neutral-800
+              bg-black px-4 py-2 text-sm text-neutral-200
+              transition
+             hover:text-white
+              hover:shadow-[0_0_25px_rgba(0,255,255,0.25)]
+              focus:outline-none focus:ring-2 focus:ring-cyan-400/30
+            "
+          >
+            Calculators
+          </Link>
         </header>
 
-        <h1 className="mt-8 text-4xl font-bold">World of Warcraft</h1>
-        <p className="mt-3 text-neutral-300">
-          Choose a category to get started.
-        </p>
+        {/* Title + intro */}
+        <div className="mt-8 sm:mt-10">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+            World of Warcraft
+          </h1>
+          <p className="mt-2 text-sm sm:text-base text-neutral-300">
+            Choose a category to get started.
+          </p>
+        </div>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+        {/* Cards */}
+        <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {/* PvE */}
           <Link
             href="/calculators/wow/pve"
-            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+            className="
+              rounded-2xl border border-neutral-800
+              p-5 sm:p-6
+              transition
+              hover:border-neutral-600
+              active:scale-[0.99]
+              focus:outline-none focus:ring-2 focus:ring-cyan-400/30
+            "
           >
-            <div className="text-sm font-semibold">PvE</div>
+            <div className="text-base font-semibold">PvE</div>
             <div className="mt-2 text-sm text-neutral-400">
               Mythic+ scaling, dungeon math, PvE tools.
             </div>
@@ -38,13 +54,16 @@ export default function WoWPage() {
 
           {/* PvP (Coming Soon) */}
           <div
-            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 opacity-60 cursor-not-allowed"
+            className="
+              rounded-2xl border border-neutral-800 bg-neutral-950
+              p-5 sm:p-6
+              opacity-60 cursor-not-allowed select-none
+            "
+            aria-disabled="true"
           >
-            <div className="text-sm font-semibold">
+            <div className="text-base font-semibold">
               PvP{" "}
-              <span className="ml-1 text-xs text-neutral-400">
-                (coming soon)
-              </span>
+              <span className="ml-1 text-xs text-neutral-400">(coming soon)</span>
             </div>
             <div className="mt-2 text-sm text-neutral-500">
               Arena & RBG calculators.

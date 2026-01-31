@@ -94,6 +94,28 @@ export default function ToolsPage() {
   </div>
 </Link>
 
+{/* Meta Loadouts */}
+          <Link
+            href="/games/cod/meta-loadouts"
+
+            className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+>
+            <div className="text-sm font-semibold">Meta Loadouts</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Current best weapon builds for Warzone and Multiplayer.
+            </div>
+          </Link>
+
+           {/* Weapon Buffs / Nerfs */}
+          <Link
+            href="/games/cod/buffs-nerfs"
+            className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+>
+            <div className="text-sm font-semibold">Weapon Buffs / Nerfs</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Patch watch: expected buffs, nerfs, rebalances, and meta shifts.
+            </div>
+          </Link>
           </div>
         </div>
       </div>

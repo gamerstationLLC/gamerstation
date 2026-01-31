@@ -102,31 +102,38 @@ export default function FortniteTTKPage() {
       "
     >
       <div className="mx-auto max-w-6xl">
-       <a
-  href="/calculators"
-  className="
-    ml-auto rounded-xl border border-neutral-700
-    bg-black-950/70 px-4 py-2 text-sm text-neutral-200
-    transition
-    hover:border-neutral-500 hover:bg-neutral-900/70
-    shadow-[0_0_20px_rgba(0,255,255,0.08)]
-  "
->
-  Calculators
-</a>
+       <div className="flex items-start justify-between gap-6">
+  {/* Left side text */}
+  <div>
+    <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
+      Fortnite TTK Calculator
+    </h1>
 
-        <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
-          Fortnite TTK Calculator
-        </h1>
+    <p className="mt-2 text-sm text-neutral-400 italic">
+      Not affiliated with, endorsed by, or sponsored by Epic Games.
+    </p>
 
-        <p className="mt-2 text-sm text-neutral-400 italic">
-          Not affiliated with, endorsed by, or sponsored by Epic Games.
-        </p>
+    <p className="mt-3 text-neutral-300 max-w-2xl">
+      Choose a weapon class, weapon, and rarity, then calculate shots-to-kill
+      and time-to-kill. (Body damage + headshot multiplier + fire rate.)
+    </p>
+  </div>
 
-        <p className="mt-3 text-neutral-300 max-w-2xl">
-          Choose a weapon class, weapon, and rarity, then calculate shots-to-kill
-          and time-to-kill. (Body damage + headshot multiplier + fire rate.)
-        </p>
+  {/* Right button */}
+  <a
+    href="/calculators"
+    className="
+      ml-auto mt-6 rounded-xl border border-neutral-800
+      bg-black px-4 py-2 text-sm text-neutral-200
+      transition
+      hover:border-neutral
+      hover:text-white
+      hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+    "
+  >
+    Calculators
+  </a>
+</div>
 
         {/* ✅ small disclaimer above tabs (mobile only) */}
         <div className="mt-4 italic text-[11px] text-neutral-400 lg:hidden">

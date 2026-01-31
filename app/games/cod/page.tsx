@@ -9,11 +9,13 @@ export default function CodHubPage() {
           <a
   href="/calculators"
   className="
-    ml-auto rounded-xl border border-neutral-700
-    bg-black-950/70 px-4 py-2 text-sm text-neutral-200
+    ml-auto rounded-xl border border-neutral-800
+    bg-black px-4 py-2 text-sm text-neutral-200
     transition
-    hover:border-neutral-500 hover:bg-neutral-900/70
-    shadow-[0_0_20px_rgba(0,255,255,0.08)]
+    hover:border-grey-400
+   
+    hover:text-white
+    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
   "
 >
   Calculators
@@ -33,36 +35,15 @@ export default function CodHubPage() {
           {/* TTK Calculator */}
           <Link
             href="/calculators/ttk/cod"
-            className="rounded-xl border border-neutral-800 bg-neutral-950 p-5 hover:border-neutral-600"
-          >
+            className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+>
             <div className="text-sm font-semibold">TTK Calculator</div>
             <div className="mt-2 text-sm text-neutral-400">
               Shots-to-kill + time-to-kill based on damage, RPM, and target HP.
             </div>
           </Link>
 
-          {/* Meta Loadouts */}
-          <Link
-            href="/games/cod/meta-loadouts"
-
-            className="rounded-xl border border-neutral-800 bg-neutral-950 p-5 hover:border-neutral-600"
-          >
-            <div className="text-sm font-semibold">Meta Loadouts</div>
-            <div className="mt-2 text-sm text-neutral-400">
-              Current best weapon builds for Warzone and Multiplayer.
-            </div>
-          </Link>
-
-          {/* Weapon Buffs / Nerfs */}
-          <Link
-            href="/games/cod/buffs-nerfs"
-            className="rounded-xl border border-neutral-800 bg-neutral-950 p-5 hover:border-neutral-600"
-          >
-            <div className="text-sm font-semibold">Weapon Buffs / Nerfs</div>
-            <div className="mt-2 text-sm text-neutral-400">
-              Patch watch: expected buffs, nerfs, rebalances, and meta shifts.
-            </div>
-          </Link>
+         
         </div>
 
         {/* Optional small footer */}

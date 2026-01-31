@@ -304,11 +304,19 @@ export default function LeaderboardClient({
             </div>
 
             <a
-              href="/calculators/lol/meta"
-              className="ml-auto rounded-xl border border-neutral-700 bg-neutral-950/70 px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-500 hover:bg-neutral-900/70"
-            >
-              Meta
-            </a>
+    href="/calculators/lol/meta"
+    className="
+      absolute right-110
+      rounded-xl border border-neutral-800
+      bg-black px-4 py-2 text-sm text-neutral-200
+      transition
+      hover:border-neutral
+      hover:text-white
+      hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+    "
+  >
+    Meta
+  </a>
           </header>
 
           <h1 className="mt-2 text-4xl font-bold tracking-tight">LoL Leaderboard</h1>
