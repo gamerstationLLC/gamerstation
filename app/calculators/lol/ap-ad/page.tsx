@@ -20,12 +20,53 @@ async function readJson<T>(absPath: string): Promise<T> {
 }
 
 /**
- * Tries several candidate locations so you don't have to perfectly match my guess.
- * Put your file in ONE of these places (or add your path to the list).
+ * IMPORTANT (fix for build error):
+ * Next's file tracing hates `path.join(process.cwd(), rel)` where `rel` is a loop variable,
+ * because it becomes "dynamic" and it tries to match thousands of files.
+ *
+ * Solution: use a SMALL, STATIC, ABSOLUTE list of candidate paths.
  */
-async function readFirstJson<T>(candidates: string[]): Promise<T | null> {
-  for (const rel of candidates) {
-    const abs = path.join(process.cwd(), rel);
+const CANDIDATE_ABS_PATHS = {
+  patch: [
+    path.join(process.cwd(), "public", "data", "lol", "versions.json"),
+    path.join(process.cwd(), "data", "lol", "versions.json"),
+    path.join(process.cwd(), "public", "data", "lol", "version.json"),
+    path.join(process.cwd(), "data", "lol", "version.json"),
+  ] as const,
+
+  champions: [
+    path.join(process.cwd(), "public", "data", "lol", "champions_index.json"),
+    path.join(process.cwd(), "public", "data", "lol", "champions.json"),
+    path.join(process.cwd(), "public", "data", "lol", "champions_full.json"),
+    path.join(process.cwd(), "data", "lol", "champions_index.json"),
+    path.join(process.cwd(), "data", "lol", "champions.json"),
+    path.join(process.cwd(), "data", "lol", "champions_full.json"),
+    path.join(process.cwd(), "public", "data", "lol", "ddragon", "championFull.json"),
+    path.join(process.cwd(), "public", "data", "lol", "ddragon", "champion.json"),
+  ] as const,
+
+  items: [
+    path.join(process.cwd(), "public", "data", "lol", "items.json"),
+    path.join(process.cwd(), "public", "data", "lol", "items_index.json"),
+    path.join(process.cwd(), "public", "data", "lol", "items_full.json"),
+    path.join(process.cwd(), "public", "data", "lol", "item.json"),
+    path.join(process.cwd(), "data", "lol", "items.json"),
+    path.join(process.cwd(), "data", "lol", "items_index.json"),
+    path.join(process.cwd(), "data", "lol", "items_full.json"),
+    path.join(process.cwd(), "public", "data", "lol", "ddragon", "item.json"),
+    path.join(process.cwd(), "public", "data", "lol", "ddragon", "items.json"),
+  ] as const,
+
+  overrides: [
+    path.join(process.cwd(), "public", "data", "lol", "spells_overrides.json"),
+    path.join(process.cwd(), "data", "lol", "spells_overrides.json"),
+    path.join(process.cwd(), "public", "data", "lol", "overrides", "spells_overrides.json"),
+    path.join(process.cwd(), "data", "lol", "overrides", "spells_overrides.json"),
+  ] as const,
+} as const;
+
+async function readFirstJsonAbs<T>(candidatesAbs: readonly string[]): Promise<T | null> {
+  for (const abs of candidatesAbs) {
     try {
       return await readJson<T>(abs);
     } catch {
@@ -50,13 +91,7 @@ function normalizeItemRows(data: any): ItemRow[] {
 }
 
 async function loadPatch(): Promise<string> {
-  const v =
-    (await readFirstJson<any>([
-      "public/data/lol/versions.json",
-      "data/lol/versions.json",
-      "public/data/lol/version.json",
-      "data/lol/version.json",
-    ])) ?? null;
+  const v = (await readFirstJsonAbs<any>(CANDIDATE_ABS_PATHS.patch)) ?? null;
 
   if (Array.isArray(v) && v[0]) return String(v[0]);
   if (typeof v === "string") return v;
@@ -69,43 +104,14 @@ async function loadPatch(): Promise<string> {
 export default async function Page() {
   const patch = await loadPatch();
 
-  const championsRaw =
-    (await readFirstJson<any>([
-      "public/data/lol/champions_index.json",
-      "public/data/lol/champions.json",
-      "public/data/lol/champions_full.json",
-      "data/lol/champions_index.json",
-      "data/lol/champions.json",
-      "data/lol/champions_full.json",
-      "public/data/lol/ddragon/championFull.json",
-      "public/data/lol/ddragon/champion.json",
-    ])) ?? null;
-
+  const championsRaw = (await readFirstJsonAbs<any>(CANDIDATE_ABS_PATHS.champions)) ?? null;
   const champions = normalizeChampionRows(championsRaw);
 
-  const itemsRaw =
-    (await readFirstJson<any>([
-      "public/data/lol/items.json",
-      "public/data/lol/items_index.json",
-      "public/data/lol/items_full.json",
-      "public/data/lol/item.json",
-      "data/lol/items.json",
-      "data/lol/items_index.json",
-      "data/lol/items_full.json",
-      "public/data/lol/ddragon/item.json",
-      "public/data/lol/ddragon/items.json",
-    ])) ?? null;
-
+  const itemsRaw = (await readFirstJsonAbs<any>(CANDIDATE_ABS_PATHS.items)) ?? null;
   const items = normalizeItemRows(itemsRaw);
 
   // Load spell overrides (numeric truth for spell damage)
-  const overrides =
-    (await readFirstJson<SpellsOverrides>([
-      "public/data/lol/spells_overrides.json",
-      "data/lol/spells_overrides.json",
-      "public/data/lol/overrides/spells_overrides.json",
-      "data/lol/overrides/spells_overrides.json",
-    ])) ?? {};
+  const overrides = (await readFirstJsonAbs<SpellsOverrides>(CANDIDATE_ABS_PATHS.overrides)) ?? {};
 
   return (
     <main className="relative min-h-screen text-white">
@@ -139,7 +145,13 @@ export default async function Page() {
         </p>
 
         <div className="mt-10">
-          <Suspense fallback={<div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 text-sm text-neutral-300">Loading calculator…</div>}>
+          <Suspense
+            fallback={
+              <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 text-sm text-neutral-300">
+                Loading calculator…
+              </div>
+            }
+          >
             <ApAdClient champions={champions} patch={patch} items={items} overrides={overrides} />
           </Suspense>
         </div>
