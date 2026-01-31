@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-31T04:12:06.536Z",
+  "generatedAt": "2026-01-31T07:11:48.502Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -156,11 +156,11 @@
           "count": 2
         },
         {
-          "name": "Thresh",
+          "name": "Alistar",
           "count": 1
         },
         {
-          "name": "Pantheon",
+          "name": "Thresh",
           "count": 1
         }
       ],
@@ -215,7 +215,7 @@
       "topChamps": [
         {
           "name": "RekSai",
-          "count": 2
+          "count": 3
         },
         {
           "name": "LeeSin",
@@ -396,15 +396,15 @@
       "summonerLevel": 705,
       "topChamps": [
         {
-          "name": "Smolder",
-          "count": 2
-        },
-        {
-          "name": "Lucian",
+          "name": "LeeSin",
           "count": 1
         },
         {
-          "name": "Tristana",
+          "name": "Vi",
+          "count": 1
+        },
+        {
+          "name": "Nocturne",
           "count": 1
         }
       ],
@@ -412,8 +412,8 @@
       "gameName": "인생은무엇일까",
       "tagLine": "김수종",
       "leaguePoints": 371,
-      "wins": 27,
-      "losses": 12,
+      "wins": 28,
+      "losses": 14,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -428,7 +428,15 @@
       "topChamps": [
         {
           "name": "Karma",
-          "count": 6
+          "count": 4
+        },
+        {
+          "name": "Zeri",
+          "count": 1
+        },
+        {
+          "name": "Poppy",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -1171,37 +1179,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "UTIqgh6GcOAeZfCFPXxvFl_KCh_5E1CSU3heIncI1SOG_NCCBVwzTGUHeDYRTxkrndmHgZyQF2cuNw",
-      "summonerId": null,
-      "summonerName": "역천괴#ker51",
-      "profileIconId": 6937,
-      "summonerLevel": 139,
-      "topChamps": [
-        {
-          "name": "Braum",
-          "count": 4
-        },
-        {
-          "name": "Rakan",
-          "count": 1
-        },
-        {
-          "name": "Nami",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "역천괴",
-      "tagLine": "ker51",
-      "leaguePoints": 235,
-      "wins": 27,
-      "losses": 17,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "I_awpRd3518gLWeqiUSQGfo4s2HCz9cJ5qH5ra3IRGD9kfG3JW6rznK3uFSrgG09vdEcGK6VTLIp8A",
       "summonerId": null,
       "summonerName": "딥블루에이드#KR1",
@@ -1382,6 +1359,37 @@
       "leaguePoints": 203,
       "wins": 37,
       "losses": 21,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "UTIqgh6GcOAeZfCFPXxvFl_KCh_5E1CSU3heIncI1SOG_NCCBVwzTGUHeDYRTxkrndmHgZyQF2cuNw",
+      "summonerId": null,
+      "summonerName": "역천괴#ker51",
+      "profileIconId": 6937,
+      "summonerLevel": 139,
+      "topChamps": [
+        {
+          "name": "Braum",
+          "count": 2
+        },
+        {
+          "name": "Nami",
+          "count": 1
+        },
+        {
+          "name": "Nautilus",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "역천괴",
+      "tagLine": "ker51",
+      "leaguePoints": 197,
+      "wins": 27,
+      "losses": 20,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,

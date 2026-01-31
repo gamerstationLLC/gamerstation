@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-31T03:43:34.411Z",
+  "generatedAt": "2026-01-31T06:43:17.203Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -44,11 +44,11 @@
           "count": 3
         },
         {
-          "name": "Viktor",
+          "name": "Gwen",
           "count": 1
         },
         {
-          "name": "Tryndamere",
+          "name": "Viktor",
           "count": 1
         }
       ],
@@ -508,15 +508,15 @@
       "summonerLevel": 1313,
       "topChamps": [
         {
-          "name": "Leona",
-          "count": 3
-        },
-        {
           "name": "Xerath",
           "count": 2
         },
         {
-          "name": "Braum",
+          "name": "Sylas",
+          "count": 1
+        },
+        {
+          "name": "Kassadin",
           "count": 1
         }
       ],
@@ -857,6 +857,37 @@
       "freshBlood": false
     },
     {
+      "puuid": "sMO0mGxv7ox2HBwK7LLP7kPrJxSHW_4eKYIh1JnQVCItIZsRzR1pWnkU3X_ZNqKC4XpZeIUjT9i67g",
+      "summonerId": null,
+      "summonerName": "是曾与你躲过雨的屋檐#饼子啊",
+      "profileIconId": 2076,
+      "summonerLevel": 656,
+      "topChamps": [
+        {
+          "name": "Caitlyn",
+          "count": 2
+        },
+        {
+          "name": "Samira",
+          "count": 2
+        },
+        {
+          "name": "Kaisa",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "是曾与你躲过雨的屋檐",
+      "tagLine": "饼子啊",
+      "leaguePoints": 185,
+      "wins": 56,
+      "losses": 47,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "U2UKas_2vMCmZp6nrhFOuLv1Nto-_ocqTO71mysFg84aNenEzVtzOvyDpLAf1_SWCXYM7Nho9pSDvA",
       "summonerId": null,
       "summonerName": "Prujs#EUW",
@@ -975,37 +1006,6 @@
       "leaguePoints": 183,
       "wins": 76,
       "losses": 71,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "sMO0mGxv7ox2HBwK7LLP7kPrJxSHW_4eKYIh1JnQVCItIZsRzR1pWnkU3X_ZNqKC4XpZeIUjT9i67g",
-      "summonerId": null,
-      "summonerName": "是曾与你躲过雨的屋檐#饼子啊",
-      "profileIconId": 2076,
-      "summonerLevel": 656,
-      "topChamps": [
-        {
-          "name": "Sivir",
-          "count": 2
-        },
-        {
-          "name": "Samira",
-          "count": 1
-        },
-        {
-          "name": "Kaisa",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "是曾与你躲过雨的屋檐",
-      "tagLine": "饼子啊",
-      "leaguePoints": 183,
-      "wins": 55,
-      "losses": 46,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,

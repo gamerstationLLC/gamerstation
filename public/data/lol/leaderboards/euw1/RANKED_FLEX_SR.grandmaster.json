@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-31T03:37:17.500Z",
+  "generatedAt": "2026-01-31T06:36:59.339Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -467,11 +467,11 @@
       "topChamps": [
         {
           "name": "Zaahen",
-          "count": 2
+          "count": 3
         },
         {
-          "name": "Aatrox",
-          "count": 2
+          "name": "Varus",
+          "count": 1
         },
         {
           "name": "Darius",
@@ -573,37 +573,6 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
-    },
-    {
-      "puuid": "ZH_MAYkV9GRtQJIBioxBA6jPp7sjXgYnSxEB-3lcKQDeZ06F7xaGSEc9aDFf9f3GzH8O0wcdh_H6Vw",
-      "summonerId": null,
-      "summonerName": "Shay#EUWW",
-      "profileIconId": 6921,
-      "summonerLevel": 260,
-      "topChamps": [
-        {
-          "name": "Belveth",
-          "count": 2
-        },
-        {
-          "name": "Malphite",
-          "count": 2
-        },
-        {
-          "name": "Lillia",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Shay",
-      "tagLine": "EUWW",
-      "leaguePoints": 447,
-      "wins": 72,
-      "losses": 39,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
     },
     {
       "puuid": "VK6tzfWUadbcbjht3xMfAdC3ozZH_p1irsxjeHsH8rmnmvzDmwDzO7kHoiNGSArroFlfTM4vDkuocA",
@@ -894,6 +863,37 @@
       "leaguePoints": 432,
       "wins": 35,
       "losses": 29,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "ZH_MAYkV9GRtQJIBioxBA6jPp7sjXgYnSxEB-3lcKQDeZ06F7xaGSEc9aDFf9f3GzH8O0wcdh_H6Vw",
+      "summonerId": null,
+      "summonerName": "Shay#EUWW",
+      "profileIconId": 6921,
+      "summonerLevel": 260,
+      "topChamps": [
+        {
+          "name": "Belveth",
+          "count": 2
+        },
+        {
+          "name": "Zac",
+          "count": 1
+        },
+        {
+          "name": "Varus",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Shay",
+      "tagLine": "EUWW",
+      "leaguePoints": 431,
+      "wins": 72,
+      "losses": 40,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,

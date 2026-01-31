@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-31T04:05:57.806Z",
+  "generatedAt": "2026-01-31T07:05:41.099Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -191,15 +191,15 @@
       "summonerLevel": 356,
       "topChamps": [
         {
+          "name": "TwistedFate",
+          "count": 2
+        },
+        {
           "name": "Vladimir",
           "count": 2
         },
         {
-          "name": "Gangplank",
-          "count": 1
-        },
-        {
-          "name": "TwistedFate",
+          "name": "Syndra",
           "count": 1
         }
       ],
@@ -222,25 +222,25 @@
       "summonerLevel": 319,
       "topChamps": [
         {
-          "name": "Yuumi",
-          "count": 4
+          "name": "Seraphine",
+          "count": 3
         },
         {
-          "name": "Nautilus",
+          "name": "Braum",
           "count": 1
         },
         {
-          "name": "Seraphine",
+          "name": "Lulu",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "네 꿈 개꿈이야",
       "tagLine": "내꿈도",
-      "leaguePoints": 552,
-      "wins": 70,
-      "losses": 26,
-      "hotStreak": true,
+      "leaguePoints": 588,
+      "wins": 72,
+      "losses": 28,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -273,6 +273,37 @@
       "freshBlood": true
     },
     {
+      "puuid": "BD-o6gehHePsMQg9SCtdSmBzkTt0pCZ1RcLJAqzkoGBsPsjORXhaIb6WKEHuPy1LWtntSERgrQM_A",
+      "summonerId": null,
+      "summonerName": "Cute#KR00",
+      "profileIconId": 1625,
+      "summonerLevel": 88,
+      "topChamps": [
+        {
+          "name": "Jinx",
+          "count": 2
+        },
+        {
+          "name": "Galio",
+          "count": 1
+        },
+        {
+          "name": "Kaisa",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Cute",
+      "tagLine": "KR00",
+      "leaguePoints": 522,
+      "wins": 36,
+      "losses": 25,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "LO6ejuqX6D_HDyTJk9ChMHd9OFiS6ij9OWUP2iWYwUTSe4LQIRXRv_mZEMQdKU1aJQZRpn_SugW4Bw",
       "summonerId": null,
       "summonerName": "박건희사랑해#ΚR1",
@@ -298,37 +329,6 @@
       "leaguePoints": 512,
       "wins": 54,
       "losses": 24,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "BD-o6gehHePsMQg9SCtdSmBzkTt0pCZ1RcLJAqzkoGBsPsjORXhaIb6WKEHuPy1LWtntSERgrQM_A",
-      "summonerId": null,
-      "summonerName": "Cute#KR00",
-      "profileIconId": 1625,
-      "summonerLevel": 88,
-      "topChamps": [
-        {
-          "name": "Jinx",
-          "count": 2
-        },
-        {
-          "name": "Galio",
-          "count": 1
-        },
-        {
-          "name": "Kaisa",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Cute",
-      "tagLine": "KR00",
-      "leaguePoints": 512,
-      "wins": 35,
-      "losses": 23,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -373,11 +373,11 @@
       "summonerLevel": 516,
       "topChamps": [
         {
-          "name": "LeeSin",
+          "name": "Talon",
           "count": 3
         },
         {
-          "name": "Talon",
+          "name": "LeeSin",
           "count": 2
         },
         {
