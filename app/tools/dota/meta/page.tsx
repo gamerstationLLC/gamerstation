@@ -1,33 +1,71 @@
 // app/tools/dota/meta/page.tsx
 import Link from "next/link";
-import DotaMetaClient, { type HeroStatsRow } from "./client";
+import DotaMetaClient, { HeroStatsRow } from "./client";
 
 export const metadata = {
   title: "Dota 2 Meta | GamerStation",
   description:
-    "Dota 2 hero meta by rank: pick rate, win rate, and pro trends (powered by OpenDota).",
+    "Dota 2 meta heroes by rank bracket and pro trends. Pick rate + win rate with frequent updates. Data via OpenDota.",
+};
+
+type PatchEntry = {
+  name?: string; // e.g. "7.40"
+  patch?: string; // sometimes present
+  id?: number | string;
+  date?: number; // unix seconds (common)
+  timestamp?: number; // fallback
+  [key: string]: any;
 };
 
 async function getHeroStats(): Promise<HeroStatsRow[]> {
-  // OpenDota heroStats endpoint returns per-hero pub (rank bracket) + pro counts.
-  // We cache via Next.js revalidate to avoid rate-limit pain and keep UX fast.
   const res = await fetch("https://api.opendota.com/api/heroStats", {
-    next: { revalidate: 300 }, // 5 minutes
+    next: { revalidate: 300 }, // ~5 minutes
   });
-
-  if (!res.ok) {
-    throw new Error(`OpenDota heroStats failed: ${res.status}`);
-  }
-
-  return (await res.json()) as HeroStatsRow[];
+  if (!res.ok) return [];
+  return res.json();
 }
 
-export default async function Page() {
-  const data = await getHeroStats();
+function extractLatestPatchName(data: any): string | null {
+  // OpenDota constants/patch sometimes returns an array, sometimes an object.
+  const list: PatchEntry[] = Array.isArray(data)
+    ? data
+    : data && typeof data === "object"
+    ? Object.values(data)
+    : [];
+
+  if (!list.length) return null;
+
+  // Sort by most recent date-ish field
+  const sorted = [...list].sort((a, b) => {
+    const ad = Number(a.date ?? a.timestamp ?? 0);
+    const bd = Number(b.date ?? b.timestamp ?? 0);
+    return bd - ad;
+  });
+
+  const top = sorted[0] ?? {};
+  const name = (top.name || top.patch || "").toString().trim();
+  return name || null;
+}
+
+async function getLatestPatch(): Promise<string> {
+  try {
+    const res = await fetch("https://api.opendota.com/api/constants/patch", {
+      next: { revalidate: 300 }, // keep in sync with the rest
+    });
+    if (!res.ok) return "—";
+    const data = await res.json();
+    return extractLatestPatchName(data) ?? "—";
+  } catch {
+    return "—";
+  }
+}
+
+export default async function DotaMetaPage() {
+  const [rows, patch] = await Promise.all([getHeroStats(), getLatestPatch()]);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* Ambient background (keeps your Tools vibe) */}
+      {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.10]"
@@ -44,9 +82,8 @@ export default async function Page() {
       </div>
 
       <div className="relative px-6 py-16">
-        <div className="mx-auto max-w-6xl">
-          {/* Header */}
-          <header className="mb-8 flex items-center">
+        <div className="mx-auto max-w-5xl">
+          <header className="mb-6 flex items-center">
             <Link href="/" className="flex items-center gap-2 hover:opacity-90">
               <img
                 src="/gs-logo-v2.png"
@@ -58,33 +95,22 @@ export default async function Page() {
               </span>
             </Link>
 
-            <a
+            <Link
               href="/tools"
-              className="
-                ml-auto rounded-xl border border-neutral-800
-                bg-black px-4 py-2 text-sm text-neutral-200
-                transition
-                hover:border-grey-400
-                hover:text-white
-                hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
-              "
+              className="ml-auto rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]"
             >
               Tools
-            </a>
+            </Link>
           </header>
 
-          <h1 className="mt-2 text-4xl font-bold tracking-tight">Dota 2 Meta</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Dota 2 Meta</h1>
           <p className="mt-3 text-neutral-300">
-            Highest pick rate + best win rate by rank bracket, plus pro trends. Data from OpenDota.{" "}
-            <span className="text-neutral-500">(Cached ~5 minutes)</span>
+            Highest pick rate + best win rate by rank bracket, plus pro trends. Data from OpenDota.
+            <span className="text-neutral-500"> (Cached ~5 minutes)</span>
           </p>
 
-          <div className="mt-10">
-            <DotaMetaClient initialRows={data} />
-          </div>
-
-          <div className="mt-10 rounded-2xl border border-neutral-800 bg-black/60 p-4 text-xs text-neutral-400">
-            Some heroes can look “OP” with small samples. Use the filters + minimum games slider to keep it honest.
+          <div className="mt-6">
+            <DotaMetaClient initialRows={rows} patch={patch} cacheLabel="~5 min" />
           </div>
         </div>
       </div>

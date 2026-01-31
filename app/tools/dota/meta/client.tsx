@@ -159,7 +159,17 @@ const HEADER_BTN_DISABLED = [
   "border-neutral-800 bg-black text-neutral-500 opacity-60 cursor-not-allowed",
 ].join(" ");
 
-export default function DotaMetaClient({ initialRows }: { initialRows: HeroStatsRow[] }) {
+// ✅ NEW: props include a patch label and optional cache label.
+// You can pass patch="7.40" cacheLabel="~5 min" from the server page.
+export default function DotaMetaClient({
+  initialRows,
+  patch = "—",
+  cacheLabel = "~5 min",
+}: {
+  initialRows: HeroStatsRow[];
+  patch?: string;
+  cacheLabel?: string;
+}) {
   const [mode, setMode] = useState<Mode>("pub");
   const [bracket, setBracket] = useState<BracketKey>("legend");
 
@@ -181,10 +191,12 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
     return Number.isFinite(n) && n >= 0 ? n : 0;
   }, [minGamesText]);
 
-  const bracketNum = useMemo(() => BRACKETS.find((b) => b.key === bracket)?.n ?? 5, [bracket]);
+  const bracketNum = useMemo(
+    () => BRACKETS.find((b) => b.key === bracket)?.n ?? 5,
+    [bracket]
+  );
 
   function onSortClick(key: SortKey) {
-    // keep bans sortable only in pro (header still shows "Bans" in both modes)
     if (key === "ban" && mode !== "pro") return;
 
     setDirByKey((prev) => {
@@ -214,27 +226,29 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
   const rows = useMemo((): Row[] => {
     const query = q.trim().toLowerCase();
 
-    const derivedBase = (initialRows || []).map((r): Omit<Row, "score" | "tier" | "tierRank"> => {
-      const displayName = (r.localized_name || r.name || `Hero ${r.id}`).toString();
-      const slug = heroSlugFromRow(r);
-      const relPath = getRelPath(r);
+    const derivedBase = (initialRows || []).map(
+      (r): Omit<Row, "score" | "tier" | "tierRank"> => {
+        const displayName = (r.localized_name || r.name || `Hero ${r.id}`).toString();
+        const slug = heroSlugFromRow(r);
+        const relPath = getRelPath(r);
 
-      if (mode === "pro") {
-        const picks = clampMin0(Number(r.pro_pick ?? 0));
-        const wins = clampMin0(Number(r.pro_win ?? 0));
-        const bans = clampMin0(Number(r.pro_ban ?? 0));
+        if (mode === "pro") {
+          const picks = clampMin0(Number(r.pro_pick ?? 0));
+          const wins = clampMin0(Number(r.pro_win ?? 0));
+          const bans = clampMin0(Number(r.pro_ban ?? 0));
+          const winrate = picks ? wins / picks : 0;
+          return { id: r.id, name: displayName, slug, relPath, picks, wins, bans, winrate };
+        }
+
+        const pickKey = `${bracketNum}_pick`;
+        const winKey = `${bracketNum}_win`;
+        const picks = clampMin0(Number(r[pickKey] ?? 0));
+        const wins = clampMin0(Number(r[winKey] ?? 0));
         const winrate = picks ? wins / picks : 0;
-        return { id: r.id, name: displayName, slug, relPath, picks, wins, bans, winrate };
+
+        return { id: r.id, name: displayName, slug, relPath, picks, wins, bans: 0, winrate };
       }
-
-      const pickKey = `${bracketNum}_pick`;
-      const winKey = `${bracketNum}_win`;
-      const picks = clampMin0(Number(r[pickKey] ?? 0));
-      const wins = clampMin0(Number(r[winKey] ?? 0));
-      const winrate = picks ? wins / picks : 0;
-
-      return { id: r.id, name: displayName, slug, relPath, picks, wins, bans: 0, winrate };
-    });
+    );
 
     let filtered = derivedBase;
     if (query) filtered = filtered.filter((r) => r.name.toLowerCase().includes(query));
@@ -295,7 +309,6 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
       const diff = av - bv;
 
       if (sortBy === "tier") {
-        // desc=true => best-first (S->D) => ascending tierRank
         return desc ? diff : -diff;
       }
 
@@ -368,12 +381,29 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
         </div>
       </div>
 
+      {/* ✅ NEW: Trust / patch row */}
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
+        <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
+          Patch: <span className="text-neutral-200">{patch}</span>
+        </span>
+        <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
+          Data: <span className="text-neutral-200">OpenDota</span>
+        </span>
+        <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
+          Cache: <span className="text-neutral-200">{cacheLabel}</span>
+        </span>
+        <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
+          Showing: <span className="text-neutral-200">{Math.min(rows.length, 100)}</span>
+          <span className="text-neutral-500">/</span>
+          <span className="text-neutral-200">{Math.min(100, rows.length)}</span>
+        </span>
+      </div>
+
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
         <div className="overflow-x-auto">
           <div className="min-w-[640px]">
             <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-3 py-2 text-xs text-neutral-400">
-              {/* Hero header (Tier button lives inside this header area, above the tier pills) */}
               <div className="col-span-5 flex items-center justify-between gap-2">
                 <span>Hero</span>
 
@@ -387,7 +417,6 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
                 </button>
               </div>
 
-              {/* ✅ Picks header as black button */}
               <div className="col-span-3 flex items-center justify-end">
                 <button
                   type="button"
@@ -399,7 +428,6 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
                 </button>
               </div>
 
-              {/* ✅ Winrate header as black button */}
               <div className="col-span-2 flex items-center justify-end">
                 <button
                   type="button"
@@ -411,7 +439,6 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
                 </button>
               </div>
 
-              {/* ✅ Always label as Bans (disabled + no-op in pub, same black button styling) */}
               <div className="col-span-2 flex items-center justify-end">
                 <button
                   type="button"
@@ -434,7 +461,6 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
                     className="grid grid-cols-12 items-center px-3 py-2 text-sm hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-neutral-600"
                     title={`Open ${r.name}`}
                   >
-                    {/* Hero row: tier pill stays in the SAME column, aligned right */}
                     <div className="col-span-5 flex min-w-0 items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
                         <div className="w-8 shrink-0 text-xs text-neutral-500">{idx + 1}.</div>
@@ -445,11 +471,17 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
                       <TierPill tier={r.tier} />
                     </div>
 
-                    <div className="col-span-3 text-right tabular-nums text-neutral-200">{fmtInt(r.picks)}</div>
+                    <div className="col-span-3 text-right tabular-nums text-neutral-200">
+                      {fmtInt(r.picks)}
+                    </div>
 
                     <div
                       className={`col-span-2 text-right tabular-nums ${
-                        r.winrate >= 0.52 ? "text-green-300" : r.winrate <= 0.48 ? "text-red-300" : "text-neutral-200"
+                        r.winrate >= 0.52
+                          ? "text-green-300"
+                          : r.winrate <= 0.48
+                          ? "text-red-300"
+                          : "text-neutral-200"
                       }`}
                     >
                       {pct(r.winrate)}
@@ -462,7 +494,8 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
                 ))
               ) : (
                 <div className="px-3 py-8 text-sm text-neutral-500">
-                  No results. Try lowering <span className="text-neutral-300">Min games</span> or clearing search.
+                  No results. Try lowering <span className="text-neutral-300">Min games</span> or
+                  clearing search.
                 </div>
               )}
             </div>
@@ -471,7 +504,8 @@ export default function DotaMetaClient({ initialRows }: { initialRows: HeroStats
       </div>
 
       <div className="mt-3 text-xs text-neutral-500">
-        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low / low→high.
+        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low /
+        low→high.
       </div>
     </section>
   );

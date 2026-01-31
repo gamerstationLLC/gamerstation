@@ -4,7 +4,8 @@ import DotaHeroesClient from "./client";
 
 export const metadata = {
   title: "Dota 2 Heroes | GamerStation",
-  description: "Browse Dota 2 heroes with meta stats, pick rate, and win rate. Data via OpenDota.",
+  description:
+    "Browse every Dota 2 hero with live meta context, pick rate, win rate, and pro trends. Data via OpenDota, updated frequently.",
 };
 
 type HeroStatsRow = {
@@ -24,6 +25,15 @@ type HeroCard = {
   name: string;
   slug: string;
   icon: string;
+};
+
+type PatchEntry = {
+  name?: string; // e.g. "7.40"
+  patch?: string;
+  id?: number | string;
+  date?: number; // unix seconds
+  timestamp?: number;
+  [key: string]: any;
 };
 
 function slugify(input: string) {
@@ -51,12 +61,46 @@ async function getHeroStats(): Promise<HeroStatsRow[]> {
   return res.json();
 }
 
+function extractLatestPatchName(data: any): string | null {
+  const list: PatchEntry[] = Array.isArray(data)
+    ? data
+    : data && typeof data === "object"
+    ? Object.values(data)
+    : [];
+
+  if (!list.length) return null;
+
+  const sorted = [...list].sort((a, b) => {
+    const ad = Number(a.date ?? a.timestamp ?? 0);
+    const bd = Number(b.date ?? b.timestamp ?? 0);
+    return bd - ad;
+  });
+
+  const top = sorted[0] ?? {};
+  const name = (top.name || top.patch || "").toString().trim();
+  return name || null;
+}
+
+async function getLatestPatch(): Promise<string> {
+  try {
+    const res = await fetch("https://api.opendota.com/api/constants/patch", {
+      next: { revalidate: 300 }, // keep in sync
+    });
+    if (!res.ok) return "—";
+    const data = await res.json();
+    return extractLatestPatchName(data) ?? "—";
+  } catch {
+    return "—";
+  }
+}
+
 export default async function DotaHeroesIndexPage({
   searchParams,
 }: {
   searchParams?: { q?: string };
 }) {
-  const rows = await getHeroStats();
+  // ✅ fetch both in parallel
+  const [rows, patch] = await Promise.all([getHeroStats(), getLatestPatch()]);
 
   const heroes: HeroCard[] = rows
     .map((r) => {
@@ -113,12 +157,35 @@ export default async function DotaHeroesIndexPage({
           </header>
 
           <h1 className="text-4xl font-bold tracking-tight">Dota 2 Heroes</h1>
+
           <p className="mt-3 text-neutral-300">
-            Index of hero pages (slug-based). Data from OpenDota (cached ~5 minutes).
+            Browse every Dota 2 hero with quick links to hero pages and meta context. Powered by
+            OpenDota match data and refreshed often.
           </p>
 
-          {/* ✅ Client-side live search + list rendering */}
-          <DotaHeroesClient heroes={heroes} initialQuery={initialQuery} />
+          {/* ✅ Small trust row (now includes patch) */}
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
+            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
+              Patch: <span className="text-neutral-200">{patch}</span>
+            </span>
+            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
+              Data: <span className="text-neutral-200">OpenDota</span>
+            </span>
+            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
+              Cache: <span className="text-neutral-200">~5 minutes</span>
+            </span>
+            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
+              {heroes.length.toLocaleString()} heroes
+            </span>
+          </div>
+
+          {/* ✅ Client-side live search + list rendering (now receives patch) */}
+          <DotaHeroesClient
+            heroes={heroes}
+            initialQuery={initialQuery}
+            patch={patch}
+            cacheLabel="~5 min"
+          />
         </div>
       </div>
     </main>
