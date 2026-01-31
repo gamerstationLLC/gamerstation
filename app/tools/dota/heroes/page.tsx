@@ -20,7 +20,7 @@ type HeroStatsRow = {
   [key: string]: any;
 };
 
-type HeroCard = {
+export type HeroCard = {
   id: number;
   name: string;
   slug: string;
@@ -159,8 +159,8 @@ export default async function DotaHeroesIndexPage({
           <h1 className="text-4xl font-bold tracking-tight">Dota 2 Heroes</h1>
 
           <p className="mt-3 text-neutral-300">
-            Browse every Dota 2 hero with quick links to hero pages and meta context. Powered by
-            OpenDota match data and refreshed often.
+            Browse every Dota 2 hero with quick links to hero pages and meta
+            context. Powered by OpenDota match data and refreshed often.
           </p>
 
           {/* ✅ Small trust row (now includes patch) */}

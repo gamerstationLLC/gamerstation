@@ -3,122 +3,119 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import type { HeroCard } from "./page";
 
-type HeroCard = {
-  id: number;
-  name: string;
-  slug: string;
-  icon: string;
+type Props = {
+  heroes: HeroCard[];
+  initialQuery: string;
+
+  // new optional props (so TS won't break if you remove them later)
+  patch?: string;
+  cacheLabel?: string;
 };
 
 export default function DotaHeroesClient({
   heroes,
   initialQuery,
-}: {
-  heroes: HeroCard[];
-  initialQuery: string;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
-
+  patch,
+  cacheLabel,
+}: Props) {
   const [q, setQ] = useState(initialQuery ?? "");
 
-  // live filtered list
   const filtered = useMemo(() => {
-    const s = (q ?? "").trim().toLowerCase();
-    if (!s) return heroes;
-    return heroes.filter((h) => h.name.toLowerCase().includes(s));
-  }, [heroes, q]);
-
-  function syncUrl(nextQ: string) {
-    const trimmed = nextQ.trim();
-    if (!trimmed) {
-      router.replace(pathname, { scroll: false });
-      return;
-    }
-    const params = new URLSearchParams();
-    params.set("q", trimmed);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }
+    const query = (q || "").trim().toLowerCase();
+    if (!query) return heroes;
+    return heroes.filter((h) => h.name.toLowerCase().includes(query));
+  }, [q, heroes]);
 
   return (
-    <div className="mt-8">
-      {/* Search */}
-      <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex w-full items-center gap-2">
+    <section className="mt-8">
+      {/* Search row */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1">
+          <label className="sr-only" htmlFor="hero-search">
+            Search heroes
+          </label>
           <input
+            id="hero-search"
             value={q}
-            onChange={(e) => {
-              const next = e.target.value;
-              setQ(next);
-              syncUrl(next);
-            }}
+            onChange={(e) => setQ(e.target.value)}
             placeholder="Search heroes…"
-            className="h-10 w-full rounded-xl border border-neutral-800 bg-black/70 px-3 text-sm text-white outline-none transition placeholder:text-neutral-500 focus:border-neutral-600 focus:shadow-[0_0_25px_rgba(0,255,255,0.18)] sm:w-[320px]"
+            className="w-full rounded-2xl border border-neutral-800 bg-black/60 px-4 py-3 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-neutral-600 focus:ring-2 focus:ring-white/10"
           />
-
-          {q.trim() ? (
-            <button
-              type="button"
-              onClick={() => {
-                setQ("");
-                syncUrl("");
-              }}
-              className="h-10 shrink-0 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white"
-              title="Clear search"
-            >
-              Clear
-            </button>
-          ) : null}
+          <div className="mt-2 text-xs text-neutral-500">
+            Showing{" "}
+            <span className="text-neutral-300">{filtered.length}</span> of{" "}
+            <span className="text-neutral-300">{heroes.length}</span>
+            {patch ? (
+              <>
+                {" "}
+                • Patch <span className="text-neutral-300">{patch}</span>
+              </>
+            ) : null}
+            {cacheLabel ? (
+              <>
+                {" "}
+                • Cache <span className="text-neutral-300">{cacheLabel}</span>
+              </>
+            ) : null}
+          </div>
         </div>
 
-        <div className="text-xs text-neutral-500 sm:text-right">
-          {q.trim() ? (
-            <>
-              Showing <span className="text-neutral-200">{filtered.length}</span> results
-            </>
-          ) : (
-            <>Tip: start typing to filter</>
-          )}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setQ("")}
+            className="rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.25)]"
+          >
+            Clear
+          </button>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {filtered.map((h) => (
           <Link
             key={h.id}
             href={`/tools/dota/heroes/${h.slug}`}
-            className="flex items-center gap-3 rounded-2xl border border-neutral-800 bg-black/60 p-4 transition hover:border-neutral-600 hover:bg-black/75"
+            className="group flex items-center gap-3 rounded-2xl border border-neutral-800 bg-black/40 p-3 transition hover:border-neutral-600 hover:bg-black/55 hover:shadow-[0_0_28px_rgba(0,255,255,0.18)]"
           >
-            {h.icon ? (
-              <img
-                src={h.icon}
-                alt=""
-                className="h-9 w-9 rounded-xl border border-neutral-800 bg-black/40"
-                loading="lazy"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="h-9 w-9 rounded-xl border border-neutral-800 bg-black/40" />
-            )}
+            <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-black">
+              {h.icon ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={h.icon}
+                  alt={h.name}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-xs text-neutral-500">
+                  —
+                </div>
+              )}
+            </div>
+
             <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-neutral-100">{h.name}</div>
+              <div className="truncate text-sm font-semibold text-white group-hover:text-white">
+                {h.name}
+              </div>
+              <div className="truncate text-xs text-neutral-500">
+                /{h.slug}
+              </div>
             </div>
           </Link>
         ))}
       </div>
 
-      {/* Empty state */}
-      {q.trim() && filtered.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-neutral-800 bg-black/60 p-6 text-sm text-neutral-300">
-          No heroes found for <span className="text-white">“{q.trim()}”</span>.
-          <div className="mt-2 text-xs text-neutral-500">
-            Try a shorter name (e.g., “void”, “spirit”, “zeu”).
-          </div>
+      {filtered.length === 0 ? (
+        <div className="mt-10 rounded-2xl border border-neutral-800 bg-black/40 p-6 text-sm text-neutral-300">
+          No heroes match{" "}
+          <span className="font-semibold text-white">{q}</span>. Try a different
+          search.
         </div>
       ) : null}
-    </div>
+    </section>
   );
 }
