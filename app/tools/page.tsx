@@ -28,35 +28,33 @@ export default function ToolsPage() {
         <div className="mx-auto max-w-5xl">
           {/* Header */}
           <header className="mb-8 flex items-center">
-  {/* Left: Logo */}
-  <Link href="/" className="flex items-center gap-2 hover:opacity-90">
-    <img
-      src="/gs-logo-v2.png"
-      alt="GamerStation"
-      className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
-    />
-    <span className="text-lg font-black tracking-tight">
-      GamerStation<span className="align-super text-[0.6em]">™</span>
-    </span>
-  </Link>
+            {/* Left: Logo */}
+            <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+              <img
+                src="/gs-logo-v2.png"
+                alt="GamerStation"
+                className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
+              />
+              <span className="text-lg font-black tracking-tight">
+                GamerStation<span className="align-super text-[0.6em]">™</span>
+              </span>
+            </Link>
 
-  {/* Right: Calculators button */}
-   <a
-  href="/calculators"
-  className="
-    ml-auto rounded-xl border border-neutral-800
-    bg-black px-4 py-2 text-sm text-neutral-200
-    transition
-    hover:border-grey-400
-   
-    hover:text-white
-    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
-  "
->
-  Calculators
-</a>
-</header>
-
+            {/* Right: Calculators button */}
+            <a
+              href="/calculators"
+              className="
+                ml-auto rounded-xl border border-neutral-800
+                bg-black px-4 py-2 text-sm text-neutral-200
+                transition
+                hover:border-grey-400
+                hover:text-white
+                hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+              "
+            >
+              Calculators
+            </a>
+          </header>
 
           <h1 className="mt-2 text-4xl font-bold tracking-tight">Tools</h1>
           <p className="mt-3 text-neutral-300">
@@ -85,37 +83,60 @@ export default function ToolsPage() {
             </Link>
 
             <Link
-  href="/calculators/lol/meta"
-  className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
->
-  <div className="text-sm font-semibold">LoL Meta</div>
-  <div className="mt-2 text-sm text-neutral-400">
-    Role-based boots + core items from real ranked matches.
-  </div>
-</Link>
+              href="/calculators/lol/meta"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">LoL Meta</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Role-based boots + core items from real ranked matches.
+              </div>
+            </Link>
 
-{/* Meta Loadouts */}
-          <Link
-            href="/games/cod/meta-loadouts"
+            {/* ✅ Dota 2 Player Stats */}
+            <Link
+              href="/tools/dota/meta"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">Dota 2 Meta</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Winrate, MMR estimate, and pickrate (OpenDota).
+              </div>
+            </Link>
 
-            className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
->
-            <div className="text-sm font-semibold">Meta Loadouts</div>
-            <div className="mt-2 text-sm text-neutral-400">
-              Current best weapon builds for Warzone and Multiplayer.
-            </div>
-          </Link>
+{/* ✅ Dota 2 champ index */}
+            <Link
+              href="/tools/dota/heroes"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">Dota 2 Hero Index</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Current heros and stats.
+              </div>
+            </Link>
 
-           {/* Weapon Buffs / Nerfs */}
-          <Link
-            href="/games/cod/buffs-nerfs"
-            className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
->
-            <div className="text-sm font-semibold">Weapon Buffs / Nerfs</div>
-            <div className="mt-2 text-sm text-neutral-400">
-              Patch watch: expected buffs, nerfs, rebalances, and meta shifts.
-            </div>
-          </Link>
+            {/* Meta Loadouts */}
+            <Link
+              href="/games/cod/meta-loadouts"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">COD Meta Loadouts</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Current best weapon builds for Warzone and Multiplayer.
+              </div>
+            </Link>
+
+            {/* Weapon Buffs / Nerfs */}
+            <Link
+              href="/games/cod/buffs-nerfs"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">COD Weapon Buffs / Nerfs</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Patch watch: expected buffs, nerfs, rebalances, and meta shifts.
+              </div>
+            </Link>
+
+            
           </div>
         </div>
       </div>
