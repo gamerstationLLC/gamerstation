@@ -1,6 +1,7 @@
 // app/tools/lol/leaderboard/client.tsx
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 export type RegionKey = "na1" | "euw1" | "kr";
@@ -130,18 +131,12 @@ function toRows(json: LeaderboardJson): LeaderboardRow[] {
   }));
 }
 
-// 1) Replace normalizeIconUrl with this:
+// ✅ accept absolute + protocol-relative only; reject random strings
 function normalizeIconUrl(url?: string | null): string | null {
   const u = (url ?? "").trim();
   if (!u) return null;
-
-  // ✅ accept normal absolute
   if (u.startsWith("https://") || u.startsWith("http://")) return u;
-
-  // ✅ accept protocol-relative (common in some outputs)
   if (u.startsWith("//")) return `https:${u}`;
-
-  // ❌ reject everything else (like "6504.png", "/cdn/..", etc.)
   return null;
 }
 
@@ -267,6 +262,10 @@ export default function LeaderboardClient({
   const surfaceRow = "bg-neutral-950/60";
   const surfaceHover = "";
 
+  // ✅ your “pilled internal nav” pattern (same as Dota pages)
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
       <div className="pointer-events-none absolute inset-0">
@@ -286,61 +285,37 @@ export default function LeaderboardClient({
 
       <div className="relative px-6 py-16">
         <div className="mx-auto max-w-5xl">
-          <header className="mb-8 flex items-start">
-            {/* Left: brand + back-to-tools link */}
-            <div className="flex flex-col">
-              <a href="/" className="flex items-center gap-2 hover:opacity-90">
-                <img
-                  src="/gs-logo-v2.png"
-                  alt="GamerStation"
-                  className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
-                />
-                <span className="text-lg font-black tracking-tight">
-                  GamerStation<span className="align-super text-[0.6em]">™</span>
-                </span>
-              </a>
+          <header className="mb-8 flex items-center gap-3">
+            {/* Left: brand */}
+            <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+              <img
+                src="/gs-logo-v2.png"
+                alt="GamerStation"
+                className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
+              />
+              <span className="text-lg font-black tracking-tight">
+                GamerStation<span className="align-super text-[0.6em]">™</span>
+              </span>
+            </Link>
 
-              
+            {/* Right: internal nav pills */}
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <Link href="/tools" className={navBtn}>
+                Tools
+              </Link>
+              <Link href="/calculators/lol/hub" className={navBtn}>
+                LoL Hub
+              </Link>
+              <Link href="/calculators/lol/meta" className={navBtn}>
+                Meta
+              </Link>
             </div>
-
-            <a
-    href="/calculators/lol/meta"
-    className="
-      absolute right-110
-      rounded-xl border border-neutral-800
-      bg-black px-4 py-2 text-sm text-neutral-200
-      transition
-      hover:border-neutral
-      hover:text-white
-      hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
-    "
-  >
-    Meta
-  </a>
           </header>
 
           <h1 className="mt-2 text-4xl font-bold tracking-tight">LoL Leaderboard</h1>
           <p className="mt-3 text-neutral-300">Browse top players and see their stats + most played champs.</p>
-          <div className="mt-2 flex items-center gap-4">
-  <a
-    href="/tools"
-    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
-  >
-    <span aria-hidden>←</span>
-    <span>Tools</span>
-  </a>
 
-  <a
-    href="/calculators/lol/hub"
-    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
-  >
-    <span aria-hidden>←</span>
-    <span>LoL Hub</span>
-  </a>
-</div>
-
-
-          <div className={`mt-3 rounded-2xl border p-4 ${surfaceCard}`}>
+          <div className={`mt-6 rounded-2xl border p-4 ${surfaceCard}`}>
             <div className="grid gap-3 sm:grid-cols-3">
               <label className="space-y-1">
                 <div className="text-xs text-neutral-400">Region</div>
@@ -417,9 +392,7 @@ export default function LeaderboardClient({
 
               <div className={`divide-y divide-neutral-800 ${surfaceRow}`}>
                 {rows.length === 0 ? (
-                  <div className="px-4 py-10 text-sm text-neutral-400">
-                    {loading ? "Loading…" : "No rows found for this selection."}
-                  </div>
+                  <div className="px-4 py-10 text-sm text-neutral-400">{loading ? "Loading…" : "No rows found for this selection."}</div>
                 ) : (
                   rows.map((r) => {
                     const rowKey = `${r.region}-${r.queue}-${r.tier}-${r.puuid}`;
@@ -450,9 +423,7 @@ export default function LeaderboardClient({
                           )}
 
                           <div className="min-w-0">
-                            <div className="font-semibold text-neutral-200 whitespace-normal break-words leading-snug">
-                              {displayName}
-                            </div>
+                            <div className="font-semibold text-neutral-200 whitespace-normal break-words leading-snug">{displayName}</div>
                           </div>
 
                           {r.flags?.hotStreak ? (
@@ -473,7 +444,7 @@ export default function LeaderboardClient({
 
                         <div className="col-span-2 flex items-center gap-2">
                           {(r.topChamps ?? []).slice(0, 3).map((c) => (
-                            <a key={c.name} href={champLink(c.name)} className="relative group" aria-label={c.name}>
+                            <Link key={c.name} href={champLink(c.name)} className="relative group" aria-label={c.name}>
                               <img
                                 src={champIcon(c.name, ddVersion)}
                                 className="
@@ -483,6 +454,7 @@ export default function LeaderboardClient({
                                   group-hover:border-cyan-400
                                 "
                                 loading="lazy"
+                                alt=""
                               />
 
                               <span
@@ -504,7 +476,7 @@ export default function LeaderboardClient({
                               >
                                 {c.name}
                               </div>
-                            </a>
+                            </Link>
                           ))}
                           {(r.topChamps ?? []).length === 0 ? <span className="text-neutral-600">—</span> : null}
                         </div>

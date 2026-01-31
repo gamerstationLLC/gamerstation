@@ -7,7 +7,7 @@ on:
 
 concurrency:
   group: lol-leaderboards-update
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Make sure we're up-to-date with main BEFORE generating files
+      # ✅ Always start from latest origin/main
       - name: Sync with main (pre-build)
         run: |
           set -e
@@ -103,8 +103,24 @@ jobs:
 
           git commit -m "chore(lol): refresh leaderboards"
 
-          # ✅ Race-safe: rebase our commit on top of latest origin/main before pushing
-          git fetch origin main
-          git rebase origin/main
+          # ✅ Parallel-safe push: rebase + retry loop
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i: fetching + rebasing on origin/main..."
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "Rebase failed; aborting and retrying..."
+              git rebase --abort || true
+            fi
 
-          git push origin HEAD:main
+            echo "Attempt $i: pushing..."
+            if git push origin HEAD:main; then
+              echo "Push succeeded."
+              exit 0
+            fi
+
+            echo "Push failed (attempt $i). Retrying in 5s..."
+            sleep 5
+          done
+
+          echo "Push failed after retries."
+          exit 1

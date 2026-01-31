@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Always start from latest origin/main (prevents rebase failures later)
+      # ✅ Always start from latest origin/main
       - name: Sync with main (pre-build)
         run: |
           set -e
@@ -52,13 +52,11 @@ jobs:
             lol-riot-cache-v1-${{ runner.os }}
             lol-riot-cache-v1
 
-      # ✅ Useful early signal: did we restore cache?
       - name: Debug - Cache hit
         run: |
           echo "cache-hit=${{ steps.riot_cache.outputs.cache-hit }}"
           du -sh scripts/riot/cache/* 2>/dev/null || true
 
-      # 🔥 KEEP ONLY LAST 90 DAYS OF MATCH DATA (repo cache)
       - name: Prune old Riot cache (90 days)
         run: |
           set -e
@@ -79,14 +77,12 @@ jobs:
           echo "Cache pruning complete."
           du -sh scripts/riot/cache/* 2>/dev/null || true
 
-      # 1) Always update ddragon data + items (fast & deterministic)
       - name: Update LoL static data (ddragon + items)
         run: npm run lol:update
 
       - name: Update LoL overrides
         run: npm run lol:update:overrides
 
-      # 2) Crawl (can be long). If it hits timeout, we still want finalize to run.
       - name: Crawl Riot matches into cache/state (soft timeout)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
@@ -118,11 +114,9 @@ jobs:
         run: |
           set -e
 
-          # ✅ Capture exit code safely even with set -e
           EC=0
           timeout 17940 npm run lol:update:meta || EC=$?
 
-          # timeout returns 124; treat as "ok, partial crawl"
           if [ "$EC" -ne 0 ] && [ "$EC" -ne 124 ]; then
             echo "Crawl failed with exit code $EC"
             exit "$EC"
@@ -130,7 +124,6 @@ jobs:
 
           echo "Crawl completed (or timed out safely). Continuing..."
 
-      # 3) Finalize ALWAYS runs (build outputs from cache/state)
       - name: Finalize meta builds outputs from cache
         if: always()
         env:
@@ -140,7 +133,6 @@ jobs:
           MIN_PATCH_MAJOR: "16"
         run: npm run lol:finalize:meta
 
-      # ✅ Debug *after* crawl+finalize, right before commit: what will be committed?
       - name: Debug - What will be committed
         if: always()
         run: |
@@ -157,7 +149,6 @@ jobs:
           echo "== Diffstat (public/data/lol) =="
           git diff --stat -- public/data/lol || true
 
-      # 4) Commit outputs if changed (ALWAYS attempt, even if crawl failed)
       - name: Commit & push (if changed)
         if: always()
         run: |
@@ -166,10 +157,8 @@ jobs:
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          # Stage only what you intend to publish
           git add public/data/lol
 
-          # If nothing staged, exit cleanly
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
@@ -177,8 +166,24 @@ jobs:
 
           git commit -m "chore(lol): automated refresh"
 
-          # ✅ Race-safe: rebase our commit on top of latest origin/main before pushing
-          git fetch origin main
-          git rebase origin/main
+          # ✅ Parallel-safe push: rebase + retry loop
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i: fetching + rebasing on origin/main..."
+            git fetch origin main
+            if ! git rebase origin/main; then
+              echo "Rebase failed; aborting and retrying..."
+              git rebase --abort || true
+            fi
 
-          git push origin HEAD:main
+            echo "Attempt $i: pushing..."
+            if git push origin HEAD:main; then
+              echo "Push succeeded."
+              exit 0
+            fi
+
+            echo "Push failed (attempt $i). Retrying in 5s..."
+            sleep 5
+          done
+
+          echo "Push failed after retries."
+          exit 1
