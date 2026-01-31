@@ -29,10 +29,7 @@ export type HeroCard = {
 
 type PatchEntry = {
   name?: string; // e.g. "7.40"
-  patch?: string;
-  id?: number | string;
   date?: number; // unix seconds
-  timestamp?: number;
   [key: string]: any;
 };
 
@@ -61,34 +58,19 @@ async function getHeroStats(): Promise<HeroStatsRow[]> {
   return res.json();
 }
 
-function extractLatestPatchName(data: any): string | null {
-  const list: PatchEntry[] = Array.isArray(data)
-    ? data
-    : data && typeof data === "object"
-    ? Object.values(data)
-    : [];
-
-  if (!list.length) return null;
-
-  const sorted = [...list].sort((a, b) => {
-    const ad = Number(a.date ?? a.timestamp ?? 0);
-    const bd = Number(b.date ?? b.timestamp ?? 0);
-    return bd - ad;
-  });
-
-  const top = sorted[0] ?? {};
-  const name = (top.name || top.patch || "").toString().trim();
-  return name || null;
-}
-
+// ✅ Correct “current patch” source for OpenDota
 async function getLatestPatch(): Promise<string> {
   try {
-    const res = await fetch("https://api.opendota.com/api/constants/patch", {
-      next: { revalidate: 300 }, // keep in sync
+    const res = await fetch("https://api.opendota.com/api/patches", {
+      next: { revalidate: 300 }, // keep in sync with your cache label
     });
     if (!res.ok) return "—";
-    const data = await res.json();
-    return extractLatestPatchName(data) ?? "—";
+
+    const patches: PatchEntry[] = await res.json();
+    const latest = Array.isArray(patches) ? patches[0] : null;
+
+    const name = (latest?.name ?? "").toString().trim();
+    return name || "—";
   } catch {
     return "—";
   }

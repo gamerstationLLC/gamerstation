@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export type HeroStatsRow = {
   id: number;
@@ -159,8 +159,20 @@ const HEADER_BTN_DISABLED = [
   "border-neutral-800 bg-black text-neutral-500 opacity-60 cursor-not-allowed",
 ].join(" ");
 
-// ✅ NEW: props include a patch label and optional cache label.
-// You can pass patch="7.40" cacheLabel="~5 min" from the server page.
+// ✅ FIX: fetch patch from your OWN API route (no CORS, no 404)
+async function fetchLatestPatchClient(): Promise<string | null> {
+  try {
+    const res = await fetch("/api/dota/patch", { cache: "no-store" });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const name = (json?.patch ?? "").toString().trim();
+    return name && name !== "—" ? name : null;
+  } catch {
+    return null;
+  }
+}
+
+// ✅ props include a patch label and optional cache label.
 export default function DotaMetaClient({
   initialRows,
   patch = "—",
@@ -195,6 +207,33 @@ export default function DotaMetaClient({
     () => BRACKETS.find((b) => b.key === bracket)?.n ?? 5,
     [bracket]
   );
+
+  // ✅ live patch state (server prop is initial value)
+  const [patchLive, setPatchLive] = useState<string>(patch || "—");
+
+  // keep in sync during dev/HMR
+  useEffect(() => {
+    setPatchLive(patch || "—");
+  }, [patch]);
+
+  // ✅ client-side refresh via your own API route
+  useEffect(() => {
+    let alive = true;
+
+    async function refresh() {
+      const latest = await fetchLatestPatchClient();
+      if (!alive) return;
+      if (latest) setPatchLive(latest);
+    }
+
+    refresh();
+    const id = window.setInterval(refresh, 5 * 60 * 1000);
+
+    return () => {
+      alive = false;
+      window.clearInterval(id);
+    };
+  }, []);
 
   function onSortClick(key: SortKey) {
     if (key === "ban" && mode !== "pro") return;
@@ -381,10 +420,10 @@ export default function DotaMetaClient({
         </div>
       </div>
 
-      {/* ✅ NEW: Trust / patch row */}
+      {/* Trust / patch row */}
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
         <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
-          Patch: <span className="text-neutral-200">{patch}</span>
+          Patch: <span className="text-neutral-200">{patchLive}</span>
         </span>
         <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
           Data: <span className="text-neutral-200">OpenDota</span>
@@ -539,7 +578,9 @@ function HeroIcon({ relPath }: { relPath: string }) {
   const [triedFallback, setTriedFallback] = useState(false);
 
   if (!relPath) {
-    return <div className="h-7 w-7 shrink-0 rounded-lg border border-neutral-800 bg-black/40 sm:h-8 sm:w-8" />;
+    return (
+      <div className="h-7 w-7 shrink-0 rounded-lg border border-neutral-800 bg-black/40 sm:h-8 sm:w-8" />
+    );
   }
 
   return (

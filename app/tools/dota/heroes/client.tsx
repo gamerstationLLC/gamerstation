@@ -2,25 +2,65 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { HeroCard } from "./page";
 
 type Props = {
   heroes: HeroCard[];
   initialQuery: string;
 
-  // new optional props (so TS won't break if you remove them later)
+  // optional props (server can pass initial values)
   patch?: string;
   cacheLabel?: string;
 };
 
+// ✅ Fetch patch from your OWN API route (no CORS, consistent, cached by your route)
+async function fetchLatestPatchClient(): Promise<string | null> {
+  try {
+    const res = await fetch("/api/dota/patch", { cache: "no-store" });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const name = (json?.patch ?? "").toString().trim();
+    return name && name !== "—" ? name : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function DotaHeroesClient({
   heroes,
   initialQuery,
-  patch,
-  cacheLabel,
+  patch = "—",
+  cacheLabel = "~5 min",
 }: Props) {
   const [q, setQ] = useState(initialQuery ?? "");
+
+  // ✅ live patch (starts from server prop, then refreshes client-side)
+  const [patchLive, setPatchLive] = useState<string>(patch || "—");
+
+  // keep in sync during dev/HMR
+  useEffect(() => {
+    setPatchLive(patch || "—");
+  }, [patch]);
+
+  // refresh patch on mount + every ~5 minutes
+  useEffect(() => {
+    let alive = true;
+
+    async function refresh() {
+      const latest = await fetchLatestPatchClient();
+      if (!alive) return;
+      if (latest) setPatchLive(latest);
+    }
+
+    refresh();
+    const id = window.setInterval(refresh, 5 * 60 * 1000);
+
+    return () => {
+      alive = false;
+      window.clearInterval(id);
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     const query = (q || "").trim().toLowerCase();
@@ -43,22 +83,14 @@ export default function DotaHeroesClient({
             placeholder="Search heroes…"
             className="w-full rounded-2xl border border-neutral-800 bg-black/60 px-4 py-3 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-neutral-600 focus:ring-2 focus:ring-white/10"
           />
+
           <div className="mt-2 text-xs text-neutral-500">
-            Showing{" "}
-            <span className="text-neutral-300">{filtered.length}</span> of{" "}
+            Showing <span className="text-neutral-300">{filtered.length}</span> of{" "}
             <span className="text-neutral-300">{heroes.length}</span>
-            {patch ? (
-              <>
-                {" "}
-                • Patch <span className="text-neutral-300">{patch}</span>
-              </>
-            ) : null}
-            {cacheLabel ? (
-              <>
-                {" "}
-                • Cache <span className="text-neutral-300">{cacheLabel}</span>
-              </>
-            ) : null}
+            {" • "}
+            Patch <span className="text-neutral-300">{patchLive}</span>
+            {" • "}
+            Cache <span className="text-neutral-300">{cacheLabel}</span>
           </div>
         </div>
 
@@ -101,9 +133,7 @@ export default function DotaHeroesClient({
               <div className="truncate text-sm font-semibold text-white group-hover:text-white">
                 {h.name}
               </div>
-              <div className="truncate text-xs text-neutral-500">
-                /{h.slug}
-              </div>
+              <div className="truncate text-xs text-neutral-500">/{h.slug}</div>
             </div>
           </Link>
         ))}
@@ -111,8 +141,7 @@ export default function DotaHeroesClient({
 
       {filtered.length === 0 ? (
         <div className="mt-10 rounded-2xl border border-neutral-800 bg-black/40 p-6 text-sm text-neutral-300">
-          No heroes match{" "}
-          <span className="font-semibold text-white">{q}</span>. Try a different
+          No heroes match <span className="font-semibold text-white">{q}</span>. Try a different
           search.
         </div>
       ) : null}

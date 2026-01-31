@@ -8,25 +8,30 @@ export const metadata = {
     "Dota 2 meta heroes by rank bracket and pro trends. Pick rate + win rate with frequent updates. Data via OpenDota.",
 };
 
+// ✅ IMPORTANT: don’t let this run in Edge + don’t bake a bad fetch into static HTML
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 type PatchEntry = {
   name?: string; // e.g. "7.40"
-  patch?: string; // sometimes present
-  id?: number | string;
-  date?: number; // unix seconds (common)
-  timestamp?: number; // fallback
+  date?: number; // unix seconds
   [key: string]: any;
 };
 
 async function getHeroStats(): Promise<HeroStatsRow[]> {
   const res = await fetch("https://api.opendota.com/api/heroStats", {
-    next: { revalidate: 300 }, // ~5 minutes
+    next: { revalidate: 300 },
+    headers: {
+      Accept: "application/json",
+      // Some CDNs behave better with an explicit UA
+      "User-Agent": "GamerStation (https://gamerstation.gg)",
+    },
   });
   if (!res.ok) return [];
   return res.json();
 }
 
 function extractLatestPatchName(data: any): string | null {
-  // OpenDota constants/patch sometimes returns an array, sometimes an object.
   const list: PatchEntry[] = Array.isArray(data)
     ? data
     : data && typeof data === "object"
@@ -35,24 +40,29 @@ function extractLatestPatchName(data: any): string | null {
 
   if (!list.length) return null;
 
-  // Sort by most recent date-ish field
+  // safest: sort by date desc in case ordering changes
   const sorted = [...list].sort((a, b) => {
-    const ad = Number(a.date ?? a.timestamp ?? 0);
-    const bd = Number(b.date ?? b.timestamp ?? 0);
+    const ad = Number(a.date ?? 0);
+    const bd = Number(b.date ?? 0);
     return bd - ad;
   });
 
-  const top = sorted[0] ?? {};
-  const name = (top.name || top.patch || "").toString().trim();
+  const name = (sorted[0]?.name ?? "").toString().trim();
   return name || null;
 }
 
 async function getLatestPatch(): Promise<string> {
   try {
-    const res = await fetch("https://api.opendota.com/api/constants/patch", {
-      next: { revalidate: 300 }, // keep in sync with the rest
+    const res = await fetch("https://api.opendota.com/api/patches", {
+      next: { revalidate: 300 },
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "GamerStation (https://gamerstation.gg)",
+      },
     });
+
     if (!res.ok) return "—";
+
     const data = await res.json();
     return extractLatestPatchName(data) ?? "—";
   } catch {
@@ -105,7 +115,8 @@ export default async function DotaMetaPage() {
 
           <h1 className="text-4xl font-bold tracking-tight">Dota 2 Meta</h1>
           <p className="mt-3 text-neutral-300">
-            Highest pick rate + best win rate by rank bracket, plus pro trends. Data from OpenDota.
+            Highest pick rate + best win rate by rank bracket, plus pro trends.
+            Data from OpenDota.
             <span className="text-neutral-500"> (Cached ~5 minutes)</span>
           </p>
 
