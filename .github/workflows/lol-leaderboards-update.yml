@@ -22,6 +22,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      # ✅ Make sure we're up-to-date with main BEFORE generating files
+      - name: Sync with main (pre-build)
+        run: |
+          set -e
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -52,8 +60,6 @@ jobs:
           LEADERBOARD_FINALIZE_CONCURRENCY: "2"
           LEADERBOARD_FINALIZE_REQ_MIN_GAP_MS: "200"
           LEADERBOARD_FINALIZE_GAP_MS: "200"
-          # optional:
-          # LEADERBOARD_DEBUG: "1"
         run: |
           set -e
           npm run lol:finalize:leaderboards
@@ -97,8 +103,8 @@ jobs:
 
           git commit -m "chore(lol): refresh leaderboards"
 
-          # Sync with remote main before pushing (prevents "fetch first" rejects)
-          git pull --rebase origin main
+          # ✅ Race-safe: rebase our commit on top of latest origin/main before pushing
+          git fetch origin main
+          git rebase origin/main
 
-          # Push the rebased HEAD
           git push origin HEAD:main
