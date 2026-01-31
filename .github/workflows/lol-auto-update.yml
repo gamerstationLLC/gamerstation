@@ -169,4 +169,9 @@ jobs:
           fi
 
           git commit -m "chore(lol): automated refresh"
-          git push origin main
+
+          # ✅ Sync with remote main before pushing (prevents "fetch first" rejects)
+          git pull --rebase origin main
+
+          # Push the rebased HEAD
+          git push origin HEAD:main

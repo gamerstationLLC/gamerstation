@@ -2,8 +2,7 @@ name: Update LoL Leaderboards
 
 on:
   schedule:
-    - cron: "0 * * * *"   
-
+    - cron: "0 * * * *" # every hour
   workflow_dispatch: {}
 
 concurrency:
@@ -47,6 +46,7 @@ jobs:
 
       # 2) Finalize leaderboards JSON (fill summonerId/profileIconId/level)
       - name: Finalize LoL leaderboards (transfer summoner data)
+        if: always()
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           LEADERBOARD_FINALIZE_CONCURRENCY: "2"
@@ -79,8 +79,9 @@ jobs:
             head -n 60 "$PREVIEW_FILE" || true
           fi
 
-      # 4) Commit outputs if changed
+      # 4) Commit outputs if changed (race-safe with other workflows)
       - name: Commit & push (if changed)
+        if: always()
         run: |
           set -e
 
@@ -95,4 +96,9 @@ jobs:
           fi
 
           git commit -m "chore(lol): refresh leaderboards"
-          git push origin main
+
+          # Sync with remote main before pushing (prevents "fetch first" rejects)
+          git pull --rebase origin main
+
+          # Push the rebased HEAD
+          git push origin HEAD:main
