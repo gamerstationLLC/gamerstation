@@ -14,17 +14,78 @@ type Props = {
   cacheLabel?: string;
 };
 
-// ✅ Fetch patch from your OWN API route (no CORS, consistent, cached by your route)
-async function fetchLatestPatchClient(): Promise<string | null> {
-  try {
-    const res = await fetch("/api/dota/patch", { cache: "no-store" });
-    if (!res.ok) return null;
-    const json = await res.json();
-    const name = (json?.patch ?? "").toString().trim();
-    return name && name !== "—" ? name : null;
-  } catch {
+function extractPatch(json: any): string | null {
+  if (!json) return null;
+
+  if (Array.isArray(json)) {
+    const first = json[0];
+    if (typeof first === "string") return first.trim() || null;
+    if (first && typeof first === "object") return extractPatch(first);
     return null;
   }
+
+  if (typeof json === "object") {
+    const candidates = [
+      json.patch,
+      json.name,
+      json.version,
+      json.latest,
+      json.current,
+      json.value,
+    ];
+
+    for (const c of candidates) {
+      if (typeof c === "string") {
+        const s = c.trim();
+        if (s) return s;
+      }
+      if (typeof c === "number" && Number.isFinite(c)) return String(c);
+    }
+  }
+
+  if (typeof json === "string") {
+    const s = json.trim();
+    return s || null;
+  }
+
+  return null;
+}
+
+async function fetchLatestPatchClient(): Promise<string | null> {
+  const controller = new AbortController();
+  const t = window.setTimeout(() => controller.abort(), 12_000);
+
+  try {
+    const res = await fetch("/api/dota/patch", {
+      cache: "no-store",
+      credentials: "same-origin",
+      signal: controller.signal,
+      headers: { Accept: "application/json" },
+    });
+
+    if (!res.ok) return null;
+
+    const json = await res.json().catch(() => null);
+    const patch = extractPatch(json);
+
+    if (!patch) return null;
+    const low = patch.toLowerCase();
+    if (low === "—" || low === "-" || low === "unknown") return null;
+
+    return patch;
+  } catch {
+    return null;
+  } finally {
+    window.clearTimeout(t);
+  }
+}
+
+function Pill({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1 text-xs text-neutral-400">
+      {label}: <span className="text-neutral-200">{value}</span>
+    </span>
+  );
 }
 
 export default function DotaHeroesClient({
@@ -70,8 +131,16 @@ export default function DotaHeroesClient({
 
   return (
     <section className="mt-8">
+      {/* ✅ Pills row (client-driven so Patch updates here too) */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Pill label="Patch" value={patchLive || "—"} />
+        <Pill label="Data" value="OpenDota" />
+        <Pill label="Cache" value={cacheLabel} />
+        <Pill label="Heroes" value={`${heroes.length}`} />
+      </div>
+
       {/* Search row */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1">
           <label className="sr-only" htmlFor="hero-search">
             Search heroes
@@ -83,15 +152,7 @@ export default function DotaHeroesClient({
             placeholder="Search heroes…"
             className="w-full rounded-2xl border border-neutral-800 bg-black/60 px-4 py-3 text-sm text-white outline-none placeholder:text-neutral-500 focus:border-neutral-600 focus:ring-2 focus:ring-white/10"
           />
-
-          <div className="mt-2 text-xs text-neutral-500">
-            Showing <span className="text-neutral-300">{filtered.length}</span> of{" "}
-            <span className="text-neutral-300">{heroes.length}</span>
-            {" • "}
-            Patch <span className="text-neutral-300">{patchLive}</span>
-            {" • "}
-            Cache <span className="text-neutral-300">{cacheLabel}</span>
-          </div>
+          {/* ✅ removed the "Showing ... Patch ... Cache ..." line entirely */}
         </div>
 
         <div className="flex items-center gap-2">
@@ -116,23 +177,14 @@ export default function DotaHeroesClient({
             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-black">
               {h.icon ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={h.icon}
-                  alt={h.name}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
+                <img src={h.icon} alt={h.name} className="h-full w-full object-cover" loading="lazy" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center text-xs text-neutral-500">
-                  —
-                </div>
+                <div className="flex h-full w-full items-center justify-center text-xs text-neutral-500">—</div>
               )}
             </div>
 
             <div className="min-w-0">
-              <div className="truncate text-sm font-semibold text-white group-hover:text-white">
-                {h.name}
-              </div>
+              <div className="truncate text-sm font-semibold text-white group-hover:text-white">{h.name}</div>
               <div className="truncate text-xs text-neutral-500">/{h.slug}</div>
             </div>
           </Link>
@@ -141,8 +193,7 @@ export default function DotaHeroesClient({
 
       {filtered.length === 0 ? (
         <div className="mt-10 rounded-2xl border border-neutral-800 bg-black/40 p-6 text-sm text-neutral-300">
-          No heroes match <span className="font-semibold text-white">{q}</span>. Try a different
-          search.
+          No heroes match <span className="font-semibold text-white">{q}</span>. Try a different search.
         </div>
       ) : null}
     </section>

@@ -27,12 +27,6 @@ export type HeroCard = {
   icon: string;
 };
 
-type PatchEntry = {
-  name?: string; // e.g. "7.40"
-  date?: number; // unix seconds
-  [key: string]: any;
-};
-
 function slugify(input: string) {
   return input
     .toLowerCase()
@@ -53,24 +47,32 @@ function iconUrl(r: HeroStatsRow) {
 async function getHeroStats(): Promise<HeroStatsRow[]> {
   const res = await fetch("https://api.opendota.com/api/heroStats", {
     next: { revalidate: 300 }, // ~5 minutes
+    headers: { Accept: "application/json" },
   });
   if (!res.ok) return [];
   return res.json();
 }
 
-// ✅ Correct “current patch” source for OpenDota
-async function getLatestPatch(): Promise<string> {
+// ✅ Server-side patch: use YOUR route so it matches the client exactly
+async function getPatchFromSelf(): Promise<string> {
   try {
-    const res = await fetch("https://api.opendota.com/api/patches", {
-      next: { revalidate: 300 }, // keep in sync with your cache label
+    const base =
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_URL
+        ? process.env.VERCEL_URL.startsWith("http")
+          ? process.env.VERCEL_URL
+          : `https://${process.env.VERCEL_URL}`
+        : "http://localhost:3000");
+
+    const res = await fetch(`${base}/api/dota/patch`, {
+      next: { revalidate: 300 },
+      headers: { Accept: "application/json" },
     });
+
     if (!res.ok) return "—";
-
-    const patches: PatchEntry[] = await res.json();
-    const latest = Array.isArray(patches) ? patches[0] : null;
-
-    const name = (latest?.name ?? "").toString().trim();
-    return name || "—";
+    const json = await res.json().catch(() => null);
+    const patch = (json?.patch ?? "").toString().trim();
+    return patch || "—";
   } catch {
     return "—";
   }
@@ -82,7 +84,7 @@ export default async function DotaHeroesIndexPage({
   searchParams?: { q?: string };
 }) {
   // ✅ fetch both in parallel
-  const [rows, patch] = await Promise.all([getHeroStats(), getLatestPatch()]);
+  const [rows, patch] = await Promise.all([getHeroStats(), getPatchFromSelf()]);
 
   const heroes: HeroCard[] = rows
     .map((r) => {
@@ -141,33 +143,12 @@ export default async function DotaHeroesIndexPage({
           <h1 className="text-4xl font-bold tracking-tight">Dota 2 Heroes</h1>
 
           <p className="mt-3 text-neutral-300">
-            Browse every Dota 2 hero with quick links to hero pages and meta
-            context. Powered by OpenDota match data and refreshed often.
+            Browse every Dota 2 hero with quick links to hero pages and meta context. Powered by OpenDota match
+            data and refreshed often.
           </p>
 
-          {/* ✅ Small trust row (now includes patch) */}
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
-            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
-              Patch: <span className="text-neutral-200">{patch}</span>
-            </span>
-            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
-              Data: <span className="text-neutral-200">OpenDota</span>
-            </span>
-            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
-              Cache: <span className="text-neutral-200">~5 minutes</span>
-            </span>
-            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
-              {heroes.length.toLocaleString()} heroes
-            </span>
-          </div>
-
-          {/* ✅ Client-side live search + list rendering (now receives patch) */}
-          <DotaHeroesClient
-            heroes={heroes}
-            initialQuery={initialQuery}
-            patch={patch}
-            cacheLabel="~5 min"
-          />
+          {/* ✅ Pills are now rendered ONLY in the client */}
+          <DotaHeroesClient heroes={heroes} initialQuery={initialQuery} patch={patch} cacheLabel="~5 min" />
         </div>
       </div>
     </main>

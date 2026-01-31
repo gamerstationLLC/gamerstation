@@ -16,14 +16,34 @@ type HeroStatsRow = {
   [key: string]: any; // 1_pick/1_win ... 8_pick/8_win
 };
 
-function heroSlugFromRow(r: HeroStatsRow) {
-  const raw = (r.name || "").toString().trim();
-  if (raw.startsWith("npc_dota_hero_")) return raw.replace("npc_dota_hero_", "");
-  const fallback = (r.localized_name || "").toString().toLowerCase().trim();
-  return fallback
+/**
+ * Canonical slug: kebab-case, stable.
+ * - Prefer OpenDota `name` (npc_dota_hero_xxx) because localized_name can differ wildly (Io/wisp, etc.)
+ * - Convert underscores -> hyphens
+ * - Safe URL chars only
+ */
+function heroSlugFromRow(r: Pick<HeroStatsRow, "name" | "localized_name">) {
+  const base = (r.name || r.localized_name || "").toString().trim().toLowerCase();
+
+  return base
+    .replace(/^npc_dota_hero_/, "")
+    .replace(/_/g, "-") // ✅ key fix
     .replace(/['"]/g, "")
     .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+/**
+ * Normalize incoming route slug so we can accept legacy underscore URLs too.
+ */
+function normalizeSlugParam(slug: string) {
+  return (slug || "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 }
@@ -163,7 +183,15 @@ const getPatchCached = cache(async (): Promise<string> => {
 async function getHeroBySlug(slug: string) {
   const result = await getHeroStatsCached();
   if (result.state !== "ok") return { hero: null as HeroStatsRow | null, result };
-  const hero = result.rows.find((r) => heroSlugFromRow(r) === slug) ?? null;
+
+  const wanted = normalizeSlugParam(slug);
+
+  const hero =
+    result.rows.find((r) => heroSlugFromRow(r) === wanted) ??
+    // Extra tolerance: sometimes people copy raw internal name w/ prefix
+    result.rows.find((r) => heroSlugFromRow(r) === normalizeSlugParam((r.name || "").toString())) ??
+    null;
+
   return { hero, result };
 }
 
@@ -199,7 +227,8 @@ export default async function DotaHeroPage({
   const trendsTab: TrendsTab = sp?.tab === "pro" ? "pro" : "public";
 
   // ✅ fetch heroStats + patch in parallel
-  const [{ hero, result }, patch] = await Promise.all([getHeroBySlug(slug), getPatchCached()]);
+  const normalizedSlug = normalizeSlugParam(slug);
+  const [{ hero, result }, patch] = await Promise.all([getHeroBySlug(normalizedSlug), getPatchCached()]);
 
   // If OpenDota is rate-limiting or down, show a friendly "queue" state instead of 500.
   if (!hero && result.state !== "ok") {
@@ -244,17 +273,15 @@ export default async function DotaHeroPage({
 
             <div className="rounded-2xl border border-neutral-800 bg-black/60 p-6">
               <div className="text-sm font-semibold text-neutral-200">
-                {result.state === "rate_limited"
-                  ? "Too many requests right now"
-                  : "Data temporarily unavailable"}
+                {result.state === "rate_limited" ? "Too many requests right now" : "Data temporarily unavailable"}
               </div>
 
               <p className="mt-2 text-sm text-neutral-300">
                 {result.state === "rate_limited"
                   ? "OpenDota is rate-limiting requests. We’ll be back in a moment."
                   : result.state === "timeout"
-                  ? "OpenDota is responding slowly right now. Please try again shortly."
-                  : "OpenDota is having issues right now. Please try again shortly."}
+                    ? "OpenDota is responding slowly right now. Please try again shortly."
+                    : "OpenDota is having issues right now. Please try again shortly."}
               </p>
 
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
@@ -295,7 +322,7 @@ export default async function DotaHeroPage({
 
               <div className="mt-5 flex flex-wrap gap-2">
                 <Link
-                  href={`/tools/dota/heroes/${slug}`}
+                  href={`/tools/dota/heroes/${normalizedSlug}`}
                   className="rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white"
                 >
                   Retry now
@@ -392,10 +419,14 @@ export default async function DotaHeroPage({
   const proNet = proWin - proLoss;
 
   const proSampleNote =
-    proPick >= 80 ? "Good sample — pro winrate is fairly meaningful." : proPick >= 30 ? "Medium sample — use some caution." : "Small sample — use caution.";
+    proPick >= 80
+      ? "Good sample — pro winrate is fairly meaningful."
+      : proPick >= 30
+        ? "Medium sample — use some caution."
+        : "Small sample — use caution.";
 
-  const publicUrl = `/tools/dota/heroes/${slug}?tab=public`;
-  const proUrl = `/tools/dota/heroes/${slug}?tab=pro`;
+  const publicUrl = `/tools/dota/heroes/${normalizedSlug}?tab=public`;
+  const proUrl = `/tools/dota/heroes/${normalizedSlug}?tab=pro`;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -466,7 +497,7 @@ export default async function DotaHeroPage({
                   href="/tools/dota/meta"
                   className="rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white"
                 >
-                  Back to Meta
+                  Meta
                 </Link>
 
                 <Link
@@ -486,145 +517,147 @@ export default async function DotaHeroPage({
             <Stat label="Pro winrate" value={proPick ? pct(proWin, proPick) : "—"} />
           </div>
 
-          {/* ✅ IMPORTANT: Right column (Public by Rank Bracket) is ALWAYS rendered, independent of Trends tab */}
-<div className="mt-6 grid items-start gap-6 lg:grid-cols-3">
-  {/* Trends (Left) */}
-  <div className="self-start rounded-2xl border border-neutral-800 bg-black/60 p-5">
-    <div className="flex items-center justify-between gap-3">
-      <div className="text-sm font-semibold">Trends</div>
+          {/* Your existing layout below (unchanged) */}
+          <div className="mt-6 grid items-start gap-6 lg:grid-cols-3">
+            {/* Trends (Left) */}
+            <div className="self-start rounded-2xl border border-neutral-800 bg-black/60 p-5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-sm font-semibold">Trends</div>
 
-      {/* Tabs (server-side via ?tab=) */}
-      <div className="inline-flex rounded-2xl border border-neutral-800 bg-black/40 p-1 text-xs">
-        <Link
-          href={proUrl}
-          className={[
-            "rounded-xl px-3 py-1.5 font-semibold transition",
-            trendsTab === "pro"
-              ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,255,255,0.14)]"
-              : "text-neutral-300 hover:text-white",
-          ].join(" ")}
-        >
-          Pro
-        </Link>
-        <Link
-          href={publicUrl}
-          className={[
-            "rounded-xl px-3 py-1.5 font-semibold transition",
-            trendsTab === "public"
-              ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,255,255,0.14)]"
-              : "text-neutral-300 hover:text-white",
-          ].join(" ")}
-        >
-          Public
-        </Link>
-      </div>
-    </div>
-
-    {trendsTab === "pro" ? (
-      <>
-        <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
-          <StatTiny label="Pro picks" value={fmtInt(proPick)} />
-          <StatTiny label="Pro bans" value={fmtInt(proBan)} />
-          <StatTiny label="Pro winrate" value={proPick ? pct(proWin, proPick) : "—"} />
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4">
-          <div className="text-xs font-semibold text-neutral-200">Pro pressure</div>
-
-          <div className="mt-3 grid gap-2 text-sm">
-            <RowKV label="Presence" value={fmtInt(proPresence)} />
-            <RowKV label="Ban share" value={pct01(proBanShare)} />
-            <RowKV label="Pick share" value={pct01(proPickShare)} />
-            <RowKV label="Pick : Ban" value={`${(Math.round(pickToBan * 100) / 100).toFixed(2)}×`} />
-          </div>
-
-          <div className="mt-3 text-xs text-neutral-500">
-            High bans relative to picks usually means “respect/denial” even if the hero isn’t spammed.
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4">
-          <div className="text-xs font-semibold text-neutral-200">Pro results</div>
-
-          <div className="mt-3 grid gap-2 text-sm">
-            <RowKV label="Wins" value={fmtInt(proWin)} />
-            <RowKV label="Losses" value={fmtInt(proLoss)} />
-            <RowKV label="Net" value={fmtInt(proNet)} />
-          </div>
-
-          <div className="mt-3 text-xs text-neutral-500">{proSampleNote}</div>
-        </div>
-      </>
-    ) : (
-      <>
-        <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-          <StatTiny label="Public picks" value={fmtInt(publicPicks)} />
-          <StatTiny label="Public winrate" value={pct01(publicWinrateAll)} />
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4">
-          <div className="text-xs font-semibold text-neutral-200">Best / Worst bracket</div>
-
-          <div className="mt-3 grid gap-2 text-sm">
-            <RowKV
-              label="Best"
-              value={bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "—"}
-            />
-            <RowKV
-              label="Worst"
-              value={worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "—"}
-            />
-          </div>
-
-          <div className="mt-3 text-xs text-neutral-500">
-            Uses min sample {fmtInt(MIN_SAMPLE)} picks to avoid tiny-pick bait.
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4">
-          <div className="text-xs font-semibold text-neutral-200">Most played brackets</div>
-
-          <div className="mt-3 grid gap-2 text-sm">
-            {topPickBrackets.map((b) => (
-              <div key={b.label} className="flex items-center justify-between">
-                <div className="font-medium text-neutral-100">{b.label}</div>
-                <div className="text-right tabular-nums text-neutral-200">
-                  {fmtInt(b.picks)}{" "}
-                  <span className="text-neutral-500">({(b.share * 100).toFixed(1)}%)</span>
+                {/* Tabs (server-side via ?tab=) */}
+                <div className="inline-flex rounded-2xl border border-neutral-800 bg-black/40 p-1 text-xs">
+                  <Link
+                    href={proUrl}
+                    className={[
+                      "rounded-xl px-3 py-1.5 font-semibold transition",
+                      trendsTab === "pro"
+                        ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,255,255,0.14)]"
+                        : "text-neutral-300 hover:text-white",
+                    ].join(" ")}
+                  >
+                    Pro
+                  </Link>
+                  <Link
+                    href={publicUrl}
+                    className={[
+                      "rounded-xl px-3 py-1.5 font-semibold transition",
+                      trendsTab === "public"
+                        ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,255,255,0.14)]"
+                        : "text-neutral-300 hover:text-white",
+                    ].join(" ")}
+                  >
+                    Public
+                  </Link>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </>
-    )}
-  </div>
 
-  {/* Public by bracket (Right) — ALWAYS visible */}
-  <div className="self-start rounded-2xl border border-neutral-800 bg-black/60 p-6 lg:col-span-2">
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-      <div className="text-sm font-semibold">Public by Rank Bracket</div>
+              {trendsTab === "pro" ? (
+                <>
+                  <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
+                    <StatTiny label="Pro picks" value={fmtInt(proPick)} />
+                    <StatTiny label="Pro bans" value={fmtInt(proBan)} />
+                    <StatTiny label="Pro winrate" value={proPick ? pct(proWin, proPick) : "—"} />
+                  </div>
 
-      <div className="flex flex-wrap gap-2 text-xs">
-        <Pill
-          label="Best bracket"
-          value={bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "—"}
-        />
-        <Pill
-          label="Worst bracket"
-          value={worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "—"}
-        />
-      </div>
-    </div>
+                  <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4">
+                    <div className="text-xs font-semibold text-neutral-200">Pro pressure</div>
 
-    {/* ...keep the rest of your right column exactly as-is... */}
+                    <div className="mt-3 grid gap-2 text-sm">
+                      <RowKV label="Presence" value={fmtInt(proPresence)} />
+                      <RowKV label="Ban share" value={pct01(proBanShare)} />
+                      <RowKV label="Pick share" value={pct01(proPickShare)} />
+                      <RowKV
+                        label="Pick : Ban"
+                        value={`${(Math.round(pickToBan * 100) / 100).toFixed(2)}×`}
+                      />
+                    </div>
 
+                    <div className="mt-3 text-xs text-neutral-500">
+                      High bans relative to picks usually means “respect/denial” even if the hero isn’t spammed.
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4">
+                    <div className="text-xs font-semibold text-neutral-200">Pro results</div>
+
+                    <div className="mt-3 grid gap-2 text-sm">
+                      <RowKV label="Wins" value={fmtInt(proWin)} />
+                      <RowKV label="Losses" value={fmtInt(proLoss)} />
+                      <RowKV label="Net" value={fmtInt(proNet)} />
+                    </div>
+
+                    <div className="mt-3 text-xs text-neutral-500">{proSampleNote}</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <StatTiny label="Public picks" value={fmtInt(publicPicks)} />
+                    <StatTiny label="Public winrate" value={pct01(publicWinrateAll)} />
+                  </div>
+
+                  <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4">
+                    <div className="text-xs font-semibold text-neutral-200">Best / Worst bracket</div>
+
+                    <div className="mt-3 grid gap-2 text-sm">
+                      <RowKV
+                        label="Best"
+                        value={
+                          bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "—"
+                        }
+                      />
+                      <RowKV
+                        label="Worst"
+                        value={
+                          worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "—"
+                        }
+                      />
+                    </div>
+
+                    <div className="mt-3 text-xs text-neutral-500">
+                      Uses min sample {fmtInt(MIN_SAMPLE)} picks to avoid tiny-pick bait.
+                    </div>
+                  </div>
+
+                  <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4">
+                    <div className="text-xs font-semibold text-neutral-200">Most played brackets</div>
+
+                    <div className="mt-3 grid gap-2 text-sm">
+                      {topPickBrackets.map((b) => (
+                        <div key={b.label} className="flex items-center justify-between">
+                          <div className="font-medium text-neutral-100">{b.label}</div>
+                          <div className="text-right tabular-nums text-neutral-200">
+                            {fmtInt(b.picks)}{" "}
+                            <span className="text-neutral-500">({(b.share * 100).toFixed(1)}%)</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Public by bracket (Right) — ALWAYS visible */}
+            <div className="self-start rounded-2xl border border-neutral-800 bg-black/60 p-6 lg:col-span-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm font-semibold">Public by Rank Bracket</div>
+
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <Pill
+                    label="Best bracket"
+                    value={bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "—"}
+                  />
+                  <Pill
+                    label="Worst bracket"
+                    value={worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "—"}
+                  />
+                </div>
+              </div>
 
               {/* Mobile summary */}
               <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/50 p-4 md:hidden">
-                <div className="text-xs font-semibold text-neutral-300">
-                  Where this hero is played (top brackets)
-                </div>
+                <div className="text-xs font-semibold text-neutral-300">Where this hero is played (top brackets)</div>
                 <div className="mt-3 grid gap-2">
                   {topPickBrackets.map((b) => (
                     <div key={b.label} className="flex items-center justify-between text-sm">
@@ -682,7 +715,8 @@ export default async function DotaHeroPage({
               </div>
 
               <div className="mt-3 text-xs text-neutral-500">
-                Public totals are aggregated across all brackets. High winrate with tiny picks is bait — sanity check samples.
+                Public totals are aggregated across all brackets. High winrate with tiny picks is bait — sanity check
+                samples.
               </div>
             </div>
           </div>
