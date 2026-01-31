@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-01-30T07:31:35.443Z",
+  "generatedAt": "2026-01-31T02:36:33.550Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
-  "count": 9,
+  "count": 10,
   "players": [
     {
       "puuid": "bVZdq4zJuZN-t7PMNMZEJloEIskZ0YnreXD06LKGT4Y959qWCAXhzlY15NVSrxFZLx71c05iPJp4Mw",
@@ -17,11 +17,11 @@
           "count": 3
         },
         {
-          "name": "Garen",
-          "count": 2
+          "name": "Talon",
+          "count": 1
         },
         {
-          "name": "Talon",
+          "name": "Brand",
           "count": 1
         }
       ],
@@ -45,14 +45,14 @@
       "topChamps": [
         {
           "name": "Galio",
-          "count": 2
+          "count": 3
         },
         {
-          "name": "Aurora",
+          "name": "TwistedFate",
           "count": 1
         },
         {
-          "name": "Thresh",
+          "name": "Aurora",
           "count": 1
         }
       ],
@@ -76,10 +76,10 @@
       "topChamps": [
         {
           "name": "Ambessa",
-          "count": 2
+          "count": 3
         },
         {
-          "name": "Veigar",
+          "name": "Jinx",
           "count": 2
         },
         {
@@ -137,12 +137,12 @@
       "summonerLevel": 436,
       "topChamps": [
         {
-          "name": "Gwen",
+          "name": "Viego",
           "count": 3
         },
         {
-          "name": "Zaahen",
-          "count": 1
+          "name": "Ambessa",
+          "count": 2
         },
         {
           "name": "Vayne",
@@ -169,14 +169,14 @@
       "topChamps": [
         {
           "name": "Katarina",
-          "count": 3
-        },
-        {
-          "name": "Qiyana",
           "count": 2
         },
         {
-          "name": "Akali",
+          "name": "Riven",
+          "count": 1
+        },
+        {
+          "name": "Irelia",
           "count": 1
         }
       ],
@@ -231,11 +231,11 @@
       "topChamps": [
         {
           "name": "Gwen",
-          "count": 2
+          "count": 3
         },
         {
           "name": "Ambessa",
-          "count": 1
+          "count": 2
         },
         {
           "name": "Diana",
@@ -283,6 +283,33 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
+    },
+    {
+      "puuid": "D-g-o_hJ8wx6An2mvI3Lw3mkpR-qd1xKMDBUCvjdQtNCJgfv9SKfvp06SgPIk5pF9BtOOGh_M_R2Xw",
+      "summonerId": null,
+      "summonerName": "Aphelios#好好生活",
+      "profileIconId": 6379,
+      "summonerLevel": 284,
+      "topChamps": [
+        {
+          "name": "Kaisa",
+          "count": 5
+        },
+        {
+          "name": "Camille",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Aphelios",
+      "tagLine": "好好生活",
+      "leaguePoints": 512,
+      "wins": 42,
+      "losses": 34,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     }
   ]
 }
