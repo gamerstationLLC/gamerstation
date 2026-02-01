@@ -14,7 +14,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 // -----------------------------
-// Helpers (STATIC path reads)
+// Helpers (NO dynamic path patterns)
 // -----------------------------
 async function readJsonIfExists<T>(absPath: string): Promise<T | null> {
   try {
@@ -25,17 +25,24 @@ async function readJsonIfExists<T>(absPath: string): Promise<T | null> {
   }
 }
 
-function abs(rel: string) {
-  return path.join(process.cwd(), rel);
-}
-
 async function guessPatch(): Promise<string> {
-  // Try a few known locations/structures, but with static paths
-  const patch1 = await readJsonIfExists<any>(abs("public/data/lol/patch.json"));
-  const patch2 = await readJsonIfExists<any>(abs("public/data/lol/version.json"));
-  const patch3 = await readJsonIfExists<any>(abs("public/data/lol/meta_builds.json"));
-  const patch4 = await readJsonIfExists<any>(abs("public/data/lol/meta_builds_ranked.json"));
-  const patch5 = await readJsonIfExists<any>(abs("public/data/lol/meta_builds_casual.json"));
+  const patchJsonPath = path.join(process.cwd(), "public/data/lol/patch.json");
+  const versionJsonPath = path.join(process.cwd(), "public/data/lol/version.json");
+  const metaBuildsPath = path.join(process.cwd(), "public/data/lol/meta_builds.json");
+  const metaBuildsRankedPath = path.join(
+    process.cwd(),
+    "public/data/lol/meta_builds_ranked.json"
+  );
+  const metaBuildsCasualPath = path.join(
+    process.cwd(),
+    "public/data/lol/meta_builds_casual.json"
+  );
+
+  const patch1 = await readJsonIfExists<any>(patchJsonPath);
+  const patch2 = await readJsonIfExists<any>(versionJsonPath);
+  const patch3 = await readJsonIfExists<any>(metaBuildsPath);
+  const patch4 = await readJsonIfExists<any>(metaBuildsRankedPath);
+  const patch5 = await readJsonIfExists<any>(metaBuildsCasualPath);
 
   const patchObj = patch1 ?? patch2 ?? patch3 ?? patch4 ?? patch5;
 
@@ -47,14 +54,13 @@ async function guessPatch(): Promise<string> {
 }
 
 async function loadChampionTierRows(): Promise<ChampionStatsRow[]> {
-  // Prefer dedicated tiers JSON; keep a fallback to meta_builds.json in case you used that
-  const rows1 = await readJsonIfExists<ChampionStatsRow[]>(
-    abs("public/data/lol/champion_tiers.json")
-  );
-  const rows2 = await readJsonIfExists<ChampionStatsRow[]>(
-    abs("public/data/lol/champion-tiers.json")
-  );
-  const rows3 = await readJsonIfExists<any>(abs("public/data/lol/meta_builds.json"));
+  const tiersPathA = path.join(process.cwd(), "public/data/lol/champion_tiers.json");
+  const tiersPathB = path.join(process.cwd(), "public/data/lol/champion-tiers.json");
+  const metaBuildsPath = path.join(process.cwd(), "public/data/lol/meta_builds.json");
+
+  const rows1 = await readJsonIfExists<ChampionStatsRow[]>(tiersPathA);
+  const rows2 = await readJsonIfExists<ChampionStatsRow[]>(tiersPathB);
+  const rows3 = await readJsonIfExists<any>(metaBuildsPath);
 
   const rows = rows1 ?? rows2 ?? rows3;
 
