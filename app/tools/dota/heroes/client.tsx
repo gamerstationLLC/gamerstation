@@ -185,7 +185,7 @@ export default function DotaHeroesClient({
 
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-white group-hover:text-white">{h.name}</div>
-              <div className="truncate text-xs text-neutral-500">/{h.slug}</div>
+              
             </div>
           </Link>
         ))}
