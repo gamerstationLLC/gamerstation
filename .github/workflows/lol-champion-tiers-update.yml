@@ -1,20 +1,21 @@
-name: Update LoL Leaderboards
+name: Update LoL Champion Tiers
 
 on:
   schedule:
-    - cron: "0 * * * *" # every hour
+    - cron: "0 */2 * * *" # every 2 hours
   workflow_dispatch: {}
 
 concurrency:
-  group: lol-leaderboards-update
+  group: lol-champion-tiers-update
   cancel-in-progress: false
 
 permissions:
   contents: write
 
 jobs:
-  leaderboards:
+  tiers:
     runs-on: ubuntu-latest
+    timeout-minutes: 90   # ⏱ soft stop at 1h30m
 
     steps:
       - name: Checkout
@@ -22,13 +23,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Always start from latest origin/main (NO REBASE)
+      # Always start from latest main
       - name: Sync with main (pre-build)
         run: |
           set -e
-          git fetch origin main
+          git fetch
           git checkout main
-          git pull origin main
+          git pull
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -39,53 +40,47 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # 1) Build leaderboards JSON (base pass)
-      - name: Build LoL leaderboards
+      # 1) Build champion tiers JSON
+      - name: Build LoL champion tiers
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
-          LEADERBOARD_TOP_N: "50"
-          LEADERBOARD_CONCURRENCY: "3"
-          LEADERBOARD_GAP_MS: "300"
-          LEADERBOARD_MATCH_IDS_COUNT: "2"
-          LEADERBOARD_REQ_MIN_GAP_MS: "250"
+          CHAMPION_TIERS_REGION: "na1"
+          CHAMPION_TIERS_QUEUE: "RANKED_SOLO_5x5"
+          CHAMPION_TIERS_MATCHES_PER_CHAMP: "200"
+          CHAMPION_TIERS_CONCURRENCY: "3"
+          CHAMPION_TIERS_GAP_MS: "300"
+          CHAMPION_TIERS_REQ_MIN_GAP_MS: "250"
         run: |
           set -e
-          npm run lol:leaderboards
+          npm run lol:champion-tiers
 
-      # 2) Finalize leaderboards JSON (fill summonerId/profileIconId/level)
-      - name: Finalize LoL leaderboards (transfer summoner data)
+      # 2) Finalize (still runs even if build partially fails)
+      - name: Finalize LoL champion tiers
         if: always()
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
-          LEADERBOARD_FINALIZE_CONCURRENCY: "2"
-          LEADERBOARD_FINALIZE_REQ_MIN_GAP_MS: "200"
-          LEADERBOARD_FINALIZE_GAP_MS: "200"
+          CHAMPION_TIERS_FINALIZE_CONCURRENCY: "2"
+          CHAMPION_TIERS_FINALIZE_GAP_MS: "200"
+          CHAMPION_TIERS_FINALIZE_REQ_MIN_GAP_MS: "200"
         run: |
           set -e
-          npm run lol:finalize:leaderboards
+          npm run lol:finalize:champion-tiers
 
-      # 3) Debug (what changed)
+      # 3) Debug
       - name: Debug - Output + git diff
         if: always()
         run: |
           echo "== Output sample =="
-          ls -lah public/data/lol/leaderboards || true
-          find public/data/lol/leaderboards -maxdepth 3 -type f -name "*.json" | head -n 20 || true
+          ls -lah public/data/lol/champion_tiers || true
+          find public/data/lol/champion_tiers -maxdepth 3 -type f -name "*.json" | head -n 20 || true
 
-          echo "== Git status (leaderboards) =="
-          git status --porcelain public/data/lol/leaderboards || true
+          echo "== Git status (champion_tiers) =="
+          git status --porcelain public/data/lol/champion_tiers || true
 
-          echo "== Diffstat (leaderboards) =="
-          git diff --stat -- public/data/lol/leaderboards || true
+          echo "== Diffstat (champion_tiers) =="
+          git diff --stat -- public/data/lol/champion_tiers || true
 
-          echo "== One file preview (first 60 lines) =="
-          PREVIEW_FILE="$(find public/data/lol/leaderboards -type f -name "*.json" | head -n 1)"
-          if [ -n "$PREVIEW_FILE" ]; then
-            echo "Preview: $PREVIEW_FILE"
-            head -n 60 "$PREVIEW_FILE" || true
-          fi
-
-     # 4) Commit → Pull → Push
+      # 4) Commit → Pull → Push
       - name: Commit & push (if changed)
         if: always()
         run: |

@@ -47,3 +47,7 @@ node_modules/
 scripts/riot/cache/matches/
 scripts/riot/cache/timelines/
 !scripts/riot/cache/state/
+
+
+# Champion tiers – raw Riot match cache
+scripts/riot/cache/champion_tiers/matches/

@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 
 export type ChampionBaseStats = {
   hp: number;
@@ -69,12 +69,6 @@ function attackSpeedAtLevel(baseAS: number, asPerLevelPct: number, level: number
   return baseAS * (1 + (asPerLevelPct / 100) * (level - 1));
 }
 
-function abilityMaxRank(key: AbilityKey) {
-  if (key === "R") return 3;
-  if (key === "P") return 1;
-  return 5;
-}
-
 function isNumericAbility(ab: ChampionAbility) {
   return !!ab.scalars?.some((s) => Array.isArray(s.values) && s.values.length > 0);
 }
@@ -82,6 +76,21 @@ function isNumericAbility(ab: ChampionAbility) {
 function getAtRank(arr: number[] | undefined, rank: number) {
   if (!arr?.length) return null;
   return arr[Math.min(rank - 1, arr.length - 1)] ?? null;
+}
+
+function GSBrand() {
+  return (
+    <Link href="/" className="flex items-center gap-2">
+      <img
+        src="/gs-logo-v2.png"
+        alt="GamerStation"
+        className="h-10 w-10 rounded-xl bg-black p-1 shadow"
+      />
+      <span className="text-lg font-black text-white">
+        GamerStation<span className="align-super text-[0.6em]">™</span>
+      </span>
+    </Link>
+  );
 }
 
 export default function StatsClient({
@@ -149,40 +158,64 @@ export default function StatsClient({
   }, [abilityList]);
 
   return (
-    <section className="mt-6 space-y-4">
-      {/* Header */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+    <main className="mx-auto w-full max-w-6xl px-4 py-6">
+      {/* ===== Header (matches your other pages) ===== */}
+      <div className="mb-4">
+        {/* Row 1 */}
+        <div className="flex items-center justify-between gap-3">
+          <GSBrand />
+
           <Link
-            href="/calculators/lol/champions"
-            className="inline-flex items-center gap-2 text-sm text-neutral-300 hover:text-white hover:underline"
+            href="/tools"
+            className="rounded-xl border border-neutral-800 bg-black px-3 py-2 text-sm text-neutral-300 hover:border-neutral-600 hover:text-white"
           >
-            <span aria-hidden>←</span> Back to Champion Index
+            Tools
           </Link>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-sm text-neutral-300">
-            <span className="hidden sm:inline text-neutral-700">•</span>
-
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-white">{championName}</span>
-              <span className="opacity-70">({championId})</span>
-            </div>
-
-            {/* Patch badge */}
-            <span className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-black/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-neutral-400">
-              <span className="opacity-70">Patch</span>
-              <span className="font-semibold text-neutral-200">{patch}</span>
+        {/* Row 2 */}
+        <div className="mt-3">
+          <h1 className="text-xl font-black text-white">
+            {championName} <span className="text-neutral-500">({championId})</span>
+          </h1>
+          <div className="ml-auto flex items-center gap-10">
+            <span className="rounded-full border border-neutral-800 bg-black/40 px-5 py-1 text-xs text-neutral-400">
+              Patch {patch}
             </span>
           </div>
         </div>
 
-        <div className="sm:text-right">
+        {/* Row 3 */}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Link
+            href="/calculators/lol"
+            className="rounded-xl border border-neutral-800 bg-black px-3 py-2 text-sm text-neutral-300 hover:border-neutral-600 hover:text-white"
+          >
+            LoL Hub
+          </Link>
+
+          <Link
+            href="/tools/lol/meta"
+            className="rounded-xl border border-neutral-800 bg-black px-3 py-2 text-sm text-neutral-300 hover:border-neutral-600 hover:text-white"
+          >
+            Meta
+          </Link>
+
+          <Link
+            href="/calculators/lol/champions"
+            className="rounded-xl border border-neutral-800 bg-black px-3 py-2 text-sm text-neutral-300 hover:border-neutral-600 hover:text-white"
+          >
+            Champion Index
+          </Link>
+
           <Link
             href={calcHref}
-            className="inline-flex w-full items-center justify-center rounded-2xl bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200 sm:w-auto"
+            className="rounded-xl border border-neutral-800 bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-neutral-200"
           >
-            Open LoL Damage Calc (import {championId})
+            Open Damage Calc (import {championId})
           </Link>
+
+          
         </div>
       </div>
 
@@ -192,10 +225,10 @@ export default function StatsClient({
       </p>
 
       {/* Stats card */}
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
+      <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-sm font-semibold">Stats at Level</div>
+            <div className="text-sm font-semibold text-white">Stats at Level</div>
             <div className="mt-1 text-xs text-neutral-400">
               Slide to see scaling from level 1 to 18.
             </div>
@@ -265,11 +298,11 @@ export default function StatsClient({
       </div>
 
       {/* Abilities */}
-      <div className="rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
+      <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <div className="text-sm font-semibold">Abilities</div>
+              <div className="text-sm font-semibold text-white">Abilities</div>
               <span className="rounded-full border border-white/10 bg-black/30 px-2 py-0.5 text-[11px] text-neutral-400">
                 {coveredCount}/4 damage mapped
               </span>
@@ -444,7 +477,7 @@ export default function StatsClient({
           })}
         </div>
       </div>
-    </section>
+    </main>
   );
 }
 
@@ -457,7 +490,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Pill({ children }: { children: React.ReactNode }) {
+function Pill({ children }: { children: ReactNode }) {
   return (
     <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">
       {children}
