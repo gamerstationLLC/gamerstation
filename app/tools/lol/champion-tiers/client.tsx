@@ -497,20 +497,7 @@ export default function LolChampionTiersClient({
       </div>
 
       {/* Context row — THIS is what tier list players expect */}
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
-        <span className={PILL}>
-          Patch <span className="text-neutral-200">{patchLive}</span>
-        </span>
-        <span className={PILL}>
-          Data window <span className="text-neutral-200">{mode === "pro" ? "Pro-weighted" : "Ranked ladder"}</span>
-        </span>
-        <span className={PILL}>
-          Updated <span className="text-neutral-200">{cacheLabel}</span>
-        </span>
-        <span className={PILL}>
-          Showing <span className="text-neutral-200">{totalShown}</span>
-        </span>
-      </div>
+     
 
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
