@@ -13,31 +13,31 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-/**
- * Tries several candidate locations so you don't have to perfectly match my guess.
- * Put your JSON in ONE of these places (or add your own path to the list).
- */
-async function readFirstJson<T>(candidates: string[]): Promise<T | null> {
-  for (const rel of candidates) {
-    const abs = path.join(process.cwd(), rel);
-    try {
-      const raw = await fs.readFile(abs, "utf-8");
-      return JSON.parse(raw) as T;
-    } catch {
-      // continue
-    }
+// -----------------------------
+// Helpers (STATIC path reads)
+// -----------------------------
+async function readJsonIfExists<T>(absPath: string): Promise<T | null> {
+  try {
+    const raw = await fs.readFile(absPath, "utf-8");
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
   }
-  return null;
+}
+
+function abs(rel: string) {
+  return path.join(process.cwd(), rel);
 }
 
 async function guessPatch(): Promise<string> {
-  const patchObj = await readFirstJson<any>([
-    "public/data/lol/patch.json",
-    "public/data/lol/version.json",
-    "public/data/lol/meta_builds.json",
-    "public/data/lol/meta_builds_ranked.json",
-    "public/data/lol/meta_builds_casual.json",
-  ]);
+  // Try a few known locations/structures, but with static paths
+  const patch1 = await readJsonIfExists<any>(abs("public/data/lol/patch.json"));
+  const patch2 = await readJsonIfExists<any>(abs("public/data/lol/version.json"));
+  const patch3 = await readJsonIfExists<any>(abs("public/data/lol/meta_builds.json"));
+  const patch4 = await readJsonIfExists<any>(abs("public/data/lol/meta_builds_ranked.json"));
+  const patch5 = await readJsonIfExists<any>(abs("public/data/lol/meta_builds_casual.json"));
+
+  const patchObj = patch1 ?? patch2 ?? patch3 ?? patch4 ?? patch5;
 
   const p = (patchObj?.patch ?? patchObj?.version ?? patchObj?.dataDragon ?? "")
     .toString()
@@ -47,14 +47,19 @@ async function guessPatch(): Promise<string> {
 }
 
 async function loadChampionTierRows(): Promise<ChampionStatsRow[]> {
-  const rows = await readFirstJson<ChampionStatsRow[]>([
-    "public/data/lol/champion_tiers.json",
-    "public/data/lol/champion-tiers.json",
-    "public/data/lol/meta_builds.json",
-  ]);
+  // Prefer dedicated tiers JSON; keep a fallback to meta_builds.json in case you used that
+  const rows1 = await readJsonIfExists<ChampionStatsRow[]>(
+    abs("public/data/lol/champion_tiers.json")
+  );
+  const rows2 = await readJsonIfExists<ChampionStatsRow[]>(
+    abs("public/data/lol/champion-tiers.json")
+  );
+  const rows3 = await readJsonIfExists<any>(abs("public/data/lol/meta_builds.json"));
+
+  const rows = rows1 ?? rows2 ?? rows3;
 
   if (!Array.isArray(rows)) return [];
-  return rows;
+  return rows as ChampionStatsRow[];
 }
 
 function GSBrand() {
