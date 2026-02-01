@@ -23,8 +23,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Always start from latest origin/main (NO MERGE COMMITS)
+      # Always start from latest origin/main
       - name: Sync with main (pre-build)
+        shell: bash
         run: |
           set -e
           git fetch origin main
@@ -40,8 +41,9 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # 1) Build leaderboards JSON (base pass)
-      - name: Build LoL leaderboards
+      # Build (never fail job)
+      - name: Build LoL leaderboards (never fails job)
+        shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           LEADERBOARD_TOP_N: "50"
@@ -50,24 +52,33 @@ jobs:
           LEADERBOARD_MATCH_IDS_COUNT: "2"
           LEADERBOARD_REQ_MIN_GAP_MS: "250"
         run: |
-          set -e
+          set +e
           npm run lol:leaderboards
+          EC=$?
+          echo "Build exit code: $EC"
+          echo "Continuing to finalize regardless..."
+          exit 0
 
-      # 2) Finalize leaderboards JSON (fill summonerId/profileIconId/level)
-      - name: Finalize LoL leaderboards (transfer summoner data)
+      # Finalize (never fail job)
+      - name: Finalize LoL leaderboards (never fails job)
         if: always()
+        shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           LEADERBOARD_FINALIZE_CONCURRENCY: "2"
           LEADERBOARD_FINALIZE_REQ_MIN_GAP_MS: "200"
           LEADERBOARD_FINALIZE_GAP_MS: "200"
         run: |
-          set -e
+          set +e
           npm run lol:finalize:leaderboards
+          EC=$?
+          echo "Finalize exit code: $EC"
+          echo "Continuing to commit/push regardless..."
+          exit 0
 
-      # 3) Debug (what changed)
       - name: Debug - Output + git diff
         if: always()
+        shell: bash
         run: |
           echo "== Output sample =="
           ls -lah public/data/lol || true
@@ -80,29 +91,31 @@ jobs:
           echo "== Diffstat (leaderboards) =="
           git diff --stat -- public/data/lol/leaderboards || true
 
-          echo "== One file preview (first 60 lines) =="
-          PREVIEW_FILE="$(find public/data/lol/leaderboards -type f -name "*.json" | head -n 1)"
-          if [ -n "$PREVIEW_FILE" ]; then
-            echo "Preview: $PREVIEW_FILE"
-            head -n 60 "$PREVIEW_FILE" || true
-          fi
-
-      # 4) Commit → Push
-      - name: Commit & push (if changed)
+      # Commit ONLY if full dataset exists
+      - name: Commit & push (only if dataset is valid)
         if: always()
+        shell: bash
         run: |
           set -e
 
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          # Guard: if output folder doesn't exist, do nothing (don't fail workflow)
+          # Guard: folder must exist
           if [ ! -d "public/data/lol/leaderboards" ]; then
-            echo "No public/data/lol/leaderboards directory exists; nothing to commit."
+            echo "No leaderboards directory exists; skipping commit."
             exit 0
           fi
 
-          git add -A public/data/lol/leaderboards || true
+          # Guard: must contain JSON files
+          JSON_COUNT=$(find public/data/lol/leaderboards -type f -name "*.json" | wc -l | tr -d ' ')
+          if [ "$JSON_COUNT" -lt 5 ]; then
+            echo "Only $JSON_COUNT json files found — dataset incomplete. Skipping commit."
+            exit 0
+          fi
+
+          # Stage only this workflow’s output
+          git add -A public/data/lol/leaderboards
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
@@ -111,11 +124,11 @@ jobs:
 
           git commit -m "chore(lol): refresh LoL Leaderboards"
 
-          # Retry push with rebase (DO NOT reset --hard; it deletes your commit)
+          # Your preferred merge-pull loop
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing latest main (rebase)..."
+            echo "Attempt $i: syncing latest main (merge)..."
             git fetch origin main
-            git pull --rebase --autostash origin main || true
+            git pull --no-rebase origin main || true
 
             echo "Attempt $i: pushing..."
             if git push origin main; then

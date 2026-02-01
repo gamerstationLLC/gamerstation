@@ -118,10 +118,9 @@ export async function main() {
   const generatedAt = new Date().toISOString();
 
   if (!files.length) {
-    await fs.writeFile(OUT_PATH, "[]", "utf-8");
-    console.log("[champion-tiers/finalize] No cached matches found. Wrote empty json.");
-    return;
-  }
+  console.log("[champion-tiers/finalize] No cached matches found. Keeping existing output.");
+  return;
+}
 
   const agg = new Map<number, Agg>();
   const bans = new Map<number, number>();
@@ -203,10 +202,9 @@ export async function main() {
     .filter((r) => r.picks > 0);
 
   if (!rows.length) {
-    await fs.writeFile(OUT_PATH, "[]", "utf-8");
-    console.log("[champion-tiers/finalize] No usable rows (0 picks). Wrote empty json.");
-    return;
-  }
+  console.log("[champion-tiers/finalize] No usable rows. Keeping existing output.");
+  return;
+}
 
   // scoring inputs
   const pickVals = rows.map((r) => Math.log1p(r.picks));

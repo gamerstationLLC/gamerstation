@@ -20,7 +20,8 @@
     "lol:finalize:leaderboards": "tsx scripts/riot/finalize-leaderboards.ts",
     "lol:all:leaderboards": "tsx scripts/riot/build-leaderboards.ts && tsx scripts/riot/finalize-leaderboards.ts",
     "lol:champion-tiers": "npx tsx ./scripts/riot/build-champion-tiers.ts",
-    "lol:finalize:champion-tiers": "npx tsx ./scripts/riot/finalize-champion-tiers.ts"
+    "lol:finalize:champion-tiers": "npx tsx ./scripts/riot/finalize-champion-tiers-from-cache.ts"
+
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

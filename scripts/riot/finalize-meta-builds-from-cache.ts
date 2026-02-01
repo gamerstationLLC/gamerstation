@@ -460,20 +460,37 @@ async function main() {
   });
 
   // ✅ If computed is empty, refuse to write (prevents nukes)
-  if (!computedHasAnyPatches(computedRanked) || !computedHasAnyPatches(computedCasual)) {
-    console.warn("[finalize] Computed outputs look empty. Refusing to overwrite existing files.");
-    process.exit(0);
-  }
+  const rankedHas = computedHasAnyPatches(computedRanked);
+const casualHas = computedHasAnyPatches(computedCasual);
 
-  const rankedPath = path.join(outDir, "meta_builds_ranked.json");
-  const casualPath = path.join(outDir, "meta_builds_casual.json");
+if (!rankedHas) {
+  console.warn("[finalize] Ranked computed output empty. Refusing to overwrite ranked file.");
+  process.exit(0);
+}
 
-  // Read existing outputs
-  const existingRanked = await readJsonIfExists<OutJson>(rankedPath);
-  const existingCasual = await readJsonIfExists<OutJson>(casualPath);
+const rankedPath = path.join(outDir, "meta_builds_ranked.json");
+const casualPath = path.join(outDir, "meta_builds_casual.json");
 
-  // ✅ Merge so we ONLY ADD / never wipe
-  const mergedRanked = mergeOutputs(existingRanked, computedRanked);
+const existingRanked = await readJsonIfExists<OutJson>(rankedPath);
+const existingCasual = await readJsonIfExists<OutJson>(casualPath);
+
+// ranked: always update if it has data
+const mergedRanked = mergeOutputs(existingRanked, computedRanked);
+await fs.mkdir(path.dirname(rankedPath), { recursive: true });
+await fs.writeFile(rankedPath, JSON.stringify(mergedRanked, null, 2), "utf-8");
+console.log(`[finalize] Wrote (merged): ${rankedPath}`);
+
+// casual: only update if it has data
+if (casualHas) {
+  const mergedCasual = mergeOutputs(existingCasual, computedCasual);
+  await fs.mkdir(path.dirname(casualPath), { recursive: true });
+  await fs.writeFile(casualPath, JSON.stringify(mergedCasual, null, 2), "utf-8");
+  console.log(`[finalize] Wrote (merged): ${casualPath}`);
+} else {
+  console.warn("[finalize] Casual computed output empty. Keeping existing casual file.");
+}
+
+
   const mergedCasual = mergeOutputs(existingCasual, computedCasual);
 
   await fs.mkdir(path.dirname(rankedPath), { recursive: true });

@@ -27,8 +27,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Always start from latest origin/main (NO MERGE COMMITS)
+      # ✅ Always start from latest origin/main (NO MERGE COMMITS here)
       - name: Sync with main (pre-build)
+        shell: bash
         run: |
           set -e
           git fetch origin main
@@ -58,11 +59,14 @@ jobs:
             lol-riot-cache-v1
 
       - name: Debug - Cache hit
+        shell: bash
         run: |
           echo "cache-hit=${{ steps.riot_cache.outputs.cache-hit }}"
           du -sh scripts/riot/cache/* 2>/dev/null || true
 
+      # ✅ Hard prune cache files older than 90d by mtime
       - name: Prune old Riot cache (90 days)
+        shell: bash
         run: |
           set -e
           echo "Pruning Riot cache older than 90 days..."
@@ -109,7 +113,6 @@ jobs:
             echo "RESET_SEEN_PUUIDS=1" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=1" >> "$GITHUB_ENV"
 
-            # keep rebuilds bounded so you don't just sleep on 429 forever
             echo "MAX_MATCHES_PER_RUN=5000" >> "$GITHUB_ENV"
             echo "MAX_NEW_PUUIDS_PER_RUN=500" >> "$GITHUB_ENV"
             echo "MATCHES_PER_PUUID=20" >> "$GITHUB_ENV"
@@ -126,7 +129,9 @@ jobs:
             echo "MATCHES_PER_PUUID=100" >> "$GITHUB_ENV"
           fi
 
-      - name: Crawl Riot matches into cache/state (soft timeout)
+      # ✅ CRITICAL: NEVER fail the job here.
+      # If API expires (401/403) or anything else breaks, we STILL want finalize+commit.
+      - name: Crawl Riot matches into cache/state (soft timeout, never fails job)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           RIOT_REGION: americas
@@ -151,26 +156,27 @@ jobs:
           RESET_CURSORS: ${{ env.RESET_CURSORS }}
           CACHE_SCAN_LIMIT: "0"
           CACHE_MAX_AGE_DAYS: "90"
-
-          # (finalize-related but harmless here)
-          MIN_DISPLAY_SAMPLE: "25"
-          BAYES_K: "100"
-          PRIOR_WINRATE: "0.5"
-          PATCH_MAJOR_MINOR_ONLY: "1"
-          ALLOW_LOW_SAMPLE_FALLBACK: "0"
+        shell: bash
         run: |
-          set -e
+          set +e
+          timeout 17940 npm run lol:update:meta
+          EC=$?
+          echo "Crawl exit code: $EC"
 
-          EC=0
-          timeout 17940 npm run lol:update:meta || EC=$?
-
-          if [ "$EC" -ne 0 ] && [ "$EC" -ne 124 ]; then
-            echo "Crawl failed with exit code $EC"
-            exit "$EC"
+          if [ "$EC" -eq 124 ]; then
+            echo "Crawl timed out safely. Continuing to finalize..."
+            exit 0
           fi
 
-          echo "Crawl completed (or timed out safely). Continuing..."
+          if [ "$EC" -ne 0 ]; then
+            echo "Crawl failed (often expired RIOT_API_KEY). Continuing anyway to finalize from cache..."
+            exit 0
+          fi
 
+          echo "Crawl completed successfully."
+          exit 0
+
+      # ✅ Offline finalize: uses cached matches; merges; never wipes outputs
       - name: Finalize meta builds outputs from cache
         if: always()
         env:
@@ -182,41 +188,48 @@ jobs:
 
       - name: Debug - What will be committed
         if: always()
+        shell: bash
         run: |
-          echo "== State counts =="
-          node -e "const fs=require('fs'); const p='scripts/riot/cache/state/seen_match_ids.json'; if(fs.existsSync(p)){const j=JSON.parse(fs.readFileSync(p,'utf8')); console.log('seen_match_ids', Array.isArray(j)?j.length:Object.keys(j).length);} else console.log('seen_match_ids missing');"
-          node -e "const fs=require('fs'); const p='scripts/riot/cache/state/seen_puuids.json'; if(fs.existsSync(p)){const j=JSON.parse(fs.readFileSync(p,'utf8')); console.log('seen_puuids', Array.isArray(j)?j.length:Object.keys(j).length);} else console.log('seen_puuids missing');"
-
           echo "== Output sizes =="
           ls -lh public/data/lol/meta_builds_ranked.json public/data/lol/meta_builds_casual.json || true
 
-          echo "== Git status (public/data/lol) =="
-          git status --porcelain public/data/lol || true
+          echo "== Git status (repo) =="
+          git status --porcelain || true
 
-          echo "== Diffstat (public/data/lol) =="
-          git diff --stat -- public/data/lol || true
+          echo "== Diffstat =="
+          git diff --stat || true
 
       - name: Commit & push (if changed)
         if: always()
+        shell: bash
         run: |
           set -e
 
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          git add public/data/lol
+          # ✅ Stage ONLY what this workflow owns
+          # - include LoL static/overrides + meta builds
+          # - explicitly exclude leaderboards + champion tiers (just in case paths overlap)
+          git add public/data/lol \
+            ':!public/data/lol/leaderboards' \
+            ':!public/data/lol/leaderboards/**' \
+            ':!public/data/lol/*leaderboard*.json' \
+            ':!public/data/lol/champion_tiers' \
+            ':!public/data/lol/champion_tiers/**' \
+            ':!public/data/lol/*tier*.json'
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "chore(lol): refresh LoL Data"
+          git commit -m "chore(lol): refresh LoL data"
 
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing latest main..."
+            echo "Attempt $i: pulling latest origin/main (merge, no rebase)..."
             git fetch origin main
-            git reset --hard origin/main
+            git pull --no-rebase origin main || true
 
             echo "Attempt $i: pushing..."
             if git push; then

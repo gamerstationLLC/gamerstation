@@ -21,6 +21,9 @@ const PUUID_CURSORS_PATH = path.join(CACHE_STATE_DIR, "puuid_cursors.json");
 const OUT_RANKED_PATH = path.join(ROOT, "public", "data", "lol", "meta_builds_ranked.json");
 const OUT_CASUAL_PATH = path.join(ROOT, "public", "data", "lol", "meta_builds_casual.json");
 
+
+
+
 // env
 const RIOT_API_KEY = process.env.RIOT_API_KEY || "";
 
@@ -57,7 +60,8 @@ const LADDER_TIER = (process.env.LADDER_TIER || "challenger").trim().toLowerCase
 const LADDER_MAX_PLAYERS = Number(process.env.LADDER_MAX_PLAYERS || 250);
 const REPROCESS_BOOTSTRAP = String(process.env.REPROCESS_BOOTSTRAP || "0") === "1";
 const CACHE_MAX_AGE_DAYS = Number(process.env.CACHE_MAX_AGE_DAYS || 90);
-
+const NOW_SEC = Math.floor(Date.now() / 1000);
+const START_TIME_SEC = NOW_SEC - CACHE_MAX_AGE_DAYS * 24 * 60 * 60;
 
 // ✅ optional: seed via match ids/urls (regional-only)
 const SEED_MATCH_IDS = String(process.env.SEED_MATCH_IDS || "")
@@ -244,13 +248,20 @@ async function fetchPlatformJson(url: string, opts?: { retries?: number }) {
 
 // Match-v5 ids (regional, paged)
 async function getMatchIdsByPuuidPaged(puuid: string, start: number, count: number): Promise<string[]> {
-  const url =
+  const base =
     `${riotRegionalBase()}/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids` +
-    `?start=${start}&count=${count}`;
+    `?start=${start}&count=${count}` +
+    `&startTime=${START_TIME_SEC}`;
+
+  // Optional: narrow the API response so you fetch fewer irrelevant match IDs
+  // Riot match-v5 supports `queue` as a filter. We can fetch ranked + casual separately if you want,
+  // but simplest is to just omit it (still safe because you filter later).
+  const url = base;
 
   const ids = (await fetchRegionalJson(url)) as any;
   return Array.isArray(ids) ? ids.map(String) : [];
 }
+
 
 async function getMatch(matchId: string): Promise<any> {
   const cachePath = path.join(CACHE_MATCHES_DIR, `${matchId}.json`);

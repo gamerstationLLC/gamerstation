@@ -5,8 +5,6 @@ on:
     - cron: "0 */2 * * *" # every 2 hours
   workflow_dispatch: {}
 
-# ✅ If you truly want to serialize Riot-heavy workflows, keep this shared lock.
-# Otherwise, change this to a unique group like "lol-champion-tiers".
 concurrency:
   group: lol-tier-update
   cancel-in-progress: false
@@ -25,8 +23,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Always start from latest origin/main (NO MERGE COMMITS)
+      # ✅ Always start from latest origin/main
       - name: Sync with main (pre-build)
+        shell: bash
         run: |
           set -e
           git fetch origin main
@@ -42,35 +41,80 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # 1) Build champion tiers JSON
-      - name: Build LoL champion tiers
-        env:
-          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
-          CHAMPION_TIERS_REGION: "na1"
-          CHAMPION_TIERS_QUEUE: "RANKED_SOLO_5x5"
-          CHAMPION_TIERS_MATCHES_PER_CHAMP: "200"
-          CHAMPION_TIERS_CONCURRENCY: "3"
-          CHAMPION_TIERS_GAP_MS: "300"
-          CHAMPION_TIERS_REQ_MIN_GAP_MS: "250"
+      # ✅ Optional: prune any tiers cache older than 90d (safe if dirs don't exist)
+      - name: Prune old Champion Tiers cache (90 days)
+        shell: bash
         run: |
           set -e
-          npm run lol:champion-tiers
+          echo "Pruning champion tiers cache older than 90 days (if present)..."
+          CUTOFF=$(date -d "90 days ago" +%s)
 
-      # 2) Finalize (still runs even if build partially fails)
-      - name: Finalize LoL champion tiers
-        if: always()
+          for DIR in scripts/riot/cache/champion_tiers scripts/riot/cache/champion-tiers; do
+            if [ -d "$DIR" ]; then
+              find "$DIR" -type f -name "*.json" | while read -r file; do
+                mtime=$(stat -c %Y "$file" 2>/dev/null || echo 0)
+                if [ "$mtime" -lt "$CUTOFF" ]; then
+                  rm -f "$file"
+                fi
+              done
+              echo "Pruned: $DIR"
+            fi
+          done
+
+      # ✅ CRITICAL: NEVER fail the job here (expired RIOT_API_KEY should not block finalize+commit)
+      - name: Build LoL champion tiers (never fails job)
+        shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
-          CHAMPION_TIERS_FINALIZE_CONCURRENCY: "2"
-          CHAMPION_TIERS_FINALIZE_GAP_MS: "200"
-          CHAMPION_TIERS_FINALIZE_REQ_MIN_GAP_MS: "200"
+
+          # ✅ what your script actually reads
+          RIOT_REGION: "americas"   # match-v5 (americas/europe/asia)
+          RIOT_PLATFORM: "na1"      # league/summoner (na1/euw1/kr/etc)
+
+          # ✅ matchlist filters + budgets
+          TIERS_QUEUE_IDS: "420,440"          # ranked solo + flex (you can set just "420")
+          TIERS_DAYS_BACK: "14"               # startTime window
+          TIERS_MAX_MATCHES_PER_RUN: "2500"   # cap total matches processed per run
+          TIERS_MAX_NEW_PUUIDS_PER_RUN: "500" # snowball cap
+          TIERS_MATCHES_PER_PUUID: "20"       # how many IDs per puuid page
+          TIERS_GAP_MS: "300"                 # spacing between requests
+          TIERS_REPROCESS_BOOTSTRAP: "0"      # keep off unless you want reprocessing
+
+          # ✅ ladder bootstrap knobs
+          LADDER_QUEUE: "RANKED_SOLO_5x5"
+          LADDER_TIER: "challenger"
+          LADDER_MAX_PLAYERS: "300"
+        run: |
+          set +e
+          EC=0
+
+          npm run lol:champion-tiers
+          EC=$?
+
+          echo "Build exit code: $EC"
+
+          if [ "$EC" -ne 0 ]; then
+            echo "Build failed (possibly expired RIOT_API_KEY). Continuing anyway to finalize..."
+            exit 0
+          fi
+
+          echo "Build completed successfully."
+          exit 0
+
+      # ✅ Finalize ALWAYS runs (your finalize overwrites champion_tiers.json each time)
+      - name: Finalize LoL champion tiers
+        if: always()
+        shell: bash
+        env:
+          RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
         run: |
           set -e
           npm run lol:finalize:champion-tiers
 
-      # 3) Debug
+      # ✅ Debug
       - name: Debug - Output + git diff
         if: always()
+        shell: bash
         run: |
           echo "== Output sample =="
           ls -lah public/data/lol || true
@@ -82,22 +126,22 @@ jobs:
           echo "== Diffstat (champion_tiers.json) =="
           git diff --stat -- public/data/lol/champion_tiers.json || true
 
-      # 4) Commit → Push
+      # ✅ Commit → Push: stage ONLY this workflow's json; merge-pull loop (NO rebase)
       - name: Commit & push (if changed)
         if: always()
+        shell: bash
         run: |
           set -e
 
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          # If the output file doesn't exist, don't fail the job.
           if [ ! -f "public/data/lol/champion_tiers.json" ]; then
             echo "No public/data/lol/champion_tiers.json exists; nothing to commit."
             exit 0
           fi
 
-          git add public/data/lol/champion_tiers.json || true
+          git add public/data/lol/champion_tiers.json
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
@@ -106,11 +150,10 @@ jobs:
 
           git commit -m "chore(lol): refresh champion tiers"
 
-          # Retry push with rebase (DO NOT reset --hard; it deletes your commit)
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing latest main (rebase)..."
+            echo "Attempt $i: syncing latest origin/main (merge, no rebase)..."
             git fetch origin main
-            git pull --rebase --autostash origin main || true
+            git pull origin main --no-rebase || true
 
             echo "Attempt $i: pushing..."
             if git push origin main; then
