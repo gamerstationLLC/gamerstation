@@ -5,8 +5,9 @@ on:
     - cron: "0 * * * *" # every hour
   workflow_dispatch: {}
 
+# ✅ Share the same lock as other Riot-heavy workflows to avoid app-rate-limit collisions
 concurrency:
-  group: lol-leaderboards-update
+  group: riot-heavy-jobs
   cancel-in-progress: false
 
 permissions:
@@ -22,13 +23,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Always start from latest origin/main (NO REBASE)
+      # ✅ Always start from latest origin/main (NO MERGE COMMITS)
       - name: Sync with main (pre-build)
         run: |
           set -e
           git fetch origin main
           git checkout main
-          git pull origin main
+          git reset --hard origin/main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -85,7 +86,7 @@ jobs:
             head -n 60 "$PREVIEW_FILE" || true
           fi
 
-     # 4) Commit → Pull → Push
+      # 4) Commit → Push
       - name: Commit & push (if changed)
         if: always()
         run: |
@@ -104,13 +105,14 @@ jobs:
           git commit -m "chore(lol): refresh LoL Leaderboards"
 
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: pulling latest main..."
-            if git pull; then
-              echo "Attempt $i: pushing..."
-              if git push; then
-                echo "Push succeeded."
-                exit 0
-              fi
+            echo "Attempt $i: syncing latest main..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Attempt $i: pushing..."
+            if git push; then
+              echo "Push succeeded."
+              exit 0
             fi
 
             echo "Attempt $i failed. Retrying in 5s..."

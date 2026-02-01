@@ -5,8 +5,9 @@ on:
     - cron: "0 */2 * * *" # every 2 hours
   workflow_dispatch: {}
 
+# ✅ Share the same lock as other Riot-heavy workflows to avoid app-rate-limit collisions
 concurrency:
-  group: lol-champion-tiers-update
+  group: riot-heavy-jobs
   cancel-in-progress: false
 
 permissions:
@@ -15,7 +16,7 @@ permissions:
 jobs:
   tiers:
     runs-on: ubuntu-latest
-    timeout-minutes: 90   # ⏱ soft stop at 1h30m
+    timeout-minutes: 90
 
     steps:
       - name: Checkout
@@ -23,13 +24,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Always start from latest main
+      # ✅ Always start from latest origin/main (NO MERGE COMMITS)
       - name: Sync with main (pre-build)
         run: |
           set -e
-          git fetch
+          git fetch origin main
           git checkout main
-          git pull
+          git reset --hard origin/main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -80,7 +81,7 @@ jobs:
           echo "== Diffstat (champion_tiers) =="
           git diff --stat -- public/data/lol/champion_tiers || true
 
-      # 4) Commit → Pull → Push
+      # 4) Commit → Push
       - name: Commit & push (if changed)
         if: always()
         run: |
@@ -99,13 +100,14 @@ jobs:
           git commit -m "chore(lol): refresh champion tiers"
 
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: pulling latest main..."
-            if git pull; then
-              echo "Attempt $i: pushing..."
-              if git push; then
-                echo "Push succeeded."
-                exit 0
-              fi
+            echo "Attempt $i: syncing latest main..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Attempt $i: pushing..."
+            if git push; then
+              echo "Push succeeded."
+              exit 0
             fi
 
             echo "Attempt $i failed. Retrying in 5s..."

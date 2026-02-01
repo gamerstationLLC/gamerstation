@@ -3,7 +3,12 @@ name: Auto Update LoL Data
 on:
   schedule:
     - cron: "15 */6 * * *" # every 6 hours
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: "Rebuild crawl from scratch (resets seen state + reprocess bootstrap)"
+        required: false
+        default: "false"
 
 concurrency:
   group: lol-auto-update
@@ -22,13 +27,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Always start from latest origin/main (NO REBASE)
+      # ✅ Always start from latest origin/main (NO MERGE COMMITS)
       - name: Sync with main (pre-build)
         run: |
           set -e
           git fetch origin main
           git checkout main
-          git pull origin main
+          git reset --hard origin/main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -83,6 +88,44 @@ jobs:
       - name: Update LoL overrides
         run: npm run lol:update:overrides
 
+      # ✅ Decide crawl mode (scheduled runs should NOT reprocess/reset)
+      - name: Set crawl mode
+        id: mode
+        shell: bash
+        run: |
+          set -e
+          REBUILD="false"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            REBUILD="${{ inputs.rebuild }}"
+          fi
+
+          echo "rebuild=$REBUILD" >> "$GITHUB_OUTPUT"
+
+          if [ "$REBUILD" = "true" ]; then
+            echo "Mode: REBUILD (reset seen state + reprocess bootstrap)"
+            echo "REPROCESS_BOOTSTRAP=1" >> "$GITHUB_ENV"
+            echo "REPROCESS_SEEDS=1" >> "$GITHUB_ENV"
+            echo "RESET_SEEN_MATCHES=1" >> "$GITHUB_ENV"
+            echo "RESET_SEEN_PUUIDS=1" >> "$GITHUB_ENV"
+            echo "RESET_CURSORS=1" >> "$GITHUB_ENV"
+
+            # keep rebuilds bounded so you don't just sleep on 429 forever
+            echo "MAX_MATCHES_PER_RUN=5000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=500" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=20" >> "$GITHUB_ENV"
+          else
+            echo "Mode: INCREMENTAL (use cache/state; no resets)"
+            echo "REPROCESS_BOOTSTRAP=0" >> "$GITHUB_ENV"
+            echo "REPROCESS_SEEDS=0" >> "$GITHUB_ENV"
+            echo "RESET_SEEN_MATCHES=0" >> "$GITHUB_ENV"
+            echo "RESET_SEEN_PUUIDS=0" >> "$GITHUB_ENV"
+            echo "RESET_CURSORS=0" >> "$GITHUB_ENV"
+
+            echo "MAX_MATCHES_PER_RUN=20000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=4000" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=100" >> "$GITHUB_ENV"
+          fi
+
       - name: Crawl Riot matches into cache/state (soft timeout)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
@@ -94,14 +137,18 @@ jobs:
           LADDER_TIER: challenger
           LADDER_MAX_PLAYERS: "250"
 
-          # crawl knobs
-          MAX_MATCHES_PER_RUN: "20000"
-          MAX_NEW_PUUIDS_PER_RUN: "4000"
-          MATCHES_PER_PUUID: "100"
+          # crawl knobs (set by mode step)
+          MAX_MATCHES_PER_RUN: ${{ env.MAX_MATCHES_PER_RUN }}
+          MAX_NEW_PUUIDS_PER_RUN: ${{ env.MAX_NEW_PUUIDS_PER_RUN }}
+          MATCHES_PER_PUUID: ${{ env.MATCHES_PER_PUUID }}
 
           # pipeline knobs
           USE_TIMELINE: "0"
-          REPROCESS_BOOTSTRAP: "1"
+          REPROCESS_BOOTSTRAP: ${{ env.REPROCESS_BOOTSTRAP }}
+          REPROCESS_SEEDS: ${{ env.REPROCESS_SEEDS }}
+          RESET_SEEN_MATCHES: ${{ env.RESET_SEEN_MATCHES }}
+          RESET_SEEN_PUUIDS: ${{ env.RESET_SEEN_PUUIDS }}
+          RESET_CURSORS: ${{ env.RESET_CURSORS }}
           CACHE_SCAN_LIMIT: "0"
           CACHE_MAX_AGE_DAYS: "90"
 
@@ -149,7 +196,6 @@ jobs:
           echo "== Diffstat (public/data/lol) =="
           git diff --stat -- public/data/lol || true
 
-      # 4) Commit → Pull → Push
       - name: Commit & push (if changed)
         if: always()
         run: |
@@ -168,13 +214,14 @@ jobs:
           git commit -m "chore(lol): refresh LoL Data"
 
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: pulling latest main..."
-            if git pull; then
-              echo "Attempt $i: pushing..."
-              if git push; then
-                echo "Push succeeded."
-                exit 0
-              fi
+            echo "Attempt $i: syncing latest main..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Attempt $i: pushing..."
+            if git push; then
+              echo "Push succeeded."
+              exit 0
             fi
 
             echo "Attempt $i failed. Retrying in 5s..."
