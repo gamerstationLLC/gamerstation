@@ -22,13 +22,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Always start from latest origin/main
+      # ✅ Always start from latest origin/main (NO REBASE)
       - name: Sync with main (pre-build)
         run: |
           set -e
           git fetch origin main
           git checkout main
-          git reset --hard origin/main
+          git pull origin main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -85,7 +85,7 @@ jobs:
             head -n 60 "$PREVIEW_FILE" || true
           fi
 
-      # 4) Commit outputs if changed (race-safe with other workflows)
+      # 4) Commit outputs if changed (pull + retry, NO REBASE)
       - name: Commit & push (if changed)
         if: always()
         run: |
@@ -103,22 +103,17 @@ jobs:
 
           git commit -m "chore(lol): refresh leaderboards"
 
-          # ✅ Parallel-safe push: rebase + retry loop
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: fetching + rebasing on origin/main..."
-            git fetch origin main
-            if ! git rebase origin/main; then
-              echo "Rebase failed; aborting and retrying..."
-              git rebase --abort || true
+            echo "Attempt $i: pulling latest main..."
+            if git pull origin main; then
+              echo "Attempt $i: pushing..."
+              if git push origin main; then
+                echo "Push succeeded."
+                exit 0
+              fi
             fi
 
-            echo "Attempt $i: pushing..."
-            if git push origin HEAD:main; then
-              echo "Push succeeded."
-              exit 0
-            fi
-
-            echo "Push failed (attempt $i). Retrying in 5s..."
+            echo "Attempt $i failed. Retrying in 5s..."
             sleep 5
           done
 
