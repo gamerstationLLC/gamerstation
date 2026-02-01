@@ -577,31 +577,34 @@ export default async function DotaHeroPage({
                 <div className="text-sm font-semibold">Trends</div>
 
                 {/* Tabs (server-side via ?tab=) */}
-                <div className="inline-flex rounded-2xl border border-neutral-800 bg-black/40 p-1 text-xs">
-                  <Link
-                    href={proUrl}
-                    className={[
-                      "rounded-xl px-3 py-1.5 font-semibold transition",
-                      trendsTab === "pro"
-                        ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,255,255,0.14)]"
-                        : "text-neutral-300 hover:text-white",
-                    ].join(" ")}
-                  >
-                    Pro
-                  </Link>
-                  <Link
-                    href={publicUrl}
-                    className={[
-                      "rounded-xl px-3 py-1.5 font-semibold transition",
-                      trendsTab === "public"
-                        ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,255,255,0.14)]"
-                        : "text-neutral-300 hover:text-white",
-                    ].join(" ")}
-                  >
-                    Public
-                  </Link>
-                </div>
-              </div>
+<div className="inline-flex rounded-2xl border border-neutral-800 bg-black/40 p-1 text-xs">
+  <Link
+    href={proUrl}
+    scroll={false}
+    className={[
+      "rounded-xl px-3 py-1.5 font-semibold transition",
+      trendsTab === "pro"
+        ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,255,255,0.14)]"
+        : "text-neutral-300 hover:text-white",
+    ].join(" ")}
+  >
+    Pro
+  </Link>
+
+  <Link
+    href={publicUrl}
+    scroll={false}
+    className={[
+      "rounded-xl px-3 py-1.5 font-semibold transition",
+      trendsTab === "public"
+        ? "bg-white/10 text-white shadow-[0_0_18px_rgba(0,255,255,0.14)]"
+        : "text-neutral-300 hover:text-white",
+    ].join(" ")}
+  >
+    Public
+  </Link>
+</div>
+</div>
 
               {trendsTab === "pro" ? (
                 <>

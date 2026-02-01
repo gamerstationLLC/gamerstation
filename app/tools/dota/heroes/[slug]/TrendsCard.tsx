@@ -1,7 +1,7 @@
 // app/tools/dota/heroes/[slug]/TrendsCardClient.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 type BracketRow = {
   label: string;
@@ -18,10 +18,12 @@ type TopPickRow = {
   wr: number; // 0..1
 };
 
-type BestWorstRow = {
-  label: string;
-  wr: number; // 0..1
-} | null;
+type BestWorstRow =
+  | {
+      label: string;
+      wr: number; // 0..1
+    }
+  | null;
 
 function fmtInt(n: number) {
   const x = Number.isFinite(n) ? Math.trunc(n) : 0;
@@ -44,6 +46,15 @@ function ratio(a: number, b: number) {
   return `${(Math.round(x * 100) / 100).toFixed(2)}×`;
 }
 
+function stopAll(e: React.SyntheticEvent) {
+  // Prevent parent <Link>/<a> default and any router pushes attached to bubbling handlers
+  // (Won't stop *capture*-phase handlers; that requires parent fix.)
+  // @ts-ignore
+  if (typeof (e as any).preventDefault === "function") e.preventDefault();
+  // @ts-ignore
+  if (typeof (e as any).stopPropagation === "function") e.stopPropagation();
+}
+
 function TogglePill({
   active,
   onClick,
@@ -56,7 +67,21 @@ function TogglePill({
   return (
     <button
       type="button"
-      onClick={onClick}
+      aria-pressed={active}
+      onPointerDown={(e) => stopAll(e)}
+      onPointerUp={(e) => stopAll(e)}
+      onMouseDown={(e) => stopAll(e)}
+      onMouseUp={(e) => stopAll(e)}
+      onTouchStart={(e) => stopAll(e)}
+      onTouchEnd={(e) => stopAll(e)}
+      onClick={(e) => {
+        stopAll(e);
+        onClick();
+      }}
+      onKeyDown={(e) => {
+        // prevent Enter/Space from triggering parent navigation
+        if (e.key === "Enter" || e.key === " ") stopAll(e);
+      }}
       className={[
         "h-9 rounded-xl border px-3 text-sm font-semibold transition",
         active
@@ -146,9 +171,22 @@ export default function TrendsCardClient(props: {
 
   const [tab, setTab] = useState<"pro" | "public">("pro");
 
-  // Pro “pressure” metrics (stable, high-ROI, not cringe)
-  const proPresence = useMemo(() => clampMin0(proPick) + clampMin0(proBan), [proPick, proBan]);
+  // If some parent click causes scroll-to-top, we restore scroll position after tab switch.
+  const lastScrollYRef = useRef<number | null>(null);
+  const setTabNoScrollJump = (next: "pro" | "public") => {
+    lastScrollYRef.current = typeof window !== "undefined" ? window.scrollY : null;
+    setTab(next);
+    // next tick: restore
+    if (typeof window !== "undefined") {
+      requestAnimationFrame(() => {
+        if (lastScrollYRef.current != null) {
+          window.scrollTo({ top: lastScrollYRef.current });
+        }
+      });
+    }
+  };
 
+  const proPresence = useMemo(() => clampMin0(proPick) + clampMin0(proBan), [proPick, proBan]);
   const proBanShare = useMemo(() => (proPresence ? proBan / proPresence : 0), [proPresence, proBan]);
   const proPickShare = useMemo(() => (proPresence ? proPick / proPresence : 0), [proPresence, proPick]);
 
@@ -169,21 +207,29 @@ export default function TrendsCardClient(props: {
 
   return (
     <div className="h-full rounded-2xl border border-neutral-800 bg-black/60 p-5">
-      {/* Header + toggle */}
       <div className="flex items-center justify-between gap-3">
         <div className="text-sm font-semibold">Trends</div>
 
-        <div className="flex items-center gap-2">
-          <TogglePill active={tab === "pro"} onClick={() => setTab("pro")}>
+        <div
+          className="flex items-center gap-2"
+          // extra safety: prevent wrapper clicks when interacting with the toggle area
+          onPointerDown={(e) => stopAll(e)}
+          onPointerUp={(e) => stopAll(e)}
+          onMouseDown={(e) => stopAll(e)}
+          onMouseUp={(e) => stopAll(e)}
+          onTouchStart={(e) => stopAll(e)}
+          onTouchEnd={(e) => stopAll(e)}
+          onClick={(e) => stopAll(e)}
+        >
+          <TogglePill active={tab === "pro"} onClick={() => setTabNoScrollJump("pro")}>
             Pro
           </TogglePill>
-          <TogglePill active={tab === "public"} onClick={() => setTab("public")}>
+          <TogglePill active={tab === "public"} onClick={() => setTabNoScrollJump("public")}>
             Public
           </TogglePill>
         </div>
       </div>
 
-      {/* Content */}
       <div className="mt-4 flex flex-col gap-4">
         {tab === "pro" ? (
           <>
@@ -220,19 +266,10 @@ export default function TrendsCardClient(props: {
               <StatTiny label="Public winrate" value={publicPicks ? pct1(publicWinrate) : "—"} />
             </div>
 
-            <MiniBox
-              title="Best / Worst bracket"
-              footnote={`Uses min sample ${fmtInt(minSample)} picks to avoid tiny-pick bait.`}
-            >
+            <MiniBox title="Best / Worst bracket" footnote={`Uses min sample ${fmtInt(minSample)} picks to avoid tiny-pick bait.`}>
               <div className="grid gap-2">
-                <KeyVal
-                  left="Best"
-                  right={bestBracket ? `${bestBracket.label} (${pct1(bestBracket.wr)})` : "—"}
-                />
-                <KeyVal
-                  left="Worst"
-                  right={worstBracket ? `${worstBracket.label} (${pct1(worstBracket.wr)})` : "—"}
-                />
+                <KeyVal left="Best" right={bestBracket ? `${bestBracket.label} (${pct1(bestBracket.wr)})` : "—"} />
+                <KeyVal left="Worst" right={worstBracket ? `${worstBracket.label} (${pct1(worstBracket.wr)})` : "—"} />
               </div>
             </MiniBox>
 
