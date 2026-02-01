@@ -15,7 +15,7 @@ permissions:
 jobs:
   leaderboards:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 240
 
     steps:
       - name: Checkout

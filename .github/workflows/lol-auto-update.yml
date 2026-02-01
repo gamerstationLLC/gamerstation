@@ -147,6 +147,9 @@ jobs:
           MAX_NEW_PUUIDS_PER_RUN: ${{ env.MAX_NEW_PUUIDS_PER_RUN }}
           MATCHES_PER_PUUID: ${{ env.MATCHES_PER_PUUID }}
 
+# 🔽 ADD THIS
+          CHECKPOINT_EVERY: "100"
+
           # pipeline knobs
           USE_TIMELINE: "0"
           REPROCESS_BOOTSTRAP: ${{ env.REPROCESS_BOOTSTRAP }}

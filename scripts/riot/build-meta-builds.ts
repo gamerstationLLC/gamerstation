@@ -21,9 +21,6 @@ const PUUID_CURSORS_PATH = path.join(CACHE_STATE_DIR, "puuid_cursors.json");
 const OUT_RANKED_PATH = path.join(ROOT, "public", "data", "lol", "meta_builds_ranked.json");
 const OUT_CASUAL_PATH = path.join(ROOT, "public", "data", "lol", "meta_builds_casual.json");
 
-
-
-
 // env
 const RIOT_API_KEY = process.env.RIOT_API_KEY || "";
 
@@ -49,6 +46,9 @@ const PATCH_MAJOR_MINOR_ONLY = String(process.env.PATCH_MAJOR_MINOR_ONLY || "1")
 // cache scan / fallback knobs
 const CACHE_SCAN_LIMIT = Number(process.env.CACHE_SCAN_LIMIT || 0);
 const ALLOW_LOW_SAMPLE_FALLBACK = String(process.env.ALLOW_LOW_SAMPLE_FALLBACK || "0") === "1";
+
+// ✅ CHECKPOINTS (new)
+const CHECKPOINT_EVERY = Number(process.env.CHECKPOINT_EVERY || 100);
 
 // ✅ Ladder bootstrap knobs
 type LadderQueue = "RANKED_SOLO_5x5" | "RANKED_FLEX_SR";
@@ -116,6 +116,42 @@ type AggState = {
 };
 
 type Role = "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY";
+
+// ✅ CHECKPOINTS: globals + helpers (new)
+let shutdownRequested = false;
+let gSeenMatches: Set<string> | null = null;
+let gSeenPuuids: Set<string> | null = null;
+let gPuuidCursors: PuuidCursors | null = null;
+let gAgg: AggState | null = null;
+let gLastCheckpointMatches = 0;
+
+async function persistState(reason: string) {
+  if (!gSeenMatches || !gSeenPuuids || !gPuuidCursors || !gAgg) return;
+
+  try {
+    await writeJson(SEEN_MATCH_IDS_PATH, { ids: Array.from(gSeenMatches) } satisfies SeenMatchIdsState);
+    await writeJson(SEEN_PUUIDS_PATH, { puuids: Array.from(gSeenPuuids) } satisfies SeenPuuidsState);
+    await writeJson(PUUID_CURSORS_PATH, gPuuidCursors);
+    await writeJson(AGG_STATE_PATH, gAgg);
+    console.log(
+      `[checkpoint] persisted (${reason}) matches=${gSeenMatches.size} puuids=${gSeenPuuids.size}`
+    );
+  } catch (e: any) {
+    console.warn(`[checkpoint] persist failed (${reason}): ${e?.message || e}`);
+  }
+}
+
+async function handleSignal(sig: string) {
+  if (shutdownRequested) return;
+  shutdownRequested = true;
+  console.log(`[signal] ${sig} received. Flushing checkpoint...`);
+  await persistState(`signal:${sig}`);
+  process.exit(0);
+}
+
+// Register signal handlers once
+process.on("SIGTERM", () => void handleSignal("SIGTERM"));
+process.on("SIGINT", () => void handleSignal("SIGINT"));
 
 function assertEnv() {
   if (!RIOT_API_KEY || !RIOT_API_KEY.startsWith("RGAPI-")) {
@@ -188,7 +224,6 @@ async function pruneCacheByMtime(dir: string, maxAgeDays: number) {
   console.log(`[cache] Pruned ${removed} files from ${dir} older than ${maxAgeDays} days`);
 }
 
-
 function riotRegionalBase() {
   return `https://${RIOT_REGION}.api.riotgames.com`;
 }
@@ -253,15 +288,11 @@ async function getMatchIdsByPuuidPaged(puuid: string, start: number, count: numb
     `?start=${start}&count=${count}` +
     `&startTime=${START_TIME_SEC}`;
 
-  // Optional: narrow the API response so you fetch fewer irrelevant match IDs
-  // Riot match-v5 supports `queue` as a filter. We can fetch ranked + casual separately if you want,
-  // but simplest is to just omit it (still safe because you filter later).
   const url = base;
 
   const ids = (await fetchRegionalJson(url)) as any;
   return Array.isArray(ids) ? ids.map(String) : [];
 }
-
 
 async function getMatch(matchId: string): Promise<any> {
   const cachePath = path.join(CACHE_MATCHES_DIR, `${matchId}.json`);
@@ -598,8 +629,7 @@ type SummonerDTO = {
 async function fetchLadderLeague(): Promise<LeagueList> {
   const base = riotPlatformBase();
 
-  // ✅ don't encode the queue in the path
-  const queuePath = LADDER_QUEUE; // "RANKED_SOLO_5x5" | "RANKED_FLEX_SR"
+  const queuePath = LADDER_QUEUE;
 
   let url: string;
   if (LADDER_TIER === "grandmaster") url = `${base}/lol/league/v4/grandmasterleagues/by-queue/${queuePath}`;
@@ -653,7 +683,6 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
   let loggedSample = false;
 
   for (const anyE of top) {
-    // ✅ IMPORTANT: Riot ladder endpoints now provide puuid directly
     const directPuuid = pickFirstString(anyE, ["puuid", "playerPuuid", "player_puuid"]);
     if (directPuuid) {
       puuids.push(directPuuid);
@@ -661,7 +690,6 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
       continue;
     }
 
-    // Fallback: older shapes that require summoner-v4 resolve
     const sid = pickFirstString(anyE, [
       "summonerId",
       "summonerID",
@@ -730,7 +758,6 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
 
   return unique;
 }
-
 
 // ===============================
 // Finalize outputs from cached Match-V5 JSONs
@@ -883,7 +910,12 @@ function finalizeBuildSig(b: BuildParts): string {
   return `b=${bPart}|c=${cPart}`;
 }
 
-function topBuildsForRole(roleMap: Record<string, Leaf>, minDisplaySample: number, bayesK: number, priorWinrate: number) {
+function topBuildsForRole(
+  roleMap: Record<string, Leaf>,
+  minDisplaySample: number,
+  bayesK: number,
+  priorWinrate: number
+) {
   const entries = Object.entries(roleMap)
     .map(([sig, leaf]) => {
       const games = leaf.games;
@@ -927,7 +959,12 @@ async function writeFinalizeOut(outPath: string, queues: number[], agg: Finalize
     for (const [champId, roles] of Object.entries(champs)) {
       obj.patches[patchKey][champId] = {};
       for (const [role, sigMap] of Object.entries(roles as any)) {
-        const top = topBuildsForRole(sigMap as Record<string, Leaf>, MIN_DISPLAY_SAMPLE, BAYES_K, PRIOR_WINRATE);
+        const top = topBuildsForRole(
+          sigMap as Record<string, Leaf>,
+          MIN_DISPLAY_SAMPLE,
+          BAYES_K,
+          PRIOR_WINRATE
+        );
         if (top.length) obj.patches[patchKey][champId][role] = top;
       }
     }
@@ -943,8 +980,6 @@ async function finalizeOutputsFromAggState(agg: AggState) {
 
   const minPatchMajor = Number(process.env.MIN_PATCH_MAJOR || 16);
 
-  // We’ll output builds per *patch string* already in agg (e.g. "15.1", "15.2")
-  // but only keep patches whose major >= minPatchMajor
   const rankedOut: any = {
     generatedAt: new Date().toISOString(),
     queues: rankedQueues,
@@ -979,21 +1014,19 @@ async function finalizeOutputsFromAggState(agg: AggState) {
   };
 
   const majorOfPatchKey = (patchKey: string): number | null => {
-    // patchKey like "15.1" or "15.1.123"
     const m = String(patchKey).match(/^(\d+)\./);
     if (!m) return null;
     const n = Number(m[1]);
     return Number.isFinite(n) ? n : null;
   };
 
-  // Helper: choose top builds for a given roleBucket (sig -> AggBucket)
   function topFromRoleBucket(roleBucket: Record<string, AggBucket>) {
     const entries = Object.entries(roleBucket || {})
       .map(([sig, b]) => {
         const games = Number(b?.games || 0);
         const wins = Number(b?.wins || 0);
         const winrate = games > 0 ? wins / games : 0;
-        const score = bayesWr(wins, games); // your bayes wr
+        const score = bayesWr(wins, games);
         return {
           buildSig: sig,
           boots: b?.boots ?? null,
@@ -1007,7 +1040,6 @@ async function finalizeOutputsFromAggState(agg: AggState) {
       })
       .filter((x) => x.games >= MIN_DISPLAY_SAMPLE)
       .sort((a, b) => {
-        // Primary: games desc, secondary: score desc (you can swap if you prefer)
         if (b.games !== a.games) return b.games - a.games;
         return b.score - a.score;
       });
@@ -1023,7 +1055,6 @@ async function finalizeOutputsFromAggState(agg: AggState) {
 
     debug.patchesKept += 1;
 
-    // ranked
     const rankedQueueObj = queuesObj?.[String(QUEUE_RANKED)] || null;
     if (rankedQueueObj) {
       for (const [champId, rolesObj] of Object.entries(rankedQueueObj)) {
@@ -1040,7 +1071,6 @@ async function finalizeOutputsFromAggState(agg: AggState) {
       }
     }
 
-    // casual (queue 400/430)
     for (const q of casualQueues) {
       const qObj = queuesObj?.[String(q)] || null;
       if (!qObj) continue;
@@ -1062,7 +1092,6 @@ async function finalizeOutputsFromAggState(agg: AggState) {
 
   console.log("[finalize-from-agg] DEBUG:", debug);
 
-  // ✅ Never nuke ranked output
   const rankedHasAny = Object.keys(rankedOut.patches || {}).length > 0;
   if (!rankedHasAny) {
     throw new Error("[finalize-from-agg] Ranked patches empty — refusing to overwrite output");
@@ -1072,7 +1101,6 @@ async function finalizeOutputsFromAggState(agg: AggState) {
   await fs.writeFile(OUT_RANKED_PATH, JSON.stringify(rankedOut, null, 2), "utf-8");
   console.log(`[finalize-from-agg] Wrote: ${OUT_RANKED_PATH}`);
 
-  // ✅ Casual: only overwrite if there is data
   const casualHasAny = Object.keys(casualOut.patches || {}).length > 0;
   if (!casualHasAny) {
     console.warn("[finalize-from-agg] Casual empty — keeping previous file (no overwrite).");
@@ -1083,16 +1111,14 @@ async function finalizeOutputsFromAggState(agg: AggState) {
   }
 }
 
-
 async function main() {
   assertEnv();
   await ensureDirs();
 
- await pruneCacheByMtime(CACHE_MATCHES_DIR, CACHE_MAX_AGE_DAYS);
-if (USE_TIMELINE) {
-  await pruneCacheByMtime(CACHE_TIMELINES_DIR, CACHE_MAX_AGE_DAYS);
-}
-
+  await pruneCacheByMtime(CACHE_MATCHES_DIR, CACHE_MAX_AGE_DAYS);
+  if (USE_TIMELINE) {
+    await pruneCacheByMtime(CACHE_TIMELINES_DIR, CACHE_MAX_AGE_DAYS);
+  }
 
   let seenMatchIds = await readJson<SeenMatchIdsState>(SEEN_MATCH_IDS_PATH);
   let seenPuuidsState = await readJson<SeenPuuidsState>(SEEN_PUUIDS_PATH);
@@ -1105,6 +1131,12 @@ if (USE_TIMELINE) {
 
   const seenMatches = new Set<string>(seenMatchIds.ids || []);
   const seenPuuids = new Set<string>(seenPuuidsState.puuids || []);
+
+  // ✅ CHECKPOINTS: wire globals (new)
+  gSeenMatches = seenMatches;
+  gSeenPuuids = seenPuuids;
+  gPuuidCursors = puuidCursors;
+  gAgg = agg;
 
   const cacheIngested = await scanCacheAndIngest(agg);
   console.log(`Ingested cached matches this run: ${cacheIngested}`);
@@ -1155,6 +1187,7 @@ if (USE_TIMELINE) {
   let matchesProcessed = 0;
 
   while (puuidQueue.length > 0) {
+    if (shutdownRequested) break; // ✅ CHECKPOINTS (new)
     if (matchesProcessed >= MAX_MATCHES_PER_RUN) break;
 
     const puuid = puuidQueue.shift()!;
@@ -1179,6 +1212,7 @@ if (USE_TIMELINE) {
     if (!matchIds.length) continue;
 
     for (const matchId of matchIds) {
+      if (shutdownRequested) break; // ✅ CHECKPOINTS (new)
       if (matchesProcessed >= MAX_MATCHES_PER_RUN) break;
       if (seenMatches.has(matchId)) continue;
 
@@ -1242,6 +1276,12 @@ if (USE_TIMELINE) {
 
       matchesProcessed += 1;
 
+      // ✅ CHECKPOINTS: flush every N matches (new)
+      if (CHECKPOINT_EVERY > 0 && matchesProcessed - gLastCheckpointMatches >= CHECKPOINT_EVERY) {
+        gLastCheckpointMatches = matchesProcessed;
+        await persistState(`every:${CHECKPOINT_EVERY}`);
+      }
+
       if (newPuuidsAdded < MAX_NEW_PUUIDS_PER_RUN) {
         for (const pt of participants) {
           const newP = String(pt?.puuid || "").trim();
@@ -1255,12 +1295,13 @@ if (USE_TIMELINE) {
     }
   }
 
+  // ✅ CHECKPOINTS: final flush (new)
+  await persistState("end");
+
   await writeJson(SEEN_MATCH_IDS_PATH, { ids: Array.from(seenMatches) } satisfies SeenMatchIdsState);
   await writeJson(SEEN_PUUIDS_PATH, { puuids: Array.from(seenPuuids) } satisfies SeenPuuidsState);
   await writeJson(PUUID_CURSORS_PATH, puuidCursors);
   await writeJson(AGG_STATE_PATH, agg);
-
-
 
   console.log("Done.");
   console.log(`Processed matches this run: ${matchesProcessed} (budget=${MAX_MATCHES_PER_RUN})`);
