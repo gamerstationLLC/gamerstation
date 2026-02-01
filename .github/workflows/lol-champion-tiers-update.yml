@@ -5,7 +5,8 @@ on:
     - cron: "0 */2 * * *" # every 2 hours
   workflow_dispatch: {}
 
-# ✅ Share the same lock as other Riot-heavy workflows to avoid app-rate-limit collisions
+# ✅ If you truly want to serialize Riot-heavy workflows, keep this shared lock.
+# Otherwise, change this to a unique group like "lol-champion-tiers".
 concurrency:
   group: lol-tier-update
   cancel-in-progress: false
@@ -72,14 +73,14 @@ jobs:
         if: always()
         run: |
           echo "== Output sample =="
-          ls -lah public/data/lol/champion_tiers || true
-          find public/data/lol/champion_tiers -maxdepth 3 -type f -name "*.json" | head -n 20 || true
+          ls -lah public/data/lol || true
+          ls -lah public/data/lol/champion_tiers.json || true
 
-          echo "== Git status (champion_tiers) =="
-          git status --porcelain public/data/lol/champion_tiers || true
+          echo "== Git status (champion_tiers.json) =="
+          git status --porcelain -- public/data/lol/champion_tiers.json || true
 
-          echo "== Diffstat (champion_tiers) =="
-          git diff --stat -- public/data/lol/champion_tiers || true
+          echo "== Diffstat (champion_tiers.json) =="
+          git diff --stat -- public/data/lol/champion_tiers.json || true
 
       # 4) Commit → Push
       - name: Commit & push (if changed)
@@ -90,7 +91,13 @@ jobs:
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          git add public/data/lol/champion_tiers
+          # If the output file doesn't exist, don't fail the job.
+          if [ ! -f "public/data/lol/champion_tiers.json" ]; then
+            echo "No public/data/lol/champion_tiers.json exists; nothing to commit."
+            exit 0
+          fi
+
+          git add public/data/lol/champion_tiers.json || true
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
@@ -99,13 +106,14 @@ jobs:
 
           git commit -m "chore(lol): refresh champion tiers"
 
+          # Retry push with rebase (DO NOT reset --hard; it deletes your commit)
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing latest main..."
+            echo "Attempt $i: syncing latest main (rebase)..."
             git fetch origin main
-            git reset --hard origin/main
+            git pull --rebase --autostash origin main || true
 
             echo "Attempt $i: pushing..."
-            if git push; then
+            if git push origin main; then
               echo "Push succeeded."
               exit 0
             fi

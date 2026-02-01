@@ -5,11 +5,9 @@ on:
     - cron: "0 * * * *" # every hour
   workflow_dispatch: {}
 
-# ✅ Share the same lock as other Riot-heavy workflows to avoid app-rate-limit collisions
 concurrency:
   group: lol-leaderboards-update
   cancel-in-progress: false
-
 
 permissions:
   contents: write
@@ -17,6 +15,7 @@ permissions:
 jobs:
   leaderboards:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
 
     steps:
       - name: Checkout
@@ -71,11 +70,12 @@ jobs:
         if: always()
         run: |
           echo "== Output sample =="
+          ls -lah public/data/lol || true
           ls -lah public/data/lol/leaderboards || true
           find public/data/lol/leaderboards -maxdepth 3 -type f -name "*.json" | head -n 20 || true
 
           echo "== Git status (leaderboards) =="
-          git status --porcelain public/data/lol/leaderboards || true
+          git status --porcelain -- public/data/lol/leaderboards || true
 
           echo "== Diffstat (leaderboards) =="
           git diff --stat -- public/data/lol/leaderboards || true
@@ -96,7 +96,13 @@ jobs:
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          git add public/data/lol/leaderboards
+          # Guard: if output folder doesn't exist, do nothing (don't fail workflow)
+          if [ ! -d "public/data/lol/leaderboards" ]; then
+            echo "No public/data/lol/leaderboards directory exists; nothing to commit."
+            exit 0
+          fi
+
+          git add -A public/data/lol/leaderboards || true
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
@@ -105,13 +111,14 @@ jobs:
 
           git commit -m "chore(lol): refresh LoL Leaderboards"
 
+          # Retry push with rebase (DO NOT reset --hard; it deletes your commit)
           for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing latest main..."
+            echo "Attempt $i: syncing latest main (rebase)..."
             git fetch origin main
-            git reset --hard origin/main
+            git pull --rebase --autostash origin main || true
 
             echo "Attempt $i: pushing..."
-            if git push; then
+            if git push origin main; then
               echo "Push succeeded."
               exit 0
             fi

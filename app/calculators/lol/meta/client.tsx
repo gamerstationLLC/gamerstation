@@ -145,6 +145,72 @@ function canUseClipboard() {
   return typeof navigator !== "undefined" && !!navigator.clipboard?.writeText;
 }
 
+const FALLBACK_MIN_GAMES = 10; // show something if we have at least this
+const Z_95 = 1.96; // ~95% confidence
+
+function wilsonLowerBound(p: number, n: number, z = Z_95) {
+  if (!Number.isFinite(p) || !Number.isFinite(n) || n <= 0) return -1;
+  p = Math.min(1, Math.max(0, p));
+  const z2 = z * z;
+  const denom = 1 + z2 / n;
+  const center = p + z2 / (2 * n);
+  const adj = z * Math.sqrt((p * (1 - p)) / n + z2 / (4 * n * n));
+  return (center - adj) / denom;
+}
+
+/**
+ * Picks the "best" build from an array, but:
+ * - only considers builds with >= fallbackMin games
+ * - strongly prefers builds with >= preferredMin games if any exist
+ * - uses Wilson LB so low-game 100% WR doesn't beat good high-sample builds
+ */
+function pickBestBuild(
+  roleBuilds: MetaRoleEntry[] | undefined,
+  preferredMin: number,
+  fallbackMin = FALLBACK_MIN_GAMES
+) {
+  if (!Array.isArray(roleBuilds) || roleBuilds.length === 0) return null;
+
+  const viable = roleBuilds.filter((b) => (b?.games ?? 0) >= fallbackMin);
+  if (!viable.length) return null;
+
+  const strong = viable.filter((b) => (b?.games ?? 0) >= preferredMin);
+  const pool = strong.length ? strong : viable;
+
+  let best = pool[0];
+  let bestScore = wilsonLowerBound(best.winrate, best.games);
+
+  for (let i = 1; i < pool.length; i++) {
+    const b = pool[i];
+    const s = wilsonLowerBound(b.winrate, b.games);
+
+    // primary: Wilson LB (sample-size-aware)
+    if (s > bestScore) {
+      best = b;
+      bestScore = s;
+      continue;
+    }
+
+    // tie-breakers: more games, then your server-side score
+    if (s === bestScore) {
+      const ng = b.games ?? 0;
+      const bg = best.games ?? 0;
+      if (ng > bg) {
+        best = b;
+        bestScore = s;
+        continue;
+      }
+      if (ng === bg && (b.score ?? 0) > (best.score ?? 0)) {
+        best = b;
+        bestScore = s;
+      }
+    }
+  }
+
+  return best;
+}
+
+
 export default function MetaClient() {
   const [mode, setMode] = useState<MetaMode>("ranked");
   const [hydrated, setHydrated] = useState(false);
@@ -299,7 +365,8 @@ const navBtn =
         roleSummaries: (['TOP','JUNGLE','MIDDLE','BOTTOM','UTILITY'] as Role[])
           .map((r) => {
             const arr = (patchChampMap?.[champKey] as Partial<Record<Role, MetaRoleEntry[]> | undefined>)?.[r];
-            const best = arr && arr.length ? arr[0] : null;
+           const best = bestBuildForRole(arr);
+
             return best ? { role: r, entry: best } : null;
           })
           .filter(Boolean) as Array<{ role: Role; entry: MetaRoleEntry }>,
@@ -317,9 +384,10 @@ const navBtn =
 
     // If a global role filter is selected, only show champs that actually have any builds for that role.
     return filteredByQuery.filter((c) => {
-      const arr = c.roleMap[role];
-      return Array.isArray(arr) && arr.length > 0;
-    });
+  const arr = c.roleMap[role];
+  return !!bestBuildForRole(arr); // >=10 and prefers >=25
+});
+
   }, [meta, patch, champions, patchChampMap, q, role]);
 
   function itemLabel(id: number) {
@@ -327,16 +395,17 @@ const navBtn =
     return item?.name ? String(item.name) : String(id);
   }
 
-  function bestBuildForRole(roleBuilds: MetaRoleEntry[] | undefined) {
-    if (!Array.isArray(roleBuilds) || !roleBuilds.length) return null;
-    return roleBuilds[0];
-  }
+ function bestBuildForRole(roleBuilds: MetaRoleEntry[] | undefined) {
+  const preferred = meta?.minDisplaySample ?? 25; // your "good sample" target
+  return pickBestBuild(roleBuilds, preferred, FALLBACK_MIN_GAMES);
+}
 
-  function isStatSig(e: MetaRoleEntry | null) {
-    if (!e || !meta) return false;
-    if (e.lowSample) return false;
-    return (e.games ?? 0) >= (meta.minDisplaySample ?? 0);
-  }
+
+ function isStatSig(e: MetaRoleEntry | null) {
+  if (!e || !meta) return false;
+  if (e.lowSample) return false;
+  return (e.games ?? 0) >= (meta.minDisplaySample ?? 25);
+}
 
   function champHasAnySigData(roleMap: Partial<Record<Role, MetaRoleEntry[]>>) {
     return (["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[]).some((r) => {
@@ -346,25 +415,25 @@ const navBtn =
   }
 
   function pickBestSigEntry(roleMap: Partial<Record<Role, MetaRoleEntry[]>>) {
-    if (!meta) return null;
+  if (!meta) return null;
 
-    let best: { role: Role; entry: MetaRoleEntry } | null = null;
+  const preferred = meta.minDisplaySample ?? 25;
 
-    for (const r of ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[]) {
-      const e = bestBuildForRole(roleMap[r]);
-      if (!e) continue;
+  let best: { role: Role; entry: MetaRoleEntry; s: number } | null = null;
 
-      if (
-        !best ||
-        (e.score ?? 0) > (best.entry.score ?? 0) ||
-        ((e.score ?? 0) === (best.entry.score ?? 0) && (e.games ?? 0) > (best.entry.games ?? 0))
-      ) {
-        best = { role: r, entry: e };
-      }
+  for (const r of ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[]) {
+    const e = pickBestBuild(roleMap[r], preferred, FALLBACK_MIN_GAMES);
+    if (!e) continue;
+
+    const s = wilsonLowerBound(e.winrate, e.games);
+
+    if (!best || s > best.s || (s === best.s && (e.games ?? 0) > (best.entry.games ?? 0))) {
+      best = { role: r, entry: e, s };
     }
-
-    return best;
   }
+
+  return best ? { role: best.role, entry: best.entry } : null;
+}
 
   function buildShareUrl(champId: string, champKey: string, roleSel: RoleFilter) {
     if (typeof window === "undefined") return "";
@@ -808,7 +877,7 @@ function BuildPreview({
       <div className="overflow-hidden rounded-2xl border border-white/10">
         {visibleCards.map((c) => {
           const isOpen = Boolean(expanded[c.champKey]);
-          const hasSig = champHasAnySigData(c.roleMap);
+
           const best = pickBestSigEntry(c.roleMap);
 
           const rolesAll: Role[] = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
@@ -861,8 +930,8 @@ function BuildPreview({
 
                     ) : (
                       <div className="mt-2 text-xs text-white/45">
-                        No builds ≥ {meta?.minDisplaySample ?? "—"} games for this champ on this
-                        patch.
+                        No builds ≥ {FALLBACK_MIN_GAMES} games for this champ on this patch yet.
+
                       </div>
                     )}
                   </div>
@@ -1078,5 +1147,4 @@ function BuildPreview({
         })}
       </div>
     </div>
-  );
 </div>)}
