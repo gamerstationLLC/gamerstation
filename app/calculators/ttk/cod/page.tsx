@@ -11,13 +11,113 @@ export const metadata: Metadata = {
     "Calculate time-to-kill (TTK) in Call of Duty for Warzone and Multiplayer. Compare weapons, accuracy, headshots, armor plates, and ranges instantly.",
 };
 
+/**
+ * IMPORTANT:
+ * This must NEVER break the page. COD site can block/slow SSR fetches.
+ * So we:
+ * - timeout fast
+ * - swallow all errors
+ * - fallback to "latest"
+ */
+async function fetchTextWithTimeout(
+  url: string,
+  ms: number,
+  revalidateSeconds: number
+): Promise<string | null> {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), ms);
+
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+      // cache a bit so we don't slam COD site or slow every request
+      next: { revalidate: revalidateSeconds },
+      // keep headers minimal; some CDNs dislike custom UAs
+    });
+    if (!res.ok) return null;
+    return await res.text();
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+function extractFirstPatchHref(indexHtml: string): string | null {
+  // Prefer a patchnotes article link. COD page structure changes, so keep it flexible.
+  // Try a few patterns and take the first match.
+  const patterns = [
+    /href="(\/patchnotes\/\d{4}\/\d{2}\/[^"]+)"/i,
+    /href="(\/patchnotes\/[^"]+)"/i,
+  ];
+
+  for (const p of patterns) {
+    const m = indexHtml.match(p);
+    if (m?.[1]) return m[1];
+  }
+  return null;
+}
+
+function extractDateLabel(patchHtml: string): string | null {
+  const m = patchHtml.match(
+    /\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},\s+\d{4}\b/
+  );
+  return m?.[0]?.trim() ?? null;
+}
+
+function extractH1Title(patchHtml: string): string | null {
+  const m = patchHtml.match(/<h1[^>]*>([^<]{3,120})<\/h1>/i);
+  if (!m?.[1]) return null;
+  const title = m[1].replace(/\s+/g, " ").trim();
+  return title.length ? title : null;
+}
+
+async function getCodPatchLabel(): Promise<string> {
+  const FALLBACK = "latest";
+
+  // 1) Fetch patchnotes index (fast timeout)
+  const indexHtml = await fetchTextWithTimeout(
+    "https://www.callofduty.com/patchnotes",
+    1800, // 1.8s timeout
+    3600 // revalidate 1 hour
+  );
+
+  if (!indexHtml) return FALLBACK;
+
+  const href = extractFirstPatchHref(indexHtml);
+  if (!href) return FALLBACK;
+
+  const patchUrl = href.startsWith("http")
+    ? href
+    : `https://www.callofduty.com${href}`;
+
+  // 2) Fetch the latest patch page (fast timeout)
+  const patchHtml = await fetchTextWithTimeout(
+    patchUrl,
+    1800, // 1.8s timeout
+    3600
+  );
+
+  if (!patchHtml) return FALLBACK;
+
+  // 3) Prefer a clean date for the pill
+  const date = extractDateLabel(patchHtml);
+  if (date) return date;
+
+  // 4) If no date, use title (kept short)
+  const title = extractH1Title(patchHtml);
+  if (title) return title;
+
+  return FALLBACK;
+}
+
 export default async function CodTtkPage() {
-  const [sheetWeaponsRaw, sheetAttachmentsRaw] = await Promise.all([
+  const [sheetWeaponsRaw, sheetAttachmentsRaw, patchLabel] = await Promise.all([
     getCodWeapons(),
     getCodAttachments(),
+    getCodPatchLabel(),
   ]);
 
-  // ✅ keep only fields the client uses (NEW: dmg10/dmg25/dmg50)
   const sheetWeapons = sheetWeaponsRaw.map((w: any) => ({
     weapon_id: w.weapon_id,
     weapon_name: w.weapon_name,
@@ -25,13 +125,11 @@ export default async function CodTtkPage() {
     rpm: w.rpm,
     headshot_mult: w.headshot_mult,
     fire_mode: w.fire_mode,
-
     dmg10: w.dmg10,
     dmg25: w.dmg25,
     dmg50: w.dmg50,
   }));
 
-  // ✅ getCodAttachments() now already filters to barrels (if you used my updated file)
   const sheetAttachments = sheetAttachmentsRaw.map((a: any) => ({
     attachment_id: a.attachment_id,
     attachment_name: a.attachment_name,
@@ -47,6 +145,7 @@ export default async function CodTtkPage() {
       <CodTtkClient
         sheetWeapons={sheetWeapons}
         sheetAttachments={sheetAttachments}
+        patchLabel={patchLabel}
       />
     </Suspense>
   );

@@ -9,7 +9,7 @@ import { type CodAttachmentRow } from "@/lib/codattachments";
 
 /**
  * attachments_global columns:
- * attachment_id, attachment_name, slot, applies_to, dmg10_add, dmg25_add, dmg50_add
+ * attachment_id, attachment_name, slot, applies_to, dmg10_add, dmgmg25_add, dmg50_add
  *
  * ✅ This client assumes your weapons CSV provides:
  * weapon_id, weapon_name, weapon_type, rpm, headshot_mult, fire_mode, dmg10, dmg25, dmg50
@@ -109,9 +109,11 @@ const RANGES: { key: RangeKey; label: string; meters: number }[] = [
 export default function CodTtkClient({
   sheetWeapons,
   sheetAttachments = [],
+  patchLabel = "latest",
 }: {
   sheetWeapons: CodWeaponRow[];
   sheetAttachments?: CodAttachmentRow[];
+  patchLabel?: string;
 }) {
   const searchParams = useSearchParams();
 
@@ -141,7 +143,13 @@ export default function CodTtkClient({
           idNorm: norm(id),
         };
       })
-      .filter(Boolean) as { id: string; name: string; cls: WeaponClass; nameNorm: string; idNorm: string }[];
+      .filter(Boolean) as {
+      id: string;
+      name: string;
+      cls: WeaponClass;
+      nameNorm: string;
+      idNorm: string;
+    }[];
   }, [sheetWeapons]);
 
   // ✅ map sheet rows -> UIWeapon (expects dmg10/dmg25/dmg50 on each row)
@@ -208,9 +216,6 @@ export default function CodTtkClient({
 
     // Then set weapon id
     setWeaponId(match.id);
-
-    // (Optional UX) jump to results on mobile if desired:
-    // setMobileTab("results");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, allWeaponLookup.length]);
 
@@ -362,6 +367,9 @@ export default function CodTtkClient({
   // ✅ sticky bottom bar display (prefer accuracy TTK if user set < 100)
   const showAccTtk = accuracyStr !== "" && Number(accuracyStr) < 100;
 
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
   return (
     <main
       className="
@@ -371,26 +379,45 @@ export default function CodTtkClient({
       "
     >
       <div className="mx-auto max-w-6xl">
-        <header className="flex items-center justify-between">
-          <Link
-            href="/games/cod"
-            className="text-sm text-neutral-300 hover:text-white"
-          >
-            ← Back to Call of Duty
+        {/* ✅ Standard GS header: brand left, ONLY Calculators top-right */}
+        <header className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+            <img
+              src="/gs-logo-v2.png"
+              alt="GamerStation"
+              className="
+                h-10 w-10 rounded-xl bg-black p-1
+                shadow-[0_0_30px_rgba(0,255,255,0.35)]
+              "
+            />
+            <span className="text-lg font-black tracking-tight">
+              GamerStation<span className="align-super text-[0.6em]">™</span>
+            </span>
           </Link>
-          <div className="text-sm text-neutral-400">Call of Duty • TTK</div>
+
+          <div className="ml-auto">
+            <Link href="/calculators" className={navBtn}>
+              Calculators
+            </Link>
+          </div>
         </header>
 
         <div className="mt-8">
-          <h1 className="text-4xl font-bold tracking-tight">
-            COD TTK Calculator
-          </h1>
+          <h1 className="text-4xl font-bold tracking-tight">COD TTK Calculator</h1>
+
           <p className="mt-3 text-neutral-300 max-w-2xl">
-            Pick a weapon, choose Multiplayer or Warzone plates, and get
-            shots-to-kill + time-to-kill.
+            Pick a weapon, choose Multiplayer or Warzone plates, and get shots-to-kill + time-to-kill.
           </p>
+
           <div className="mt-4 italic text-[11px] text-neutral-400">
             Damage values are modeled in tiered ranges and may be approximations.
+          </div>
+
+          {/* ✅ Patch pill (server-derived label passed into client) */}
+          <div className="mt-3">
+            <span className="inline-flex items-center rounded-full border border-neutral-800 bg-black/40 px-3 py-1 text-[11px] text-neutral-200">
+              Patch: <span className="ml-1 font-semibold text-white">{patchLabel}</span>
+            </span>
           </div>
         </div>
 
@@ -511,6 +538,7 @@ export default function CodTtkClient({
                       </option>
                     ))}
                   </select>
+
                   <div className="mt-1 text-[11px] text-neutral-500">
                     Note: Barrels only. Other attachments typically have no effect on TTK.
                   </div>
@@ -520,7 +548,6 @@ export default function CodTtkClient({
                   </div>
                 </label>
 
-                {/* ✅ Minimal replacement: show adds for each bucket instead of one */}
                 <div className="rounded-xl border border-neutral-800 bg-black/40 p-3">
                   <div className="text-xs text-neutral-400">Barrel adds</div>
                   <div className="mt-2 grid grid-cols-2 gap-2 text-[11px] text-neutral-300">
@@ -564,8 +591,7 @@ export default function CodTtkClient({
 
                     if (/^\d{0,3}$/.test(val)) {
                       const asNum = Number(val);
-                      if (Number.isFinite(asNum) && asNum <= 100)
-                        setAccuracyStr(val);
+                      if (Number.isFinite(asNum) && asNum <= 100) setAccuracyStr(val);
                       else if (val.length <= 2) setAccuracyStr(val);
                     }
                   }}
@@ -573,7 +599,6 @@ export default function CodTtkClient({
                   placeholder="100"
                 />
 
-                {/* ✅ NEW: tiny toggle buttons right under Accuracy */}
                 <div className="mt-2 flex gap-2">
                   <button
                     type="button"
@@ -609,7 +634,6 @@ export default function CodTtkClient({
               </div>
             </div>
 
-            {/* Weapon stats */}
             <div className="mt-6 rounded-2xl border border-neutral-800 bg-black/40 p-4">
               <div className="text-sm font-semibold">Weapon stats</div>
 
@@ -628,9 +652,7 @@ export default function CodTtkClient({
                     min={1}
                     className="mt-2 w-full rounded-lg border border-neutral-800 bg-black px-3 py-2 text-sm outline-none focus:border-neutral-600"
                   />
-                  <div className="mt-1 text-[11px] text-neutral-500">
-                    Leave blank to use sheet value.
-                  </div>
+                  <div className="mt-1 text-[11px] text-neutral-500">Leave blank to use sheet value.</div>
                 </label>
 
                 <div className="rounded-xl border border-neutral-800 bg-black/40 p-3">
@@ -655,9 +677,7 @@ export default function CodTtkClient({
             <div className="mt-5 grid gap-3">
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
                 <div className="text-sm text-neutral-300">Selected weapon</div>
-                <div className="text-sm font-semibold">
-                  {selected?.name ?? "—"}
-                </div>
+                <div className="text-sm font-semibold">{selected?.name ?? "—"}</div>
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
@@ -672,7 +692,6 @@ export default function CodTtkClient({
                 <div className="text-sm font-semibold">{fmt(shotsPerSecond, 2)}</div>
               </div>
 
-              {/* ✅ NEW: TTK-by-range in Results tab */}
               <div className="rounded-xl border border-neutral-800 bg-black/40 px-4 py-3">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-neutral-300">TTK by range</div>
@@ -690,9 +709,7 @@ export default function CodTtkClient({
                         className="flex items-center justify-between rounded-lg border border-neutral-800 bg-black/30 px-3 py-2"
                       >
                         <div className="text-sm text-neutral-300">{r.label}</div>
-                        <div className="text-sm font-semibold tabular-nums">
-                          {fmtMs(shownTtk)}
-                        </div>
+                        <div className="text-sm font-semibold tabular-nums">{fmtMs(shownTtk)}</div>
                       </div>
                     );
                   })}
@@ -701,85 +718,68 @@ export default function CodTtkClient({
             </div>
 
             <div className="mt-6 text-xs text-neutral-500 leading-relaxed">
-              Note: Real in-game TTK depends on range breakpoints, limb
-              modifiers, headshot rules, sprint-to-fire, ADS, recoil, and server
-              tick/latency. This tool is meant as a clean baseline.
+              Note: Real in-game TTK depends on range breakpoints, limb modifiers, headshot rules,
+              sprint-to-fire, ADS, recoil, and server tick/latency. This tool is meant as a clean baseline.
             </div>
           </section>
         </div>
       </div>
 
-   {/* ✅ MOBILE ONLY: sticky bottom TTK bar now shows ranges */}
-<div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
-  <div className="border-t border-neutral-800 bg-black/80 backdrop-blur">
-    <div className="mx-auto max-w-6xl px-7 py-1">
-      {/* OUTER: not a button (prevents nested button hydration error) */}
-      <div
-        role="button"
-        tabIndex={0}
-        
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") setMobileTab("results");
-        }}
-        className="w-full text-left"
-      >
-        {/* header + button share SAME row & width */}
-        <div className="flex items-start justify-between gap-3">
-          <div className="text-[10px] leading-tight text-neutral-400">
-            {selected?.name ?? "—"} •{" "}
-            {mode === "wz" ? `WZ (${plates} plates)` : "MP"} •{" "}
-            {hitZone === "torso" ? "Torso" : "Headshots"}
-            {showAccTtk ? " • acc" : ""}
-          </div>
+      {/* ✅ MOBILE ONLY: sticky bottom TTK bar now shows ranges */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+        <div className="border-t border-neutral-800 bg-black/80 backdrop-blur">
+          <div className="mx-auto max-w-6xl px-7 py-1">
+            <div
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") setMobileTab("results");
+              }}
+              className="w-full text-left"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="text-[10px] leading-tight text-neutral-400">
+                  {selected?.name ?? "—"} • {mode === "wz" ? `WZ (${plates} plates)` : "MP"} •{" "}
+                  {hitZone === "torso" ? "Torso" : "Headshots"}
+                  {showAccTtk ? " • acc" : ""}
+                </div>
 
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setMobileTab(mobileTab === "inputs" ? "results" : "inputs");
-            }}
-            className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-neutral-200 hover:bg-white/10"
-          >
-            {mobileTab === "inputs" ? "View results" : "Edit inputs"}
-          </button>
-        </div>
-
-        {/* ✅ CHANGED: 4-column grid so chips have a true right edge */}
-        <div className="mt-2 grid grid-cols-4 gap-1.5 text-[10px] leading-tight">
-          {rangeResults.map((r) => {
-            const shownTtk = showAccTtk ? r.ttkMsWithAccuracy : r.ttkMs;
-
-            const shortLabel =
-              r.key === "r10"
-                ? "0–10"
-                : r.key === "r25"
-                ? "10–25"
-                : r.key === "r50"
-                ? "25–50"
-                : "50+";
-
-            return (
-              <div
-                key={r.key}
-                className="flex w-full items-center justify-between rounded border border-neutral-800 bg-black/30 px-2 py"
-              >
-                <span className="opacity-70">{shortLabel}</span>
-                <span className="font-semibold tabular-nums">
-                  {isFinite(shownTtk) ? `${Math.round(shownTtk)}ms` : "—"}
-                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMobileTab(mobileTab === "inputs" ? "results" : "inputs");
+                  }}
+                  className="shrink-0 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold text-neutral-200 hover:bg-white/10"
+                >
+                  {mobileTab === "inputs" ? "View results" : "Edit inputs"}
+                </button>
               </div>
-            );
-          })}
+
+              <div className="mt-2 grid grid-cols-4 gap-1.5 text-[10px] leading-tight">
+                {rangeResults.map((r) => {
+                  const shownTtk = showAccTtk ? r.ttkMsWithAccuracy : r.ttkMs;
+
+                  const shortLabel =
+                    r.key === "r10" ? "0–10" : r.key === "r25" ? "10–25" : r.key === "r50" ? "25–50" : "50+";
+
+                  return (
+                    <div
+                      key={r.key}
+                      className="flex w-full items-center justify-between rounded border border-neutral-800 bg-black/30 px-2 py-1"
+                    >
+                      <span className="opacity-70">{shortLabel}</span>
+                      <span className="font-semibold tabular-nums">
+                        {isFinite(shownTtk) ? `${Math.round(shownTtk)}ms` : "—"}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
     </main>
   );
 }

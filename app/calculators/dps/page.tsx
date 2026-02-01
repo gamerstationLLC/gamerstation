@@ -35,42 +35,64 @@ export default function DpsPage() {
     return { shotsPerSecond, expectedDamagePerHit, dps };
   }, [damagePerHit, rpm, accuracyPct, critChancePct, critMultiplier]);
 
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
+  const backLink =
+    "inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4";
+
   return (
     <main className="min-h-screen bg-black text-white">
       <div className="mx-auto max-w-5xl px-6 py-12">
-        <header className="flex items-center justify-between">
-        
+        {/* ✅ Standard header: brand left, top-right pills = Tools + Calculators */}
+        <header className="flex items-center gap-3">
+  {/* Brand left */}
+  <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+            <img
+              src="/gs-logo-v2.png"
+              alt="GamerStation"
+              className="
+                h-10 w-10 rounded-xl bg-black p-1
+                shadow-[0_0_30px_rgba(0,255,255,0.35)]
+              "
+            />
+            <span className="text-lg font-black tracking-tight">
+              GamerStation<span className="align-super text-[0.6em]">™</span>
+            </span>
+          </Link>
 
-          <div className="text-sm text-neutral-500">Universal DPS</div>
-        </header>
 
-        <div className="flex items-start justify-between gap-6">
-  {/* Left text */}
-  <div>
-    <h1 className="mt-6 text-3xl font-bold">DPS Calculator</h1>
-
-    <p className="mt-2 max-w-2xl text-neutral-300">
-      Works for most games. Enter damage + RPM, optionally include accuracy
-      and crits.
-    </p>
+  {/* Top-right: ONLY Calculators */}
+  <div className="ml-auto">
+    <Link
+      href="/calculators"
+      className="
+        rounded-xl border border-neutral-800
+        bg-black px-4 py-2 text-sm text-neutral-200
+        transition
+        hover:border-neutral-600
+        hover:text-white
+        hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+      "
+    >
+      Calculators
+    </Link>
   </div>
+</header>
 
-  {/* Right button / calc trigger */}
-  <a
-    href="/calculators"
-    className="
-      ml-auto mt-6 rounded-xl border border-neutral-800
-      bg-black px-4 py-2 text-sm text-neutral-200
-      transition
-      hover:border-neutral
-      hover:text-white
-      hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
-    "
-  >
-    Calculators
-  </a>
-</div>
 
+        <div className="mt-2 text-sm text-neutral-500">Universal DPS</div>
+
+        {/* Title + blurb */}
+        <div className="mt-6">
+          <h1 className="text-3xl font-bold">DPS Calculator</h1>
+
+          <p className="mt-2 max-w-2xl text-neutral-300">
+            Works for most games. Enter damage + RPM, optionally include accuracy and crits.
+          </p>
+
+          
+        </div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           {/* Inputs */}
@@ -149,28 +171,21 @@ export default function DpsPage() {
           </section>
 
           {/* Results */}
-          <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-5 h-fit self-start">
-
+          <section className="h-fit self-start rounded-2xl border border-neutral-800 bg-neutral-950 p-5">
             <h2 className="text-sm font-semibold">Results</h2>
 
             <div className="mt-4 grid gap-4">
-              <ResultRow
-                label="Shots per second"
-                value={results.shotsPerSecond.toFixed(2)}
-              />
+              <ResultRow label="Shots per second" value={results.shotsPerSecond.toFixed(2)} />
               <ResultRow
                 label="Expected damage per hit"
                 value={results.expectedDamagePerHit.toFixed(2)}
               />
-              <ResultRow
-                label="Estimated DPS"
-                value={results.dps.toFixed(2)}
-              />
+              <ResultRow label="Estimated DPS" value={results.dps.toFixed(2)} />
             </div>
 
             <p className="mt-6 text-xs text-neutral-500">
-              Note: Real DPS depends on reloads, recoil, drop-off, armor, buffs,
-              headshots, and hit registration.
+              Note: Real DPS depends on reloads, recoil, drop-off, armor, buffs, headshots, and hit
+              registration.
             </p>
           </section>
         </div>
@@ -214,13 +229,7 @@ function ResultRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function PresetButton({
-  label,
-  onClick,
-}: {
-  label: string;
-  onClick: () => void;
-}) {
+function PresetButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       type="button"

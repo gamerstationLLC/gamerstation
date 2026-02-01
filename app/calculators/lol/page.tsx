@@ -191,10 +191,34 @@ export default async function LolCalculatorPage() {
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
-        <Link href="/calculators/lol/hub" className="text-sm text-neutral-300 hover:text-white">
-          ← Back to Hub
-        </Link>
+       <header className="flex items-center gap-3">
+  {/* GS brand */}
+  <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+    <img
+      src="/gs-logo-v2.png"
+      alt="GamerStation"
+      className="
+        h-10 w-10 rounded-xl bg-black p-1
+        shadow-[0_0_30px_rgba(0,255,255,0.35)]
+      "
+    />
+    <span className="text-lg font-black tracking-tight">
+      GamerStation<span className="align-super text-[0.6em]">™</span>
+    </span>
+  </Link>
 
+  {/* Top-right: ONLY Calculators */}
+  <div className="ml-auto">
+    <Link
+      href="/calculators/lol/hub"
+      className="rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]"
+    >
+      LoL Hub
+    </Link>
+  </div>
+</header>
+
+          
         <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
           League of Legends Damage Calculator
         </h1>

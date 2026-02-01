@@ -2,24 +2,44 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "WoW PvE Calculators – Stat Impact, Mythic+ Scaling & Mistake Analysis | GamerStation",
+  title:
+    "WoW PvE Calculators – Stat Impact, Mythic+ Scaling & Mistake Analysis | GamerStation",
   description:
     "World of Warcraft PvE calculators for raid and Mythic+. Analyze stat impact, Mythic+ scaling, and DPS loss from downtime or mistakes using fast, non-simulation tools.",
 };
 
 export default function WoWPvEHubPage() {
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
   return (
     <main className="min-h-screen bg-black text-white px-6 py-16">
       <div className="mx-auto max-w-5xl">
-        <header className="flex items-center justify-between">
-          <Link
-            href="/calculators/wow"
-            className="text-sm text-neutral-300 hover:text-white"
-          >
-            ← Back to WoW
+        {/* ✅ Standard GS header */}
+        <header className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+            <img
+              src="/gs-logo-v2.png"
+              alt="GamerStation"
+              className="
+                h-10 w-10 rounded-xl bg-black p-1
+                shadow-[0_0_30px_rgba(0,255,255,0.35)]
+              "
+            />
+            <span className="text-lg font-black tracking-tight">
+              GamerStation<span className="align-super text-[0.6em]">™</span>
+            </span>
           </Link>
+
+          <div className="ml-auto">
+            <Link href="/calculators/wow" className={navBtn}>
+              WoW Hub
+            </Link>
+          </div>
         </header>
 
+        {/* Back link */}
+        
         <h1 className="mt-8 text-4xl font-bold">WoW PvE</h1>
         <p className="mt-3 text-neutral-300">
           Pick a PvE tool to get started.
@@ -29,7 +49,7 @@ export default function WoWPvEHubPage() {
           {/* Mythic+ Scaling */}
           <Link
             href="/calculators/wow/pve/mythic-plus"
-            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+            className="rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
           >
             <div className="text-sm font-semibold">Mythic+ Scaling</div>
             <div className="mt-2 text-sm text-neutral-400">
@@ -40,7 +60,7 @@ export default function WoWPvEHubPage() {
           {/* Uptime / Mistake Impact */}
           <Link
             href="/calculators/wow/pve/uptime"
-            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+            className="rounded-2xl border border-neutral-800  p-6 hover:border-neutral-600 transition"
           >
             <div className="text-sm font-semibold">
               Uptime / Mistake Impact
@@ -53,7 +73,7 @@ export default function WoWPvEHubPage() {
           {/* Stat Impact */}
           <Link
             href="/calculators/wow/pve/stat-impact"
-            className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 hover:border-neutral-600 transition"
+            className="rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
           >
             <div className="text-sm font-semibold">Stat Impact</div>
             <div className="mt-2 text-sm text-neutral-400">

@@ -451,8 +451,20 @@ export default function OsrsDpsPage() {
     <main className="min-h-screen bg-black text-white px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+            <img
+              src="/gs-logo-v2.png"
+              alt="GamerStation"
+              className="
+                h-10 w-10 rounded-xl bg-black p-1
+                shadow-[0_0_30px_rgba(0,255,255,0.35)]
+              "
+            />
+            <span className="text-lg font-black tracking-tight">
+              GamerStation<span className="align-super text-[0.6em]">™</span>
+            </span>
+          </Link>
           
-          <div className="text-sm text-neutral-400">OSRS • DPS</div>
            <a
   href="/calculators"
   className="

@@ -70,12 +70,12 @@ export default function CalculatorsPage() {
 
             {/* COD TTK */}
             <Link
-              href="/games/cod"
+              href="/calculators/ttk/cod"
               className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
             >
               <div className="text-sm font-semibold">Call of Duty</div>
               <div className="mt-2 text-sm text-neutral-400">
-                TTK calculator + weapon buffs / nerfs.
+                TTK calculator.
               </div>
             </Link>
 

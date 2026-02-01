@@ -27,9 +27,9 @@ type ChampionIndexJson = {
   data: Record<
     string,
     {
-      id: string; // "Lux"
-      key: string; // "99"
-      name: string; // "Lux"
+      id: string;
+      key: string;
+      name: string;
       title: string;
       tags: string[];
       image: { full: string };
@@ -60,6 +60,9 @@ async function getChampionIndex(version: string): Promise<ChampionRow[]> {
 export default async function ChampionsPickerPage() {
   const patch = await getLatestPatch();
   const champions = await getChampionIndex(patch);
+
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -94,7 +97,12 @@ export default async function ChampionsPickerPage() {
               </span>
             </Link>
 
-            
+            {/* Top-right: Tools */}
+            <div className="ml-auto">
+              <Link href="/tools" className={navBtn}>
+                Tools
+              </Link>
+            </div>
           </header>
 
           <h1 className="mt-2 text-4xl font-bold tracking-tight">

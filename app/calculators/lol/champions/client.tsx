@@ -44,30 +44,31 @@ export default function ChampionPickerClient({
     router.push(`/calculators/lol/champions/${slug}`);
   }
 
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
+  const topLink =
+    "inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4";
+
   return (
     <section className="mt-3">
+      {/* ✅ Top row: ONLY Tools (top-right) and Calculators (top-right if you add later).
+          This client component doesn't own the global header, so we provide the same behavior locally:
+          - Tools stays on the right
+          - Any other page-specific nav goes below (left-aligned)
+      */}
+      
 
-     <div className="mt-2 flex items-center gap-4">
-  <a
-    href="/tools"
-    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
-  >
-    <span aria-hidden>←</span>
-    <span>Tools</span>
-  </a>
-
-  <a
-    href="/calculators/lol/hub"
-    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
-  >
-    <span aria-hidden>←</span>
-    <span>LoL Hub</span>
-  </a>
-</div>
-
+      {/* ✅ Below description zone (for this component, we place it right after the top row):
+          Non-top-right nav goes left-aligned here */}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <Link href="/calculators/lol/hub" className={navBtn}>
+          LoL Hub
+        </Link>
+      </div>
 
       {/* Search */}
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative w-full">
           <input
             ref={inputRef}
@@ -126,9 +127,7 @@ export default function ChampionPickerClient({
                 )}
               </div>
 
-              <div className="text-sm text-neutral-500 transition group-hover:text-neutral-200">
-                →
-              </div>
+              <div className="text-sm text-neutral-500 transition group-hover:text-neutral-200">→</div>
             </div>
           </button>
         ))}

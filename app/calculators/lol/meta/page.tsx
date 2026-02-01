@@ -1,4 +1,3 @@
-// app/calculators/lol/meta/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import MetaClient from "./client";
@@ -25,9 +24,12 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* ✅ GamerStation glow/grid background (visual only; no SEO impact) */}
+      {/* background */}
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.10]"
@@ -43,26 +45,28 @@ export default function Page() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black" />
       </div>
 
-      {/* content */}
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-8">
-        <div className="flex items-start justify-between gap-3">
-  <div className="flex flex-col gap-2">
-    {/* REAL GS LOGO (shared asset) */}
-    <Link href="/" className="flex items-center gap-2">
-      <img
-        src="/icon.png"   // ← use the SAME path you already use
-        alt="GamerStation"
-        className="h-7 w-7 rounded-lg"
-      />
-      <span className="text-sm font-semibold tracking-wide text-white">
-        GamerStation™
-      </span>
-    </Link>
+        {/* Header */}
+        <header className="flex items-center justify-between gap-3">
+          {/* ✅ Match your previous brand treatment */}
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+            <img
+              src="/gs-logo-v2.png"
+              alt="GamerStation"
+              className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
+            />
+            <span className="text-lg font-black tracking-tight">
+              GamerStation<span className="align-super text-[0.6em]">™</span>
+            </span>
+          </Link>
 
-    
-  </div>
-</div>
-
+          {/* Top-right global nav (Tools only) */}
+          <div className="flex items-center gap-2">
+            <Link href="/tools" className={navBtn}>
+              Tools
+            </Link>
+          </div>
+        </header>
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">Current LoL Meta</h1>
         <p className="mt-2 text-sm text-white/65">

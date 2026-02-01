@@ -261,6 +261,8 @@ export default function MetaClient() {
     for (const c of champions) map.set(String(c.key), c);
     return map;
   }, [champions]);
+const navBtn =
+  "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   const patchOptions = useMemo(() => {
     if (!meta) return [];
@@ -708,101 +710,90 @@ function BuildPreview({
 
 
   
-  return (
+   return (
     <div>
-    <div className="mt- flex items-center gap-4">
-  <a
-    href="/tools"
-    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
-  >
-    <span aria-hidden>←</span>
-    <span>Tools</span>
-  </a>
+      {/* ✅ Non-Tools nav belongs below the page description, left-aligned */}
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <Link href="/calculators/lol/hub" className={navBtn}>
+          LoL Hub
+        </Link>
+      </div>
 
-  <a
-    href="/calculators/lol/hub"
-    className="inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4"
-  >
-    <span aria-hidden>←</span>
-    <span>LoL Hub</span>
-  </a>
-</div>
+      <div className="space-y-4">
+        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-2">
+              <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-2">
+                <button
+                  onClick={() => setMode("ranked")}
+                  className={cx(
+                    "w-full rounded-lg border px-3 py-1.5 text-sm transition lg:w-auto",
+                    mode === "ranked"
+                      ? "border-white/20 bg-white/10 text-white"
+                      : "border-white/10 bg-transparent text-white/70 hover:text-white"
+                  )}
+                >
+                  Ranked
+                </button>
+                <button
+                  onClick={() => setMode("casual")}
+                  className={cx(
+                    "w-full rounded-lg border px-3 py-1.5 text-sm transition lg:w-auto",
+                    mode === "casual"
+                      ? "border-white/20 bg-white/10 text-white"
+                      : "border-white/10 bg-transparent text-white/70 hover:text-white"
+                  )}
+                >
+                  Casual
+                </button>
 
-    <div className="space-y-4">
-      <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-2">
+                <div className="mx-2 hidden h-6 w-px bg-white/10 lg:block" />
+              </div>
+
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:flex-row lg:items-center">
+                <label className="flex w-full items-center justify-between gap-2 text-sm text-white/70 sm:w-auto sm:justify-start">
+                  Role
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value as RoleFilter)}
+                    className="w-40 rounded-lg border border-white/10 bg-black px-2 py-1 text-sm text-white outline-none sm:w-auto"
+                  >
+                    <option value="ALL">All</option>
+                    <option value="TOP">Top</option>
+                    <option value="JUNGLE">Jungle</option>
+                    <option value="MIDDLE">Mid</option>
+                    <option value="BOTTOM">Bot</option>
+                    <option value="UTILITY">Support</option>
+                  </select>
+                </label>
+
+                <input
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder="Search champ..."
+                  className="w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-sm text-white outline-none placeholder:text-white/35 lg:w-64"
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-2">
               <button
-                onClick={() => setMode("ranked")}
-                className={cx(
-                  "w-full rounded-lg border px-3 py-1.5 text-sm transition lg:w-auto",
-                  mode === "ranked"
-                    ? "border-white/20 bg-white/10 text-white"
-                    : "border-white/10 bg-transparent text-white/70 hover:text-white"
-                )}
+                onClick={() => setAllExpanded(true)}
+                className="w-full rounded-lg border border-white/10 bg-transparent px-3 py-2 text-sm text-white/80 hover:border-white/20 hover:text-white lg:w-auto"
               >
-                Ranked
+                Expand all
               </button>
               <button
-                onClick={() => setMode("casual")}
-                className={cx(
-                  "w-full rounded-lg border px-3 py-1.5 text-sm transition lg:w-auto",
-                  mode === "casual"
-                    ? "border-white/20 bg-white/10 text-white"
-                    : "border-white/10 bg-transparent text-white/70 hover:text-white"
-                )}
+                onClick={() => setAllExpanded(false)}
+                className="w-full rounded-lg border border-white/10 bg-transparent px-3 py-2 text-sm text-white/80 hover:border-white/20 hover:text-white lg:w-auto"
               >
-                Casual
+                Collapse all
               </button>
-
-              <div className="mx-2 hidden h-6 w-px bg-white/10 lg:block" />
-            </div>
-
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center lg:flex-row lg:items-center">
-              <label className="flex w-full items-center justify-between gap-2 text-sm text-white/70 sm:w-auto sm:justify-start">
-                Role
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as RoleFilter)}
-                  className="w-40 rounded-lg border border-white/10 bg-black px-2 py-1 text-sm text-white outline-none sm:w-auto"
-                >
-                  <option value="ALL">All</option>
-                  <option value="TOP">Top</option>
-                  <option value="JUNGLE">Jungle</option>
-                  <option value="MIDDLE">Mid</option>
-                  <option value="BOTTOM">Bot</option>
-                  <option value="UTILITY">Support</option>
-                </select>
-              </label>
-
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Search champ..."
-                className="w-full rounded-lg border border-white/10 bg-black px-3 py-2 text-sm text-white outline-none placeholder:text-white/35 lg:w-64"
-              />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-2">
-            <button
-              onClick={() => setAllExpanded(true)}
-              className="w-full rounded-lg border border-white/10 bg-transparent px-3 py-2 text-sm text-white/80 hover:border-white/20 hover:text-white lg:w-auto"
-            >
-              Expand all
-            </button>
-            <button
-              onClick={() => setAllExpanded(false)}
-              className="w-full rounded-lg border border-white/10 bg-transparent px-3 py-2 text-sm text-white/80 hover:border-white/20 hover:text-white lg:w-auto"
-            >
-              Collapse all
-            </button>
-          </div>
-        </div>
-
-        {headerBadges}
-        {confidenceNote}
+          {headerBadges}
+          {confidenceNote}
 
         <div className="mt-3 text-sm text-white/60">
           Showing <span className="text-white/85">{visibleCards.length}</span> champions{" "}

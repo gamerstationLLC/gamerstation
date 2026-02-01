@@ -55,7 +55,8 @@ export default function FortniteTTKPage() {
       return;
     }
 
-    const stillValid = weaponId && weaponsForClass.some((w) => w.id === weaponId);
+    const stillValid =
+      weaponId && weaponsForClass.some((w) => w.id === weaponId);
     if (!stillValid) {
       setWeaponId(weaponsForClass[0].id);
     }
@@ -77,16 +78,23 @@ export default function FortniteTTKPage() {
 
   // Expected damage per shot given expected headshot %
   const hsFrac = clamp(hsPct, 0, 100) / 100;
-  const expectedDamage = bodyDmg * (1 - hsFrac) + bodyDmg * hsMult * hsFrac;
+  const expectedDamage =
+    bodyDmg * (1 - hsFrac) + bodyDmg * hsMult * hsFrac;
 
   // Shots to kill + TTK
-  const shotsToKill = expectedDamage > 0 ? Math.ceil(targetHp / expectedDamage) : NaN;
+  const shotsToKill =
+    expectedDamage > 0 ? Math.ceil(targetHp / expectedDamage) : NaN;
 
   // Fortnite timing model baseline: first shot at t=0, next at 1/fireRate, etc.
   const ttkSeconds =
-    fireRate > 0 && Number.isFinite(shotsToKill) ? Math.max(0, shotsToKill - 1) / fireRate : NaN;
+    fireRate > 0 && Number.isFinite(shotsToKill)
+      ? Math.max(0, shotsToKill - 1) / fireRate
+      : NaN;
 
   const ttkLabel = Number.isFinite(ttkSeconds) ? `${fmt(ttkSeconds, 3)}s` : "—";
+
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
     <main
@@ -97,6 +105,29 @@ export default function FortniteTTKPage() {
       "
     >
       <div className="mx-auto max-w-6xl">
+        {/* ✅ Standard GS header (slightly larger like Calculators page) */}
+        <header className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+            <img
+              src="/gs-logo-v2.png"
+              alt="GamerStation"
+              className="
+                h-10 w-10 rounded-xl bg-black p-1
+                shadow-[0_0_30px_rgba(0,255,255,0.35)]
+              "
+            />
+            <span className="text-lg font-black tracking-tight">
+              GamerStation<span className="align-super text-[0.6em]">™</span>
+            </span>
+          </Link>
+
+          <div className="ml-auto">
+            <Link href="/calculators" className={navBtn}>
+              Calculators
+            </Link>
+          </div>
+        </header>
+
         <div className="flex items-start justify-between gap-6">
           {/* Left side text */}
           <div>
@@ -109,30 +140,19 @@ export default function FortniteTTKPage() {
             </p>
 
             <p className="mt-3 text-neutral-300 max-w-2xl">
-              Choose a weapon class, weapon, and rarity, then calculate shots-to-kill and
-              time-to-kill. (Body damage + headshot multiplier + fire rate.)
+              Choose a weapon class, weapon, and rarity, then calculate
+              shots-to-kill and time-to-kill. (Body damage + headshot multiplier
+              + fire rate.)
             </p>
 
             {/* ✅ Added small evergreen note (keeps UI same, just extra line) */}
             <p className="mt-2 text-xs text-neutral-500 max-w-2xl">
-              Weapon stats are a representative baseline set. Seasonal loot pools and balance changes may vary.
+              Weapon stats are a representative baseline set. Seasonal loot
+              pools and balance changes may vary.
             </p>
           </div>
 
-          {/* Right button */}
-          <a
-            href="/calculators"
-            className="
-              ml-auto mt-6 rounded-xl border border-neutral-800
-              bg-black px-4 py-2 text-sm text-neutral-200
-              transition
-              hover:border-neutral
-              hover:text-white
-              hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
-            "
-          >
-            Calculators
-          </a>
+          {/* (removed old right-side <a> button; header has it now) */}
         </div>
 
         {/* ✅ small disclaimer above tabs (mobile only) */}
@@ -237,7 +257,9 @@ export default function FortniteTTKPage() {
                 <label className="text-sm text-neutral-300">Target HP</label>
                 <input
                   value={targetHp}
-                  onChange={(e) => setTargetHp(clamp(Number(e.target.value || 0), 1, 9999))}
+                  onChange={(e) =>
+                    setTargetHp(clamp(Number(e.target.value || 0), 1, 9999))
+                  }
                   type="number"
                   className="mt-2 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-white outline-none focus:border-neutral-600"
                 />
@@ -263,7 +285,9 @@ export default function FortniteTTKPage() {
             {/* Headshot % */}
             <div className="mt-6">
               <div className="flex items-center justify-between">
-                <label className="text-sm text-neutral-300">Headshot % (expected)</label>
+                <label className="text-sm text-neutral-300">
+                  Headshot % (expected)
+                </label>
                 <span className="text-sm text-neutral-200">{hsPct}%</span>
               </div>
               <input
@@ -283,19 +307,26 @@ export default function FortniteTTKPage() {
               <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
                 <div>
                   <div className="text-neutral-400">Body dmg</div>
-                  <div className="font-semibold">{selectedWeapon ? bodyDmg : "—"}</div>
+                  <div className="font-semibold">
+                    {selectedWeapon ? bodyDmg : "—"}
+                  </div>
                 </div>
                 <div>
                   <div className="text-neutral-400">HS multiplier</div>
-                  <div className="font-semibold">{selectedWeapon ? fmt(hsMult, 2) : "—"}</div>
+                  <div className="font-semibold">
+                    {selectedWeapon ? fmt(hsMult, 2) : "—"}
+                  </div>
                 </div>
                 <div>
                   <div className="text-neutral-400">Fire rate</div>
-                  <div className="font-semibold">{selectedWeapon ? fmt(fireRate, 2) : "—"}</div>
+                  <div className="font-semibold">
+                    {selectedWeapon ? fmt(fireRate, 2) : "—"}
+                  </div>
                 </div>
               </div>
               <div className="mt-3 text-xs text-neutral-500">
-                Rarity affects body damage. Headshots use multiplier on top of the selected rarity’s base damage.
+                Rarity affects body damage. Headshots use multiplier on top of
+                the selected rarity’s base damage.
               </div>
             </div>
 
@@ -314,29 +345,36 @@ export default function FortniteTTKPage() {
 
             <div className="mt-6 space-y-3">
               <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                <span className="text-sm text-neutral-300">Expected damage / shot</span>
+                <span className="text-sm text-neutral-300">
+                  Expected damage / shot
+                </span>
                 <span className="font-semibold">{fmt(expectedDamage, 2)}</span>
               </div>
 
               <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
                 <span className="text-sm text-neutral-300">Shots to kill</span>
-                <span className="font-semibold">{Number.isFinite(shotsToKill) ? shotsToKill : "—"}</span>
+                <span className="font-semibold">
+                  {Number.isFinite(shotsToKill) ? shotsToKill : "—"}
+                </span>
               </div>
 
               <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-                <span className="text-sm text-neutral-300">Time to kill (TTK)</span>
+                <span className="text-sm text-neutral-300">
+                  Time to kill (TTK)
+                </span>
                 <span className="font-semibold">{ttkLabel}</span>
               </div>
 
               <div className="mt-4 text-xs text-neutral-500">
-                Note: Real fights vary with bloom, recoil, movement, latency, reloads, and missed shots. This is a clean
-                baseline estimate.
+                Note: Real fights vary with bloom, recoil, movement, latency,
+                reloads, and missed shots. This is a clean baseline estimate.
               </div>
 
               <div className="mt-6 rounded-2xl border border-neutral-800 bg-black p-4">
                 <div className="text-sm font-semibold">Formula</div>
                 <div className="mt-2 text-xs text-neutral-300 leading-relaxed">
-                  ExpectedDamage = BaseDamage(rarity) × (1 − HS%) + BaseDamage(rarity) × HSMultiplier × HS%
+                  ExpectedDamage = BaseDamage(rarity) × (1 − HS%) + BaseDamage(rarity) ×
+                  HSMultiplier × HS%
                   <br />
                   ShotsToKill = ceil(TargetHP / ExpectedDamage)
                   <br />
@@ -352,9 +390,14 @@ export default function FortniteTTKPage() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
         <div className="border-t border-neutral-800 bg-black/80 backdrop-blur">
           <div className="mx-auto max-w-6xl px-6 py-3 flex items-center justify-between gap-4">
-            <button type="button" onClick={() => setMobileTab("results")} className="min-w-0 text-left">
+            <button
+              type="button"
+              onClick={() => setMobileTab("results")}
+              className="min-w-0 text-left"
+            >
               <div className="text-[11px] text-neutral-400">
-                {selectedWeapon?.name ?? "—"} • {RARITIES.find((r) => r.value === rarity)?.label ?? rarity} •{" "}
+                {selectedWeapon?.name ?? "—"} •{" "}
+                {RARITIES.find((r) => r.value === rarity)?.label ?? rarity} •{" "}
                 {targetHp} HP
               </div>
               <div className="truncate text-sm font-semibold">TTK: {ttkLabel}</div>
@@ -362,7 +405,9 @@ export default function FortniteTTKPage() {
 
             <button
               type="button"
-              onClick={() => setMobileTab(mobileTab === "inputs" ? "results" : "inputs")}
+              onClick={() =>
+                setMobileTab(mobileTab === "inputs" ? "results" : "inputs")
+              }
               className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-neutral-200 hover:bg-white/10"
             >
               {mobileTab === "inputs" ? "View results" : "Edit inputs"}

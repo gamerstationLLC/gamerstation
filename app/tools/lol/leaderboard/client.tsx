@@ -285,8 +285,8 @@ export default function LeaderboardClient({
 
       <div className="relative px-6 py-16">
         <div className="mx-auto max-w-5xl">
+          {/* Row 1: Brand (left) + Tools (right) */}
           <header className="mb-8 flex items-center gap-3">
-            {/* Left: brand */}
             <Link href="/" className="flex items-center gap-2 hover:opacity-90">
               <img
                 src="/gs-logo-v2.png"
@@ -298,22 +298,25 @@ export default function LeaderboardClient({
               </span>
             </Link>
 
-            {/* Right: internal nav pills */}
-            <div className="ml-auto flex flex-wrap items-center gap-2">
+            <div className="ml-auto">
               <Link href="/tools" className={navBtn}>
                 Tools
-              </Link>
-              <Link href="/calculators/lol/hub" className={navBtn}>
-                LoL Hub
-              </Link>
-              <Link href="/calculators/lol/meta" className={navBtn}>
-                Meta
               </Link>
             </div>
           </header>
 
           <h1 className="mt-2 text-4xl font-bold tracking-tight">LoL Leaderboard</h1>
           <p className="mt-3 text-neutral-300">Browse top players and see their stats + most played champs.</p>
+
+          {/* ✅ Move Hub + Meta BELOW the description, aligned left */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Link href="/calculators/lol/hub" className={navBtn}>
+              LoL Hub
+            </Link>
+            <Link href="/calculators/lol/meta" className={navBtn}>
+              Meta
+            </Link>
+          </div>
 
           <div className={`mt-6 rounded-2xl border p-4 ${surfaceCard}`}>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -392,7 +395,9 @@ export default function LeaderboardClient({
 
               <div className={`divide-y divide-neutral-800 ${surfaceRow}`}>
                 {rows.length === 0 ? (
-                  <div className="px-4 py-10 text-sm text-neutral-400">{loading ? "Loading…" : "No rows found for this selection."}</div>
+                  <div className="px-4 py-10 text-sm text-neutral-400">
+                    {loading ? "Loading…" : "No rows found for this selection."}
+                  </div>
                 ) : (
                   rows.map((r) => {
                     const rowKey = `${r.region}-${r.queue}-${r.tier}-${r.puuid}`;
@@ -405,7 +410,10 @@ export default function LeaderboardClient({
                     const finalUrl = !isBroken ? preferredUrl || fallbackUrl : fallbackUrl;
 
                     return (
-                      <div key={rowKey} className={`grid grid-cols-12 gap-2 px-4 py-3 text-sm transition ${surfaceHover}`}>
+                      <div
+                        key={rowKey}
+                        className={`grid grid-cols-12 gap-2 px-4 py-3 text-sm transition ${surfaceHover}`}
+                      >
                         <div className="col-span-1 text-neutral-400">{r.rank}</div>
 
                         <div className="col-span-4 min-w-0 flex items-center gap-3">
@@ -423,7 +431,9 @@ export default function LeaderboardClient({
                           )}
 
                           <div className="min-w-0">
-                            <div className="font-semibold text-neutral-200 whitespace-normal break-words leading-snug">{displayName}</div>
+                            <div className="font-semibold text-neutral-200 whitespace-normal break-words leading-snug">
+                              {displayName}
+                            </div>
                           </div>
 
                           {r.flags?.hotStreak ? (
