@@ -55,6 +55,9 @@ const REPROCESS_BOOTSTRAP = String(process.env.TIERS_REPROCESS_BOOTSTRAP || "0")
 const GAP_MS = Number(process.env.TIERS_GAP_MS || 250);
 const DAYS_BACK = Number(process.env.TIERS_DAYS_BACK || 14);
 
+// ✅ checkpoint / soft-timeout support
+const CHECKPOINT_EVERY_MATCHES = Number(process.env.TIERS_CHECKPOINT_EVERY || 50);
+
 type SeenMatchIdsState = { ids: string[] };
 type SeenPuuidsState = { puuids: string[] };
 type PuuidCursors = Record<string, number>;
@@ -68,6 +71,46 @@ console.log("[env] RIOT_PLATFORM (league/summoner):", RIOT_PLATFORM);
 console.log("[env] LADDER_TIER/QUEUE/MAX:", LADDER_TIER, LADDER_QUEUE, LADDER_MAX_PLAYERS);
 console.log("[env] TIERS_QUEUE_IDS:", TIERS_QUEUE_IDS.join(","));
 console.log("[env] DAYS_BACK:", DAYS_BACK);
+console.log("[env] CHECKPOINT_EVERY_MATCHES:", CHECKPOINT_EVERY_MATCHES);
+
+// ===============================
+// ✅ Option A: Periodic checkpoint + SIGTERM/SIGINT persistence
+// ===============================
+let seenMatchesRef: Set<string> | null = null;
+let seenPuuidsRef: Set<string> | null = null;
+let puuidCursorsRef: PuuidCursors | null = null;
+
+async function persistState() {
+  if (!seenMatchesRef || !seenPuuidsRef || !puuidCursorsRef) return;
+
+  await writeJson(SEEN_MATCH_IDS_PATH, {
+    ids: Array.from(seenMatchesRef),
+  } satisfies SeenMatchIdsState);
+
+  await writeJson(SEEN_PUUIDS_PATH, {
+    puuids: Array.from(seenPuuidsRef),
+  } satisfies SeenPuuidsState);
+
+  await writeJson(PUUID_CURSORS_PATH, puuidCursorsRef);
+}
+
+function setupShutdownHandlers() {
+  const handler = async (sig: string) => {
+    try {
+      console.log(`[shutdown] received ${sig} — persisting state...`);
+      await persistState();
+      console.log("[shutdown] state persisted. Exiting cleanly.");
+    } catch (e) {
+      console.warn("[shutdown] failed to persist state:", e);
+    } finally {
+      // Important: exit 0 so your workflow continues to finalize+commit
+      process.exit(0);
+    }
+  };
+
+  process.once("SIGTERM", () => void handler("SIGTERM"));
+  process.once("SIGINT", () => void handler("SIGINT"));
+}
 
 function assertEnv() {
   if (!RIOT_API_KEY || !RIOT_API_KEY.startsWith("RGAPI-")) {
@@ -176,7 +219,11 @@ async function fetchPlatformJson(url: string, opts?: { retries?: number }) {
 // -------------------------
 // Match-v5 ids (regional) with filters
 // -------------------------
-async function getMatchIdsByPuuidFiltered(puuid: string, start: number, count: number): Promise<string[]> {
+async function getMatchIdsByPuuidFiltered(
+  puuid: string,
+  start: number,
+  count: number
+): Promise<string[]> {
   const startTime = oldestAllowedUnix(DAYS_BACK);
 
   // Riot supports: queue, startTime, endTime, type
@@ -241,7 +288,8 @@ async function fetchLadderLeague(): Promise<LeagueList> {
   const queuePath = LADDER_QUEUE;
 
   let url: string;
-  if (LADDER_TIER === "grandmaster") url = `${base}/lol/league/v4/grandmasterleagues/by-queue/${queuePath}`;
+  if (LADDER_TIER === "grandmaster")
+    url = `${base}/lol/league/v4/grandmasterleagues/by-queue/${queuePath}`;
   else if (LADDER_TIER === "master") url = `${base}/lol/league/v4/masterleagues/by-queue/${queuePath}`;
   else url = `${base}/lol/league/v4/challengerleagues/by-queue/${queuePath}`;
 
@@ -313,7 +361,9 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
   }
 
   const unique = Array.from(new Set(puuids));
-  console.log(`[ladder] puuids: unique=${unique.length} direct=${direct} viaSummoner=${viaSummoner} fail=${fail}`);
+  console.log(
+    `[ladder] puuids: unique=${unique.length} direct=${direct} viaSummoner=${viaSummoner} fail=${fail}`
+  );
 
   if (!unique.length) {
     throw new Error("[ladder] bootstrap produced 0 PUUIDs. Check RIOT_PLATFORM, LADDER_TIER, LADDER_QUEUE.");
@@ -332,6 +382,12 @@ async function main() {
 
   const seenMatches = new Set<string>(seenMatchIds.ids || []);
   const seenPuuids = new Set<string>(seenPuuidsState.puuids || []);
+
+  // ✅ wire refs for checkpoint + shutdown persistence
+  seenMatchesRef = seenMatches;
+  seenPuuidsRef = seenPuuids;
+  puuidCursorsRef = puuidCursors;
+  setupShutdownHandlers();
 
   // ✅ Bootstrap PUUID queue from ladder
   const puuidQueue: string[] = [];
@@ -398,6 +454,20 @@ async function main() {
       const parts: any[] = Array.isArray(info?.participants) ? info.participants : [];
       matchesProcessed += 1;
 
+      // ✅ periodic checkpoint so soft-timeout doesn't lose progress
+      if (
+        Number.isFinite(CHECKPOINT_EVERY_MATCHES) &&
+        CHECKPOINT_EVERY_MATCHES > 0 &&
+        matchesProcessed % CHECKPOINT_EVERY_MATCHES === 0
+      ) {
+        try {
+          await persistState();
+          console.log(`[checkpoint] persisted at matchesProcessed=${matchesProcessed}`);
+        } catch (e) {
+          console.warn("[checkpoint] persist failed:", e);
+        }
+      }
+
       if (newPuuidsAdded < MAX_NEW_PUUIDS_PER_RUN) {
         for (const pt of parts) {
           const newP = String(pt?.puuid || "").trim();
@@ -411,9 +481,8 @@ async function main() {
     }
   }
 
-  await writeJson(SEEN_MATCH_IDS_PATH, { ids: Array.from(seenMatches) } satisfies SeenMatchIdsState);
-  await writeJson(SEEN_PUUIDS_PATH, { puuids: Array.from(seenPuuids) } satisfies SeenPuuidsState);
-  await writeJson(PUUID_CURSORS_PATH, puuidCursors);
+  // final write (still important)
+  await persistState();
 
   console.log("Done.");
   console.log(`Processed matches this run: ${matchesProcessed} (budget=${MAX_MATCHES_PER_RUN})`);
