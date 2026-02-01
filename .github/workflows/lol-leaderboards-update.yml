@@ -7,8 +7,9 @@ on:
 
 # ✅ Share the same lock as other Riot-heavy workflows to avoid app-rate-limit collisions
 concurrency:
-  group: riot-heavy-jobs
+  group: lol-leaderboards-update
   cancel-in-progress: false
+
 
 permissions:
   contents: write
