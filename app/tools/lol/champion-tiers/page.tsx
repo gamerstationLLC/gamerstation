@@ -116,7 +116,7 @@ export default async function LolChampionTiersPage() {
         {/* Row 3: Meta below title + patch/cache right */}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
-            href="/tools/lol/meta"
+            href="/calculators/lol/meta"
             className="rounded-xl border border-neutral-800 bg-black px-3 py-2 text-sm text-neutral-300 hover:border-neutral-600 hover:text-white"
           >
             Meta

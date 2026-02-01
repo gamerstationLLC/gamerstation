@@ -195,7 +195,7 @@ export default function StatsClient({
           </Link>
 
           <Link
-            href="/tools/lol/meta"
+            href="/calculators/lol/meta"
             className="rounded-xl border border-neutral-800 bg-black px-3 py-2 text-sm text-neutral-300 hover:border-neutral-600 hover:text-white"
           >
             Meta

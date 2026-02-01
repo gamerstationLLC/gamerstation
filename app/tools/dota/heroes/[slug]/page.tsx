@@ -237,10 +237,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const { hero } = await getHeroBySlug(slug);
 
+  const normalizedSlug = normalizeSlugParam(slug);
+  const canonicalPath = `/tools/dota/heroes/${normalizedSlug}`;
+
   if (!hero) {
     return {
       title: "Hero unavailable | GamerStation",
       description: "Dota 2 hero data is temporarily unavailable. Please try again shortly.",
+      alternates: { canonical: canonicalPath },
+      robots: {
+        index: true,
+        follow: true,
+      },
     };
   }
 
@@ -248,8 +256,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${heroName} | Dota 2 Meta | GamerStation`,
     description: `Meta stats for ${heroName}: public pick/win by rank bracket and pro trends. Data via OpenDota.`,
+    alternates: { canonical: canonicalPath }, // ✅ key part
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
+
 
 type TrendsTab = "pro" | "public";
 
@@ -462,7 +476,8 @@ export default async function DotaHeroPage({
         ? "Medium sample — use some caution."
         : "Small sample — use caution.";
 
-  const publicUrl = `/tools/dota/heroes/${normalizedSlug}?tab=public`;
+  const publicUrl = `/tools/dota/heroes/${normalizedSlug}`; // ✅ canonical
+
   const proUrl = `/tools/dota/heroes/${normalizedSlug}?tab=pro`;
 
   return (
