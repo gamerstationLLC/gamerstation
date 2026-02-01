@@ -158,14 +158,14 @@ jobs:
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          git add public/data/lol/champion_tiers
+          git add public/data/lol
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
 
-          git commit -m "chore(lol): refresh champion tiers"
+          git commit -m "chore(lol): refresh LoL Data"
 
           for i in 1 2 3 4 5; do
             echo "Attempt $i: pulling latest main..."
