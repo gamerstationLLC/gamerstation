@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-01-31T05:36:15.561Z",
+  "generatedAt": "2026-02-01T02:27:56.828Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
-  "count": 10,
+  "count": 11,
   "players": [
     {
       "puuid": "bVZdq4zJuZN-t7PMNMZEJloEIskZ0YnreXD06LKGT4Y959qWCAXhzlY15NVSrxFZLx71c05iPJp4Mw",
@@ -13,15 +13,15 @@
       "summonerLevel": 133,
       "topChamps": [
         {
-          "name": "Evelynn",
-          "count": 3
-        },
-        {
           "name": "Brand",
           "count": 2
         },
         {
           "name": "Talon",
+          "count": 2
+        },
+        {
+          "name": "Garen",
           "count": 1
         }
       ],
@@ -45,24 +45,24 @@
       "topChamps": [
         {
           "name": "Galio",
-          "count": 3
+          "count": 2
         },
         {
-          "name": "TwistedFate",
+          "name": "Jhin",
           "count": 1
         },
         {
-          "name": "Aurora",
+          "name": "TwistedFate",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "Ostrich",
       "tagLine": "lol",
-      "leaguePoints": 1985,
+      "leaguePoints": 1965,
       "wins": 84,
-      "losses": 9,
-      "hotStreak": true,
+      "losses": 10,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -76,10 +76,10 @@
       "topChamps": [
         {
           "name": "Ambessa",
-          "count": 3
+          "count": 2
         },
         {
-          "name": "Jinx",
+          "name": "Veigar",
           "count": 2
         },
         {
@@ -137,15 +137,15 @@
       "summonerLevel": 436,
       "topChamps": [
         {
-          "name": "Karthus",
+          "name": "Vayne",
           "count": 3
         },
         {
           "name": "Viego",
-          "count": 2
+          "count": 1
         },
         {
-          "name": "Samira",
+          "name": "Swain",
           "count": 1
         }
       ],
@@ -172,11 +172,11 @@
           "count": 3
         },
         {
-          "name": "Katarina",
+          "name": "Qiyana",
           "count": 1
         },
         {
-          "name": "Riven",
+          "name": "Katarina",
           "count": 1
         }
       ],
@@ -230,15 +230,15 @@
       "summonerLevel": 373,
       "topChamps": [
         {
-          "name": "Gwen",
+          "name": "Ambessa",
           "count": 3
         },
         {
-          "name": "Ambessa",
+          "name": "Gwen",
           "count": 2
         },
         {
-          "name": "Diana",
+          "name": "Malphite",
           "count": 1
         }
       ],
@@ -293,14 +293,14 @@
       "topChamps": [
         {
           "name": "Kaisa",
-          "count": 4
+          "count": 2
         },
         {
-          "name": "Aphelios",
+          "name": "Akali",
           "count": 1
         },
         {
-          "name": "Camille",
+          "name": "Orianna",
           "count": 1
         }
       ],
@@ -310,6 +310,37 @@
       "leaguePoints": 512,
       "wins": 42,
       "losses": 34,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "IPiutTvR_TaGkfQcrOs2yOKzDIsC6vqMBshd_Agfjs6jyPfA2Lv6FyzI7dsy0W6CMzb2iAWHZqYSxQ",
+      "summonerId": null,
+      "summonerName": "Peekaboo#Peek3",
+      "profileIconId": 1296,
+      "summonerLevel": 611,
+      "topChamps": [
+        {
+          "name": "Ashe",
+          "count": 2
+        },
+        {
+          "name": "Yunara",
+          "count": 1
+        },
+        {
+          "name": "Caitlyn",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Peekaboo",
+      "tagLine": "Peek3",
+      "leaguePoints": 504,
+      "wins": 36,
+      "losses": 25,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
