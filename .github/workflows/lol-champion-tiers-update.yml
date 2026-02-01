@@ -15,7 +15,11 @@ permissions:
 jobs:
   tiers:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+
+    # IMPORTANT:
+    # Job timeout must be > 90m so the runner is not killed.
+    # We soft-timeout the crawl step at 90m, then still finalize+commit.
+    timeout-minutes: 180
 
     steps:
       - name: Checkout
@@ -61,8 +65,9 @@ jobs:
             fi
           done
 
-      # ✅ CRITICAL: NEVER fail the job here (expired RIOT_API_KEY should not block finalize+commit)
-      - name: Build LoL champion tiers (never fails job)
+      # ✅ Soft timeout: stop the crawl after 90 minutes, but DO NOT kill the job.
+      # ✅ CRITICAL: NEVER fail the job here (expired RIOT_API_KEY or timeout should not block finalize+commit)
+      - name: Build LoL champion tiers (soft-timeout 90m; never fails job)
         shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
@@ -86,30 +91,36 @@ jobs:
           LADDER_MAX_PLAYERS: "300"
         run: |
           set +e
-          EC=0
+          echo "Starting tiers crawl with soft timeout of 90 minutes..."
 
-          npm run lol:champion-tiers
+          # 5400s = 90 minutes
+          timeout --signal=SIGTERM --kill-after=30s 5400 npm run lol:champion-tiers
+
           EC=$?
 
-          echo "Build exit code: $EC"
-
-          if [ "$EC" -ne 0 ]; then
-            echo "Build failed (possibly expired RIOT_API_KEY). Continuing anyway to finalize..."
-            exit 0
+          # GNU timeout uses exit code 124 when it times out.
+          if [ "$EC" -eq 124 ]; then
+            echo "Crawl hit 90-minute soft timeout. Proceeding to finalize+commit with what we have."
+          else
+            echo "Crawl exited with code: $EC (continuing regardless)."
           fi
 
-          echo "Build completed successfully."
+          # Never fail job here
           exit 0
 
-      # ✅ Finalize ALWAYS runs (your finalize overwrites champion_tiers.json each time)
-      - name: Finalize LoL champion tiers
+      # ✅ Finalize ALWAYS runs (if crawl timed out or key expired, we still try to finalize)
+      - name: Finalize LoL champion tiers (never fails job)
         if: always()
         shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
         run: |
-          set -e
+          set +e
           npm run lol:finalize:champion-tiers
+          EC=$?
+          echo "Finalize exit code: $EC"
+          echo "Continuing to debug/commit regardless..."
+          exit 0
 
       # ✅ Debug
       - name: Debug - Output + git diff
