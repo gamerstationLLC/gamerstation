@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T03:29:25.837Z",
+  "generatedAt": "2026-02-02T06:43:01.336Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -14,14 +14,10 @@
       "topChamps": [
         {
           "name": "Evelynn",
-          "count": 3
+          "count": 5
         },
         {
-          "name": "JarvanIV",
-          "count": 2
-        },
-        {
-          "name": "Talon",
+          "name": "Garen",
           "count": 1
         }
       ],
@@ -44,15 +40,11 @@
       "summonerLevel": 561,
       "topChamps": [
         {
-          "name": "Varus",
-          "count": 3
-        },
-        {
           "name": "Rammus",
-          "count": 2
+          "count": 5
         },
         {
-          "name": "Vayne",
+          "name": "Lucian",
           "count": 1
         }
       ],
@@ -137,8 +129,8 @@
           "count": 3
         },
         {
-          "name": "Lucian",
-          "count": 2
+          "name": "Mordekaiser",
+          "count": 1
         },
         {
           "name": "Viego",
@@ -165,14 +157,14 @@
       "topChamps": [
         {
           "name": "Katarina",
-          "count": 4
+          "count": 2
         },
         {
-          "name": "Akali",
+          "name": "Gwen",
           "count": 1
         },
         {
-          "name": "Hwei",
+          "name": "Riven",
           "count": 1
         }
       ],
@@ -188,6 +180,37 @@
       "freshBlood": false
     },
     {
+      "puuid": "DnSexdRt48W6o24yS0Lf0mNViUDQhBOKBF5vzroqg0C4Efb3kOS9VXr8dRqFN0QaaIJJZaDX37lUVQ",
+      "summonerId": null,
+      "summonerName": "韩立L#CNnb",
+      "profileIconId": 5314,
+      "summonerLevel": 629,
+      "topChamps": [
+        {
+          "name": "Varus",
+          "count": 3
+        },
+        {
+          "name": "Aphelios",
+          "count": 2
+        },
+        {
+          "name": "Kaisa",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "韩立L",
+      "tagLine": "CNnb",
+      "leaguePoints": 726,
+      "wins": 39,
+      "losses": 13,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "jdeigKGEIpQn-etG-QRT2sIVP3w0NAK9R2IF1qpx6sJtogmbZs0vHGTzv56tjA51QgsLHI6KImagqw",
       "summonerId": null,
       "summonerName": "南风知我意#0321",
@@ -195,15 +218,15 @@
       "summonerLevel": 373,
       "topChamps": [
         {
+          "name": "Gwen",
+          "count": 2
+        },
+        {
           "name": "Ambessa",
           "count": 2
         },
         {
           "name": "Diana",
-          "count": 2
-        },
-        {
-          "name": "Gwen",
           "count": 1
         }
       ],
@@ -214,37 +237,6 @@
       "wins": 35,
       "losses": 11,
       "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "DnSexdRt48W6o24yS0Lf0mNViUDQhBOKBF5vzroqg0C4Efb3kOS9VXr8dRqFN0QaaIJJZaDX37lUVQ",
-      "summonerId": null,
-      "summonerName": "韩立L#CNnb",
-      "profileIconId": 5314,
-      "summonerLevel": 629,
-      "topChamps": [
-        {
-          "name": "Aphelios",
-          "count": 4
-        },
-        {
-          "name": "Pantheon",
-          "count": 1
-        },
-        {
-          "name": "Sivir",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "韩立L",
-      "tagLine": "CNnb",
-      "leaguePoints": 606,
-      "wins": 35,
-      "losses": 13,
-      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -320,14 +312,14 @@
       "topChamps": [
         {
           "name": "Kaisa",
-          "count": 3
+          "count": 2
         },
         {
           "name": "Camille",
           "count": 2
         },
         {
-          "name": "Zeri",
+          "name": "Sivir",
           "count": 1
         }
       ],
