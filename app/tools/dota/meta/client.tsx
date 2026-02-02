@@ -159,7 +159,6 @@ const HEADER_BTN_DISABLED = [
   "border-neutral-800 bg-black text-neutral-500 opacity-60 cursor-not-allowed",
 ].join(" ");
 
-// ✅ FIX: fetch patch from your OWN API route (no CORS, no 404)
 async function fetchLatestPatchClient(): Promise<string | null> {
   try {
     const res = await fetch("/api/dota/patch", { cache: "no-store" });
@@ -172,7 +171,6 @@ async function fetchLatestPatchClient(): Promise<string | null> {
   }
 }
 
-// ✅ props include a patch label and optional cache label.
 export default function DotaMetaClient({
   initialRows,
   patch = "—",
@@ -189,7 +187,7 @@ export default function DotaMetaClient({
   const [desc, setDesc] = useState(true);
 
   const [dirByKey, setDirByKey] = useState<Record<SortKey, boolean>>({
-    tier: true, // default: best-first (S -> D)
+    tier: true,
     pick: true,
     winrate: true,
     ban: true,
@@ -208,15 +206,12 @@ export default function DotaMetaClient({
     [bracket]
   );
 
-  // ✅ live patch state (server prop is initial value)
   const [patchLive, setPatchLive] = useState<string>(patch || "—");
 
-  // keep in sync during dev/HMR
   useEffect(() => {
     setPatchLive(patch || "—");
   }, [patch]);
 
-  // ✅ client-side refresh via your own API route
   useEffect(() => {
     let alive = true;
 
@@ -265,6 +260,7 @@ export default function DotaMetaClient({
   const rows = useMemo((): Row[] => {
     const query = q.trim().toLowerCase();
 
+    // 1) Build base rows (depends on mode + bracket)
     const derivedBase = (initialRows || []).map(
       (r): Omit<Row, "score" | "tier" | "tierRank"> => {
         const displayName = (r.localized_name || r.name || `Hero ${r.id}`).toString();
@@ -289,12 +285,15 @@ export default function DotaMetaClient({
       }
     );
 
-    let filtered = derivedBase;
-    if (query) filtered = filtered.filter((r) => r.name.toLowerCase().includes(query));
-    filtered = filtered.filter((r) => r.picks >= minGames);
+    // 2) Apply *stable* filters that SHOULD affect tiers
+    //    (minGames, mode, bracket already baked in)
+    const stableFiltered = derivedBase.filter((r) => r.picks >= minGames);
 
-    const pickVals = filtered.map((r) => Math.log1p(r.picks));
-    const winVals = filtered.map((r) => r.winrate);
+    if (!stableFiltered.length) return [];
+
+    // 3) Compute tiers from the stable set (NOT from search results)
+    const pickVals = stableFiltered.map((r) => Math.log1p(r.picks));
+    const winVals = stableFiltered.map((r) => r.winrate);
 
     const muPick = mean(pickVals);
     const sdPick = std(pickVals, muPick);
@@ -305,7 +304,7 @@ export default function DotaMetaClient({
     const W_PICK = 0.45;
     const W_WIN = 0.55;
 
-    const withScores = filtered.map((r) => {
+    const withScores = stableFiltered.map((r) => {
       const zPick = (Math.log1p(r.picks) - muPick) / sdPick;
       const zWin = (r.winrate - muWin) / sdWin;
       const score = W_PICK * zPick + W_WIN * zWin;
@@ -321,11 +320,18 @@ export default function DotaMetaClient({
       tierById.set(byScore[i].id, tierFromPercentile(p));
     }
 
-    const finalRows: Row[] = withScores.map((r) => {
+    // 4) Attach tier + rank (still stable)
+    let finalRows: Row[] = withScores.map((r) => {
       const tier = tierById.get(r.id) ?? "—";
       return { ...r, tier, tierRank: TIER_RANK[tier] ?? 9 };
     });
 
+    // 5) Apply search ONLY for display (tiers do NOT change)
+    if (query) {
+      finalRows = finalRows.filter((r) => r.name.toLowerCase().includes(query));
+    }
+
+    // 6) Sort display rows
     finalRows.sort((a, b) => {
       const av =
         sortBy === "tier"
@@ -348,10 +354,10 @@ export default function DotaMetaClient({
       const diff = av - bv;
 
       if (sortBy === "tier") {
-        return desc ? diff : -diff;
+        return desc ? -diff : diff;
       }
 
-      return desc ? -diff : diff;
+      return desc ? diff : -diff;
     });
 
     return finalRows.slice(0, 100);
@@ -437,7 +443,12 @@ export default function DotaMetaClient({
           <span className="text-neutral-200">{Math.min(100, rows.length)}</span>
         </span>
       </div>
-
+<div className="mt-3 text-xs text-neutral-500">
+        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low. 
+      </div>
+      <div className="mt-3 text-xs text-neutral-500">
+        Tap on a hero to see individual performance.
+      </div>
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
         <div className="overflow-x-auto">
@@ -542,10 +553,7 @@ export default function DotaMetaClient({
         </div>
       </div>
 
-      <div className="mt-3 text-xs text-neutral-500">
-        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low /
-        low→high.
-      </div>
+      
     </section>
   );
 }
