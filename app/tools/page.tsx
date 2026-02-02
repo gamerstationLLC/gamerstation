@@ -146,6 +146,16 @@ export default function ToolsPage() {
               </div>
             </Link>
 
+            <Link
+              href="/tools/cod/player-stats"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">COD Player Stats</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Recent Player Stats.
+              </div>
+            </Link>
+
             
           </div>
         </div>
