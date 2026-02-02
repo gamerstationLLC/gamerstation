@@ -1,8 +1,9 @@
+// PART 1 / 3
 "use client";
 
 import Link from "next/link";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type MetaMode = "ranked" | "casual";
 type Role = "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY";
@@ -210,7 +211,11 @@ function pickBestBuild(
   return best;
 }
 
-
+// ✅ ADDED: simple guard for URL role parsing (used only for hydration)
+function isRole(x: string | null): x is Role {
+  return x === "TOP" || x === "JUNGLE" || x === "MIDDLE" || x === "BOTTOM" || x === "UTILITY";
+}
+// PART 2 / 3
 export default function MetaClient() {
   const [mode, setMode] = useState<MetaMode>("ranked");
   const [hydrated, setHydrated] = useState(false);
@@ -239,14 +244,51 @@ export default function MetaClient() {
   const [activeRoleByChamp, setActiveRoleByChamp] = useState<Record<string, Role>>({});
 
   // ✅ per-champ selected item in the expanded view (shows full info panel)
-  const [selectedExpandedItemByChamp, setSelectedExpandedItemByChamp] = useState<Record<string, number | null>>({});
+  const [selectedExpandedItemByChamp, setSelectedExpandedItemByChamp] = useState<
+    Record<string, number | null>
+  >({});
 
   const CHAMPS_URL = "/data/lol/champions_index.json";
   const ITEMS_URL = "/data/lol/items.json";
 
+  // ✅ ADDED: URL hydration refs (so we can auto-fill search from share link)
+  const didHydrateRef = useRef(false);
+  const patchFromUrlRef = useRef<string>("");
+
+  // ✅ UPDATED hydration effect:
+  // - reads mode normally
+  // - ALSO reads role/champ/patch from URL
+  // - champ => fills search input
   useEffect(() => {
     setHydrated(true);
-    setMode(readModeFromUrl());
+
+    if (typeof window === "undefined") {
+      setMode(readModeFromUrl());
+      return;
+    }
+
+    if (didHydrateRef.current) return;
+    didHydrateRef.current = true;
+
+    const sp = new URLSearchParams(window.location.search);
+
+    // mode
+    const urlMode = sp.get("mode") === "casual" ? "casual" : "ranked";
+    setMode(urlMode);
+
+    // role (optional)
+    const urlRole = sp.get("role");
+    if (isRole(urlRole)) setRole(urlRole);
+
+    // ✅ champ (auto-fill search bar)
+    const urlChamp = sp.get("champ");
+    if (typeof urlChamp === "string" && urlChamp.trim()) {
+      setQ(urlChamp.trim());
+    }
+
+    // patch (validate after meta loads)
+    const urlPatch = sp.get("patch");
+    patchFromUrlRef.current = typeof urlPatch === "string" ? urlPatch : "";
   }, []);
 
   useEffect(() => {
@@ -307,7 +349,14 @@ export default function MetaClient() {
 
       const patches = Object.keys(json.patches || {}).sort((a, b) => toPatchNum(b) - toPatchNum(a));
       const newest = patches[0] || "";
-      setPatch((prev) => prev || newest);
+
+      // ✅ ADDED: apply URL patch if it exists in the dataset
+      const urlPatch = patchFromUrlRef.current;
+      if (urlPatch && json.patches?.[urlPatch]) {
+        setPatch(urlPatch);
+      } else {
+        setPatch((prev) => prev || newest);
+      }
 
       setExpanded({});
       pushModeToUrl(mode);
@@ -327,8 +376,9 @@ export default function MetaClient() {
     for (const c of champions) map.set(String(c.key), c);
     return map;
   }, [champions]);
-const navBtn =
-  "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
+  const navBtn =
+    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   const patchOptions = useMemo(() => {
     if (!meta) return [];
@@ -362,11 +412,12 @@ const navBtn =
         name: c.name,
         title: c.title,
         roleMap: (patchChampMap?.[champKey] || {}) as Partial<Record<Role, MetaRoleEntry[]>>,
-        roleSummaries: (['TOP','JUNGLE','MIDDLE','BOTTOM','UTILITY'] as Role[])
+        roleSummaries: (["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[])
           .map((r) => {
-            const arr = (patchChampMap?.[champKey] as Partial<Record<Role, MetaRoleEntry[]> | undefined>)?.[r];
-           const best = bestBuildForRole(arr);
-
+            const arr = (patchChampMap?.[champKey] as Partial<Record<Role, MetaRoleEntry[]> | undefined>)?.[
+              r
+            ];
+            const best = bestBuildForRole(arr);
             return best ? { role: r, entry: best } : null;
           })
           .filter(Boolean) as Array<{ role: Role; entry: MetaRoleEntry }>,
@@ -384,10 +435,9 @@ const navBtn =
 
     // If a global role filter is selected, only show champs that actually have any builds for that role.
     return filteredByQuery.filter((c) => {
-  const arr = c.roleMap[role];
-  return !!bestBuildForRole(arr); // >=10 and prefers >=25
-});
-
+      const arr = c.roleMap[role];
+      return !!bestBuildForRole(arr); // >=10 and prefers >=25
+    });
   }, [meta, patch, champions, patchChampMap, q, role]);
 
   function itemLabel(id: number) {
@@ -395,17 +445,16 @@ const navBtn =
     return item?.name ? String(item.name) : String(id);
   }
 
- function bestBuildForRole(roleBuilds: MetaRoleEntry[] | undefined) {
-  const preferred = meta?.minDisplaySample ?? 25; // your "good sample" target
-  return pickBestBuild(roleBuilds, preferred, FALLBACK_MIN_GAMES);
-}
+  function bestBuildForRole(roleBuilds: MetaRoleEntry[] | undefined) {
+    const preferred = meta?.minDisplaySample ?? 25; // your "good sample" target
+    return pickBestBuild(roleBuilds, preferred, FALLBACK_MIN_GAMES);
+  }
 
-
- function isStatSig(e: MetaRoleEntry | null) {
-  if (!e || !meta) return false;
-  if (e.lowSample) return false;
-  return (e.games ?? 0) >= (meta.minDisplaySample ?? 25);
-}
+  function isStatSig(e: MetaRoleEntry | null) {
+    if (!e || !meta) return false;
+    if (e.lowSample) return false;
+    return (e.games ?? 0) >= (meta.minDisplaySample ?? 25);
+  }
 
   function champHasAnySigData(roleMap: Partial<Record<Role, MetaRoleEntry[]>>) {
     return (["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[]).some((r) => {
@@ -415,25 +464,25 @@ const navBtn =
   }
 
   function pickBestSigEntry(roleMap: Partial<Record<Role, MetaRoleEntry[]>>) {
-  if (!meta) return null;
+    if (!meta) return null;
 
-  const preferred = meta.minDisplaySample ?? 25;
+    const preferred = meta.minDisplaySample ?? 25;
 
-  let best: { role: Role; entry: MetaRoleEntry; s: number } | null = null;
+    let best: { role: Role; entry: MetaRoleEntry; s: number } | null = null;
 
-  for (const r of ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[]) {
-    const e = pickBestBuild(roleMap[r], preferred, FALLBACK_MIN_GAMES);
-    if (!e) continue;
+    for (const r of ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[]) {
+      const e = pickBestBuild(roleMap[r], preferred, FALLBACK_MIN_GAMES);
+      if (!e) continue;
 
-    const s = wilsonLowerBound(e.winrate, e.games);
+      const s = wilsonLowerBound(e.winrate, e.games);
 
-    if (!best || s > best.s || (s === best.s && (e.games ?? 0) > (best.entry.games ?? 0))) {
-      best = { role: r, entry: e, s };
+      if (!best || s > best.s || (s === best.s && (e.games ?? 0) > (best.entry.games ?? 0))) {
+        best = { role: r, entry: e, s };
+      }
     }
-  }
 
-  return best ? { role: best.role, entry: best.entry } : null;
-}
+    return best ? { role: best.role, entry: best.entry } : null;
+  }
 
   function buildShareUrl(champId: string, champKey: string, roleSel: RoleFilter) {
     if (typeof window === "undefined") return "";
@@ -442,7 +491,10 @@ const navBtn =
     u.searchParams.set("mode", mode);
     if (patch) u.searchParams.set("patch", patch);
     if (roleSel !== "ALL") u.searchParams.set("role", roleSel);
-    u.searchParams.set("champ", champId || champKey);
+
+    // ✅ ONLY CHANGE YOU NEEDED:
+    // store champ as "Akali" etc so the search bar can auto-fill on open
+    u.searchParams.set("champ", champId?.trim() ? champId.trim() : String(champKey));
 
     return u.toString();
   }
@@ -465,9 +517,9 @@ const navBtn =
     const core = Array.isArray(entry.core) ? entry.core : [];
     const full = Array.isArray(entry.items) && entry.items.length ? entry.items : [...boots, ...core];
 
-    const line1 = `${champName} • Patch ${patch || "—"} • ${
-      mode === "ranked" ? "Ranked" : "Casual"
-    } • ${shortRole(r)}`;
+    const line1 = `${champName} • Patch ${patch || "—"} • ${mode === "ranked" ? "Ranked" : "Casual"} • ${shortRole(
+      r
+    )}`;
     const line2 = `Boots: ${boots.length ? itemsToText(boots) : "—"}`;
     const line3 = `Core: ${core.length ? itemsToText(core) : "—"}`;
     const line4 = full.length ? `Items: ${itemsToText(full)}` : "";
@@ -481,6 +533,7 @@ const navBtn =
         : "";
     const rSig = entry.runesSig ? `Runes: ${entry.runesSig}` : "";
 
+    // NOTE: leaving your original behavior as-is (uses global role filter state)
     const url = buildShareUrl(champId, champKey, role);
 
     return [line1, line2, line3, line4, line5, s, rSig, url].filter(Boolean).join("\n");
@@ -504,7 +557,7 @@ const navBtn =
     setItemToast({ id, text });
     window.setTimeout(() => setItemToast(null), 1200);
   }
-
+// PART 3 / 3
   function roleEntryUi(
     roleBuilds: MetaRoleEntry[] | undefined,
     champCtx?: { champKey: string; champId: string; champName: string },
@@ -514,8 +567,7 @@ const navBtn =
     if (!entry) return null;
 
     const boots = entry.boots ? itemLabel(entry.boots) : "—";
-    const core =
-      Array.isArray(entry.core) && entry.core.length ? entry.core.map(itemLabel).join(" • ") : "—";
+    const core = Array.isArray(entry.core) && entry.core.length ? entry.core.map(itemLabel).join(" • ") : "—";
     const wr = formatPct(entry.winrate);
     const games = entry.games;
 
@@ -523,125 +575,120 @@ const navBtn =
 
     const canCopy = canUseClipboard() && !!champCtx && !!roleCtx;
 
-   return (
-  <div
-    className="
-      relative rounded-xl border border-white/15
-      bg-gradient-to-b from-white/[0.06] to-black/60
-      ring-1 ring-white/10
-      shadow-[0_0_0_1px_rgba(255,255,255,0.06),_0_0_32px_rgba(0,255,255,0.10)]
-      p-3
-    "
-  >
-    <div className="flex items-center justify-between gap-2">
-      <div className="text-sm font-semibold text-white/95">{wr}</div>
+    return (
+      <div
+        className="
+          relative rounded-xl border border-white/15
+          bg-gradient-to-b from-white/[0.06] to-black/60
+          ring-1 ring-white/10
+          shadow-[0_0_0_1px_rgba(255,255,255,0.06),_0_0_32px_rgba(0,255,255,0.10)]
+          p-3
+        "
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-sm font-semibold text-white/95">{wr}</div>
 
-      <div className="flex items-center gap-2">
-        {!sig ? (
-          <span
-            className="rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[10px] text-white/70"
-            title={`Low sample: fewer than ${meta?.minDisplaySample ?? 0} games. Small samples can show inflated winrates.`}
-          >
-            low sample
-          </span>
-        ) : null}
-
-        <div className="text-xs text-white/60">{games}g</div>
-
-        {canCopy ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const text = buildShareText({
-                champName: champCtx!.champName,
-                champId: champCtx!.champId,
-                champKey: champCtx!.champKey,
-                role: roleCtx!,
-                entry,
-              });
-              copyBuildText(text, `${champCtx!.champKey}-${roleCtx!}`);
-            }}
-            className="
-              ml-1 rounded-md border border-white/20
-              bg-black/60 px-2 py-1 text-[11px] text-white/85
-              transition
-              hover:border-cyan-400 hover:text-white
-              hover:shadow-[0_0_12px_rgba(0,255,255,0.55)]
-            "
-            title="Copy build + link"
-          >
-            {copiedKey === `${champCtx!.champKey}-${roleCtx!}` ? "Copied" : "Copy"}
-          </button>
-        ) : null}
-      </div>
-    </div>
-
-    <div className="mt-2 text-xs text-white/70">
-      <div>
-        <span className="text-white/45">Boots:</span> {boots}
-      </div>
-      <div className="mt-1">
-        <span className="text-white/45">Core:</span> {core}
-      </div>
-    </div>
-  </div>
-)};
-
-
-  // ✅ FIXED: items are tappable, stopPropagation prevents the card from expanding when you tap an item.
-  // Also adds a small toast so iOS users can actually SEE the name.
-  
-function BuildPreviewList({
-  summaries,
-  version,
-}: {
-  summaries: Array<{ role: Role; entry: MetaRoleEntry }>;
-  version: string;
-}) {
-  const v = version || "16.1.1";
-
-  return (
-    <div className="mt-2 space-y-2">
-      {summaries.map(({ role, entry }) => (
-        <div key={role} className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="shrink-0 text-xs font-semibold text-white/65">
-              {shortRole(role)}
-            </div>
-            <div className="shrink-0 text-xs text-white/55">
-              {formatPct(entry.winrate)} · {entry.games} games
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {entry.boots ? (
-              <img
-                src={itemIconUrl(v, entry.boots)}
-                alt="Boots"
-                className="h-7 w-7 rounded-md object-cover"
-                loading="lazy"
-              />
+            {!sig ? (
+              <span
+                className="rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[10px] text-white/70"
+                title={`Low sample: fewer than ${meta?.minDisplaySample ?? 0} games. Small samples can show inflated winrates.`}
+              >
+                low sample
+              </span>
             ) : null}
 
-            {entry.core.map((id, idx) => (
-              <img
-                key={`${role}-${id}-${idx}`}
-                src={itemIconUrl(v, id)}
-                alt={`Core item ${idx + 1}`}
-                className="h-7 w-7 rounded-md object-cover"
-                loading="lazy"
-              />
-            ))}
+            <div className="text-xs text-white/60">{games}g</div>
+
+            {canCopy ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const text = buildShareText({
+                    champName: champCtx!.champName,
+                    champId: champCtx!.champId,
+                    champKey: champCtx!.champKey,
+                    role: roleCtx!,
+                    entry,
+                  });
+                  copyBuildText(text, `${champCtx!.champKey}-${roleCtx!}`);
+                }}
+                className="
+                  ml-1 rounded-md border border-white/20
+                  bg-black/60 px-2 py-1 text-[11px] text-white/85
+                  transition
+                  hover:border-cyan-400 hover:text-white
+                  hover:shadow-[0_0_12px_rgba(0,255,255,0.55)]
+                "
+                title="Copy build + link"
+              >
+                {copiedKey === `${champCtx!.champKey}-${roleCtx!}` ? "Copied" : "Copy"}
+              </button>
+            ) : null}
           </div>
         </div>
-      ))}
-    </div>
-  );
-}
 
-function BuildPreview({
+        <div className="mt-2 text-xs text-white/70">
+          <div>
+            <span className="text-white/45">Boots:</span> {boots}
+          </div>
+          <div className="mt-1">
+            <span className="text-white/45">Core:</span> {core}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function BuildPreviewList({
+    summaries,
+    version,
+  }: {
+    summaries: Array<{ role: Role; entry: MetaRoleEntry }>;
+    version: string;
+  }) {
+    const v = version || "16.1.1";
+
+    return (
+      <div className="mt-2 space-y-2">
+        {summaries.map(({ role, entry }) => (
+          <div key={role} className="space-y-1">
+            <div className="flex items-center gap-2">
+              <div className="shrink-0 text-xs font-semibold text-white/65">{shortRole(role)}</div>
+              <div className="shrink-0 text-xs text-white/55">
+                {formatPct(entry.winrate)} · {entry.games} games
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {entry.boots ? (
+                <img
+                  src={itemIconUrl(v, entry.boots)}
+                  alt="Boots"
+                  className="h-7 w-7 rounded-md object-cover"
+                  loading="lazy"
+                />
+              ) : null}
+
+              {entry.core.map((id, idx) => (
+                <img
+                  key={`${role}-${id}-${idx}`}
+                  src={itemIconUrl(v, id)}
+                  alt={`Core item ${idx + 1}`}
+                  className="h-7 w-7 rounded-md object-cover"
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  function BuildPreview({
     roleLabel,
     entry,
     champKey,
@@ -664,7 +711,9 @@ function BuildPreview({
     return (
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <div className="shrink-0 text-xs font-semibold text-white/65">{roleLabel}</div>
-        <div className="shrink-0 text-xs text-white/55">{formatPct(entry.winrate)} · {entry.games} games</div>
+        <div className="shrink-0 text-xs text-white/55">
+          {formatPct(entry.winrate)} · {entry.games} games
+        </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
           {previewItems.length ? (
@@ -704,13 +753,10 @@ function BuildPreview({
           )}
         </div>
 
-        {selectedName ? (
-          <div className="min-w-0 truncate text-xs text-white/75">{selectedName}</div>
-        ) : null}
+        {selectedName ? <div className="min-w-0 truncate text-xs text-white/75">{selectedName}</div> : null}
       </div>
     );
   }
-
 
   function setAllExpanded(next: boolean) {
     const obj: Record<string, boolean> = {};
@@ -721,19 +767,14 @@ function BuildPreview({
   const headerBadges = useMemo(() => {
     if (!meta) return null;
 
-    
-
-
     return (
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/60">
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
-          Patch {patch || "—"}
-        </span>
-        
+        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">Patch {patch || "—"}</span>
+
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
           Min display {meta.minDisplaySample}
         </span>
-        
+
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
           Generated {formatGeneratedAtStable(meta.generatedAt)}
         </span>
@@ -752,12 +793,12 @@ function BuildPreview({
             <div className="mt-1 text-white/60">
               Builds are based on recent match data. Any build under{" "}
               <span className="text-white/80">{meta.minDisplaySample}</span> games is labeled{" "}
-              <span className="text-white/80">low sample</span> and should be treated as “not enough
-              data yet.”
+              <span className="text-white/80">low sample</span> and should be treated as “not enough data
+              yet.”
             </div>
             <div className="mt-2 text-white/55">
-              Winrate scoring uses smoothing (Bayes K={meta.bayesK}, prior=
-              {Math.round(meta.priorWinrate * 100)}%), but low samples can still be noisy.
+              Winrate scoring uses smoothing (Bayes K={meta.bayesK}, prior={Math.round(meta.priorWinrate * 100)}
+              %), but low samples can still be noisy.
             </div>
           </div>
 
@@ -777,9 +818,7 @@ function BuildPreview({
     setExpanded((prev) => ({ ...prev, [champKey]: !prev[champKey] }));
   }
 
-
-  
-   return (
+  return (
     <div>
       {/* ✅ Non-Tools nav belongs below the page description, left-aligned */}
       <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -790,7 +829,6 @@ function BuildPreview({
           Tiers List
         </Link>
       </div>
-      
 
       <div className="space-y-4">
         <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
@@ -868,287 +906,279 @@ function BuildPreview({
           {headerBadges}
           {confidenceNote}
 
-        <div className="mt-3 text-sm text-white/60">
-          Showing <span className="text-white/85">{visibleCards.length}</span> champions{" "}
-          <span className="text-white/35">
-            (patch contains {Object.keys(patchChampMap || {}).length})
-          </span>
+          <div className="mt-3 text-sm text-white/60">
+            Showing <span className="text-white/85">{visibleCards.length}</span> champions{" "}
+            <span className="text-white/35">(patch contains {Object.keys(patchChampMap || {}).length})</span>
+          </div>
+
+          {!meta && <div className="mt-3 text-sm text-white/60">Loading meta…</div>}
         </div>
 
-        {!meta && <div className="mt-3 text-sm text-white/60">Loading meta…</div>}
-      </div>
+        <div className="overflow-hidden rounded-2xl border border-white/10">
+          {visibleCards.map((c) => {
+            const isOpen = Boolean(expanded[c.champKey]);
 
-      <div className="overflow-hidden rounded-2xl border border-white/10">
-        {visibleCards.map((c) => {
-          const isOpen = Boolean(expanded[c.champKey]);
+            const best = pickBestSigEntry(c.roleMap);
 
-          const best = pickBestSigEntry(c.roleMap);
+            const rolesAll: Role[] = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
+            const rolesWithData = rolesAll.filter((r) => bestBuildForRole(c.roleMap[r]));
+            const activeRole = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData[0];
+            const activeEntry = activeRole ? bestBuildForRole(c.roleMap[activeRole]) : null;
 
-          const rolesAll: Role[] = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
-          const rolesWithData = rolesAll.filter((r) => bestBuildForRole(c.roleMap[r]));
-          const activeRole = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData[0];
-          const activeEntry = activeRole ? bestBuildForRole(c.roleMap[activeRole]) : null;
+            const canCopy = canUseClipboard() && (!!activeEntry || !!best);
+            const copyToastKey = `${c.champKey}-${activeRole || "best"}`;
 
-          const canCopy = canUseClipboard() && (!!activeEntry || !!best);
-          const copyToastKey = `${c.champKey}-${activeRole || "best"}`;
-
-          return (
-            <div key={c.champKey} className="border-b border-white/10 last:border-b-0">
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => toggleCard(c.champKey)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    toggleCard(c.champKey);
-                  }
-                }}
-                className="flex w-full cursor-pointer items-start justify-between gap-3 bg-white/[0.02] px-4 py-3 text-left hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
-              >
-                <div className="flex min-w-0 gap-3">
-                  <img
-                    src={champIconUrl(vForIcons, c.champId)}
-                    alt={c.name}
-                    className="mt-0.5 h-9 w-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.02] object-cover sm:h-10 sm:w-10"
-                    loading="lazy"
-                    onError={(e) => {
-                      const img = e.currentTarget;
-                      // prevent infinite loop
-                      img.onerror = null;
-                      img.src = champIconUrl("16.1.1", c.champId);
-                    }}
-                  />
-
-                  <div className="min-w-0">
-                    <div className="flex items-baseline gap-2">
-                      <div className="truncate text-sm font-semibold text-white/95">{c.name}</div>
-                      {c.title ? (
-                        <div className="truncate text-xs text-white/45">{c.title}</div>
-                      ) : null}
-                    </div>
-
-                   
-                    {c.roleSummaries.length ? (
-                      <BuildPreviewList summaries={c.roleSummaries} version={ddVersion || "16.1.1"} />
-
-                    ) : (
-                      <div className="mt-2 text-xs text-white/45">
-                        No builds ≥ {FALLBACK_MIN_GAMES} games for this champ on this patch yet.
-
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="shrink-0 pt-1">
-                  <div className="flex flex-col items-end gap-1">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleCard(c.champKey);
+            return (
+              <div key={c.champKey} className="border-b border-white/10 last:border-b-0">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => toggleCard(c.champKey)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleCard(c.champKey);
+                    }
+                  }}
+                  className="flex w-full cursor-pointer items-start justify-between gap-3 bg-white/[0.02] px-4 py-3 text-left hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+                >
+                  <div className="flex min-w-0 gap-3">
+                    <img
+                      src={champIconUrl(vForIcons, c.champId)}
+                      alt={c.name}
+                      className="mt-0.5 h-9 w-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.02] object-cover sm:h-10 sm:w-10"
+                      loading="lazy"
+                      onError={(e) => {
+                        const img = e.currentTarget;
+                        img.onerror = null;
+                        img.src = champIconUrl("16.1.1", c.champId);
                       }}
-                      className="rounded-lg border border-white/10 bg-transparent px-2.5 py-1.5 text-xs text-white/80 hover:border-white/20 hover:text-white"
-                      title={isOpen ? "Hide build" : "View build"}
-                    >
-                      {isOpen ? "Hide build ▴" : "View build ▾"}
-                    </button>
+                    />
 
-                    {isOpen && canCopy ? (
+                    <div className="min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <div className="truncate text-sm font-semibold text-white/95">{c.name}</div>
+                        {c.title ? <div className="truncate text-xs text-white/45">{c.title}</div> : null}
+                      </div>
+
+                      {c.roleSummaries.length ? (
+                        <BuildPreviewList summaries={c.roleSummaries} version={ddVersion || "16.1.1"} />
+                      ) : (
+                        <div className="mt-2 text-xs text-white/45">
+                          No builds ≥ {FALLBACK_MIN_GAMES} games for this champ on this patch yet.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="shrink-0 pt-1">
+                    <div className="flex flex-col items-end gap-1">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          const entryToCopy = activeEntry ?? best?.entry;
-                          const roleToCopy = activeRole ?? best?.role;
-                          if (!entryToCopy || !roleToCopy) return;
-                          const text = buildShareText({
-                            champName: c.name,
-                            champId: c.champId,
-                            champKey: c.champKey,
-                            role: roleToCopy,
-                            entry: entryToCopy,
-                          });
-                          copyBuildText(text, copyToastKey);
+                          toggleCard(c.champKey);
                         }}
                         className="rounded-lg border border-white/10 bg-transparent px-2.5 py-1.5 text-xs text-white/80 hover:border-white/20 hover:text-white"
-                        title="Copy build + link"
+                        title={isOpen ? "Hide build" : "View build"}
                       >
-                        {copiedKey === copyToastKey ? "Copied" : "Copy"}
+                        {isOpen ? "Hide build ▴" : "View build ▾"}
                       </button>
-                    ) : null}
+
+                      {isOpen && canCopy ? (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const entryToCopy = activeEntry ?? best?.entry;
+                            const roleToCopy = activeRole ?? best?.role;
+                            if (!entryToCopy || !roleToCopy) return;
+                            const text = buildShareText({
+                              champName: c.name,
+                              champId: c.champId,
+                              champKey: c.champKey,
+                              role: roleToCopy,
+                              entry: entryToCopy,
+                            });
+                            copyBuildText(text, copyToastKey);
+                          }}
+                          className="rounded-lg border border-white/10 bg-transparent px-2.5 py-1.5 text-xs text-white/80 hover:border-white/20 hover:text-white"
+                          title="Copy build + link"
+                        >
+                          {copiedKey === copyToastKey ? "Copied" : "Copy"}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {isOpen ? (
-                <div className="bg-black px-4 pb-4 pt-3">
-                  {(() => {
-                    const rolesAll: Role[] = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
-                    const rolesWithData = rolesAll.filter((r) => bestBuildForRole(c.roleMap[r]));
-                    if (!rolesWithData.length) {
-                      return (
-                        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-xs text-white/45">
-                          No data yet
-                        </div>
-                      );
-                    }
-
-                    const active = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData[0];
-                    const entry = bestBuildForRole(c.roleMap[active])!;
-
-                    const wr = formatPct(entry.winrate);
-                    const sig = isStatSig(entry);
-
-                    const allItems = [
-                      ...(entry.boots ? [entry.boots] : []),
-                      ...(Array.isArray(entry.core) ? entry.core : []),
-                      ...(Array.isArray(entry.items) ? entry.items : []),
-                    ]
-                      .filter((x) => Number.isFinite(x) && x > 0)
-                      .map((x) => Number(x));
-
-                    // de-dupe while keeping order
-                    const seen = new Set<number>();
-                    const uniqItems = allItems.filter((id) => {
-                      if (seen.has(id)) return false;
-                      seen.add(id);
-                      return true;
-                    });
-
-                    const selectedItem = selectedExpandedItemByChamp[c.champKey] ?? uniqItems[0] ?? null;
-                    const selectedObj = selectedItem ? itemsById.get(selectedItem) : undefined;
-
-                    return (
-                      <div className="space-y-3">
-                        {/* Role tabs — only show roles that actually have data */}
-                        <div className="flex flex-wrap items-center gap-2">
-                          {rolesWithData.map((r) => {
-                            const isActive = r === active;
-                            return (
-                              <button
-                                key={r}
-                                type="button"
-                                onClick={() =>
-                                  setActiveRoleByChamp((prev) => ({
-                                    ...prev,
-                                    [c.champKey]: r,
-                                  }))
-                                }
-                                className={cx(
-                                  "rounded-full border px-3 py-1 text-xs font-semibold",
-                                  isActive
-                                    ? "border-white/25 bg-white/[0.06] text-white"
-                                    : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:text-white"
-                                )}
-                              >
-                                {shortRole(r)}
-                              </button>
-                            );
-                          })}
-
-                          <div className="ml-auto flex items-center gap-2 text-xs text-white/55">
-                            {!sig ? (
-                              <span
-                                className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55"
-                                title={`Low sample: fewer than ${meta?.minDisplaySample ?? 0} games. Small samples can show inflated winrates.`}
-                              >
-                                low sample
-                              </span>
-                            ) : null}
-                            <span className="text-white/60">{wr}</span>
-                            <span>{entry.games} games</span>
-
-                            
+                {isOpen ? (
+                  <div className="bg-black px-4 pb-4 pt-3">
+                    {(() => {
+                      const rolesAll2: Role[] = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"];
+                      const rolesWithData2 = rolesAll2.filter((r) => bestBuildForRole(c.roleMap[r]));
+                      if (!rolesWithData2.length) {
+                        return (
+                          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3 text-xs text-white/45">
+                            No data yet
                           </div>
-                        </div>
+                        );
+                      }
 
-                        {/* Items row */}
-                        <div className="flex flex-wrap items-center gap-2">
-                          {uniqItems.map((id) => {
-                            const nm = itemsById.get(id)?.name ?? String(id);
-                            const isSelected = selectedItem === id;
+                      const active = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData2[0];
+                      const entry = bestBuildForRole(c.roleMap[active])!;
 
-                            return (
-                              <button
-                                key={id}
-                                type="button"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setSelectedExpandedItemByChamp((prev) => ({
-                                    ...prev,
-                                    [c.champKey]: prev[c.champKey] === id ? null : id,
-                                  }));
-                                }}
-                                className={cx(
-                                  "group relative grid place-items-center rounded-lg border bg-white/[0.02] p-0.5",
-                                  isSelected ? "border-white/30" : "border-white/10 hover:border-white/20"
-                                )}
-                                title={nm}
-                              >
-                                <img
-                                  src={itemIconUrl(ddVersion || "16.1.1", id)}
-                                  alt={nm}
-                                  className="h-10 w-10 rounded-md object-cover"
-                                  loading="lazy"
-                                />
-                              </button>
-                            );
-                          })}
-                        </div>
+                      const wr = formatPct(entry.winrate);
+                      const sig = isStatSig(entry);
 
-                        {/* Selected item info */}
-                        {selectedItem && selectedObj ? (
-                          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="min-w-0">
-                                <div className="truncate text-sm font-semibold text-white/90">
-                                  {selectedObj.name ?? selectedItem}
+                      const allItems = [
+                        ...(entry.boots ? [entry.boots] : []),
+                        ...(Array.isArray(entry.core) ? entry.core : []),
+                        ...(Array.isArray(entry.items) ? entry.items : []),
+                      ]
+                        .filter((x) => Number.isFinite(x) && x > 0)
+                        .map((x) => Number(x));
+
+                      const seen = new Set<number>();
+                      const uniqItems = allItems.filter((id) => {
+                        if (seen.has(id)) return false;
+                        seen.add(id);
+                        return true;
+                      });
+
+                      const selectedItem = selectedExpandedItemByChamp[c.champKey] ?? uniqItems[0] ?? null;
+                      const selectedObj = selectedItem ? itemsById.get(selectedItem) : undefined;
+
+                      return (
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            {rolesWithData2.map((r) => {
+                              const isActive = r === active;
+                              return (
+                                <button
+                                  key={r}
+                                  type="button"
+                                  onClick={() =>
+                                    setActiveRoleByChamp((prev) => ({
+                                      ...prev,
+                                      [c.champKey]: r,
+                                    }))
+                                  }
+                                  className={cx(
+                                    "rounded-full border px-3 py-1 text-xs font-semibold",
+                                    isActive
+                                      ? "border-white/25 bg-white/[0.06] text-white"
+                                      : "border-white/10 bg-white/[0.02] text-white/70 hover:border-white/20 hover:text-white"
+                                  )}
+                                >
+                                  {shortRole(r)}
+                                </button>
+                              );
+                            })}
+
+                            <div className="ml-auto flex items-center gap-2 text-xs text-white/55">
+                              {!sig ? (
+                                <span
+                                  className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55"
+                                  title={`Low sample: fewer than ${meta?.minDisplaySample ?? 0} games. Small samples can show inflated winrates.`}
+                                >
+                                  low sample
+                                </span>
+                              ) : null}
+                              <span className="text-white/60">{wr}</span>
+                              <span>{entry.games} games</span>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2">
+                            {uniqItems.map((id) => {
+                              const nm = itemsById.get(id)?.name ?? String(id);
+                              const isSelected = selectedItem === id;
+
+                              return (
+                                <button
+                                  key={id}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setSelectedExpandedItemByChamp((prev) => ({
+                                      ...prev,
+                                      [c.champKey]: prev[c.champKey] === id ? null : id,
+                                    }));
+                                  }}
+                                  className={cx(
+                                    "group relative grid place-items-center rounded-lg border bg-white/[0.02] p-0.5",
+                                    isSelected ? "border-white/30" : "border-white/10 hover:border-white/20"
+                                  )}
+                                  title={nm}
+                                >
+                                  <img
+                                    src={itemIconUrl(ddVersion || "16.1.1", id)}
+                                    alt={nm}
+                                    className="h-10 w-10 rounded-md object-cover"
+                                    loading="lazy"
+                                  />
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {selectedItem && selectedObj ? (
+                            <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <div className="truncate text-sm font-semibold text-white/90">
+                                    {selectedObj.name ?? selectedItem}
+                                  </div>
+                                  {selectedObj.plaintext ? (
+                                    <div className="mt-0.5 text-xs text-white/55">{selectedObj.plaintext}</div>
+                                  ) : null}
                                 </div>
-                                {selectedObj.plaintext ? (
-                                  <div className="mt-0.5 text-xs text-white/55">
-                                    {selectedObj.plaintext}
+
+                                {typeof selectedObj.gold?.total === "number" ? (
+                                  <div className="shrink-0 rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/60">
+                                    {selectedObj.gold.total}g
                                   </div>
                                 ) : null}
                               </div>
 
-                              {typeof selectedObj.gold?.total === "number" ? (
-                                <div className="shrink-0 rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/60">
-                                  {selectedObj.gold.total}g
+                              {selectedObj.description ? (
+                                <div className="mt-2 text-xs leading-relaxed text-white/70">
+                                  {stripHtml(selectedObj.description)}
+                                </div>
+                              ) : null}
+
+                              {selectedObj.stats && Object.keys(selectedObj.stats).length ? (
+                                <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2">
+                                  {Object.entries(selectedObj.stats).map(([k, v]) => (
+                                    <div key={k} className="text-[11px] text-white/60">
+                                      <span className="text-white/45">{k}:</span>{" "}
+                                      <span className="text-white/75">{String(v)}</span>
+                                    </div>
+                                  ))}
                                 </div>
                               ) : null}
                             </div>
+                          ) : null}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
 
-                            {selectedObj.description ? (
-                              <div className="mt-2 text-xs leading-relaxed text-white/70">
-                                {stripHtml(selectedObj.description)}
-                              </div>
-                            ) : null}
-
-                            {selectedObj.stats && Object.keys(selectedObj.stats).length ? (
-                              <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2">
-                                {Object.entries(selectedObj.stats).map(([k, v]) => (
-                                  <div key={k} className="text-[11px] text-white/60">
-                                    <span className="text-white/45">{k}:</span>{" "}
-                                    <span className="text-white/75">{String(v)}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            ) : null}
-                          </div>
-                        ) : null}
-                      </div>
-                    );
-                  })()}
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
+        {itemToast ? (
+          <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-white/15 bg-black/80 px-3 py-1 text-xs text-white/85 shadow-lg">
+            {itemToast.text}
+          </div>
+        ) : null}
       </div>
     </div>
-</div>)}
+  );
+}
