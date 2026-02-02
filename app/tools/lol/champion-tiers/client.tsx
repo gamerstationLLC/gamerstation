@@ -468,6 +468,7 @@ if (sortBy === "tier") return desc ? -diff : diff;
               <span className="text-neutral-600">{desc ? "↓" : "↑"}</span>
             </div>
           </div>
+          
         </div>
 
         {/* Right: Search + Min games */}
@@ -492,10 +493,16 @@ if (sortBy === "tier") return desc ? -diff : diff;
                 className="h-10 w-28 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none focus:border-neutral-600"
                 title="Filter out low-sample champions"
               />
+            
             </div>
+            
           </div>
         </div>
+        
       </div>
+      <div className="mt-2 text-neutral-500 text-xs">
+          Tip: On mobile, swipe sideways to see every column.
+        </div>
 
       {/* Context row — THIS is what tier list players expect */}
      
@@ -619,9 +626,7 @@ if (sortBy === "tier") return desc ? -diff : diff;
           <span className="text-neutral-200">ban pressure</span> (Pro mode tie-breaker). Use this as a quick meta
           overview — matchup and team comp still matter.
         </div>
-        <div className="mt-2 text-neutral-500">
-          Tip: On mobile, swipe sideways to see every column.
-        </div>
+        
       </div>
     </section>
   );
