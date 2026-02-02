@@ -400,7 +400,8 @@ export default function LolChampionTiersClient({
       const diff = av - bv;
 
       // tier: smaller rank is better (S=0). desc=false => S->D
-      if (sortBy === "tier") return desc ? diff : -diff;
+if (sortBy === "tier") return desc ? -diff : diff;
+
 
       // numeric columns: desc=true => high->low
       return desc ? -diff : diff;
