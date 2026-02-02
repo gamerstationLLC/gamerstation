@@ -1,5 +1,7 @@
 // app/tools/dota/meta/page.tsx
 import Link from "next/link";
+import fs from "node:fs/promises";
+import path from "node:path";
 import DotaMetaClient, { HeroStatsRow } from "./client";
 
 export const metadata = {
@@ -16,6 +18,18 @@ type PatchEntry = {
   name?: string; // e.g. "7.40"
   date?: number; // unix seconds
   [key: string]: any;
+};
+
+type ImmortalJson = {
+  generated_at?: string;
+  window_days?: number;
+  min_rank_tier?: number;
+  rows?: Array<{
+    hero_id: number;
+    picks: number;
+    wins: number;
+    winrate?: number;
+  }>;
 };
 
 async function getHeroStats(): Promise<HeroStatsRow[]> {
@@ -70,8 +84,52 @@ async function getLatestPatch(): Promise<string> {
   }
 }
 
+async function readImmortalJson(): Promise<ImmortalJson | null> {
+  try {
+    const abs = path.join(process.cwd(), "public", "data", "dota", "immortal_hero_stats.json");
+    const raw = await fs.readFile(abs, "utf-8");
+    return JSON.parse(raw) as ImmortalJson;
+  } catch {
+    return null;
+  }
+}
+
 export default async function DotaMetaPage() {
-  const [rows, patch] = await Promise.all([getHeroStats(), getLatestPatch()]);
+  const [rows, patch, immortal] = await Promise.all([getHeroStats(), getLatestPatch(), readImmortalJson()]);
+
+  // Build map hero_id -> { picks, wins }
+  const immByHero = new Map<number, { picks: number; wins: number }>();
+  const immRows = Array.isArray(immortal?.rows) ? immortal!.rows! : [];
+  for (const r of immRows) {
+    const id = Number(r.hero_id);
+    const picks = Number(r.picks);
+    const wins = Number(r.wins);
+    if (Number.isFinite(id) && id > 0 && Number.isFinite(picks) && Number.isFinite(wins)) {
+      immByHero.set(id, {
+        picks: Math.max(0, Math.trunc(picks)),
+        wins: Math.max(0, Math.trunc(wins)),
+      });
+    }
+  }
+
+  // Inject Immortal bucket into the shape the client expects: 8_pick / 8_win
+  const mergedRows: HeroStatsRow[] = (rows || []).map((h) => {
+    const id = Number(h.id);
+    const imm = immByHero.get(id);
+    if (!imm) return h;
+
+    return {
+      ...h,
+      ["8_pick"]: imm.picks,
+      ["8_win"]: imm.wins,
+    } as HeroStatsRow;
+  });
+
+  // Optional: nicer label; if you want to keep "~5 min" hardcoded, you can.
+  const cacheLabel =
+    immortal?.generated_at
+      ? `Immortal updated ${new Date(immortal.generated_at).toLocaleString()}`
+      : "~5 min";
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -115,13 +173,12 @@ export default async function DotaMetaPage() {
 
           <h1 className="text-4xl font-bold tracking-tight">Dota 2 Meta</h1>
           <p className="mt-3 text-neutral-300">
-            Highest pick rate + best win rate by rank bracket, plus pro trends.
-            Data from OpenDota.
+            Highest pick rate + best win rate by rank bracket, plus pro trends. Data from OpenDota.
             <span className="text-neutral-500"> (Cached ~5 minutes)</span>
           </p>
 
           <div className="mt-6">
-            <DotaMetaClient initialRows={rows} patch={patch} cacheLabel="~5 min" />
+            <DotaMetaClient initialRows={mergedRows} patch={patch} cacheLabel={cacheLabel} />
           </div>
         </div>
       </div>

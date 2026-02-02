@@ -1,0 +1,177 @@
+name: Update Dota Immortal Stats
+
+on:
+  schedule:
+    - cron: "0 * * * *" 
+  workflow_dispatch: {}
+
+concurrency:
+  group: dota-immortal-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  immortal:
+    runs-on: ubuntu-latest
+
+    # IMPORTANT:
+    # Job timeout must be > 90m so the runner is not killed.
+    # We soft-timeout the build step at 90m, then still finalize+commit.
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ✅ Always start from latest origin/main
+      - name: Sync with main (pre-build)
+        shell: bash
+        run: |
+          set -e
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      # ✅ Optional: prune any Immortal cache older than 30d (safe if dirs don't exist)
+      # (Feel free to change 30 to 60/90 later. This cache can grow fast.)
+      - name: Prune old Dota Immortal cache (30 days)
+        shell: bash
+        run: |
+          set -e
+          echo "Pruning Dota Immortal cache older than 30 days (if present)..."
+          CUTOFF=$(date -d "30 days ago" +%s)
+
+          for DIR in scripts/dota/cache/immortal_v2/matches; do
+            if [ -d "$DIR" ]; then
+              find "$DIR" -type f -name "*.json" | while read -r file; do
+                mtime=$(stat -c %Y "$file" 2>/dev/null || echo 0)
+                if [ "$mtime" -lt "$CUTOFF" ]; then
+                  rm -f "$file"
+                fi
+              done
+              echo "Pruned: $DIR"
+            fi
+          done
+
+      # ✅ Soft timeout: stop the BUILD after 90 minutes, but DO NOT kill the job.
+      # ✅ CRITICAL: NEVER fail the job here (timeout/429/etc should not block finalize+commit)
+      - name: Build Dota Immortal cache (soft-timeout 90m; never fails job)
+        shell: bash
+        env:
+          # Optional: add later as a secret if you get a key. Script still works without it.
+          OPENDOTA_API_KEY: ${{ secrets.OPENDOTA_API_KEY }}
+
+          # ✅ knobs (match what the script reads)
+          DOTA_IMMORTAL_WINDOW_DAYS: "7"
+          DOTA_PUBLICMATCHES_PAGES: "8"
+          DOTA_MAX_NEW_MATCHES: "160"
+          DOTA_REQ_DELAY_MS: "250"
+        run: |
+          set +e
+          echo "Starting Dota Immortal build with soft timeout of 90 minutes..."
+
+          # 5400s = 90 minutes
+          timeout --signal=SIGTERM --kill-after=30s 5400 npm run dota:immortal:build
+          EC=$?
+
+          # GNU timeout uses exit code 124 when it times out.
+          if [ "$EC" -eq 124 ]; then
+            echo "Build hit 90-minute soft timeout. Proceeding to finalize+commit with what we have."
+          else
+            echo "Build exited with code: $EC (continuing regardless)."
+          fi
+
+          # Never fail job here
+          exit 0
+
+      # ✅ Finalize ALWAYS runs (if build timed out or API got 429s, we still try to finalize)
+      - name: Finalize Dota Immortal JSON (never fails job)
+        if: always()
+        shell: bash
+        env:
+          DOTA_IMMORTAL_WINDOW_DAYS: "7"
+          DOTA_IMMORTAL_MIN_RANK_TIER: "80"
+          DOTA_IMMORTAL_MIN_HEROES: "70"
+          DOTA_IMMORTAL_MIN_TOTAL_PICKS: "5000"
+        run: |
+          set +e
+          npm run dota:immortal:finalize
+          EC=$?
+          echo "Finalize exit code: $EC"
+          echo "Continuing to debug/commit regardless..."
+          exit 0
+
+      # ✅ Debug
+      - name: Debug - Output + git diff
+        if: always()
+        shell: bash
+        run: |
+          echo "== Output sample =="
+          ls -lah public/data/dota || true
+          ls -lah public/data/dota/immortal_hero_stats.json || true
+
+          echo "== Git status (immortal_hero_stats.json) =="
+          git status --porcelain -- public/data/dota/immortal_hero_stats.json || true
+
+          echo "== Diffstat (immortal_hero_stats.json) =="
+          git diff --stat -- public/data/dota/immortal_hero_stats.json || true
+
+          echo "== Checkpoints =="
+          ls -lah scripts/dota/cache/immortal_v2/state || true
+          cat scripts/dota/cache/immortal_v2/state/finalize_checkpoint.json 2>/dev/null || true
+          cat scripts/dota/cache/immortal_v2/state/build_checkpoint.json 2>/dev/null || true
+
+      # ✅ Commit → Push: stage ONLY this workflow's json; merge-pull loop (NO rebase)
+      - name: Commit & push (if changed)
+        if: always()
+        shell: bash
+        run: |
+          set -e
+
+          git config user.name "gamerstation-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          if [ ! -f "public/data/dota/immortal_hero_stats.json" ]; then
+            echo "No public/data/dota/immortal_hero_stats.json exists; nothing to commit."
+            exit 0
+          fi
+
+          git add public/data/dota/immortal_hero_stats.json
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(dota): refresh immortal hero stats"
+
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i: syncing latest origin/main (merge, no rebase)..."
+            git fetch origin main
+            git pull origin main --no-rebase || true
+
+            echo "Attempt $i: pushing..."
+            if git push origin main; then
+              echo "Push succeeded."
+              exit 0
+            fi
+
+            echo "Attempt $i failed. Retrying in 5s..."
+            sleep 5
+          done
+
+          echo "Push failed after retries."
+          exit 1
