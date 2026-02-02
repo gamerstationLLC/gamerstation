@@ -1,0 +1,947 @@
+{
+  "players": [
+    {
+      "player_slot": 0,
+      "team_number": 0,
+      "team_slot": 0,
+      "hero_id": 23,
+      "hero_variant": 1,
+      "item_0": 50,
+      "item_1": 141,
+      "item_2": 60,
+      "item_3": 34,
+      "item_4": 4205,
+      "item_5": 20,
+      "backpack_0": 4204,
+      "backpack_1": 22,
+      "backpack_2": 0,
+      "item_neutral": 71,
+      "item_neutral2": 1586,
+      "kills": 4,
+      "deaths": 3,
+      "assists": 4,
+      "leaver_status": 0,
+      "last_hits": 109,
+      "denies": 4,
+      "gold_per_min": 476,
+      "xp_per_min": 493,
+      "level": 13,
+      "net_worth": 9923,
+      "aghanims_scepter": 0,
+      "aghanims_shard": 0,
+      "moonshard": 0,
+      "hero_damage": 6650,
+      "tower_damage": 1016,
+      "hero_healing": 0,
+      "gold": 768,
+      "gold_spent": 9405,
+      "ability_upgrades_arr": [
+        5032,
+        5031,
+        5033,
+        5032,
+        5032,
+        5035,
+        5032,
+        5033,
+        5033,
+        5033,
+        1015,
+        5031,
+        5035,
+        5031
+      ],
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": true,
+      "win": 1,
+      "lose": 0,
+      "total_gold": 9805,
+      "total_xp": 10155,
+      "kills_per_min": 0.1941747572815534,
+      "kda": 2,
+      "abandons": 0,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 476,
+          "pct": 0.38271604938271603
+        },
+        "xp_per_min": {
+          "raw": 493,
+          "pct": 0.17592592592592593
+        },
+        "kills_per_min": {
+          "raw": 0.1941747572815534,
+          "pct": 0.6496913580246914
+        },
+        "last_hits_per_min": {
+          "raw": 5.29126213592233,
+          "pct": 0.36882716049382713
+        },
+        "hero_damage_per_min": {
+          "raw": 322.81553398058253,
+          "pct": 0.09722222222222222
+        },
+        "hero_healing_per_min": {
+          "raw": 0,
+          "pct": 0.9104938271604939
+        },
+        "tower_damage": {
+          "raw": 1016,
+          "pct": 0.45524691358024694
+        }
+      }
+    },
+    {
+      "account_id": 185812270,
+      "player_slot": 1,
+      "team_number": 0,
+      "team_slot": 1,
+      "hero_id": 53,
+      "hero_variant": 1,
+      "item_0": 569,
+      "item_1": 267,
+      "item_2": 63,
+      "item_3": 236,
+      "item_4": 0,
+      "item_5": 11,
+      "backpack_0": 0,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 2097,
+      "item_neutral2": 1584,
+      "kills": 6,
+      "deaths": 5,
+      "assists": 22,
+      "leaver_status": 0,
+      "last_hits": 78,
+      "denies": 1,
+      "gold_per_min": 532,
+      "xp_per_min": 475,
+      "level": 13,
+      "net_worth": 10952,
+      "aghanims_scepter": 0,
+      "aghanims_shard": 0,
+      "moonshard": 0,
+      "hero_damage": 14677,
+      "tower_damage": 12315,
+      "hero_healing": 1064,
+      "gold": 3777,
+      "gold_spent": 7615,
+      "ability_upgrades_arr": [
+        5245,
+        5246,
+        5245,
+        5246,
+        5245,
+        5248,
+        5245,
+        5247,
+        5247,
+        5247,
+        926,
+        5247,
+        5248,
+        5246
+      ],
+      "personaname": "123321",
+      "name": null,
+      "last_login": null,
+      "rank_tier": 61,
+      "computed_mmr": null,
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": true,
+      "win": 1,
+      "lose": 0,
+      "total_gold": 10959,
+      "total_xp": 9785,
+      "kills_per_min": 0.2912621359223301,
+      "kda": 4.67,
+      "abandons": 0,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 532,
+          "pct": 0.44336569579288027
+        },
+        "xp_per_min": {
+          "raw": 475,
+          "pct": 0.18851132686084143
+        },
+        "kills_per_min": {
+          "raw": 0.2912621359223301,
+          "pct": 0.7758899676375405
+        },
+        "last_hits_per_min": {
+          "raw": 3.7864077669902914,
+          "pct": 0.1925566343042071
+        },
+        "hero_damage_per_min": {
+          "raw": 712.4757281553398,
+          "pct": 0.5703883495145631
+        },
+        "hero_healing_per_min": {
+          "raw": 51.650485436893206,
+          "pct": 0.9231391585760518
+        },
+        "tower_damage": {
+          "raw": 12315,
+          "pct": 0.8972491909385113
+        }
+      }
+    },
+    {
+      "player_slot": 2,
+      "team_number": 0,
+      "team_slot": 2,
+      "hero_id": 59,
+      "hero_variant": 3,
+      "item_0": 116,
+      "item_1": 151,
+      "item_2": 63,
+      "item_3": 156,
+      "item_4": 218,
+      "item_5": 55,
+      "backpack_0": 0,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 1604,
+      "item_neutral2": 1584,
+      "kills": 22,
+      "deaths": 1,
+      "assists": 9,
+      "leaver_status": 0,
+      "last_hits": 131,
+      "denies": 2,
+      "gold_per_min": 780,
+      "xp_per_min": 778,
+      "level": 17,
+      "net_worth": 16287,
+      "aghanims_scepter": 0,
+      "aghanims_shard": 0,
+      "moonshard": 0,
+      "hero_damage": 26268,
+      "tower_damage": 11489,
+      "hero_healing": 0,
+      "gold": 1237,
+      "gold_spent": 15420,
+      "ability_upgrades_arr": [
+        5272,
+        5273,
+        5272,
+        5273,
+        5272,
+        5274,
+        7300,
+        5273,
+        5273,
+        5272,
+        7140,
+        7300,
+        5274,
+        7300,
+        7300,
+        433
+      ],
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": true,
+      "win": 1,
+      "lose": 0,
+      "total_gold": 16068,
+      "total_xp": 16026,
+      "kills_per_min": 1.0679611650485437,
+      "kda": 15.5,
+      "abandons": 0,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 780,
+          "pct": 0.9886749716874292
+        },
+        "xp_per_min": {
+          "raw": 778,
+          "pct": 0.6851642129105323
+        },
+        "kills_per_min": {
+          "raw": 1.0679611650485437,
+          "pct": 1
+        },
+        "last_hits_per_min": {
+          "raw": 6.359223300970874,
+          "pct": 0.8323895809739524
+        },
+        "hero_damage_per_min": {
+          "raw": 1275.1456310679612,
+          "pct": 0.9592298980747452
+        },
+        "hero_healing_per_min": {
+          "raw": 0,
+          "pct": 0.9762174405436014
+        },
+        "tower_damage": {
+          "raw": 11489,
+          "pct": 0.9026047565118913
+        }
+      }
+    },
+    {
+      "account_id": 278504858,
+      "player_slot": 3,
+      "team_number": 0,
+      "team_slot": 3,
+      "hero_id": 36,
+      "hero_variant": 1,
+      "item_0": 36,
+      "item_1": 15,
+      "item_2": 15,
+      "item_3": 180,
+      "item_4": 232,
+      "item_5": 1107,
+      "backpack_0": 15,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 1604,
+      "item_neutral2": 1583,
+      "kills": 8,
+      "deaths": 8,
+      "assists": 20,
+      "leaver_status": 0,
+      "last_hits": 39,
+      "denies": 1,
+      "gold_per_min": 440,
+      "xp_per_min": 455,
+      "level": 12,
+      "net_worth": 8738,
+      "aghanims_scepter": 0,
+      "aghanims_shard": 0,
+      "moonshard": 0,
+      "hero_damage": 10675,
+      "tower_damage": 420,
+      "hero_healing": 5340,
+      "gold": 1583,
+      "gold_spent": 7380,
+      "ability_upgrades_arr": [
+        5158,
+        5159,
+        5158,
+        1270,
+        5158,
+        5161,
+        5158,
+        1270,
+        1270,
+        1270,
+        820,
+        5159,
+        5161
+      ],
+      "personaname": "BUG掉线了",
+      "name": null,
+      "last_login": null,
+      "rank_tier": null,
+      "computed_mmr": null,
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": true,
+      "win": 1,
+      "lose": 0,
+      "total_gold": 9064,
+      "total_xp": 9373,
+      "kills_per_min": 0.3883495145631068,
+      "kda": 3.11,
+      "abandons": 0,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 440,
+          "pct": 0.21264367816091953
+        },
+        "xp_per_min": {
+          "raw": 455,
+          "pct": 0.1040868454661558
+        },
+        "kills_per_min": {
+          "raw": 0.3883495145631068,
+          "pct": 0.8282247765006385
+        },
+        "last_hits_per_min": {
+          "raw": 1.8932038834951457,
+          "pct": 0.037675606641123884
+        },
+        "hero_damage_per_min": {
+          "raw": 518.2038834951456,
+          "pct": 0.18007662835249041
+        },
+        "hero_healing_per_min": {
+          "raw": 259.2233009708738,
+          "pct": 0.8441890166028098
+        },
+        "tower_damage": {
+          "raw": 420,
+          "pct": 0.2841634738186462
+        }
+      }
+    },
+    {
+      "account_id": 152177740,
+      "player_slot": 4,
+      "team_number": 0,
+      "team_slot": 4,
+      "hero_id": 86,
+      "hero_variant": 1,
+      "item_0": 232,
+      "item_1": 102,
+      "item_2": 36,
+      "item_3": 1,
+      "item_4": 265,
+      "item_5": 180,
+      "backpack_0": 0,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 1604,
+      "item_neutral2": 1595,
+      "kills": 14,
+      "deaths": 4,
+      "assists": 22,
+      "leaver_status": 0,
+      "last_hits": 35,
+      "denies": 3,
+      "gold_per_min": 500,
+      "xp_per_min": 532,
+      "level": 14,
+      "net_worth": 9362,
+      "aghanims_scepter": 0,
+      "aghanims_shard": 0,
+      "moonshard": 0,
+      "hero_damage": 28686,
+      "tower_damage": 361,
+      "hero_healing": 0,
+      "gold": 602,
+      "gold_spent": 9755,
+      "ability_upgrades_arr": [
+        5448,
+        5450,
+        5450,
+        7320,
+        5450,
+        5452,
+        5450,
+        7320,
+        7320,
+        7320,
+        6862,
+        5448,
+        5452,
+        5448,
+        5448
+      ],
+      "personaname": "小蝴蝶",
+      "name": null,
+      "last_login": null,
+      "rank_tier": null,
+      "computed_mmr": null,
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": true,
+      "win": 1,
+      "lose": 0,
+      "total_gold": 10300,
+      "total_xp": 10959,
+      "kills_per_min": 0.6796116504854368,
+      "kda": 7.2,
+      "abandons": 0,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 500,
+          "pct": 0.8084705882352942
+        },
+        "xp_per_min": {
+          "raw": 532,
+          "pct": 0.3388235294117647
+        },
+        "kills_per_min": {
+          "raw": 0.6796116504854369,
+          "pct": 0.9943529411764706
+        },
+        "last_hits_per_min": {
+          "raw": 1.6990291262135921,
+          "pct": 0.17929411764705883
+        },
+        "hero_damage_per_min": {
+          "raw": 1392.5242718446602,
+          "pct": 0.9915294117647059
+        },
+        "hero_healing_per_min": {
+          "raw": 0,
+          "pct": 0.5157647058823529
+        },
+        "tower_damage": {
+          "raw": 361,
+          "pct": 0.43105882352941177
+        }
+      }
+    },
+    {
+      "player_slot": 128,
+      "team_number": 1,
+      "team_slot": 0,
+      "hero_id": 35,
+      "hero_variant": 1,
+      "item_0": 63,
+      "item_1": 22,
+      "item_2": 36,
+      "item_3": 17,
+      "item_4": 75,
+      "item_5": 0,
+      "backpack_0": 0,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 0,
+      "item_neutral2": 0,
+      "kills": 0,
+      "deaths": 15,
+      "assists": 9,
+      "hero_damage": 7559,
+      "tower_damage": 0,
+      "hero_healing": 182,
+      "gold": 111,
+      "last_hits": 26,
+      "denies": 7,
+      "gold_per_min": 202,
+      "xp_per_min": 213,
+      "gold_spent": 4230,
+      "level": 8,
+      "net_worth": 3926,
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": false,
+      "win": 0,
+      "lose": 1,
+      "total_gold": 4161,
+      "total_xp": 4387,
+      "kda": 0.56,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 202,
+          "pct": 0.004633204633204633
+        },
+        "xp_per_min": {
+          "raw": 213,
+          "pct": 0.008494208494208495
+        },
+        "kills_per_min": {
+          "raw": 0,
+          "pct": 0.013127413127413128
+        },
+        "last_hits_per_min": {
+          "raw": 1.262135922330097,
+          "pct": 0.021235521235521235
+        },
+        "hero_damage_per_min": {
+          "raw": 366.94174757281553,
+          "pct": 0.044015444015444015
+        },
+        "hero_healing_per_min": {
+          "raw": 8.83495145631068,
+          "pct": 0.9884169884169884
+        },
+        "tower_damage": {
+          "raw": 0,
+          "pct": 0.08532818532818533
+        }
+      }
+    },
+    {
+      "player_slot": 129,
+      "team_number": 1,
+      "team_slot": 1,
+      "hero_id": 84,
+      "hero_variant": 1,
+      "item_0": 63,
+      "item_1": 36,
+      "item_2": 11,
+      "item_3": 56,
+      "item_4": 0,
+      "item_5": 73,
+      "backpack_0": 0,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 0,
+      "item_neutral2": 0,
+      "kills": 6,
+      "deaths": 10,
+      "assists": 10,
+      "hero_damage": 10486,
+      "tower_damage": 0,
+      "hero_healing": 0,
+      "gold": 3528,
+      "last_hits": 36,
+      "denies": 11,
+      "gold_per_min": 360,
+      "xp_per_min": 298,
+      "gold_spent": 3455,
+      "level": 10,
+      "net_worth": 6793,
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": false,
+      "win": 0,
+      "lose": 1,
+      "total_gold": 7416,
+      "total_xp": 6138,
+      "kills_per_min": 0.2912621359223301,
+      "kda": 1.45,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 360,
+          "pct": 0.2423949782713665
+        },
+        "xp_per_min": {
+          "raw": 298,
+          "pct": 0.03669724770642202
+        },
+        "kills_per_min": {
+          "raw": 0.2912621359223301,
+          "pct": 0.9275712216320618
+        },
+        "last_hits_per_min": {
+          "raw": 1.7475728155339807,
+          "pct": 0.24577498792853694
+        },
+        "hero_damage_per_min": {
+          "raw": 509.0291262135923,
+          "pct": 0.4331240946402704
+        },
+        "hero_healing_per_min": {
+          "raw": 0,
+          "pct": 0.687107677450507
+        },
+        "tower_damage": {
+          "raw": 0,
+          "pct": 0.21438918396909706
+        }
+      }
+    },
+    {
+      "player_slot": 130,
+      "team_number": 1,
+      "team_slot": 2,
+      "hero_id": 93,
+      "hero_variant": 3,
+      "item_0": 63,
+      "item_1": 170,
+      "item_2": 11,
+      "item_3": 36,
+      "item_4": 75,
+      "item_5": 22,
+      "backpack_0": 0,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 0,
+      "item_neutral2": 0,
+      "kills": 3,
+      "deaths": 10,
+      "assists": 8,
+      "hero_damage": 5571,
+      "tower_damage": 0,
+      "hero_healing": 18,
+      "gold": 268,
+      "last_hits": 27,
+      "denies": 8,
+      "gold_per_min": 277,
+      "xp_per_min": 279,
+      "gold_spent": 5755,
+      "level": 9,
+      "net_worth": 5833,
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": false,
+      "win": 0,
+      "lose": 1,
+      "total_gold": 5706,
+      "total_xp": 5747,
+      "kills_per_min": 0.14563106796116504,
+      "kda": 1,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 277,
+          "pct": 0.034442498540572096
+        },
+        "xp_per_min": {
+          "raw": 279,
+          "pct": 0.023350846468184472
+        },
+        "kills_per_min": {
+          "raw": 0.14563106796116504,
+          "pct": 0.30531231757151195
+        },
+        "last_hits_per_min": {
+          "raw": 1.3106796116504855,
+          "pct": 0.013426736719206071
+        },
+        "hero_damage_per_min": {
+          "raw": 270.43689320388347,
+          "pct": 0.13601868067717454
+        },
+        "hero_healing_per_min": {
+          "raw": 0.8737864077669903,
+          "pct": 0.9696438995913602
+        },
+        "tower_damage": {
+          "raw": 0,
+          "pct": 0.14244016345592528
+        }
+      }
+    },
+    {
+      "player_slot": 131,
+      "team_number": 1,
+      "team_slot": 3,
+      "hero_id": 5,
+      "hero_variant": 3,
+      "item_0": 185,
+      "item_1": 36,
+      "item_2": 40,
+      "item_3": 77,
+      "item_4": 254,
+      "item_5": 214,
+      "backpack_0": 0,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 0,
+      "item_neutral2": 0,
+      "kills": 7,
+      "deaths": 12,
+      "assists": 7,
+      "hero_damage": 8517,
+      "tower_damage": 0,
+      "hero_healing": 0,
+      "gold": 1141,
+      "last_hits": 37,
+      "denies": 4,
+      "gold_per_min": 332,
+      "xp_per_min": 326,
+      "gold_spent": 6140,
+      "level": 10,
+      "net_worth": 6941,
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": false,
+      "win": 0,
+      "lose": 1,
+      "total_gold": 6839,
+      "total_xp": 6715,
+      "kills_per_min": 0.3398058252427184,
+      "kda": 1.08,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 332,
+          "pct": 0.44511733535200604
+        },
+        "xp_per_min": {
+          "raw": 326,
+          "pct": 0.09992429977289932
+        },
+        "kills_per_min": {
+          "raw": 0.33980582524271846,
+          "pct": 0.9780469341408025
+        },
+        "last_hits_per_min": {
+          "raw": 1.7961165048543688,
+          "pct": 0.5094625283875852
+        },
+        "hero_damage_per_min": {
+          "raw": 413.44660194174753,
+          "pct": 0.5071915215745647
+        },
+        "hero_healing_per_min": {
+          "raw": 0,
+          "pct": 0.7993943981831946
+        },
+        "tower_damage": {
+          "raw": 0,
+          "pct": 0.2543527630582892
+        }
+      }
+    },
+    {
+      "player_slot": 132,
+      "team_number": 1,
+      "team_slot": 4,
+      "hero_id": 3,
+      "hero_variant": 1,
+      "item_0": 92,
+      "item_1": 180,
+      "item_2": 36,
+      "item_3": 79,
+      "item_4": 215,
+      "item_5": 0,
+      "backpack_0": 0,
+      "backpack_1": 0,
+      "backpack_2": 0,
+      "item_neutral": 0,
+      "item_neutral2": 0,
+      "kills": 5,
+      "deaths": 7,
+      "assists": 13,
+      "hero_damage": 11823,
+      "tower_damage": 12,
+      "hero_healing": 3076,
+      "gold": 879,
+      "last_hits": 15,
+      "denies": 8,
+      "gold_per_min": 316,
+      "xp_per_min": 386,
+      "gold_spent": 5900,
+      "level": 11,
+      "net_worth": 6339,
+      "is_subscriber": false,
+      "radiant_win": true,
+      "start_time": 1770008171,
+      "duration": 1236,
+      "cluster": 227,
+      "lobby_type": 4,
+      "game_mode": 1,
+      "is_contributor": false,
+      "patch": 59,
+      "region": 20,
+      "isRadiant": false,
+      "win": 0,
+      "lose": 1,
+      "total_gold": 6509,
+      "total_xp": 7951,
+      "kills_per_min": 0.24271844660194172,
+      "kda": 2.25,
+      "benchmarks": {
+        "gold_per_min": {
+          "raw": 316,
+          "pct": 0.5300751879699248
+        },
+        "xp_per_min": {
+          "raw": 386,
+          "pct": 0.20676691729323307
+        },
+        "kills_per_min": {
+          "raw": 0.24271844660194172,
+          "pct": 0.9022556390977443
+        },
+        "last_hits_per_min": {
+          "raw": 0.7281553398058253,
+          "pct": 0.23308270676691728
+        },
+        "hero_damage_per_min": {
+          "raw": 573.9320388349514,
+          "pct": 0.8533834586466166
+        },
+        "hero_healing_per_min": {
+          "raw": 149.32038834951456,
+          "pct": 0.9924812030075187
+        },
+        "tower_damage": {
+          "raw": 12,
+          "pct": 0.2518796992481203
+        }
+      }
+    }
+  ],
+  "radiant_win": true,
+  "duration": 1236,
+  "pre_game_duration": 90,
+  "start_time": 1770008171,
+  "match_id": 8674331157,
+  "match_seq_num": 7287133892,
+  "tower_status_radiant": 2047,
+  "tower_status_dire": 0,
+  "barracks_status_radiant": 63,
+  "barracks_status_dire": 0,
+  "cluster": 227,
+  "first_blood_time": 0,
+  "lobby_type": 4,
+  "human_players": 5,
+  "leagueid": 0,
+  "game_mode": 1,
+  "flags": 1,
+  "engine": 1,
+  "radiant_score": 54,
+  "dire_score": 21,
+  "od_data": {
+    "has_api": true,
+    "has_gcdata": false,
+    "has_parsed": false,
+    "has_archive": false
+  },
+  "metadata": null,
+  "patch": 59,
+  "region": 20
+}

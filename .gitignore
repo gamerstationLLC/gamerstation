@@ -49,8 +49,11 @@ scripts/riot/cache/timelines/
 !scripts/riot/cache/state/
 
 
-# Champion tiers – raw Riot match cache
-scripts/riot/cache/champion_tiers/matches/
-
 # 🚫 Hold COD tools from repo for now
 app/tools/cod/
+
+# Dota Immortal cache (never commit)
+scripts/dota/cache/
+
+# Riot / LoL caches (never commit)
+scripts/riot/cache/
