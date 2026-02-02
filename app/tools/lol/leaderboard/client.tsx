@@ -316,6 +316,9 @@ export default function LeaderboardClient({
             <Link href="/calculators/lol/meta" className={navBtn}>
               Meta
             </Link>
+            <Link href="/tools/lol/champion-tiers" className={navBtn}>
+          Tiers List
+        </Link>
           </div>
 
           <div className={`mt-6 rounded-2xl border p-4 ${surfaceCard}`}>

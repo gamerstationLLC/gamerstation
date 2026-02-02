@@ -786,7 +786,11 @@ function BuildPreview({
         <Link href="/calculators/lol/hub" className={navBtn}>
           LoL Hub
         </Link>
+        <Link href="/tools/lol/champion-tiers" className={navBtn}>
+          Tiers List
+        </Link>
       </div>
+      
 
       <div className="space-y-4">
         <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
