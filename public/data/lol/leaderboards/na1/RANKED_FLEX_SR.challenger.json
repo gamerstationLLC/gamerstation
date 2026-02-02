@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-02-02T03:29:25.837Z",
+  "generatedAt": "2026-02-02T09:40:36.092Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
-  "count": 12,
+  "count": 11,
   "players": [
     {
       "puuid": "bVZdq4zJuZN-t7PMNMZEJloEIskZ0YnreXD06LKGT4Y959qWCAXhzlY15NVSrxFZLx71c05iPJp4Mw",
@@ -14,15 +14,7 @@
       "topChamps": [
         {
           "name": "Evelynn",
-          "count": 3
-        },
-        {
-          "name": "JarvanIV",
-          "count": 2
-        },
-        {
-          "name": "Talon",
-          "count": 1
+          "count": 6
         }
       ],
       "sampleGames": 6,
@@ -44,15 +36,11 @@
       "summonerLevel": 561,
       "topChamps": [
         {
-          "name": "Varus",
-          "count": 3
-        },
-        {
           "name": "Rammus",
-          "count": 2
+          "count": 5
         },
         {
-          "name": "Vayne",
+          "name": "Lucian",
           "count": 1
         }
       ],
@@ -93,6 +81,37 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
+    },
+    {
+      "puuid": "DnSexdRt48W6o24yS0Lf0mNViUDQhBOKBF5vzroqg0C4Efb3kOS9VXr8dRqFN0QaaIJJZaDX37lUVQ",
+      "summonerId": null,
+      "summonerName": "韩立L#CNnb",
+      "profileIconId": 5314,
+      "summonerLevel": 629,
+      "topChamps": [
+        {
+          "name": "Varus",
+          "count": 3
+        },
+        {
+          "name": "Kaisa",
+          "count": 2
+        },
+        {
+          "name": "Aphelios",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "韩立L",
+      "tagLine": "CNnb",
+      "leaguePoints": 806,
+      "wins": 42,
+      "losses": 14,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     },
     {
       "puuid": "5xPInuVQZkLcVn1Lr0FMJqwiTmvM1W9dzdrAFG8mEVmNZmMiiS8Q1Pwa1PmCCCbb7VyxTk-14_eTrg",
@@ -137,11 +156,11 @@
           "count": 3
         },
         {
-          "name": "Lucian",
-          "count": 2
+          "name": "Lux",
+          "count": 1
         },
         {
-          "name": "Viego",
+          "name": "Mordekaiser",
           "count": 1
         }
       ],
@@ -165,14 +184,14 @@
       "topChamps": [
         {
           "name": "Katarina",
-          "count": 4
+          "count": 2
         },
         {
-          "name": "Akali",
+          "name": "Gwen",
           "count": 1
         },
         {
-          "name": "Hwei",
+          "name": "Riven",
           "count": 1
         }
       ],
@@ -195,15 +214,15 @@
       "summonerLevel": 373,
       "topChamps": [
         {
+          "name": "Gwen",
+          "count": 2
+        },
+        {
           "name": "Ambessa",
           "count": 2
         },
         {
           "name": "Diana",
-          "count": 2
-        },
-        {
-          "name": "Gwen",
           "count": 1
         }
       ],
@@ -214,37 +233,6 @@
       "wins": 35,
       "losses": 11,
       "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "DnSexdRt48W6o24yS0Lf0mNViUDQhBOKBF5vzroqg0C4Efb3kOS9VXr8dRqFN0QaaIJJZaDX37lUVQ",
-      "summonerId": null,
-      "summonerName": "韩立L#CNnb",
-      "profileIconId": 5314,
-      "summonerLevel": 629,
-      "topChamps": [
-        {
-          "name": "Aphelios",
-          "count": 4
-        },
-        {
-          "name": "Pantheon",
-          "count": 1
-        },
-        {
-          "name": "Sivir",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "韩立L",
-      "tagLine": "CNnb",
-      "leaguePoints": 606,
-      "wins": 35,
-      "losses": 13,
-      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -272,40 +260,9 @@
       "sampleGames": 6,
       "gameName": "9416bd6c51674266",
       "tagLine": "9195",
-      "leaguePoints": 595,
+      "leaguePoints": 520,
       "wins": 51,
       "losses": 30,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "Z67gM00Ajh1IGchJ97xo7HTlxP1jPtJLKEQpiYtp7nG1BFQIShWQgX9KidsDy1efp8ESFlsFQMZ8Ww",
-      "summonerId": null,
-      "summonerName": "如梦幻泡影#如露亦如电",
-      "profileIconId": 7068,
-      "summonerLevel": 710,
-      "topChamps": [
-        {
-          "name": "Ezreal",
-          "count": 2
-        },
-        {
-          "name": "Sivir",
-          "count": 2
-        },
-        {
-          "name": "Janna",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "如梦幻泡影",
-      "tagLine": "如露亦如电",
-      "leaguePoints": 517,
-      "wins": 31,
-      "losses": 9,
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
@@ -320,14 +277,14 @@
       "topChamps": [
         {
           "name": "Kaisa",
-          "count": 3
+          "count": 2
         },
         {
           "name": "Camille",
           "count": 2
         },
         {
-          "name": "Zeri",
+          "name": "Sivir",
           "count": 1
         }
       ],
