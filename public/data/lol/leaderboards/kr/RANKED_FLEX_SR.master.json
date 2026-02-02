@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T01:32:51.062Z",
+  "generatedAt": "2026-02-02T05:27:04.925Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -90,6 +90,37 @@
       "wins": 21,
       "losses": 10,
       "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "caKpviU4WCCEB3G2G4Cya4iwoePQElMNxB5hge1l5D1OT94cWnTFdBmvozHoRfMgIAs4lPYvZLedEA",
+      "summonerId": null,
+      "summonerName": "해남 원딜#1130",
+      "profileIconId": 3861,
+      "summonerLevel": 445,
+      "topChamps": [
+        {
+          "name": "Aphelios",
+          "count": 3
+        },
+        {
+          "name": "Kaisa",
+          "count": 1
+        },
+        {
+          "name": "Bard",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "해남 원딜",
+      "tagLine": "1130",
+      "leaguePoints": 217,
+      "wins": 18,
+      "losses": 1,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -223,14 +254,14 @@
       "topChamps": [
         {
           "name": "Poppy",
-          "count": 4
+          "count": 2
         },
         {
-          "name": "Rakan",
+          "name": "Rumble",
           "count": 1
         },
         {
-          "name": "Vladimir",
+          "name": "Sion",
           "count": 1
         }
       ],
@@ -602,37 +633,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "caKpviU4WCCEB3G2G4Cya4iwoePQElMNxB5hge1l5D1OT94cWnTFdBmvozHoRfMgIAs4lPYvZLedEA",
-      "summonerId": null,
-      "summonerName": "해남 원딜#1130",
-      "profileIconId": 3861,
-      "summonerLevel": 445,
-      "topChamps": [
-        {
-          "name": "Bard",
-          "count": 2
-        },
-        {
-          "name": "Aphelios",
-          "count": 2
-        },
-        {
-          "name": "Ashe",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "해남 원딜",
-      "tagLine": "1130",
-      "leaguePoints": 157,
-      "wins": 16,
-      "losses": 1,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "jqQvuNtmMZrIc4NbS26l5r5acRO6iLIy-gp7UXenYDOeGOGr_KzGbNzG3x152cumOqUY3v5JsiJ9Hg",
       "summonerId": null,
       "summonerName": "호뚜링#머신건",
@@ -640,15 +640,15 @@
       "summonerLevel": 865,
       "topChamps": [
         {
-          "name": "Shen",
+          "name": "Kaisa",
           "count": 1
         },
         {
-          "name": "Gnar",
+          "name": "Caitlyn",
           "count": 1
         },
         {
-          "name": "Aurora",
+          "name": "Ahri",
           "count": 1
         }
       ],
@@ -702,15 +702,15 @@
       "summonerLevel": 925,
       "topChamps": [
         {
+          "name": "Samira",
+          "count": 1
+        },
+        {
           "name": "Morgana",
           "count": 1
         },
         {
           "name": "Caitlyn",
-          "count": 1
-        },
-        {
-          "name": "Jhin",
           "count": 1
         }
       ],
@@ -1364,8 +1364,8 @@
       "summonerLevel": 633,
       "topChamps": [
         {
-          "name": "Caitlyn",
-          "count": 2
+          "name": "Sivir",
+          "count": 1
         },
         {
           "name": "Orianna",

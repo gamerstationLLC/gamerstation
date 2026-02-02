@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T01:18:45.124Z",
+  "generatedAt": "2026-02-02T05:12:59.853Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -98,15 +98,15 @@
       "summonerLevel": 356,
       "topChamps": [
         {
+          "name": "Vladimir",
+          "count": 1
+        },
+        {
+          "name": "Azir",
+          "count": 1
+        },
+        {
           "name": "Ezreal",
-          "count": 1
-        },
-        {
-          "name": "Vayne",
-          "count": 1
-        },
-        {
-          "name": "Leblanc",
           "count": 1
         }
       ],
@@ -308,6 +308,37 @@
       "freshBlood": true
     },
     {
+      "puuid": "LO6ejuqX6D_HDyTJk9ChMHd9OFiS6ij9OWUP2iWYwUTSe4LQIRXRv_mZEMQdKU1aJQZRpn_SugW4Bw",
+      "summonerId": null,
+      "summonerName": "박건희사랑해#ΚR1",
+      "profileIconId": 6874,
+      "summonerLevel": 84,
+      "topChamps": [
+        {
+          "name": "Yasuo",
+          "count": 3
+        },
+        {
+          "name": "Yone",
+          "count": 2
+        },
+        {
+          "name": "DrMundo",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "박건희사랑해",
+      "tagLine": "ΚR1",
+      "leaguePoints": 559,
+      "wins": 56,
+      "losses": 24,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "TtYCK62ZcpKSw8a7rIKf_0R0CpNLW32tU0T60aeyPDaJi14GxR49B7CyN9iOi6--QqzOndLKh7HO_Q",
       "summonerId": null,
       "summonerName": "테크맥스#kr2",
@@ -339,6 +370,37 @@
       "freshBlood": true
     },
     {
+      "puuid": "dxohf4Yoxr1_tF3hwqP-fyrUjODkQ8yCgM2lJciRrTs4RY2pgwDUAnvYl-1DYvNoBVOBOv0qo_pAuw",
+      "summonerId": null,
+      "summonerName": "언어는당신의인격#KR1",
+      "profileIconId": 6008,
+      "summonerLevel": 516,
+      "topChamps": [
+        {
+          "name": "Talon",
+          "count": 2
+        },
+        {
+          "name": "Lillia",
+          "count": 2
+        },
+        {
+          "name": "KSante",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "언어는당신의인격",
+      "tagLine": "KR1",
+      "leaguePoints": 528,
+      "wins": 57,
+      "losses": 49,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "BD-o6gehHePsMQg9SCtdSmBzkTt0pCZ1RcLJAqzkoGBsPsjORXhaIb6WKEHuPy1LWtntSERgrQM_A",
       "summonerId": null,
       "summonerName": "Cute#KR00",
@@ -364,37 +426,6 @@
       "leaguePoints": 522,
       "wins": 36,
       "losses": 25,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "LO6ejuqX6D_HDyTJk9ChMHd9OFiS6ij9OWUP2iWYwUTSe4LQIRXRv_mZEMQdKU1aJQZRpn_SugW4Bw",
-      "summonerId": null,
-      "summonerName": "박건희사랑해#ΚR1",
-      "profileIconId": 6874,
-      "summonerLevel": 84,
-      "topChamps": [
-        {
-          "name": "Yasuo",
-          "count": 3
-        },
-        {
-          "name": "Yone",
-          "count": 2
-        },
-        {
-          "name": "DrMundo",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "박건희사랑해",
-      "tagLine": "ΚR1",
-      "leaguePoints": 512,
-      "wins": 54,
-      "losses": 24,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -457,37 +488,6 @@
       "leaguePoints": 503,
       "wins": 44,
       "losses": 36,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "dxohf4Yoxr1_tF3hwqP-fyrUjODkQ8yCgM2lJciRrTs4RY2pgwDUAnvYl-1DYvNoBVOBOv0qo_pAuw",
-      "summonerId": null,
-      "summonerName": "언어는당신의인격#KR1",
-      "profileIconId": 6008,
-      "summonerLevel": 516,
-      "topChamps": [
-        {
-          "name": "Lillia",
-          "count": 3
-        },
-        {
-          "name": "Talon",
-          "count": 2
-        },
-        {
-          "name": "Qiyana",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "언어는당신의인격",
-      "tagLine": "KR1",
-      "leaguePoints": 500,
-      "wins": 56,
-      "losses": 49,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,

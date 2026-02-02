@@ -20,7 +20,10 @@
     "lol:finalize:leaderboards": "npx tsx scripts/riot/finalize-leaderboards.ts || true",
     "lol:all:leaderboards": "npx tsx scripts/riot/build-leaderboards.ts && npm run lol:finalize:leaderboards",
     "lol:champion-tiers": "npx tsx ./scripts/riot/build-champion-tiers.ts",
-    "lol:finalize:champion-tiers": "npx tsx ./scripts/riot/finalize-champion-tiers-from-cache.ts"
+    "lol:finalize:champion-tiers": "npx tsx ./scripts/riot/finalize-champion-tiers-from-cache.ts",
+    "dota:immortal:build": "npx tsx scripts/dota/build-immortal-from-explorer.ts",
+    "dota:immortal:finalize": "npx tsx scripts/dota/finalize-immortal-from-cache.ts",
+    "dota:immortal": "npm run dota:immortal:build && npm run dota:immortal:finalize"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T00:42:04.932Z",
+  "generatedAt": "2026-02-02T04:36:20.155Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -17,8 +17,8 @@
           "count": 2
         },
         {
-          "name": "Nami",
-          "count": 2
+          "name": "Lissandra",
+          "count": 1
         },
         {
           "name": "Syndra",
@@ -28,8 +28,8 @@
       "sampleGames": 6,
       "gameName": "Lemon Tea丶",
       "tagLine": "XAV",
-      "leaguePoints": 1996,
-      "wins": 110,
+      "leaguePoints": 2040,
+      "wins": 112,
       "losses": 68,
       "hotStreak": false,
       "inactive": false,
@@ -489,15 +489,15 @@
       "summonerLevel": 176,
       "topChamps": [
         {
-          "name": "Jayce",
-          "count": 2
-        },
-        {
-          "name": "Ambessa",
+          "name": "Sylas",
           "count": 1
         },
         {
-          "name": "LeeSin",
+          "name": "Kayle",
+          "count": 1
+        },
+        {
+          "name": "Talon",
           "count": 1
         }
       ],
@@ -521,7 +521,15 @@
       "topChamps": [
         {
           "name": "TahmKench",
-          "count": 6
+          "count": 4
+        },
+        {
+          "name": "Zilean",
+          "count": 1
+        },
+        {
+          "name": "MonkeyKing",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -1309,37 +1317,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "Ui6KR0Pbrb5zX7o_3HyX27l1ZSbUm3LMtlL09qLhO0wr2QIzDPVGuZzzL103r3t944yiXI3WzLLH_A",
-      "summonerId": null,
-      "summonerName": "Rabble Arouser#EUW",
-      "profileIconId": 7035,
-      "summonerLevel": 727,
-      "topChamps": [
-        {
-          "name": "Smolder",
-          "count": 1
-        },
-        {
-          "name": "Qiyana",
-          "count": 1
-        },
-        {
-          "name": "Senna",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Rabble Arouser",
-      "tagLine": "EUW",
-      "leaguePoints": 652,
-      "wins": 41,
-      "losses": 17,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "CAGeo431r1WM2tk_swGB-H26EV_eJRrzjSjAUPW35rUI4fLTL0linqFdY4R7KrjrCn65rUyI17ZA-A",
       "summonerId": null,
       "summonerName": "SZ Frost#SZ1",
@@ -1451,6 +1428,37 @@
       "wins": 56,
       "losses": 3,
       "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "lnkeA_P9M8ABTZ9vbM_ydpIyf0U3tJHD1iD3xeOLli3xMaLnSxXMEtWmXQ2-EJV8u7Ggpoph_RJVew",
+      "summonerId": null,
+      "summonerName": "Kokoro Koishi#NA1",
+      "profileIconId": 7,
+      "summonerLevel": 524,
+      "topChamps": [
+        {
+          "name": "Malzahar",
+          "count": 1
+        },
+        {
+          "name": "Ryze",
+          "count": 1
+        },
+        {
+          "name": "Anivia",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Kokoro Koishi",
+      "tagLine": "NA1",
+      "leaguePoints": 642,
+      "wins": 54,
+      "losses": 32,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
