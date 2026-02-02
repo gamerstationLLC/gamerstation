@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T00:49:55.592Z",
+  "generatedAt": "2026-02-02T04:44:10.634Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -144,6 +144,37 @@
       "wins": 53,
       "losses": 35,
       "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "ODgDgD1MmhKJ106OFD9mISuYbqqQprTi0nCTGu8B1oLk8_vjUGXoRCa1j3Ezcld72DD34IWEhhU68w",
+      "summonerId": null,
+      "summonerName": "rainy day#hail",
+      "profileIconId": 3545,
+      "summonerLevel": 1401,
+      "topChamps": [
+        {
+          "name": "Shaco",
+          "count": 2
+        },
+        {
+          "name": "Gwen",
+          "count": 2
+        },
+        {
+          "name": "Braum",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "rainy day",
+      "tagLine": "hail",
+      "leaguePoints": 476,
+      "wins": 53,
+      "losses": 54,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -358,37 +389,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "lSngAzaOgxuBUsWhjozssmqA6HrzE_NP7LjO_-ufxcnCmDRltTJp96mDGzUcR9W5xEiSPp0-Yln5MQ",
-      "summonerId": null,
-      "summonerName": "Muffin cat#1408",
-      "profileIconId": 3837,
-      "summonerLevel": 1193,
-      "topChamps": [
-        {
-          "name": "Twitch",
-          "count": 3
-        },
-        {
-          "name": "Vayne",
-          "count": 2
-        },
-        {
-          "name": "Akshan",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Muffin cat",
-      "tagLine": "1408",
-      "leaguePoints": 455,
-      "wins": 31,
-      "losses": 8,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "7hLW6MeumLknCIoRcUZm-XZrpC447PRm-xqfs3p_oGz-wNcz-LbLmxlGfJesG5hfl12E6fWeekH4_Q",
       "summonerId": null,
       "summonerName": "十 мало тебя 十#444",
@@ -546,6 +546,68 @@
       "wins": 36,
       "losses": 28,
       "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "lSngAzaOgxuBUsWhjozssmqA6HrzE_NP7LjO_-ufxcnCmDRltTJp96mDGzUcR9W5xEiSPp0-Yln5MQ",
+      "summonerId": null,
+      "summonerName": "Muffin cat#1408",
+      "profileIconId": 3837,
+      "summonerLevel": 1193,
+      "topChamps": [
+        {
+          "name": "Twitch",
+          "count": 3
+        },
+        {
+          "name": "Diana",
+          "count": 1
+        },
+        {
+          "name": "Akshan",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Muffin cat",
+      "tagLine": "1408",
+      "leaguePoints": 445,
+      "wins": 31,
+      "losses": 9,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "7YmKfQuECTdIsRTbhT5WcSE2zbK6268wwaCquc6SjHFKzCzYJpgJ3ZOyAfQP_HN_40ZhKbqWcHvw4w",
+      "summonerId": null,
+      "summonerName": "你们是猪#我是狗",
+      "profileIconId": 6498,
+      "summonerLevel": 532,
+      "topChamps": [
+        {
+          "name": "Irelia",
+          "count": 2
+        },
+        {
+          "name": "Sylas",
+          "count": 2
+        },
+        {
+          "name": "Ryze",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "你们是猪",
+      "tagLine": "我是狗",
+      "leaguePoints": 443,
+      "wins": 72,
+      "losses": 55,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -733,37 +795,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "ODgDgD1MmhKJ106OFD9mISuYbqqQprTi0nCTGu8B1oLk8_vjUGXoRCa1j3Ezcld72DD34IWEhhU68w",
-      "summonerId": null,
-      "summonerName": "rainy day#hail",
-      "profileIconId": 3545,
-      "summonerLevel": 1400,
-      "topChamps": [
-        {
-          "name": "Gwen",
-          "count": 2
-        },
-        {
-          "name": "DrMundo",
-          "count": 2
-        },
-        {
-          "name": "Shaco",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "rainy day",
-      "tagLine": "hail",
-      "leaguePoints": 428,
-      "wins": 51,
-      "losses": 54,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "Ja3andw0kBpCtwAXuDJFCuem4XJE8dPLFpf4tQq_tHF6mliPohYHSg-w2c_o3sY-X4lxbxeZAqfysg",
       "summonerId": null,
       "summonerName": "Lv1 Safari#EUW",
@@ -793,29 +824,6 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": true
-    },
-    {
-      "puuid": "B_92fNYkk1fws-levJO-7hhUSljIt_ZMSVg7Q5_ZeRIeLIHaWolWVPWF_uACIAYLoNd4H9L_4JQ36w",
-      "summonerId": null,
-      "summonerName": "The Magical Cat#Love",
-      "profileIconId": 6275,
-      "summonerLevel": 990,
-      "topChamps": [
-        {
-          "name": "Yuumi",
-          "count": 6
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "The Magical Cat",
-      "tagLine": "Love",
-      "leaguePoints": 421,
-      "wins": 47,
-      "losses": 46,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
     },
     {
       "puuid": "2s2CwfwlkwuCL6xmGDD46HLVnhorP65OamOLHOIVY7iopwpoHzcvGlA3934_FZ_3XeyAamuUYu117A",
@@ -856,8 +864,8 @@
       "summonerLevel": 1162,
       "topChamps": [
         {
-          "name": "Viego",
-          "count": 2
+          "name": "Nidalee",
+          "count": 1
         },
         {
           "name": "Janna",
@@ -919,11 +927,7 @@
       "topChamps": [
         {
           "name": "Syndra",
-          "count": 5
-        },
-        {
-          "name": "Yasuo",
-          "count": 1
+          "count": 6
         }
       ],
       "sampleGames": 6,
@@ -1317,6 +1321,33 @@
       "freshBlood": true
     },
     {
+      "puuid": "B_92fNYkk1fws-levJO-7hhUSljIt_ZMSVg7Q5_ZeRIeLIHaWolWVPWF_uACIAYLoNd4H9L_4JQ36w",
+      "summonerId": null,
+      "summonerName": "The Magical Cat#Love",
+      "profileIconId": 6275,
+      "summonerLevel": 990,
+      "topChamps": [
+        {
+          "name": "Yuumi",
+          "count": 5
+        },
+        {
+          "name": "Nami",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "The Magical Cat",
+      "tagLine": "Love",
+      "leaguePoints": 401,
+      "wins": 47,
+      "losses": 47,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
       "puuid": "OVMbScVvUcdDLQXWNrR2_yl61-jAudBUlmbzx_nIc31PpoGv7EAVFKqE6dr1w3-gIaKQ1GroN4d92A",
       "summonerId": null,
       "summonerName": "Shadow Monarch#SLLV",
@@ -1408,37 +1439,6 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": true
-    },
-    {
-      "puuid": "5rI_97VyjfXM2Y0ycc61OaGt7YHXwCZa11yfBassoxhvGM9zd9zLROOzz4bMqED2mbWuzOZn-SkN3Q",
-      "summonerId": null,
-      "summonerName": "Taai Lung#EUW",
-      "profileIconId": 5028,
-      "summonerLevel": 865,
-      "topChamps": [
-        {
-          "name": "Belveth",
-          "count": 2
-        },
-        {
-          "name": "LeeSin",
-          "count": 1
-        },
-        {
-          "name": "XinZhao",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Taai Lung",
-      "tagLine": "EUW",
-      "leaguePoints": 398,
-      "wins": 36,
-      "losses": 36,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
     },
     {
       "puuid": "aQ5Si_2RIkP_wX9_Dh4x0aHGEJ6V_inpn6nsinqe1hj1TNDCs13pYCtUipdjSkbSkBM1LSVBnucPyw",
