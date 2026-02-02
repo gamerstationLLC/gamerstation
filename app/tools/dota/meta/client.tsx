@@ -354,10 +354,10 @@ export default function DotaMetaClient({
       const diff = av - bv;
 
       if (sortBy === "tier") {
-        return desc ? diff : -diff;
+        return desc ? -diff : diff;
       }
 
-      return desc ? -diff : diff;
+      return desc ? diff : -diff;
     });
 
     return finalRows.slice(0, 100);
