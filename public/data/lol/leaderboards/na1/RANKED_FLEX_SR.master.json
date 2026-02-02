@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T10:16:56.182Z",
+  "generatedAt": "2026-02-02T12:40:18.998Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -632,15 +632,15 @@
       "summonerLevel": 623,
       "topChamps": [
         {
-          "name": "MissFortune",
-          "count": 2
+          "name": "Nautilus",
+          "count": 1
+        },
+        {
+          "name": "Diana",
+          "count": 1
         },
         {
           "name": "Gragas",
-          "count": 2
-        },
-        {
-          "name": "Nasus",
           "count": 1
         }
       ],
@@ -1199,7 +1199,7 @@
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
-      "freshBlood": true
+      "freshBlood": false
     },
     {
       "puuid": "lJMv67HbcF7Ql4FzxKPnPofYe086VnK9bS1XvdpdwSZ46NRSRV-gPTwKc4DICFhk1hqXoE7C-HxXhQ",
@@ -1410,11 +1410,11 @@
       "summonerLevel": 774,
       "topChamps": [
         {
-          "name": "Viego",
+          "name": "Ambessa",
           "count": 2
         },
         {
-          "name": "Ambessa",
+          "name": "Viego",
           "count": 2
         },
         {
@@ -1465,35 +1465,35 @@
       "freshBlood": true
     },
     {
-      "puuid": "EvzaV3OLPNgFck1PG0pK7XmZDmpX8qrMyXBD4PlHk0_LpIMsWEmuJQojOByy2P63EQjQzSERuSDiHA",
+      "puuid": "QttJMwaTu3ATosTB5fTJNynjunFTUWOJ2-SFyYc3uZ7hPIK4jdhEZc1LS3pIfkWiDuQ6zeQIsS_9Hg",
       "summonerId": null,
-      "summonerName": "Eternity#6580",
-      "profileIconId": 7064,
-      "summonerLevel": 475,
+      "summonerName": "Fuzz#Its",
+      "profileIconId": 1389,
+      "summonerLevel": 844,
       "topChamps": [
         {
+          "name": "Ornn",
+          "count": 1
+        },
+        {
           "name": "Varus",
-          "count": 2
+          "count": 1
         },
         {
-          "name": "Kassadin",
-          "count": 2
-        },
-        {
-          "name": "Mordekaiser",
+          "name": "Ezreal",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "Eternity",
-      "tagLine": "6580",
+      "gameName": "Fuzz",
+      "tagLine": "Its",
       "leaguePoints": 95,
-      "wins": 33,
-      "losses": 28,
+      "wins": 23,
+      "losses": 9,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
-      "freshBlood": true
+      "freshBlood": false
     }
   ]
 }
