@@ -38,14 +38,7 @@ type Mode = "ranked" | "pro";
 type RoleKey = "all" | "top" | "jungle" | "mid" | "bot" | "support";
 type SortKey = "tier" | "games" | "winrate" | "banrate";
 
-const ROLES: Array<{ key: RoleKey; label: string }> = [
-  { key: "all", label: "All roles" },
-  { key: "top", label: "Top" },
-  { key: "jungle", label: "Jungle" },
-  { key: "mid", label: "Mid" },
-  { key: "bot", label: "Bot" },
-  { key: "support", label: "Support" },
-];
+
 
 type Tier = "S" | "A" | "B" | "C" | "D" | "—";
 
@@ -440,18 +433,6 @@ if (sortBy === "tier") return desc ? -diff : diff;
 
             <div className="mx-2 hidden h-8 w-px bg-neutral-800 lg:block" />
 
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as RoleKey)}
-              className="h-10 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none focus:border-neutral-600"
-              title="Filter by role"
-            >
-              {ROLES.map((r) => (
-                <option key={r.key} value={r.key}>
-                  {r.label}
-                </option>
-              ))}
-            </select>
 
             {/* Quick “Sort” indicator (people expect it) */}
             <div className="ml-1 self-center text-xs text-neutral-500">
