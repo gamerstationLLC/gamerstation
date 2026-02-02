@@ -357,7 +357,7 @@ export default function DotaMetaClient({
         return desc ? -diff : diff;
       }
 
-      return desc ? diff : -diff;
+      return desc ? -diff : diff;
     });
 
     return finalRows.slice(0, 100);
