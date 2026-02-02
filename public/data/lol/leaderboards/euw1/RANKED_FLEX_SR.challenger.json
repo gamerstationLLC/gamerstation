@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T13:06:55.923Z",
+  "generatedAt": "2026-02-02T16:11:24.403Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -76,11 +76,15 @@
       "topChamps": [
         {
           "name": "Chogath",
-          "count": 4
+          "count": 3
         },
         {
           "name": "Volibear",
           "count": 2
+        },
+        {
+          "name": "Zaahen",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -102,25 +106,25 @@
       "summonerLevel": 967,
       "topChamps": [
         {
+          "name": "Cassiopeia",
+          "count": 1
+        },
+        {
+          "name": "Nami",
+          "count": 1
+        },
+        {
           "name": "Sylas",
-          "count": 1
-        },
-        {
-          "name": "Pantheon",
-          "count": 1
-        },
-        {
-          "name": "Xerath",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "Roshan",
       "tagLine": "LoL",
-      "leaguePoints": 1338,
+      "leaguePoints": 1320,
       "wins": 82,
-      "losses": 49,
-      "hotStreak": true,
+      "losses": 50,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -171,9 +175,9 @@
       "sampleGames": 6,
       "gameName": "Spraakmeneer",
       "tagLine": "EUW",
-      "leaguePoints": 1161,
-      "wins": 83,
-      "losses": 50,
+      "leaguePoints": 1189,
+      "wins": 84,
+      "losses": 51,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -187,23 +191,23 @@
       "summonerLevel": 527,
       "topChamps": [
         {
-          "name": "Vayne",
+          "name": "Ezreal",
           "count": 3
         },
         {
-          "name": "Ezreal",
+          "name": "Aphelios",
           "count": 2
         },
         {
-          "name": "Caitlyn",
+          "name": "Vayne",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "Bobby likes adc",
       "tagLine": "flex",
-      "leaguePoints": 1126,
-      "wins": 60,
+      "leaguePoints": 1151,
+      "wins": 61,
       "losses": 30,
       "hotStreak": false,
       "inactive": false,
@@ -370,7 +374,7 @@
       "topChamps": [
         {
           "name": "Viego",
-          "count": 3
+          "count": 4
         },
         {
           "name": "Ekko",
@@ -521,14 +525,14 @@
       "topChamps": [
         {
           "name": "TahmKench",
-          "count": 4
+          "count": 3
         },
         {
-          "name": "Zilean",
+          "name": "Lillia",
           "count": 1
         },
         {
-          "name": "MonkeyKing",
+          "name": "Zilean",
           "count": 1
         }
       ],
@@ -601,6 +605,29 @@
       "wins": 48,
       "losses": 22,
       "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "0ho26Y8m5xjJ_X9-RJGYBNJlU_liffUmxuS21O-aOu9jwnqimQ-PNH0LlgLKaKmguh8pFPBuae46Mg",
+      "summonerId": null,
+      "summonerName": "Eloverspeiser#EUW",
+      "profileIconId": 6286,
+      "summonerLevel": 631,
+      "topChamps": [
+        {
+          "name": "Ekko",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Eloverspeiser",
+      "tagLine": "EUW",
+      "leaguePoints": 787,
+      "wins": 96,
+      "losses": 67,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -691,29 +718,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "0ho26Y8m5xjJ_X9-RJGYBNJlU_liffUmxuS21O-aOu9jwnqimQ-PNH0LlgLKaKmguh8pFPBuae46Mg",
-      "summonerId": null,
-      "summonerName": "Eloverspeiser#EUW",
-      "profileIconId": 6286,
-      "summonerLevel": 631,
-      "topChamps": [
-        {
-          "name": "Ekko",
-          "count": 6
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Eloverspeiser",
-      "tagLine": "EUW",
-      "leaguePoints": 777,
-      "wins": 94,
-      "losses": 65,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "a-jpTEuNfurRXHI3q1yf9upu6w6YCQ9-Hibf6FBza_H2GD4ekY1HQ4AMyhwDSxQXcKNlIqThdSZoxw",
       "summonerId": null,
       "summonerName": "Nο Cat Nο Life#EUW",
@@ -753,7 +757,11 @@
       "topChamps": [
         {
           "name": "Gwen",
-          "count": 6
+          "count": 5
+        },
+        {
+          "name": "Belveth",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -1100,6 +1108,33 @@
       "freshBlood": true
     },
     {
+      "puuid": "tCxqHSMHrseI50SdUxY29fXbgtP1TaO3mopAU9MriP2GxwQvPVVU6HUH3FiH9quV5n1P6F5ghKqI0Q",
+      "summonerId": null,
+      "summonerName": "Damori#EUW",
+      "profileIconId": 6762,
+      "summonerLevel": 585,
+      "topChamps": [
+        {
+          "name": "Caitlyn",
+          "count": 5
+        },
+        {
+          "name": "Seraphine",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Damori",
+      "tagLine": "EUW",
+      "leaguePoints": 683,
+      "wins": 63,
+      "losses": 42,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
       "puuid": "ahgPdFy-_uvaYB6L3GP4u4uVgkmUlCOwj8GdX-rMUinFQ9gl6G8QxkBbisRKK7PFl9OslzZGbfTF-g",
       "summonerId": null,
       "summonerName": "ikill123#EUW",
@@ -1157,33 +1192,6 @@
       "wins": 39,
       "losses": 18,
       "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "tCxqHSMHrseI50SdUxY29fXbgtP1TaO3mopAU9MriP2GxwQvPVVU6HUH3FiH9quV5n1P6F5ghKqI0Q",
-      "summonerId": null,
-      "summonerName": "Damori#EUW",
-      "profileIconId": 6762,
-      "summonerLevel": 585,
-      "topChamps": [
-        {
-          "name": "Caitlyn",
-          "count": 5
-        },
-        {
-          "name": "Jhin",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Damori",
-      "tagLine": "EUW",
-      "leaguePoints": 660,
-      "wins": 62,
-      "losses": 42,
-      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
