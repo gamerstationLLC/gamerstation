@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T09:58:46.126Z",
+  "generatedAt": "2026-02-02T15:24:33.376Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -75,16 +75,16 @@
       "summonerLevel": 464,
       "topChamps": [
         {
+          "name": "Khazix",
+          "count": 2
+        },
+        {
           "name": "JarvanIV",
           "count": 2
         },
         {
-          "name": "Sylas",
-          "count": 2
-        },
-        {
-          "name": "Khazix",
-          "count": 2
+          "name": "Ekko",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -130,6 +130,37 @@
       "freshBlood": true
     },
     {
+      "puuid": "JhsefLq6wkhtq_wLbqPL6UYf5TT43mz__0xJeLaIx6GcuiCx5ynfBLqTraYm0FvQHkOHRf_nRZZs8Q",
+      "summonerId": null,
+      "summonerName": "TheMadHobbit#LOONY",
+      "profileIconId": 1625,
+      "summonerLevel": 771,
+      "topChamps": [
+        {
+          "name": "Varus",
+          "count": 2
+        },
+        {
+          "name": "Xayah",
+          "count": 1
+        },
+        {
+          "name": "Ezreal",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "TheMadHobbit",
+      "tagLine": "LOONY",
+      "leaguePoints": 439,
+      "wins": 29,
+      "losses": 11,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "u6BSdncI0DM8jQt9xST0jgrMm7LlCclGlBHj59rYNCBCeC6v0YCjKTYcOpUeUCENgT7689VIAFcvug",
       "summonerId": null,
       "summonerName": "Erschie#000",
@@ -168,11 +199,11 @@
           "count": 2
         },
         {
-          "name": "Rell",
+          "name": "Nautilus",
           "count": 1
         },
         {
-          "name": "Milio",
+          "name": "Braum",
           "count": 1
         }
       ],
@@ -210,37 +241,6 @@
       "wins": 28,
       "losses": 14,
       "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "JhsefLq6wkhtq_wLbqPL6UYf5TT43mz__0xJeLaIx6GcuiCx5ynfBLqTraYm0FvQHkOHRf_nRZZs8Q",
-      "summonerId": null,
-      "summonerName": "TheMadHobbit#LOONY",
-      "profileIconId": 1625,
-      "summonerLevel": 771,
-      "topChamps": [
-        {
-          "name": "Varus",
-          "count": 2
-        },
-        {
-          "name": "Xayah",
-          "count": 1
-        },
-        {
-          "name": "Ezreal",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "TheMadHobbit",
-      "tagLine": "LOONY",
-      "leaguePoints": 409,
-      "wins": 28,
-      "losses": 11,
-      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -432,37 +432,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "t1zM9C4nfXawF6bnlo4bxB7RHKSgwYbBSTEJLsBEcVdCTr8dY_4FFkb97DgQFVexTyWOBJa2tp9Jpw",
-      "summonerId": null,
-      "summonerName": "sad#ouo",
-      "profileIconId": 4418,
-      "summonerLevel": 717,
-      "topChamps": [
-        {
-          "name": "Soraka",
-          "count": 1
-        },
-        {
-          "name": "Seraphine",
-          "count": 1
-        },
-        {
-          "name": "Karma",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "sad",
-      "tagLine": "ouo",
-      "leaguePoints": 335,
-      "wins": 26,
-      "losses": 13,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "XNDb9kVsWlv4k3GAs36Ke7iSUD6TPdbjR7F2usxyLYgrRHNlZON7cag5OfFEQgc3M7Whb3yaw2oDpA",
       "summonerId": null,
       "summonerName": "Elysina#Doll",
@@ -515,6 +484,37 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": true
+    },
+    {
+      "puuid": "t1zM9C4nfXawF6bnlo4bxB7RHKSgwYbBSTEJLsBEcVdCTr8dY_4FFkb97DgQFVexTyWOBJa2tp9Jpw",
+      "summonerId": null,
+      "summonerName": "sad#ouo",
+      "profileIconId": 4418,
+      "summonerLevel": 717,
+      "topChamps": [
+        {
+          "name": "Soraka",
+          "count": 1
+        },
+        {
+          "name": "Seraphine",
+          "count": 1
+        },
+        {
+          "name": "Karma",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "sad",
+      "tagLine": "ouo",
+      "leaguePoints": 325,
+      "wins": 26,
+      "losses": 14,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
     },
     {
       "puuid": "8Z3exu-kIBTlqK1S51vI9sf-76J09Du2JaaDScjEYQMiBOQD74ogLoYfotF_2wjoqnHM3lhR6--EBw",
@@ -1222,11 +1222,15 @@
       "summonerId": null,
       "summonerName": "语 慊#1208",
       "profileIconId": 5958,
-      "summonerLevel": 872,
+      "summonerLevel": 873,
       "topChamps": [
         {
+          "name": "Braum",
+          "count": 4
+        },
+        {
           "name": "Elise",
-          "count": 5
+          "count": 1
         },
         {
           "name": "Qiyana",

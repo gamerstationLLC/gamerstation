@@ -2,7 +2,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export type HeroStatsRow = {
   id: number;
@@ -159,6 +160,12 @@ const HEADER_BTN_DISABLED = [
   "border-neutral-800 bg-black text-neutral-500 opacity-60 cursor-not-allowed",
 ].join(" ");
 
+const MINI_BTN = [
+  "inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm font-semibold transition",
+  "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600 hover:text-white",
+  "focus:outline-none focus:ring-1 focus:ring-neutral-600",
+].join(" ");
+
 async function fetchLatestPatchClient(): Promise<string | null> {
   try {
     const res = await fetch("/api/dota/patch", { cache: "no-store" });
@@ -171,6 +178,54 @@ async function fetchLatestPatchClient(): Promise<string | null> {
   }
 }
 
+function isMode(x: string | null): x is Mode {
+  return x === "pub" || x === "pro";
+}
+function isBracket(x: string | null): x is BracketKey {
+  return (
+    x === "herald" ||
+    x === "guardian" ||
+    x === "crusader" ||
+    x === "archon" ||
+    x === "legend" ||
+    x === "ancient" ||
+    x === "divine" ||
+    x === "immortal"
+  );
+}
+function isSortKey(x: string | null): x is SortKey {
+  return x === "tier" || x === "pick" || x === "winrate" || x === "ban";
+}
+
+async function copyToClipboard(text: string) {
+  // Prefer modern clipboard API
+  try {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // fall through to legacy
+  }
+
+  // Legacy fallback (works in more contexts)
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "true");
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    ta.style.left = "-1000px";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 export default function DotaMetaClient({
   initialRows,
   patch = "—",
@@ -180,10 +235,13 @@ export default function DotaMetaClient({
   patch?: string;
   cacheLabel?: string;
 }) {
+  const params = useSearchParams();
+  const didHydrateRef = useRef(false);
+
   const [mode, setMode] = useState<Mode>("pub");
   const [bracket, setBracket] = useState<BracketKey>("legend");
 
-  const [sortBy, setSortBy] = useState<SortKey>("pick");
+  const [sortBy, setSortBy] = useState<SortKey>("tier");
   const [desc, setDesc] = useState(true);
 
   const [dirByKey, setDirByKey] = useState<Record<SortKey, boolean>>({
@@ -207,11 +265,64 @@ export default function DotaMetaClient({
   );
 
   const [patchLive, setPatchLive] = useState<string>(patch || "—");
+  const [copyStatus, setCopyStatus] = useState<string>("");
 
   useEffect(() => {
     setPatchLive(patch || "—");
   }, [patch]);
 
+  // ✅ URL -> state hydration (runs once)
+  useEffect(() => {
+    if (didHydrateRef.current) return;
+    didHydrateRef.current = true;
+
+    const pMode = params.get("mode");
+    const pBracket = params.get("bracket");
+    const pQ = params.get("q");
+    const pMin = params.get("minGames");
+    const pSort = params.get("sort");
+    const pDesc = params.get("desc"); // "1"/"0"/"true"/"false"
+
+    // mode
+    if (isMode(pMode)) {
+      setMode(pMode);
+      // if pro, bracket isn't relevant, but we keep whatever user sent
+    }
+
+    // bracket (only meaningful for pub)
+    if (isBracket(pBracket)) {
+      setBracket(pBracket);
+    }
+
+    // search
+    if (typeof pQ === "string" && pQ.length) {
+      setQ(pQ);
+    }
+
+    // minGames
+    if (typeof pMin === "string" && pMin.trim().length) {
+      const n = Number(pMin);
+      if (Number.isFinite(n) && n >= 0) setMinGamesText(String(Math.trunc(n)));
+    }
+
+    // sort + desc
+    if (isSortKey(pSort)) {
+      setSortBy(pSort);
+
+      // if user asks for ban sorting but they're not pro, clamp
+      // (we'll also handle this in setModeSafe)
+      const rawDesc =
+        pDesc === "1" || pDesc === "true" ? true : pDesc === "0" || pDesc === "false" ? false : null;
+
+      if (rawDesc !== null) {
+        setDesc(rawDesc);
+        setDirByKey((prev) => ({ ...prev, [pSort]: rawDesc }));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Patch refresher
   useEffect(() => {
     let alive = true;
 
@@ -257,6 +368,49 @@ export default function DotaMetaClient({
     }
   }
 
+  function buildShareUrl() {
+    const base =
+      typeof window !== "undefined"
+        ? `${window.location.origin}${window.location.pathname}`
+        : "/tools/dota/meta";
+
+    const sp = new URLSearchParams();
+    sp.set("mode", mode);
+
+    if (mode === "pub") sp.set("bracket", bracket);
+    if (q.trim()) sp.set("q", q.trim());
+    if (minGames > 0) sp.set("minGames", String(minGames));
+
+    sp.set("sort", sortBy);
+    sp.set("desc", desc ? "1" : "0");
+
+    return `${base}?${sp.toString()}`;
+  }
+
+  function buildTextSummary() {
+    const parts: string[] = [];
+    parts.push(`Dota 2 Meta (GamerStation)`);
+    parts.push(`Mode: ${mode === "pro" ? "Pro" : "Public"}`);
+    if (mode === "pub") parts.push(`Bracket: ${BRACKETS.find((b) => b.key === bracket)?.label ?? bracket}`);
+    parts.push(`Sort: ${sortLabel(sortBy)} (${desc ? "high→low" : "low→high"})`);
+    parts.push(`Min games: ${minGames}`);
+    if (q.trim()) parts.push(`Search: ${q.trim()}`);
+    parts.push(`Patch: ${patchLive}`);
+    return parts.join(" | ");
+  }
+
+  async function onCopyLink() {
+    const ok = await copyToClipboard(buildShareUrl());
+    setCopyStatus(ok ? "Copied share link ✅" : "Copy failed ❌");
+    window.setTimeout(() => setCopyStatus(""), 1800);
+  }
+
+  async function onCopyText() {
+    const ok = await copyToClipboard(`${buildTextSummary()}\n${buildShareUrl()}`);
+    setCopyStatus(ok ? "Copied text ✅" : "Copy failed ❌");
+    window.setTimeout(() => setCopyStatus(""), 1800);
+  }
+
   const rows = useMemo((): Row[] => {
     const query = q.trim().toLowerCase();
 
@@ -286,9 +440,7 @@ export default function DotaMetaClient({
     );
 
     // 2) Apply *stable* filters that SHOULD affect tiers
-    //    (minGames, mode, bracket already baked in)
     const stableFiltered = derivedBase.filter((r) => r.picks >= minGames);
-
     if (!stableFiltered.length) return [];
 
     // 3) Compute tiers from the stable set (NOT from search results)
@@ -353,11 +505,9 @@ export default function DotaMetaClient({
 
       const diff = av - bv;
 
-      if (sortBy === "tier") {
-        return desc ? -diff : diff;
-      }
+if (sortBy === "tier") return desc ? diff : -diff;
+return desc ? -diff : diff;
 
-      return desc ? -diff : diff;
     });
 
     return finalRows.slice(0, 100);
@@ -423,6 +573,17 @@ export default function DotaMetaClient({
               />
             </div>
           </div>
+
+          {/* ✅ Split copy buttons (link vs text) */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" className={MINI_BTN} onClick={onCopyLink}>
+              Copy Share Link
+            </button>
+            <button type="button" className={MINI_BTN} onClick={onCopyText}>
+              Copy Text Summary
+            </button>
+            {copyStatus ? <span className="text-xs text-neutral-400">{copyStatus}</span> : null}
+          </div>
         </div>
       </div>
 
@@ -443,12 +604,12 @@ export default function DotaMetaClient({
           <span className="text-neutral-200">{Math.min(100, rows.length)}</span>
         </span>
       </div>
-<div className="mt-3 text-xs text-neutral-500">
-        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low. 
-      </div>
+
       <div className="mt-3 text-xs text-neutral-500">
-        Tap on a hero to see individual performance.
+        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low.
       </div>
+      <div className="mt-3 text-xs text-neutral-500">Tap on a hero to see individual performance.</div>
+
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
         <div className="overflow-x-auto">
@@ -521,9 +682,7 @@ export default function DotaMetaClient({
                       <TierPill tier={r.tier} />
                     </div>
 
-                    <div className="col-span-3 text-right tabular-nums text-neutral-200">
-                      {fmtInt(r.picks)}
-                    </div>
+                    <div className="col-span-3 text-right tabular-nums text-neutral-200">{fmtInt(r.picks)}</div>
 
                     <div
                       className={`col-span-2 text-right tabular-nums ${
@@ -544,16 +703,13 @@ export default function DotaMetaClient({
                 ))
               ) : (
                 <div className="px-3 py-8 text-sm text-neutral-500">
-                  No results. Try lowering <span className="text-neutral-300">Min games</span> or
-                  clearing search.
+                  No results. Try lowering <span className="text-neutral-300">Min games</span> or clearing search.
                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
-
-      
     </section>
   );
 }
@@ -586,9 +742,7 @@ function HeroIcon({ relPath }: { relPath: string }) {
   const [triedFallback, setTriedFallback] = useState(false);
 
   if (!relPath) {
-    return (
-      <div className="h-7 w-7 shrink-0 rounded-lg border border-neutral-800 bg-black/40 sm:h-8 sm:w-8" />
-    );
+    return <div className="h-7 w-7 shrink-0 rounded-lg border border-neutral-800 bg-black/40 sm:h-8 sm:w-8" />;
   }
 
   return (

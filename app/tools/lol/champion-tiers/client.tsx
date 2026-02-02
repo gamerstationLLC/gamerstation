@@ -370,35 +370,33 @@ export default function LolChampionTiersClient({
       return { ...r, tier, tierRank: TIER_RANK[tier] ?? 9 };
     });
 
-    // Sorting
-    finalRows.sort((a, b) => {
-      const av =
-        sortBy === "tier"
-          ? a.tierRank
-          : sortBy === "games"
-          ? a.games
-          : sortBy === "banrate"
-          ? a.banrate
-          : a.winrate;
+    // 6) Sort display rows
+finalRows.sort((a, b) => {
+  const av =
+    sortBy === "tier"
+      ? a.tierRank
+      : sortBy === "games"
+      ? a.games
+      : sortBy === "banrate"
+      ? a.bans
+      : a.winrate;
 
-      const bv =
-        sortBy === "tier"
-          ? b.tierRank
-          : sortBy === "games"
-          ? b.games
-          : sortBy === "banrate"
-          ? b.banrate
-          : b.winrate;
+  const bv =
+    sortBy === "tier"
+      ? b.tierRank
+      : sortBy === "games"
+      ? b.games
+      : sortBy === "banrate"
+      ? b.bans
+      : b.winrate;
 
-      const diff = av - bv;
+  const diff = av - bv;
 
-      // tier: smaller rank is better (S=0). desc=false => S->D
-if (sortBy === "tier") return desc ? -diff : diff;
+  // ↓ should mean highest → lowest
+  if (sortBy === "tier") return desc ? -diff : diff;
+  return desc ? -diff : diff;
+});
 
-
-      // numeric columns: desc=true => high->low
-      return desc ? -diff : diff;
-    });
 
     return finalRows.slice(0, 200);
   }, [initialRows, patchLive, mode, role, q, minGames, sortBy, desc]);
