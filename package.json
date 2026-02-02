@@ -21,11 +21,11 @@
     "lol:all:leaderboards": "tsx scripts/riot/build-leaderboards.ts && tsx scripts/riot/finalize-leaderboards.ts",
     "lol:champion-tiers": "npx tsx ./scripts/riot/build-champion-tiers.ts",
     "lol:finalize:champion-tiers": "npx tsx ./scripts/riot/finalize-champion-tiers-from-cache.ts"
-
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
     "dotenv": "^17.2.3",
+    "fflate": "^0.8.2",
     "next": "16.1.1",
     "node-fetch": "^3.3.2",
     "react": "19.2.3",

@@ -443,7 +443,12 @@ export default function DotaMetaClient({
           <span className="text-neutral-200">{Math.min(100, rows.length)}</span>
         </span>
       </div>
-
+<div className="mt-3 text-xs text-neutral-500">
+        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low. 
+      </div>
+      <div className="mt-3 text-xs text-neutral-500">
+        Tap on a hero to see individual performance.
+      </div>
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
         <div className="overflow-x-auto">
@@ -548,10 +553,7 @@ export default function DotaMetaClient({
         </div>
       </div>
 
-      <div className="mt-3 text-xs text-neutral-500">
-        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low /
-        low→high.
-      </div>
+      
     </section>
   );
 }
