@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-03T20:08:28.610Z",
+  "generatedAt": "2026-02-03T22:31:57.061Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -14,7 +14,7 @@
       "topChamps": [
         {
           "name": "MissFortune",
-          "count": 2
+          "count": 3
         },
         {
           "name": "Corki",
@@ -22,14 +22,14 @@
         },
         {
           "name": "Ezreal",
-          "count": 2
+          "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "TheMadHobbit",
       "tagLine": "LOONY",
-      "leaguePoints": 509,
-      "wins": 32,
+      "leaguePoints": 539,
+      "wins": 33,
       "losses": 13,
       "hotStreak": false,
       "inactive": false,
@@ -44,15 +44,15 @@
       "summonerLevel": 464,
       "topChamps": [
         {
+          "name": "Nocturne",
+          "count": 1
+        },
+        {
           "name": "Lissandra",
           "count": 1
         },
         {
           "name": "Galio",
-          "count": 1
-        },
-        {
-          "name": "Viego",
           "count": 1
         }
       ],
@@ -358,6 +358,29 @@
       "freshBlood": true
     },
     {
+      "puuid": "cdpyTCCTJESCGG3iEaU28tZXcOY2jsh6znhTagE2PewkBkNT5eLwPvZx6weydBAr3hUuveW8piVyrA",
+      "summonerId": null,
+      "summonerName": "thugger#0428",
+      "profileIconId": 6735,
+      "summonerLevel": 586,
+      "topChamps": [
+        {
+          "name": "Yasuo",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "thugger",
+      "tagLine": "0428",
+      "leaguePoints": 357,
+      "wins": 54,
+      "losses": 24,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "XNDb9kVsWlv4k3GAs36Ke7iSUD6TPdbjR7F2usxyLYgrRHNlZON7cag5OfFEQgc3M7Whb3yaw2oDpA",
       "summonerId": null,
       "summonerName": "Elysina#Doll",
@@ -544,32 +567,28 @@
       "freshBlood": true
     },
     {
-      "puuid": "9l-ENZKdF5xZIj6LWEi7_-fz6WReFvZRYgv6hDUFqrRt8NhWJ2h6HhuJo6Sb_XU1DxQjtsNxudc3bw",
+      "puuid": "P1NmcLVHqf6wR2om3VO5x4qdJX51pXaWaqnUuKQtv7avBzavpBmVSX5qKvmOV0KgNU-6QhNczVg97g",
       "summonerId": null,
-      "summonerName": "100m#NA1",
-      "profileIconId": 4073,
-      "summonerLevel": 142,
+      "summonerName": "Nephew#ggwp",
+      "profileIconId": 1231,
+      "summonerLevel": 460,
       "topChamps": [
         {
-          "name": "Sett",
-          "count": 2
+          "name": "DrMundo",
+          "count": 5
         },
         {
-          "name": "Jayce",
-          "count": 2
-        },
-        {
-          "name": "Vladimir",
+          "name": "Garen",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "100m",
-      "tagLine": "NA1",
-      "leaguePoints": 328,
-      "wins": 80,
-      "losses": 52,
-      "hotStreak": false,
+      "gameName": "Nephew",
+      "tagLine": "ggwp",
+      "leaguePoints": 333,
+      "wins": 33,
+      "losses": 19,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -784,31 +803,35 @@
       "freshBlood": true
     },
     {
-      "puuid": "cdpyTCCTJESCGG3iEaU28tZXcOY2jsh6znhTagE2PewkBkNT5eLwPvZx6weydBAr3hUuveW8piVyrA",
+      "puuid": "9l-ENZKdF5xZIj6LWEi7_-fz6WReFvZRYgv6hDUFqrRt8NhWJ2h6HhuJo6Sb_XU1DxQjtsNxudc3bw",
       "summonerId": null,
-      "summonerName": "thugger#0428",
-      "profileIconId": 6735,
-      "summonerLevel": 586,
+      "summonerName": "100m#NA1",
+      "profileIconId": 4073,
+      "summonerLevel": 142,
       "topChamps": [
         {
-          "name": "Yasuo",
-          "count": 5
+          "name": "Sett",
+          "count": 3
         },
         {
-          "name": "Yone",
+          "name": "Jayce",
+          "count": 2
+        },
+        {
+          "name": "Gnar",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "thugger",
-      "tagLine": "0428",
-      "leaguePoints": 305,
-      "wins": 52,
-      "losses": 24,
+      "gameName": "100m",
+      "tagLine": "NA1",
+      "leaguePoints": 301,
+      "wins": 81,
+      "losses": 54,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
-      "freshBlood": true
+      "freshBlood": false
     },
     {
       "puuid": "jkHugOr1B3H7ojlfql7fkolLapsLEvBFwANissHkK9kosSaIuGCwBY6VPoS22MyMb0-8C6tRMR6Qwg",
@@ -863,33 +886,6 @@
       "leaguePoints": 299,
       "wins": 29,
       "losses": 14,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "P1NmcLVHqf6wR2om3VO5x4qdJX51pXaWaqnUuKQtv7avBzavpBmVSX5qKvmOV0KgNU-6QhNczVg97g",
-      "summonerId": null,
-      "summonerName": "Nephew#ggwp",
-      "profileIconId": 1231,
-      "summonerLevel": 460,
-      "topChamps": [
-        {
-          "name": "DrMundo",
-          "count": 5
-        },
-        {
-          "name": "Garen",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Nephew",
-      "tagLine": "ggwp",
-      "leaguePoints": 284,
-      "wins": 31,
-      "losses": 19,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -1264,11 +1260,11 @@
       "topChamps": [
         {
           "name": "Soraka",
-          "count": 3
+          "count": 4
         },
         {
           "name": "Mel",
-          "count": 2
+          "count": 1
         },
         {
           "name": "Sona",
@@ -1295,11 +1291,11 @@
       "topChamps": [
         {
           "name": "Jayce",
-          "count": 3
+          "count": 5
         },
         {
           "name": "Elise",
-          "count": 3
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -1468,15 +1464,15 @@
       "summonerLevel": 620,
       "topChamps": [
         {
+          "name": "Jhin",
+          "count": 2
+        },
+        {
           "name": "Sivir",
           "count": 1
         },
         {
           "name": "MissFortune",
-          "count": 1
-        },
-        {
-          "name": "Yunara",
           "count": 1
         }
       ],

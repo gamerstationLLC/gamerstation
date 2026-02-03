@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-03T21:46:13.390Z",
+  "generatedAt": "2026-02-03T23:55:47.151Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -424,37 +424,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "3xb5Xo7GEyXqwMao7LacjVyUVzjmBiqq7FFkU6KOXCvhuH05tm7h3DW0M3JouFiSPpv_grbTwqHxAg",
-      "summonerId": null,
-      "summonerName": "사랑은늦게올수있지만정글은안된다#TOP",
-      "profileIconId": 7050,
-      "summonerLevel": 408,
-      "topChamps": [
-        {
-          "name": "Warwick",
-          "count": 1
-        },
-        {
-          "name": "Irelia",
-          "count": 1
-        },
-        {
-          "name": "KSante",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "사랑은늦게올수있지만정글은안된다",
-      "tagLine": "TOP",
-      "leaguePoints": 190,
-      "wins": 20,
-      "losses": 10,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "0CzCCUTX0UlBO3tFyPTitYi0zibr_p1fevysCwew7IFo-S7f1-BBDKmQPSBvN5MQcjFOK7qENLiDew",
       "summonerId": null,
       "summonerName": "어머저건꼭사야해#KR1",
@@ -477,6 +446,37 @@
       "sampleGames": 6,
       "gameName": "어머저건꼭사야해",
       "tagLine": "KR1",
+      "leaguePoints": 190,
+      "wins": 20,
+      "losses": 10,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "3xb5Xo7GEyXqwMao7LacjVyUVzjmBiqq7FFkU6KOXCvhuH05tm7h3DW0M3JouFiSPpv_grbTwqHxAg",
+      "summonerId": null,
+      "summonerName": "사랑은늦게올수있지만정글은안된다#TOP",
+      "profileIconId": 7050,
+      "summonerLevel": 408,
+      "topChamps": [
+        {
+          "name": "Warwick",
+          "count": 1
+        },
+        {
+          "name": "Irelia",
+          "count": 1
+        },
+        {
+          "name": "KSante",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "사랑은늦게올수있지만정글은안된다",
+      "tagLine": "TOP",
       "leaguePoints": 190,
       "wins": 20,
       "losses": 10,
@@ -896,14 +896,14 @@
       "topChamps": [
         {
           "name": "Yunara",
-          "count": 3
+          "count": 2
         },
         {
-          "name": "Vayne",
+          "name": "Caitlyn",
           "count": 1
         },
         {
-          "name": "Morgana",
+          "name": "Vayne",
           "count": 1
         }
       ],
