@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-03T09:45:25.873Z",
+  "generatedAt": "2026-02-03T12:47:16.726Z",
   "region": "na1",
   "queue": "RANKED_SOLO_5x5",
   "tier": "CHALLENGER",
@@ -110,7 +110,7 @@
           "count": 3
         },
         {
-          "name": "Evelynn",
+          "name": "Seraphine",
           "count": 1
         },
         {
@@ -121,9 +121,9 @@
       "sampleGames": 6,
       "gameName": "Cupic",
       "tagLine": "Hwei",
-      "leaguePoints": 2304,
-      "wins": 158,
-      "losses": 82,
+      "leaguePoints": 2300,
+      "wins": 160,
+      "losses": 83,
       "hotStreak": false,
       "inactive": false,
       "veteran": true,
@@ -199,24 +199,24 @@
       "summonerLevel": 67,
       "topChamps": [
         {
+          "name": "Kindred",
+          "count": 2
+        },
+        {
           "name": "Diana",
-          "count": 1
+          "count": 2
         },
         {
           "name": "MasterYi",
-          "count": 1
-        },
-        {
-          "name": "Kindred",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "1314",
       "tagLine": "ever",
-      "leaguePoints": 2215,
-      "wins": 162,
-      "losses": 80,
+      "leaguePoints": 2209,
+      "wins": 163,
+      "losses": 81,
       "hotStreak": false,
       "inactive": false,
       "veteran": true,
@@ -467,10 +467,10 @@
       "topChamps": [
         {
           "name": "Ziggs",
-          "count": 2
+          "count": 3
         },
         {
-          "name": "Seraphine",
+          "name": "Soraka",
           "count": 1
         },
         {
@@ -481,9 +481,9 @@
       "sampleGames": 6,
       "gameName": "Yozu",
       "tagLine": "Lux",
-      "leaguePoints": 1886,
-      "wins": 144,
-      "losses": 70,
+      "leaguePoints": 1884,
+      "wins": 146,
+      "losses": 71,
       "hotStreak": false,
       "inactive": false,
       "veteran": true,
@@ -505,39 +505,16 @@
           "count": 2
         },
         {
-          "name": "Fiora",
+          "name": "Tryndamere",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "Zamudo",
       "tagLine": "LYON",
-      "leaguePoints": 1870,
-      "wins": 143,
-      "losses": 89,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": true,
-      "freshBlood": false
-    },
-    {
-      "puuid": "E9nj13QnYlLc6SMr_tUov7dM_OuzUJwR4nDf5QqDQZrpfF6UnRVpHR_Wv5BIWYgXg0ZLUDG22IhWvw",
-      "summonerId": null,
-      "summonerName": "let her leave#mars",
-      "profileIconId": 6850,
-      "summonerLevel": 121,
-      "topChamps": [
-        {
-          "name": "Qiyana",
-          "count": 6
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "let her leave",
-      "tagLine": "mars",
-      "leaguePoints": 1767,
-      "wins": 131,
-      "losses": 77,
+      "leaguePoints": 1840,
+      "wins": 144,
+      "losses": 90,
       "hotStreak": false,
       "inactive": false,
       "veteran": true,
@@ -562,9 +539,32 @@
       "sampleGames": 6,
       "gameName": "not Rezz",
       "tagLine": "NA1",
-      "leaguePoints": 1760,
-      "wins": 155,
+      "leaguePoints": 1814,
+      "wins": 158,
       "losses": 88,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": true,
+      "freshBlood": false
+    },
+    {
+      "puuid": "E9nj13QnYlLc6SMr_tUov7dM_OuzUJwR4nDf5QqDQZrpfF6UnRVpHR_Wv5BIWYgXg0ZLUDG22IhWvw",
+      "summonerId": null,
+      "summonerName": "let her leave#mars",
+      "profileIconId": 6850,
+      "summonerLevel": 121,
+      "topChamps": [
+        {
+          "name": "Qiyana",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "let her leave",
+      "tagLine": "mars",
+      "leaguePoints": 1767,
+      "wins": 131,
+      "losses": 77,
       "hotStreak": false,
       "inactive": false,
       "veteran": true,
@@ -911,24 +911,24 @@
       "summonerLevel": 692,
       "topChamps": [
         {
-          "name": "Alistar",
-          "count": 3
-        },
-        {
-          "name": "Nautilus",
+          "name": "Ziggs",
           "count": 1
         },
         {
-          "name": "Milio",
+          "name": "Pyke",
+          "count": 1
+        },
+        {
+          "name": "Alistar",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "Aldnoah",
       "tagLine": "NA1",
-      "leaguePoints": 1623,
-      "wins": 131,
-      "losses": 97,
+      "leaguePoints": 1624,
+      "wins": 132,
+      "losses": 98,
       "hotStreak": false,
       "inactive": false,
       "veteran": true,
@@ -1022,6 +1022,37 @@
       "leaguePoints": 1587,
       "wins": 144,
       "losses": 130,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": true,
+      "freshBlood": false
+    },
+    {
+      "puuid": "JINaeuKwQokkbMcGXQeai3D4n5B9xiyAJZ0K7lLSldaJZ7V0pbozyfJckHdqK0Xf8Jmf8QhjxdsvWQ",
+      "summonerId": null,
+      "summonerName": "Tomo#0999",
+      "profileIconId": 6254,
+      "summonerLevel": 1344,
+      "topChamps": [
+        {
+          "name": "Ezreal",
+          "count": 3
+        },
+        {
+          "name": "Vi",
+          "count": 1
+        },
+        {
+          "name": "Sivir",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Tomo",
+      "tagLine": "0999",
+      "leaguePoints": 1585,
+      "wins": 164,
+      "losses": 126,
       "hotStreak": false,
       "inactive": false,
       "veteran": true,
@@ -1145,37 +1176,6 @@
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "JINaeuKwQokkbMcGXQeai3D4n5B9xiyAJZ0K7lLSldaJZ7V0pbozyfJckHdqK0Xf8Jmf8QhjxdsvWQ",
-      "summonerId": null,
-      "summonerName": "Tomo#0999",
-      "profileIconId": 6254,
-      "summonerLevel": 1344,
-      "topChamps": [
-        {
-          "name": "Ezreal",
-          "count": 3
-        },
-        {
-          "name": "Vi",
-          "count": 1
-        },
-        {
-          "name": "Sivir",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Tomo",
-      "tagLine": "0999",
-      "leaguePoints": 1570,
-      "wins": 163,
-      "losses": 126,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": true,
       "freshBlood": false
     },
     {
