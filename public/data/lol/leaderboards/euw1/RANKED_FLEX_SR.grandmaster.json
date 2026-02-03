@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-03T01:59:00.526Z",
+  "generatedAt": "2026-02-03T07:58:19.131Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -13,15 +13,15 @@
       "summonerLevel": 1205,
       "topChamps": [
         {
+          "name": "Alistar",
+          "count": 1
+        },
+        {
           "name": "Pyke",
           "count": 1
         },
         {
           "name": "Aphelios",
-          "count": 1
-        },
-        {
-          "name": "Garen",
           "count": 1
         }
       ],
@@ -401,14 +401,14 @@
       "topChamps": [
         {
           "name": "Milio",
-          "count": 4
-        },
-        {
-          "name": "Caitlyn",
-          "count": 1
+          "count": 3
         },
         {
           "name": "Ashe",
+          "count": 2
+        },
+        {
+          "name": "Caitlyn",
           "count": 1
         }
       ],
@@ -621,37 +621,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "7YmKfQuECTdIsRTbhT5WcSE2zbK6268wwaCquc6SjHFKzCzYJpgJ3ZOyAfQP_HN_40ZhKbqWcHvw4w",
-      "summonerId": null,
-      "summonerName": "你们是猪#我是狗",
-      "profileIconId": 6498,
-      "summonerLevel": 532,
-      "topChamps": [
-        {
-          "name": "Irelia",
-          "count": 2
-        },
-        {
-          "name": "Sylas",
-          "count": 2
-        },
-        {
-          "name": "Ryze",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "你们是猪",
-      "tagLine": "我是狗",
-      "leaguePoints": 443,
-      "wins": 72,
-      "losses": 55,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "LNceEPd2yQQVuigYqeHvo5DRhPc5oY5EMU1fgHUE0ydqilnZHTa_cZ71KSPPfJJWEpCNbZTuARw_ZQ",
       "summonerId": null,
       "summonerName": "KrakowskiDymacz#2115",
@@ -768,6 +737,37 @@
       "freshBlood": true
     },
     {
+      "puuid": "7YmKfQuECTdIsRTbhT5WcSE2zbK6268wwaCquc6SjHFKzCzYJpgJ3ZOyAfQP_HN_40ZhKbqWcHvw4w",
+      "summonerId": null,
+      "summonerName": "你们是猪#我是狗",
+      "profileIconId": 6498,
+      "summonerLevel": 532,
+      "topChamps": [
+        {
+          "name": "Irelia",
+          "count": 2
+        },
+        {
+          "name": "Sylas",
+          "count": 2
+        },
+        {
+          "name": "KSante",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "你们是猪",
+      "tagLine": "我是狗",
+      "leaguePoints": 426,
+      "wins": 72,
+      "losses": 56,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
       "puuid": "UHIVyAgPCoUGxgbfixi4Ihn81gkW7ACLtCrmsDDJfeQN7eZI_ToFAejJBYoEeuBJtOQzEa9-PUwl-Q",
       "summonerId": null,
       "summonerName": "小舟潮#Will",
@@ -869,7 +869,7 @@
       "topChamps": [
         {
           "name": "XinZhao",
-          "count": 1
+          "count": 2
         },
         {
           "name": "Khazix",
@@ -993,7 +993,11 @@
       "topChamps": [
         {
           "name": "Sylas",
-          "count": 6
+          "count": 5
+        },
+        {
+          "name": "Ahri",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -1163,14 +1167,14 @@
       "topChamps": [
         {
           "name": "Nocturne",
-          "count": 4
-        },
-        {
-          "name": "Volibear",
-          "count": 1
+          "count": 3
         },
         {
           "name": "Vi",
+          "count": 2
+        },
+        {
+          "name": "Volibear",
           "count": 1
         }
       ],
