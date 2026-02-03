@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-03T14:28:18.312Z",
+  "generatedAt": "2026-02-03T16:42:03.538Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -76,7 +76,11 @@
       "topChamps": [
         {
           "name": "Volibear",
-          "count": 6
+          "count": 5
+        },
+        {
+          "name": "Chogath",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -130,11 +134,7 @@
       "topChamps": [
         {
           "name": "Swain",
-          "count": 5
-        },
-        {
-          "name": "Zoe",
-          "count": 1
+          "count": 6
         }
       ],
       "sampleGames": 6,
@@ -184,11 +184,7 @@
       "topChamps": [
         {
           "name": "Ezreal",
-          "count": 3
-        },
-        {
-          "name": "Caitlyn",
-          "count": 2
+          "count": 5
         },
         {
           "name": "Yunara",
@@ -447,14 +443,10 @@
       "topChamps": [
         {
           "name": "Akshan",
-          "count": 3
+          "count": 5
         },
         {
           "name": "Garen",
-          "count": 1
-        },
-        {
-          "name": "Zed",
           "count": 1
         }
       ],
@@ -478,14 +470,14 @@
       "topChamps": [
         {
           "name": "TahmKench",
-          "count": 3
+          "count": 4
         },
         {
-          "name": "Lucian",
+          "name": "Volibear",
           "count": 1
         },
         {
-          "name": "Lulu",
+          "name": "Lucian",
           "count": 1
         }
       ],
@@ -624,12 +616,12 @@
       "summonerLevel": 1140,
       "topChamps": [
         {
-          "name": "Varus",
+          "name": "Zeri",
           "count": 2
         },
         {
-          "name": "Zeri",
-          "count": 1
+          "name": "Varus",
+          "count": 2
         },
         {
           "name": "Ezreal",
@@ -643,6 +635,37 @@
       "wins": 48,
       "losses": 24,
       "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "0ho26Y8m5xjJ_X9-RJGYBNJlU_liffUmxuS21O-aOu9jwnqimQ-PNH0LlgLKaKmguh8pFPBuae46Mg",
+      "summonerId": null,
+      "summonerName": "Eloverspeiser#EUW",
+      "profileIconId": 6286,
+      "summonerLevel": 631,
+      "topChamps": [
+        {
+          "name": "Ekko",
+          "count": 3
+        },
+        {
+          "name": "Blitzcrank",
+          "count": 2
+        },
+        {
+          "name": "Braum",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Eloverspeiser",
+      "tagLine": "EUW",
+      "leaguePoints": 799,
+      "wins": 100,
+      "losses": 71,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -853,37 +876,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "0ho26Y8m5xjJ_X9-RJGYBNJlU_liffUmxuS21O-aOu9jwnqimQ-PNH0LlgLKaKmguh8pFPBuae46Mg",
-      "summonerId": null,
-      "summonerName": "Eloverspeiser#EUW",
-      "profileIconId": 6286,
-      "summonerLevel": 631,
-      "topChamps": [
-        {
-          "name": "Ekko",
-          "count": 4
-        },
-        {
-          "name": "Blitzcrank",
-          "count": 1
-        },
-        {
-          "name": "Vi",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Eloverspeiser",
-      "tagLine": "EUW",
-      "leaguePoints": 755,
-      "wins": 98,
-      "losses": 71,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "aqx9QHZO3wmlq02W-8khWN7pJxMtNMOwbnsduViW9oldHBP4mUOxYRq_H9zHjMOf1f2cMRo4MLtw6w",
       "summonerId": null,
       "summonerName": "sold#444",
@@ -1000,6 +992,37 @@
       "freshBlood": true
     },
     {
+      "puuid": "Ui6KR0Pbrb5zX7o_3HyX27l1ZSbUm3LMtlL09qLhO0wr2QIzDPVGuZzzL103r3t944yiXI3WzLLH_A",
+      "summonerId": null,
+      "summonerName": "Rabble Arouser#EUW",
+      "profileIconId": 7035,
+      "summonerLevel": 727,
+      "topChamps": [
+        {
+          "name": "Senna",
+          "count": 2
+        },
+        {
+          "name": "Irelia",
+          "count": 1
+        },
+        {
+          "name": "Ekko",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Rabble Arouser",
+      "tagLine": "EUW",
+      "leaguePoints": 742,
+      "wins": 45,
+      "losses": 20,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "a-jpTEuNfurRXHI3q1yf9upu6w6YCQ9-Hibf6FBza_H2GD4ekY1HQ4AMyhwDSxQXcKNlIqThdSZoxw",
       "summonerId": null,
       "summonerName": "Nο Cat Nο Life#EUW",
@@ -1089,11 +1112,11 @@
       "topChamps": [
         {
           "name": "Sona",
-          "count": 2
+          "count": 4
         },
         {
           "name": "Rammus",
-          "count": 2
+          "count": 1
         },
         {
           "name": "Veigar",
@@ -1174,14 +1197,14 @@
       "topChamps": [
         {
           "name": "TahmKench",
-          "count": 3
+          "count": 2
         },
         {
-          "name": "AurelionSol",
+          "name": "Elise",
           "count": 1
         },
         {
-          "name": "Shaco",
+          "name": "AurelionSol",
           "count": 1
         }
       ],
@@ -1197,32 +1220,32 @@
       "freshBlood": true
     },
     {
-      "puuid": "Ui6KR0Pbrb5zX7o_3HyX27l1ZSbUm3LMtlL09qLhO0wr2QIzDPVGuZzzL103r3t944yiXI3WzLLH_A",
+      "puuid": "LiQxxsfoQSbGzWlySAE3km9RaPGSvzOylsaY1-V3rHTD-G25ob2_WughML5bwE7jHFVILASBx_wDhg",
       "summonerId": null,
-      "summonerName": "Rabble Arouser#EUW",
-      "profileIconId": 7035,
-      "summonerLevel": 727,
+      "summonerName": "painted knight#api",
+      "profileIconId": 6922,
+      "summonerLevel": 1137,
       "topChamps": [
         {
-          "name": "Senna",
+          "name": "Zed",
           "count": 2
         },
         {
-          "name": "Riven",
-          "count": 1
+          "name": "Azir",
+          "count": 2
         },
         {
-          "name": "Gwen",
+          "name": "AurelionSol",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "Rabble Arouser",
-      "tagLine": "EUW",
-      "leaguePoints": 682,
-      "wins": 43,
+      "gameName": "painted knight",
+      "tagLine": "api",
+      "leaguePoints": 683,
+      "wins": 41,
       "losses": 20,
-      "hotStreak": false,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -1328,12 +1351,12 @@
       "summonerLevel": 1196,
       "topChamps": [
         {
-          "name": "KSante",
-          "count": 3
+          "name": "TahmKench",
+          "count": 4
         },
         {
-          "name": "TahmKench",
-          "count": 2
+          "name": "KSante",
+          "count": 1
         },
         {
           "name": "Renekton",
@@ -1391,14 +1414,14 @@
       "topChamps": [
         {
           "name": "Braum",
-          "count": 4
+          "count": 3
         },
         {
-          "name": "Karma",
+          "name": "Pyke",
           "count": 1
         },
         {
-          "name": "Rakan",
+          "name": "Karma",
           "count": 1
         }
       ],
@@ -1432,37 +1455,6 @@
       "wins": 57,
       "losses": 28,
       "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "IcWyNpplxHPzLsmRGMWbnM0uMnScX4y_BseWncJopO9NKbuKxyyKh-d4fZ_Dzk6cJr_gAddNH3Ds3Q",
-      "summonerId": null,
-      "summonerName": "General Lector#EUW",
-      "profileIconId": 585,
-      "summonerLevel": 194,
-      "topChamps": [
-        {
-          "name": "Draven",
-          "count": 2
-        },
-        {
-          "name": "DrMundo",
-          "count": 1
-        },
-        {
-          "name": "Caitlyn",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "General Lector",
-      "tagLine": "EUW",
-      "leaguePoints": 644,
-      "wins": 56,
-      "losses": 3,
-      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
