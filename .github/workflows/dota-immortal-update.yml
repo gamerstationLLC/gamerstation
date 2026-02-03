@@ -1,9 +1,19 @@
 name: Update Dota Immortal Stats
 
 on:
+  # Every 8 hours (00:00, 08:00, 16:00 UTC)
   schedule:
-    - cron: "0 */8 * * *" 
-  workflow_dispatch: {}
+    - cron: "0 */8 * * *"
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: "Rebuild from scratch (wipe immortal_v2 cache/state before crawling)"
+        required: false
+        default: "false"
+      aggressive:
+        description: "Aggressive crawl settings (more pages + more new matches)"
+        required: false
+        default: "false"
 
 concurrency:
   group: dota-immortal-update
@@ -15,11 +25,27 @@ permissions:
 jobs:
   immortal:
     runs-on: ubuntu-latest
-
-    # IMPORTANT:
-    # Job timeout must be > 90m so the runner is not killed.
-    # We soft-timeout the build step at 90m, then still finalize+commit.
     timeout-minutes: 180
+
+    defaults:
+      run:
+        shell: bash
+
+    # ✅ Centralize knobs so build/finalize stay in sync
+    env:
+      # No key needed for free usage; leaving this here is harmless.
+      OPENDOTA_API_KEY: ${{ secrets.OPENDOTA_API_KEY }}
+
+      # Default crawl knobs (safe + much bigger intake than before)
+      DOTA_IMMORTAL_WINDOW_DAYS: "60"
+      DOTA_PUBLICMATCHES_PAGES: "40"
+      DOTA_MAX_NEW_MATCHES: "1000"
+      DOTA_REQ_DELAY_MS: "250"
+
+      # Finalize thresholds (tune as you like; these are realistic for Immortal once cache grows)
+      DOTA_IMMORTAL_MIN_RANK_TIER: "80"
+      DOTA_IMMORTAL_MIN_HEROES: "60"
+      DOTA_IMMORTAL_MIN_TOTAL_PICKS: "2000"
 
     steps:
       - name: Checkout
@@ -29,7 +55,6 @@ jobs:
 
       # ✅ Always start from latest origin/main
       - name: Sync with main (pre-build)
-        shell: bash
         run: |
           set -e
           git fetch origin main
@@ -45,10 +70,28 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # ✅ Optional: prune any Immortal cache older than 30d (safe if dirs don't exist)
-      # (Feel free to change 30 to 60/90 later. This cache can grow fast.)
+      # ✅ Optional: wipe cache/state if user requested a rebuild
+      - name: Rebuild toggle (wipe immortal_v2 cache/state)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.rebuild == 'true' }}
+        run: |
+          set -e
+          echo "Rebuild=true → wiping scripts/dota/cache/immortal_v2 ..."
+          rm -rf scripts/dota/cache/immortal_v2 || true
+          mkdir -p scripts/dota/cache/immortal_v2
+
+      # ✅ Optional: more aggressive crawl settings on demand
+      - name: Aggressive toggle (bigger intake)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.aggressive == 'true' }}
+        run: |
+          set -e
+          echo "Aggressive=true → overriding crawl knobs..."
+          echo "DOTA_IMMORTAL_WINDOW_DAYS=30" >> $GITHUB_ENV
+          echo "DOTA_PUBLICMATCHES_PAGES=40" >> $GITHUB_ENV
+          echo "DOTA_MAX_NEW_MATCHES=1200" >> $GITHUB_ENV
+          echo "DOTA_REQ_DELAY_MS=250" >> $GITHUB_ENV
+
+      # ✅ Prune cache older than 30d (safe if dirs don't exist)
       - name: Prune old Dota Immortal cache (30 days)
-        shell: bash
         run: |
           set -e
           echo "Pruning Dota Immortal cache older than 30 days (if present)..."
@@ -69,19 +112,14 @@ jobs:
       # ✅ Soft timeout: stop the BUILD after 90 minutes, but DO NOT kill the job.
       # ✅ CRITICAL: NEVER fail the job here (timeout/429/etc should not block finalize+commit)
       - name: Build Dota Immortal cache (soft-timeout 90m; never fails job)
-        shell: bash
-        env:
-          # Optional: add later as a secret if you get a key. Script still works without it.
-          OPENDOTA_API_KEY: ${{ secrets.OPENDOTA_API_KEY }}
-
-          # ✅ knobs (match what the script reads)
-          DOTA_IMMORTAL_WINDOW_DAYS: "7"
-          DOTA_PUBLICMATCHES_PAGES: "8"
-          DOTA_MAX_NEW_MATCHES: "160"
-          DOTA_REQ_DELAY_MS: "250"
         run: |
           set +e
           echo "Starting Dota Immortal build with soft timeout of 90 minutes..."
+          echo "Knobs:"
+          echo "  WINDOW_DAYS=$DOTA_IMMORTAL_WINDOW_DAYS"
+          echo "  PAGES=$DOTA_PUBLICMATCHES_PAGES"
+          echo "  MAX_NEW=$DOTA_MAX_NEW_MATCHES"
+          echo "  DELAY_MS=$DOTA_REQ_DELAY_MS"
 
           # 5400s = 90 minutes
           timeout --signal=SIGTERM --kill-after=30s 5400 npm run dota:immortal:build
@@ -97,17 +135,16 @@ jobs:
           # Never fail job here
           exit 0
 
-      # ✅ Finalize ALWAYS runs (if build timed out or API got 429s, we still try to finalize)
+      # ✅ Finalize ALWAYS runs
       - name: Finalize Dota Immortal JSON (never fails job)
         if: always()
-        shell: bash
-        env:
-          DOTA_IMMORTAL_WINDOW_DAYS: "7"
-          DOTA_IMMORTAL_MIN_RANK_TIER: "80"
-          DOTA_IMMORTAL_MIN_HEROES: "70"
-          DOTA_IMMORTAL_MIN_TOTAL_PICKS: "5000"
         run: |
           set +e
+          echo "Finalizing with thresholds:"
+          echo "  MIN_RANK_TIER=$DOTA_IMMORTAL_MIN_RANK_TIER"
+          echo "  MIN_HEROES=$DOTA_IMMORTAL_MIN_HEROES"
+          echo "  MIN_TOTAL_PICKS=$DOTA_IMMORTAL_MIN_TOTAL_PICKS"
+
           npm run dota:immortal:finalize
           EC=$?
           echo "Finalize exit code: $EC"
@@ -117,7 +154,6 @@ jobs:
       # ✅ Debug
       - name: Debug - Output + git diff
         if: always()
-        shell: bash
         run: |
           echo "== Output sample =="
           ls -lah public/data/dota || true
@@ -133,11 +169,12 @@ jobs:
           ls -lah scripts/dota/cache/immortal_v2/state || true
           cat scripts/dota/cache/immortal_v2/state/finalize_checkpoint.json 2>/dev/null || true
           cat scripts/dota/cache/immortal_v2/state/build_checkpoint.json 2>/dev/null || true
+          cat scripts/dota/cache/immortal_v2/state/last_attempt.json 2>/dev/null || true
+          cat scripts/dota/cache/immortal_v2/state/last_success.json 2>/dev/null || true
 
       # ✅ Commit → Push: stage ONLY this workflow's json; merge-pull loop (NO rebase)
       - name: Commit & push (if changed)
         if: always()
-        shell: bash
         run: |
           set -e
 
