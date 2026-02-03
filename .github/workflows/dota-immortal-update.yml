@@ -37,9 +37,9 @@ jobs:
       OPENDOTA_API_KEY: ${{ secrets.OPENDOTA_API_KEY }}
 
       # Default crawl knobs (safe + much bigger intake than before)
-      DOTA_IMMORTAL_WINDOW_DAYS: "30"
+      DOTA_IMMORTAL_WINDOW_DAYS: "60"
       DOTA_PUBLICMATCHES_PAGES: "40"
-      DOTA_MAX_NEW_MATCHES: "500"
+      DOTA_MAX_NEW_MATCHES: "1000"
       DOTA_REQ_DELAY_MS: "250"
 
       # Finalize thresholds (tune as you like; these are realistic for Immortal once cache grows)
