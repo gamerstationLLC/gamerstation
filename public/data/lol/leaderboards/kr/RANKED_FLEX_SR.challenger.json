@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-03T17:18:48.211Z",
+  "generatedAt": "2026-02-03T21:32:08.579Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -14,7 +14,7 @@
       "topChamps": [
         {
           "name": "Aphelios",
-          "count": 2
+          "count": 4
         },
         {
           "name": "Yunara",
@@ -28,10 +28,10 @@
       "sampleGames": 6,
       "gameName": "뭘야려",
       "tagLine": "KR123",
-      "leaguePoints": 988,
-      "wins": 77,
-      "losses": 46,
-      "hotStreak": true,
+      "leaguePoints": 1008,
+      "wins": 79,
+      "losses": 47,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -55,9 +55,9 @@
       "sampleGames": 6,
       "gameName": "SiO2nH2O",
       "tagLine": "실리카겔",
-      "leaguePoints": 775,
-      "wins": 48,
-      "losses": 23,
+      "leaguePoints": 783,
+      "wins": 49,
+      "losses": 24,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -95,6 +95,37 @@
       "freshBlood": true
     },
     {
+      "puuid": "ZmWpU3W546I4ObnCCkD-L9ge_xt-LGxo0gvDS0BwGkd94HLZQLseTw8OhrgmmeKFSmH__o-5uXOPZQ",
+      "summonerId": null,
+      "summonerName": "허엉3#JJ2YA",
+      "profileIconId": 5991,
+      "summonerLevel": 601,
+      "topChamps": [
+        {
+          "name": "Akali",
+          "count": 3
+        },
+        {
+          "name": "Aurora",
+          "count": 2
+        },
+        {
+          "name": "Vex",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "허엉3",
+      "tagLine": "JJ2YA",
+      "leaguePoints": 727,
+      "wins": 57,
+      "losses": 45,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
       "puuid": "QW8wKDgB8WjZ_GWlKqwL_DHTGw28ql-hJMVSUEwUMp4lqBda1YiDs6ByJVbjMszZtXWGq_7qKlDR5A",
       "summonerId": null,
       "summonerName": "두 몽#KR1",
@@ -126,37 +157,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "ZmWpU3W546I4ObnCCkD-L9ge_xt-LGxo0gvDS0BwGkd94HLZQLseTw8OhrgmmeKFSmH__o-5uXOPZQ",
-      "summonerId": null,
-      "summonerName": "허엉3#JJ2YA",
-      "profileIconId": 5991,
-      "summonerLevel": 601,
-      "topChamps": [
-        {
-          "name": "Akali",
-          "count": 3
-        },
-        {
-          "name": "Akshan",
-          "count": 2
-        },
-        {
-          "name": "Aurora",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "허엉3",
-      "tagLine": "JJ2YA",
-      "leaguePoints": 723,
-      "wins": 56,
-      "losses": 44,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "DzO3iC3QXIoi4KC-tkHINbKMkBDILeLRIL-M6fDRJZRCtdk9kaw-mv6_WPxFy4uG8l_M2zGdcpa0gQ",
       "summonerId": null,
       "summonerName": "chendian#KR 1",
@@ -165,27 +165,54 @@
       "topChamps": [
         {
           "name": "Rammus",
-          "count": 3
+          "count": 4
         },
         {
           "name": "Qiyana",
           "count": 2
-        },
-        {
-          "name": "Zac",
-          "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "chendian",
       "tagLine": "KR 1",
-      "leaguePoints": 659,
-      "wins": 68,
-      "losses": 52,
-      "hotStreak": true,
+      "leaguePoints": 678,
+      "wins": 70,
+      "losses": 53,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
+    },
+    {
+      "puuid": "p68SVFVxBS__qw_Kad98XYenXAqtSJMB-EQ6Jboy0PjtLJCn6uDQDSvjSpM4C4aAaTfM2oRFliL7UQ",
+      "summonerId": null,
+      "summonerName": "중증망상장애#KR1",
+      "profileIconId": 4492,
+      "summonerLevel": 443,
+      "topChamps": [
+        {
+          "name": "Vayne",
+          "count": 2
+        },
+        {
+          "name": "Vladimir",
+          "count": 2
+        },
+        {
+          "name": "Jayce",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "중증망상장애",
+      "tagLine": "KR1",
+      "leaguePoints": 661,
+      "wins": 47,
+      "losses": 28,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     },
     {
       "puuid": "-CsstuXhjxEoX1r246SGNf20dz_HBNNpIJYXzSbZwqRk8-bvrF7RUfb8tDejwcHTUpjhaww_mWQ9FA",
@@ -195,15 +222,15 @@
       "summonerLevel": 208,
       "topChamps": [
         {
-          "name": "Hwei",
-          "count": 1
-        },
-        {
           "name": "Akali",
+          "count": 2
+        },
+        {
+          "name": "Yone",
           "count": 1
         },
         {
-          "name": "Syndra",
+          "name": "Ambessa",
           "count": 1
         }
       ],
@@ -226,15 +253,15 @@
       "summonerLevel": 498,
       "topChamps": [
         {
-          "name": "Alistar",
-          "count": 2
-        },
-        {
-          "name": "Braum",
+          "name": "Graves",
           "count": 1
         },
         {
-          "name": "Thresh",
+          "name": "Nautilus",
+          "count": 1
+        },
+        {
+          "name": "Braum",
           "count": 1
         }
       ],
@@ -250,30 +277,30 @@
       "freshBlood": true
     },
     {
-      "puuid": "p68SVFVxBS__qw_Kad98XYenXAqtSJMB-EQ6Jboy0PjtLJCn6uDQDSvjSpM4C4aAaTfM2oRFliL7UQ",
+      "puuid": "iT9OmkevryUH08pjT86_sqpo5jBkm0_gKrVH3VY_Rt6360EDwC_snqk2fwxhnT0waWDNhfyuBq2UwQ",
       "summonerId": null,
-      "summonerName": "중증망상장애#KR1",
-      "profileIconId": 4492,
-      "summonerLevel": 443,
+      "summonerName": "으 뜸#4630",
+      "profileIconId": 7050,
+      "summonerLevel": 751,
       "topChamps": [
         {
-          "name": "Vayne",
-          "count": 2
+          "name": "Lillia",
+          "count": 1
         },
         {
-          "name": "Vladimir",
-          "count": 2
+          "name": "Sylas",
+          "count": 1
         },
         {
-          "name": "Malphite",
+          "name": "Trundle",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "중증망상장애",
-      "tagLine": "KR1",
+      "gameName": "으 뜸",
+      "tagLine": "4630",
       "leaguePoints": 630,
-      "wins": 45,
+      "wins": 43,
       "losses": 27,
       "hotStreak": false,
       "inactive": false,
@@ -302,37 +329,6 @@
       "leaguePoints": 603,
       "wins": 73,
       "losses": 29,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "iT9OmkevryUH08pjT86_sqpo5jBkm0_gKrVH3VY_Rt6360EDwC_snqk2fwxhnT0waWDNhfyuBq2UwQ",
-      "summonerId": null,
-      "summonerName": "으 뜸#4630",
-      "profileIconId": 7050,
-      "summonerLevel": 751,
-      "topChamps": [
-        {
-          "name": "Nocturne",
-          "count": 2
-        },
-        {
-          "name": "Trundle",
-          "count": 1
-        },
-        {
-          "name": "LeeSin",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "으 뜸",
-      "tagLine": "4630",
-      "leaguePoints": 591,
-      "wins": 41,
-      "losses": 26,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
