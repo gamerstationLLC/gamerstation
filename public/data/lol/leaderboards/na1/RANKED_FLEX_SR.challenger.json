@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-03T07:01:33.931Z",
+  "generatedAt": "2026-02-03T10:19:51.701Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -76,14 +76,14 @@
       "topChamps": [
         {
           "name": "KogMaw",
-          "count": 1
-        },
-        {
-          "name": "Veigar",
-          "count": 1
+          "count": 2
         },
         {
           "name": "Caitlyn",
+          "count": 1
+        },
+        {
+          "name": "Twitch",
           "count": 1
         }
       ],
@@ -107,58 +107,27 @@
       "topChamps": [
         {
           "name": "Aphelios",
-          "count": 2
+          "count": 3
         },
         {
           "name": "Kaisa",
-          "count": 1
+          "count": 2
         },
         {
-          "name": "Yunara",
+          "name": "Varus",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "韩立L",
       "tagLine": "CNnb",
-      "leaguePoints": 866,
-      "wins": 45,
-      "losses": 17,
+      "leaguePoints": 976,
+      "wins": 49,
+      "losses": 18,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
-    },
-    {
-      "puuid": "YlEOqHqqskp0sVNh3mmWAGT-xe_Fw7KFYU4dLBR-1wd-hJrPDdupzESH7j2S2gtM-lMMxPuHqtA7PQ",
-      "summonerId": null,
-      "summonerName": "Labubu#bunii",
-      "profileIconId": 3150,
-      "summonerLevel": 882,
-      "topChamps": [
-        {
-          "name": "Ahri",
-          "count": 4
-        },
-        {
-          "name": "Orianna",
-          "count": 1
-        },
-        {
-          "name": "Zoe",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Labubu",
-      "tagLine": "bunii",
-      "leaguePoints": 800,
-      "wins": 55,
-      "losses": 33,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
     },
     {
       "puuid": "4AQH7b6YYssRajp-EkNr8LvQet64cSHs1m2ajfNLZYzQ0xQ5vRaGX4IhNR4ZwOd17dpCcmP996FbSQ",
@@ -187,6 +156,37 @@
       "wins": 50,
       "losses": 27,
       "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "YlEOqHqqskp0sVNh3mmWAGT-xe_Fw7KFYU4dLBR-1wd-hJrPDdupzESH7j2S2gtM-lMMxPuHqtA7PQ",
+      "summonerId": null,
+      "summonerName": "Labubu#bunii",
+      "profileIconId": 3150,
+      "summonerLevel": 882,
+      "topChamps": [
+        {
+          "name": "Ahri",
+          "count": 3
+        },
+        {
+          "name": "Katarina",
+          "count": 1
+        },
+        {
+          "name": "Orianna",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Labubu",
+      "tagLine": "bunii",
+      "leaguePoints": 787,
+      "wins": 55,
+      "losses": 34,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -254,35 +254,35 @@
       "freshBlood": true
     },
     {
-      "puuid": "uIMve6RVxHelCuTkOgOoEV6fyCosmyBwbTZXLKySVep1erOzxy2rPlgTF5Sp_YgIfu_2JxKKFI6u5w",
+      "puuid": "8-wAjGBltf5sd5DO1pvOgarfvBw_I8E5j3ZEODOUe-OxcLTHydxT8tD8Vd49DrPY6EOvBJSGeym0Jg",
       "summonerId": null,
-      "summonerName": "9416bd6c51674266#9195",
-      "profileIconId": 6923,
-      "summonerLevel": 248,
+      "summonerName": "Jason the other#NA1",
+      "profileIconId": 6638,
+      "summonerLevel": 858,
       "topChamps": [
         {
-          "name": "Diana",
-          "count": 3
+          "name": "Pyke",
+          "count": 1
         },
         {
-          "name": "JarvanIV",
-          "count": 2
+          "name": "Braum",
+          "count": 1
         },
         {
-          "name": "Lillia",
+          "name": "Neeko",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "9416bd6c51674266",
-      "tagLine": "9195",
-      "leaguePoints": 520,
-      "wins": 51,
-      "losses": 30,
+      "gameName": "Jason the other",
+      "tagLine": "NA1",
+      "leaguePoints": 567,
+      "wins": 33,
+      "losses": 12,
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
-      "freshBlood": false
+      "freshBlood": true
     },
     {
       "puuid": "D-g-o_hJ8wx6An2mvI3Lw3mkpR-qd1xKMDBUCvjdQtNCJgfv9SKfvp06SgPIk5pF9BtOOGh_M_R2Xw",
@@ -327,11 +327,11 @@
           "count": 2
         },
         {
-          "name": "JarvanIV",
+          "name": "Pyke",
           "count": 1
         },
         {
-          "name": "Yunara",
+          "name": "JarvanIV",
           "count": 1
         }
       ],
