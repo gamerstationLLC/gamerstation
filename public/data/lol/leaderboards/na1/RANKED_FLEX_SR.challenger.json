@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T05:17:57.515Z",
+  "generatedAt": "2026-02-04T06:59:50.950Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -13,15 +13,15 @@
       "summonerLevel": 133,
       "topChamps": [
         {
+          "name": "Ryze",
+          "count": 2
+        },
+        {
           "name": "Evelynn",
           "count": 2
         },
         {
-          "name": "Talon",
-          "count": 2
-        },
-        {
-          "name": "Ryze",
+          "name": "Brand",
           "count": 1
         }
       ],
@@ -45,11 +45,7 @@
       "topChamps": [
         {
           "name": "Varus",
-          "count": 5
-        },
-        {
-          "name": "Lucian",
-          "count": 1
+          "count": 6
         }
       ],
       "sampleGames": 6,
@@ -164,15 +160,15 @@
       "summonerLevel": 882,
       "topChamps": [
         {
+          "name": "Irelia",
+          "count": 1
+        },
+        {
+          "name": "Qiyana",
+          "count": 1
+        },
+        {
           "name": "Evelynn",
-          "count": 1
-        },
-        {
-          "name": "Karma",
-          "count": 1
-        },
-        {
-          "name": "Nami",
           "count": 1
         }
       ],
@@ -196,10 +192,14 @@
       "topChamps": [
         {
           "name": "Gwen",
-          "count": 5
+          "count": 3
         },
         {
-          "name": "Vayne",
+          "name": "Twitch",
+          "count": 1
+        },
+        {
+          "name": "Karthus",
           "count": 1
         }
       ],
@@ -277,6 +277,37 @@
       "freshBlood": true
     },
     {
+      "puuid": "8-wAjGBltf5sd5DO1pvOgarfvBw_I8E5j3ZEODOUe-OxcLTHydxT8tD8Vd49DrPY6EOvBJSGeym0Jg",
+      "summonerId": null,
+      "summonerName": "Jason the other#NA1",
+      "profileIconId": 6638,
+      "summonerLevel": 858,
+      "topChamps": [
+        {
+          "name": "Ekko",
+          "count": 1
+        },
+        {
+          "name": "Taliyah",
+          "count": 1
+        },
+        {
+          "name": "Zoe",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Jason the other",
+      "tagLine": "NA1",
+      "leaguePoints": 537,
+      "wins": 35,
+      "losses": 19,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "IPiutTvR_TaGkfQcrOs2yOKzDIsC6vqMBshd_Agfjs6jyPfA2Lv6FyzI7dsy0W6CMzb2iAWHZqYSxQ",
       "summonerId": null,
       "summonerName": "Peekaboo#Peek3",
@@ -303,37 +334,6 @@
       "wins": 37,
       "losses": 25,
       "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "8-wAjGBltf5sd5DO1pvOgarfvBw_I8E5j3ZEODOUe-OxcLTHydxT8tD8Vd49DrPY6EOvBJSGeym0Jg",
-      "summonerId": null,
-      "summonerName": "Jason the other#NA1",
-      "profileIconId": 6638,
-      "summonerLevel": 858,
-      "topChamps": [
-        {
-          "name": "Galio",
-          "count": 1
-        },
-        {
-          "name": "Ahri",
-          "count": 1
-        },
-        {
-          "name": "Leblanc",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Jason the other",
-      "tagLine": "NA1",
-      "leaguePoints": 511,
-      "wins": 34,
-      "losses": 19,
-      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true

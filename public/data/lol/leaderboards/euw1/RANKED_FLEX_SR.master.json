@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T02:21:03.608Z",
+  "generatedAt": "2026-02-04T08:04:42.579Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -974,6 +974,33 @@
       "freshBlood": true
     },
     {
+      "puuid": "OC6d1HE44rqpLnIoxTXtgpbDaIx4t4NFTorsAzMqN1yQkhMbdYkN6Ze6ombikE_xNDFjX2wbjh4RYg",
+      "summonerId": null,
+      "summonerName": "青田后入熊澪#1128",
+      "profileIconId": 6,
+      "summonerLevel": 184,
+      "topChamps": [
+        {
+          "name": "Elise",
+          "count": 5
+        },
+        {
+          "name": "JarvanIV",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "青田后入熊澪",
+      "tagLine": "1128",
+      "leaguePoints": 182,
+      "wins": 71,
+      "losses": 50,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "sHdzfV9idSMMdPg6p_ybSIxwOl6j202-K-TgfE4G6kq6gMGkhEmUB3_nRAvJQ1J6tmvjsjndB8sZlg",
       "summonerId": null,
       "summonerName": "Grandlos#EUW",
@@ -1163,15 +1190,15 @@
       "summonerLevel": 796,
       "topChamps": [
         {
+          "name": "Ahri",
+          "count": 2
+        },
+        {
+          "name": "Galio",
+          "count": 1
+        },
+        {
           "name": "Taliyah",
-          "count": 1
-        },
-        {
-          "name": "Caitlyn",
-          "count": 1
-        },
-        {
-          "name": "Jinx",
           "count": 1
         }
       ],
@@ -1269,6 +1296,33 @@
       "tagLine": "EUW",
       "leaguePoints": 179,
       "wins": 26,
+      "losses": 19,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "kq-U_UyklMHVf33hdvQrD0305IxPxxKRdrRYDEqa_tNiQciTI_R9JI2AaeLE2hxtFz4pNfAHi-VZoQ",
+      "summonerId": null,
+      "summonerName": "九歌v9 EFLS#JIUGE",
+      "profileIconId": 7049,
+      "summonerLevel": 507,
+      "topChamps": [
+        {
+          "name": "Aphelios",
+          "count": 5
+        },
+        {
+          "name": "Jinx",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "九歌v9 EFLS",
+      "tagLine": "JIUGE",
+      "leaguePoints": 179,
+      "wins": 25,
       "losses": 19,
       "hotStreak": false,
       "inactive": false,
@@ -1456,68 +1510,6 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
-    },
-    {
-      "puuid": "6zt-j7lc38hsMq7uYZvedijCfdAAO9y68xcKBtyHfBCTiJzXKesqPQRKZImn7fS64Vjj_yqFG_8BTg",
-      "summonerId": null,
-      "summonerName": "ĄRłŞξ Chopps#SIN",
-      "profileIconId": 6735,
-      "summonerLevel": 177,
-      "topChamps": [
-        {
-          "name": "Yasuo",
-          "count": 2
-        },
-        {
-          "name": "Jhin",
-          "count": 1
-        },
-        {
-          "name": "Ryze",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "ĄRłŞξ Chopps",
-      "tagLine": "SIN",
-      "leaguePoints": 176,
-      "wins": 26,
-      "losses": 22,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "ShngGAQ9RxksesHlZmFbJ5_OKePdC2637F0A0Cs4c1UFBVLXCFTAu_gmVuLADUJXyQ_8i4VK3oJkdA",
-      "summonerId": null,
-      "summonerName": "Lottò#Root",
-      "profileIconId": 7049,
-      "summonerLevel": 612,
-      "topChamps": [
-        {
-          "name": "Malphite",
-          "count": 2
-        },
-        {
-          "name": "Garen",
-          "count": 1
-        },
-        {
-          "name": "Fizz",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Lottò",
-      "tagLine": "Root",
-      "leaguePoints": 175,
-      "wins": 26,
-      "losses": 25,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
     }
   ]
 }
