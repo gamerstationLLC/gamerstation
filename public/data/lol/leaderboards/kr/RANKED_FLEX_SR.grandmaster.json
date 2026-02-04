@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-03T23:49:31.583Z",
+  "generatedAt": "2026-02-04T02:51:28.379Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -195,15 +195,15 @@
       "summonerLevel": 945,
       "topChamps": [
         {
-          "name": "Ezreal",
+          "name": "MissFortune",
           "count": 2
         },
         {
-          "name": "Braum",
+          "name": "Jhin",
           "count": 1
         },
         {
-          "name": "MissFortune",
+          "name": "Yunara",
           "count": 1
         }
       ],
@@ -253,15 +253,15 @@
       "summonerLevel": 104,
       "topChamps": [
         {
+          "name": "Vi",
+          "count": 2
+        },
+        {
           "name": "LeeSin",
           "count": 2
         },
         {
-          "name": "RekSai",
-          "count": 2
-        },
-        {
-          "name": "Vi",
+          "name": "JarvanIV",
           "count": 1
         }
       ],
@@ -703,37 +703,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "fSMl_uaHfqtCkgUkfmeETLIO7WudO8P-Ia4HAI9vNu4iVoD21RfVNgA6UDhZ0MiGUHhzH1flnQ4NWQ",
-      "summonerId": null,
-      "summonerName": "햇공주와 페럿기사#守護者",
-      "profileIconId": 29,
-      "summonerLevel": 84,
-      "topChamps": [
-        {
-          "name": "Yasuo",
-          "count": 3
-        },
-        {
-          "name": "Lucian",
-          "count": 1
-        },
-        {
-          "name": "Yone",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "햇공주와 페럿기사",
-      "tagLine": "守護者",
-      "leaguePoints": 336,
-      "wins": 38,
-      "losses": 21,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "eHNPOofQqcxgiySVqK1nSLsSf69k2-r4ds5WF3j5v_z3xrORVAi0WkBI8Yr-JwsGL8gtRCvUAOUWUA",
       "summonerId": null,
       "summonerName": "햇공주와 페럿기사#晨曦花",
@@ -756,6 +725,37 @@
       "sampleGames": 6,
       "gameName": "햇공주와 페럿기사",
       "tagLine": "晨曦花",
+      "leaguePoints": 336,
+      "wins": 38,
+      "losses": 21,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "fSMl_uaHfqtCkgUkfmeETLIO7WudO8P-Ia4HAI9vNu4iVoD21RfVNgA6UDhZ0MiGUHhzH1flnQ4NWQ",
+      "summonerId": null,
+      "summonerName": "햇공주와 페럿기사#守護者",
+      "profileIconId": 29,
+      "summonerLevel": 84,
+      "topChamps": [
+        {
+          "name": "Yasuo",
+          "count": 3
+        },
+        {
+          "name": "Lucian",
+          "count": 1
+        },
+        {
+          "name": "Yone",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "햇공주와 페럿기사",
+      "tagLine": "守護者",
       "leaguePoints": 336,
       "wins": 38,
       "losses": 21,
