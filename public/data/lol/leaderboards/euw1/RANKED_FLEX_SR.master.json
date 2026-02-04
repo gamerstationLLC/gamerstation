@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T08:04:42.579Z",
+  "generatedAt": "2026-02-04T11:42:19.046Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -32,6 +32,37 @@
       "wins": 45,
       "losses": 17,
       "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "o8JnFvCoPrHhYQkJGqF6hzAeHUS79h1CLzGIesiIC-ir9omMhf1yxQqTcAicZfKVrkl3MKESxG0P7A",
+      "summonerId": null,
+      "summonerName": "Grandma Death#EUW",
+      "profileIconId": 576,
+      "summonerLevel": 820,
+      "topChamps": [
+        {
+          "name": "Teemo",
+          "count": 3
+        },
+        {
+          "name": "Annie",
+          "count": 1
+        },
+        {
+          "name": "DrMundo",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Grandma Death",
+      "tagLine": "EUW",
+      "leaguePoints": 228,
+      "wins": 28,
+      "losses": 21,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -128,6 +159,37 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": true
+    },
+    {
+      "puuid": "4BSQHYy-c6WEprNM95IUGZWM1kwrfDoFahO9gYQyUnBveBr2v4-F5ppwDyNXf3THqNoLUGL-YH9LeQ",
+      "summonerId": null,
+      "summonerName": "George Droid#BBOIL",
+      "profileIconId": 5465,
+      "summonerLevel": 430,
+      "topChamps": [
+        {
+          "name": "Gragas",
+          "count": 4
+        },
+        {
+          "name": "Blitzcrank",
+          "count": 1
+        },
+        {
+          "name": "Galio",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "George Droid",
+      "tagLine": "BBOIL",
+      "leaguePoints": 200,
+      "wins": 58,
+      "losses": 44,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
     },
     {
       "puuid": "ePwueUhSbS9qsRsbiQANOW--uFfk6fpXJpwQJCT4O9__Qt9HGvjSrl7w8O_T5GJVXNzmIOtzlN4LwQ",
@@ -350,15 +412,15 @@
       "summonerLevel": 739,
       "topChamps": [
         {
-          "name": "Rengar",
+          "name": "Akshan",
           "count": 2
         },
         {
-          "name": "Ezreal",
+          "name": "Irelia",
           "count": 1
         },
         {
-          "name": "Akshan",
+          "name": "Aurora",
           "count": 1
         }
       ],
@@ -506,14 +568,14 @@
       "topChamps": [
         {
           "name": "Milio",
-          "count": 3
-        },
-        {
-          "name": "Lulu",
           "count": 2
         },
         {
-          "name": "Soraka",
+          "name": "Nami",
+          "count": 1
+        },
+        {
+          "name": "Ahri",
           "count": 1
         }
       ],
@@ -950,15 +1012,15 @@
       "summonerLevel": 562,
       "topChamps": [
         {
-          "name": "Aphelios",
-          "count": 3
-        },
-        {
           "name": "Jinx",
           "count": 2
         },
         {
-          "name": "Kaisa",
+          "name": "Aphelios",
+          "count": 2
+        },
+        {
+          "name": "Sivir",
           "count": 1
         }
       ],
@@ -1448,68 +1510,6 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": true
-    },
-    {
-      "puuid": "Inm6eWf9TLxN7pIDC5HF0tSuuTxUqajjoqN9itpSaXMSh-0FLIMVA5W9my3gyj_5d7NTSqYckVOwmg",
-      "summonerId": null,
-      "summonerName": "Stöckli#sr88",
-      "profileIconId": 4568,
-      "summonerLevel": 537,
-      "topChamps": [
-        {
-          "name": "Lucian",
-          "count": 2
-        },
-        {
-          "name": "Syndra",
-          "count": 1
-        },
-        {
-          "name": "Ezreal",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Stöckli",
-      "tagLine": "sr88",
-      "leaguePoints": 177,
-      "wins": 21,
-      "losses": 14,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "-p66syQ3vFqDsuR8ObauzekvWxL0htiVnjp8bXXob9J4n04anVq7QdYYGuxqpgdCsNbWpqo2by1CMg",
-      "summonerId": null,
-      "summonerName": "INT qLibali#EUW",
-      "profileIconId": 4561,
-      "summonerLevel": 1112,
-      "topChamps": [
-        {
-          "name": "Heimerdinger",
-          "count": 1
-        },
-        {
-          "name": "Talon",
-          "count": 1
-        },
-        {
-          "name": "Senna",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "INT qLibali",
-      "tagLine": "EUW",
-      "leaguePoints": 177,
-      "wins": 18,
-      "losses": 5,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
     }
   ]
 }
