@@ -1,10 +1,41 @@
 {
-  "generatedAt": "2026-02-04T17:26:37.545Z",
+  "generatedAt": "2026-02-04T21:25:30.270Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
   "count": 50,
   "players": [
+    {
+      "puuid": "jtdr4rPDSagkQ8lNwXF1RG0_OKULOl_Ctxdg0BHJM46-sYLOrzR9edJvCJhnNvZGmuPLItE66nIrTg",
+      "summonerId": null,
+      "summonerName": "RalG#좋아요",
+      "profileIconId": 6941,
+      "summonerLevel": 303,
+      "topChamps": [
+        {
+          "name": "Blitzcrank",
+          "count": 2
+        },
+        {
+          "name": "Azir",
+          "count": 1
+        },
+        {
+          "name": "Braum",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "RalG",
+      "tagLine": "좋아요",
+      "leaguePoints": 218,
+      "wins": 39,
+      "losses": 28,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
     {
       "puuid": "11ovMy4WGJ2lkyxYATZ8qtC8vXKvaCJuN17Dd8AkTd6nmW1Ch3ef_Q7Kf3ZLtR3kSKW6Mc132YO59w",
       "summonerId": null,
@@ -75,16 +106,12 @@
       "summonerLevel": 218,
       "topChamps": [
         {
-          "name": "Ashe",
-          "count": 3
-        },
-        {
           "name": "Tristana",
-          "count": 2
+          "count": 4
         },
         {
-          "name": "Caitlyn",
-          "count": 1
+          "name": "Ashe",
+          "count": 2
         }
       ],
       "sampleGames": 6,
@@ -223,14 +250,14 @@
       "topChamps": [
         {
           "name": "Kaisa",
-          "count": 3
+          "count": 4
         },
         {
           "name": "Lucian",
           "count": 1
         },
         {
-          "name": "Nami",
+          "name": "Lissandra",
           "count": 1
         }
       ],
@@ -571,7 +598,11 @@
       "topChamps": [
         {
           "name": "Aurora",
-          "count": 6
+          "count": 5
+        },
+        {
+          "name": "Aphelios",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -980,15 +1011,15 @@
       "summonerLevel": 925,
       "topChamps": [
         {
-          "name": "Kaisa",
-          "count": 1
+          "name": "Jinx",
+          "count": 3
         },
         {
-          "name": "Ezreal",
-          "count": 1
+          "name": "Yunara",
+          "count": 2
         },
         {
-          "name": "Galio",
+          "name": "Varus",
           "count": 1
         }
       ],
@@ -1002,37 +1033,6 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
-    },
-    {
-      "puuid": "iNYdaJsjeoX5SWSp3P2ULoWszlxk1It48ldvpgqXrJEMkAJAhd7lfKR6LinnOhMaPHPE0Jj1uiPO8g",
-      "summonerId": null,
-      "summonerName": "60440897del#KR1",
-      "profileIconId": 4532,
-      "summonerLevel": 49,
-      "topChamps": [
-        {
-          "name": "Ezreal",
-          "count": 2
-        },
-        {
-          "name": "Tristana",
-          "count": 1
-        },
-        {
-          "name": "Veigar",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "60440897del",
-      "tagLine": "KR1",
-      "leaguePoints": 151,
-      "wins": 37,
-      "losses": 30,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
     },
     {
       "puuid": "mt2v3JcbUGkba6wIyNn7s4kRJKrTH8JfAUp8E0ZlrpE4PCfc-ZLpEfanwc7Qkgw1k2oAhWS29K3-6Q",
@@ -1070,7 +1070,7 @@
       "summonerId": null,
       "summonerName": "화려한 꽃은 늠름하게 진다#kr2",
       "profileIconId": 29,
-      "summonerLevel": 183,
+      "summonerLevel": 184,
       "topChamps": [
         {
           "name": "Zac",
@@ -1097,7 +1097,11 @@
       "topChamps": [
         {
           "name": "Yuumi",
-          "count": 5
+          "count": 2
+        },
+        {
+          "name": "Neeko",
+          "count": 1
         },
         {
           "name": "Lulu",
@@ -1124,10 +1128,14 @@
       "topChamps": [
         {
           "name": "Taric",
-          "count": 5
+          "count": 3
         },
         {
-          "name": "Thresh",
+          "name": "Yuumi",
+          "count": 1
+        },
+        {
+          "name": "Nami",
           "count": 1
         }
       ],
@@ -1239,15 +1247,15 @@
       "summonerLevel": 214,
       "topChamps": [
         {
-          "name": "Ezreal",
+          "name": "Aphelios",
           "count": 2
         },
         {
-          "name": "Jhin",
+          "name": "Kaisa",
           "count": 1
         },
         {
-          "name": "Yunara",
+          "name": "Lucian",
           "count": 1
         }
       ],
@@ -1261,6 +1269,37 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
+    },
+    {
+      "puuid": "iNYdaJsjeoX5SWSp3P2ULoWszlxk1It48ldvpgqXrJEMkAJAhd7lfKR6LinnOhMaPHPE0Jj1uiPO8g",
+      "summonerId": null,
+      "summonerName": "60440897del#KR1",
+      "profileIconId": 4532,
+      "summonerLevel": 49,
+      "topChamps": [
+        {
+          "name": "Sion",
+          "count": 1
+        },
+        {
+          "name": "Kaisa",
+          "count": 1
+        },
+        {
+          "name": "Ashe",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "60440897del",
+      "tagLine": "KR1",
+      "leaguePoints": 134,
+      "wins": 37,
+      "losses": 31,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     },
     {
       "puuid": "zpsmFxnHoWYUYLHo8RUAvZIOFlbGqqe4p0Bg54jB68Ombe3GrrG14yoLVgFOfAN8i8wJoBpKpC5blg",
@@ -1360,18 +1399,18 @@
       "summonerId": null,
       "summonerName": "귀욤하긔#KR1",
       "profileIconId": 3478,
-      "summonerLevel": 970,
+      "summonerLevel": 971,
       "topChamps": [
         {
-          "name": "Yunara",
-          "count": 2
-        },
-        {
-          "name": "Nautilus",
+          "name": "Ezreal",
           "count": 1
         },
         {
-          "name": "Ezreal",
+          "name": "Galio",
+          "count": 1
+        },
+        {
+          "name": "Kaisa",
           "count": 1
         }
       ],
@@ -1443,37 +1482,6 @@
       "leaguePoints": 128,
       "wins": 37,
       "losses": 30,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "bVtq45YWRobuFAhGotiMC2Utw4zOQqjq2Ca9uSKsfC3SPlXWRaEHVhHQLdiqE-B-0bb6sBHSU5AnKQ",
-      "summonerId": null,
-      "summonerName": "마리아#KR2",
-      "profileIconId": 7033,
-      "summonerLevel": 646,
-      "topChamps": [
-        {
-          "name": "Caitlyn",
-          "count": 2
-        },
-        {
-          "name": "Karma",
-          "count": 1
-        },
-        {
-          "name": "Jhin",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "마리아",
-      "tagLine": "KR2",
-      "leaguePoints": 128,
-      "wins": 34,
-      "losses": 27,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
