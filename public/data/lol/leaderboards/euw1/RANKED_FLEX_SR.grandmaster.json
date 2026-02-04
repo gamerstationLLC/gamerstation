@@ -1,10 +1,41 @@
 {
-  "generatedAt": "2026-02-04T11:36:01.093Z",
+  "generatedAt": "2026-02-04T14:42:00.746Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
   "count": 50,
   "players": [
+    {
+      "puuid": "Ja3andw0kBpCtwAXuDJFCuem4XJE8dPLFpf4tQq_tHF6mliPohYHSg-w2c_o3sY-X4lxbxeZAqfysg",
+      "summonerId": null,
+      "summonerName": "Lv1 Safari#EUW",
+      "profileIconId": 1387,
+      "summonerLevel": 741,
+      "topChamps": [
+        {
+          "name": "Hecarim",
+          "count": 2
+        },
+        {
+          "name": "Naafiri",
+          "count": 1
+        },
+        {
+          "name": "Nami",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Lv1 Safari",
+      "tagLine": "EUW",
+      "leaguePoints": 543,
+      "wins": 36,
+      "losses": 21,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
     {
       "puuid": "52G52DmfE7AulOP6X31qdgZUbmxDT-Z382T1-zrq6OtaGO0FdMuCcaQYixOrL1gBHhpo63jWQeIYPQ",
       "summonerId": null,
@@ -32,6 +63,56 @@
       "wins": 55,
       "losses": 54,
       "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "ov6EvcNaCK8DJsPsIG_zfHquZdKfILr8dcBnUHi4_gb5LK5hVmKRiMuiDq62-5pBpoGHmTjl0r1ZWg",
+      "summonerId": null,
+      "summonerName": "Rodraago#EUWPT",
+      "profileIconId": 7049,
+      "summonerLevel": 531,
+      "topChamps": [
+        {
+          "name": "Ahri",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Rodraago",
+      "tagLine": "EUWPT",
+      "leaguePoints": 512,
+      "wins": 48,
+      "losses": 33,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "WYH_VhCE52N3-u8g55zgmBoEXKws0PVDrnw7e4XCxGJzAGdfwOM_32E-ayresK9vz8RPhFh45w8SWg",
+      "summonerId": null,
+      "summonerName": "BlaZing#Yasuo",
+      "profileIconId": 3366,
+      "summonerLevel": 1139,
+      "topChamps": [
+        {
+          "name": "Yasuo",
+          "count": 5
+        },
+        {
+          "name": "Yone",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "BlaZing",
+      "tagLine": "Yasuo",
+      "leaguePoints": 495,
+      "wins": 33,
+      "losses": 19,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -68,32 +149,32 @@
       "freshBlood": false
     },
     {
-      "puuid": "Ja3andw0kBpCtwAXuDJFCuem4XJE8dPLFpf4tQq_tHF6mliPohYHSg-w2c_o3sY-X4lxbxeZAqfysg",
+      "puuid": "W5MwQHpTXn4aw7l6Ua_3LyfKQE4moORyH_ziomRGf1UYhgehRFGz2Fruvjfdiim6KiBeQtBAvw4u6A",
       "summonerId": null,
-      "summonerName": "Lv1 Safari#EUW",
-      "profileIconId": 1387,
-      "summonerLevel": 740,
+      "summonerName": "ElVichard#ITA",
+      "profileIconId": 4630,
+      "summonerLevel": 591,
       "topChamps": [
         {
-          "name": "Zaahen",
+          "name": "Bard",
           "count": 2
         },
         {
-          "name": "Hecarim",
+          "name": "Rell",
           "count": 1
         },
         {
-          "name": "Ziggs",
+          "name": "Thresh",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "Lv1 Safari",
-      "tagLine": "EUW",
-      "leaguePoints": 486,
-      "wins": 34,
-      "losses": 21,
-      "hotStreak": false,
+      "gameName": "ElVichard",
+      "tagLine": "ITA",
+      "leaguePoints": 477,
+      "wins": 73,
+      "losses": 72,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -133,12 +214,8 @@
           "count": 4
         },
         {
-          "name": "Ambessa",
-          "count": 1
-        },
-        {
-          "name": "Aatrox",
-          "count": 1
+          "name": "Darius",
+          "count": 2
         }
       ],
       "sampleGames": 6,
@@ -478,33 +555,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "WYH_VhCE52N3-u8g55zgmBoEXKws0PVDrnw7e4XCxGJzAGdfwOM_32E-ayresK9vz8RPhFh45w8SWg",
-      "summonerId": null,
-      "summonerName": "BlaZing#Yasuo",
-      "profileIconId": 3366,
-      "summonerLevel": 1139,
-      "topChamps": [
-        {
-          "name": "Yasuo",
-          "count": 5
-        },
-        {
-          "name": "Yone",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "BlaZing",
-      "tagLine": "Yasuo",
-      "leaguePoints": 455,
-      "wins": 31,
-      "losses": 17,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "v0-xpjFNzn4iRMiAWqnLlGFsBgigsSYg-CszJ-WxSHJgD3BOPpvVspzXWX2Fv2OshlTcubzRRgiX7g",
       "summonerId": null,
       "summonerName": "Papadodi#1010",
@@ -520,8 +570,8 @@
           "count": 2
         },
         {
-          "name": "Ashe",
-          "count": 2
+          "name": "Milio",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -597,8 +647,16 @@
       "summonerLevel": 1042,
       "topChamps": [
         {
+          "name": "Nami",
+          "count": 2
+        },
+        {
           "name": "Karma",
-          "count": 6
+          "count": 2
+        },
+        {
+          "name": "Seraphine",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -673,6 +731,37 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
+    },
+    {
+      "puuid": "waovM0prhhDPokBz4gj1wrQ3Xcp-pF8o5QimWifTWuaR6jDKYm1K51hAC0lGHDynFsaXDuQ01tAOLg",
+      "summonerId": null,
+      "summonerName": "RedBullsFlügel#LUX",
+      "profileIconId": 6860,
+      "summonerLevel": 816,
+      "topChamps": [
+        {
+          "name": "Nami",
+          "count": 2
+        },
+        {
+          "name": "Ahri",
+          "count": 1
+        },
+        {
+          "name": "Rakan",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "RedBullsFlügel",
+      "tagLine": "LUX",
+      "leaguePoints": 444,
+      "wins": 29,
+      "losses": 23,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     },
     {
       "puuid": "LNceEPd2yQQVuigYqeHvo5DRhPc5oY5EMU1fgHUE0ydqilnZHTa_cZ71KSPPfJJWEpCNbZTuARw_ZQ",
@@ -845,31 +934,35 @@
       "freshBlood": true
     },
     {
-      "puuid": "ov6EvcNaCK8DJsPsIG_zfHquZdKfILr8dcBnUHi4_gb5LK5hVmKRiMuiDq62-5pBpoGHmTjl0r1ZWg",
+      "puuid": "IYNJG1Cibna95JAcNpaeo0kOQkw0SurEJ9KZJ_gdXR24mbSv1mH4phEEDWRNHXOV6HGfov_172BrhQ",
       "summonerId": null,
-      "summonerName": "Rodraago#EUWPT",
-      "profileIconId": 7049,
-      "summonerLevel": 531,
+      "summonerName": "mina craver#loki",
+      "profileIconId": 3172,
+      "summonerLevel": 401,
       "topChamps": [
         {
-          "name": "Ahri",
-          "count": 5
+          "name": "Nami",
+          "count": 3
         },
         {
-          "name": "Malphite",
+          "name": "Lulu",
+          "count": 2
+        },
+        {
+          "name": "Lux",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "Rodraago",
-      "tagLine": "EUWPT",
-      "leaguePoints": 435,
-      "wins": 45,
-      "losses": 33,
-      "hotStreak": true,
+      "gameName": "mina craver",
+      "tagLine": "loki",
+      "leaguePoints": 434,
+      "wins": 36,
+      "losses": 29,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
-      "freshBlood": false
+      "freshBlood": true
     },
     {
       "puuid": "VVnY5fMVSWSDVC1Kk88LCKYs9cgeE-PsAbo25JXGzxYocU7fWanebOdlkx7cu3-lHPdOMginm7eZMg",
@@ -1046,6 +1139,37 @@
       "freshBlood": false
     },
     {
+      "puuid": "3dOIeFCU7e3OIJfZGLJCnHy54lfrQkpRlqiPgnjHnSB6jjgoHMNEAUcVCsERmmLE7hN_JcwvM-0RbA",
+      "summonerId": null,
+      "summonerName": "Trust0#7154",
+      "profileIconId": 6795,
+      "summonerLevel": 581,
+      "topChamps": [
+        {
+          "name": "Sivir",
+          "count": 2
+        },
+        {
+          "name": "Caitlyn",
+          "count": 1
+        },
+        {
+          "name": "Ashe",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Trust0",
+      "tagLine": "7154",
+      "leaguePoints": 423,
+      "wins": 32,
+      "losses": 15,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "6DmknYwjORWD0rVKjP_WD_DplTKx8LtNmo2DYfGQYxhtZd44RfCwI6K8YwE1TRYE9jqfWI4dJuMi0A",
       "summonerId": null,
       "summonerName": "Alber#XDD",
@@ -1131,37 +1255,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "W5MwQHpTXn4aw7l6Ua_3LyfKQE4moORyH_ziomRGf1UYhgehRFGz2Fruvjfdiim6KiBeQtBAvw4u6A",
-      "summonerId": null,
-      "summonerName": "ElVichard#ITA",
-      "profileIconId": 4630,
-      "summonerLevel": 591,
-      "topChamps": [
-        {
-          "name": "Gnar",
-          "count": 2
-        },
-        {
-          "name": "Sylas",
-          "count": 2
-        },
-        {
-          "name": "Bard",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "ElVichard",
-      "tagLine": "ITA",
-      "leaguePoints": 418,
-      "wins": 70,
-      "losses": 72,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "1pu83kEGD6bTorQMtYv5QEwzBQoH1avV4SwWQHvPaJvN0-NTHFmlZy5z0pM2oEs9LM4wapRom5WhWw",
       "summonerId": null,
       "summonerName": "DM hao cai A#EUW",
@@ -1193,37 +1286,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "waovM0prhhDPokBz4gj1wrQ3Xcp-pF8o5QimWifTWuaR6jDKYm1K51hAC0lGHDynFsaXDuQ01tAOLg",
-      "summonerId": null,
-      "summonerName": "RedBullsFlügel#LUX",
-      "profileIconId": 6860,
-      "summonerLevel": 816,
-      "topChamps": [
-        {
-          "name": "Nami",
-          "count": 2
-        },
-        {
-          "name": "Syndra",
-          "count": 2
-        },
-        {
-          "name": "Milio",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "RedBullsFlügel",
-      "tagLine": "LUX",
-      "leaguePoints": 415,
-      "wins": 28,
-      "losses": 23,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "4B9BT1d19lKDrxgOImBOXl5PRmSjdSCVZUXXJ3gPAEw2kkaVXgP2CLhYfQ3Ebua0WbVqofMMlafGpA",
       "summonerId": null,
       "summonerName": "Fire Knight#FSH",
@@ -1251,37 +1313,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "IYNJG1Cibna95JAcNpaeo0kOQkw0SurEJ9KZJ_gdXR24mbSv1mH4phEEDWRNHXOV6HGfov_172BrhQ",
-      "summonerId": null,
-      "summonerName": "mina craver#loki",
-      "profileIconId": 3172,
-      "summonerLevel": 401,
-      "topChamps": [
-        {
-          "name": "Nami",
-          "count": 2
-        },
-        {
-          "name": "Lulu",
-          "count": 2
-        },
-        {
-          "name": "Lux",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "mina craver",
-      "tagLine": "loki",
-      "leaguePoints": 406,
-      "wins": 35,
-      "losses": 29,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "AiS0TBRLY7Gel5sIthIMoCFhQuDkiYga4nVZc_0XyFHeInRs-ADQhrDf-F65ZN1zyuhowEqzcHX-og",
       "summonerId": null,
       "summonerName": "Sjurdt#EUW",
@@ -1290,7 +1321,11 @@
       "topChamps": [
         {
           "name": "Hwei",
-          "count": 5
+          "count": 4
+        },
+        {
+          "name": "Zaahen",
+          "count": 1
         },
         {
           "name": "KSante",
@@ -1309,35 +1344,31 @@
       "freshBlood": false
     },
     {
-      "puuid": "RVeP9oRwPmYovhpex_8q6EAx7HgDbuY3XYnhWQnFpsVtlyjnmeYLN6NwiCB9ALxGGXC8yXO6qmjmUQ",
+      "puuid": "lzTJxHJp7uniHrdZOpdLw4upX-GZEmSZMPEjgt4Nig3v0ed7tz4y5BG5sq4IgIHhU_wvR5y5jQvkuw",
       "summonerId": null,
-      "summonerName": "Boyan#EUW",
-      "profileIconId": 585,
-      "summonerLevel": 298,
+      "summonerName": "aoqn#222",
+      "profileIconId": 1133,
+      "summonerLevel": 83,
       "topChamps": [
         {
-          "name": "Ryze",
-          "count": 2
-        },
-        {
-          "name": "Ziggs",
-          "count": 1
-        },
-        {
           "name": "AurelionSol",
+          "count": 5
+        },
+        {
+          "name": "Ryze",
           "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "Boyan",
-      "tagLine": "EUW",
+      "gameName": "aoqn",
+      "tagLine": "222",
       "leaguePoints": 401,
-      "wins": 75,
-      "losses": 52,
-      "hotStreak": false,
+      "wins": 67,
+      "losses": 29,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
-      "freshBlood": false
+      "freshBlood": true
     },
     {
       "puuid": "NBHzgMZeJYyGOnlHO34CIg2AdwYTEFKG9R29XNnyt7G-z9zIBoqzC6jJhubG1Y2LcIdaxN3SLOejMw",
@@ -1427,37 +1458,6 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
-    },
-    {
-      "puuid": "CybC2ClU3Ie_LE6qnYadO601f8Kel7A0zqUaXXLfenLSpsMQQC0LWKK-LpmbOOUvzL0vUbKwnNYyIA",
-      "summonerId": null,
-      "summonerName": "Ebolav#Ebooo",
-      "profileIconId": 7066,
-      "summonerLevel": 1099,
-      "topChamps": [
-        {
-          "name": "Aurora",
-          "count": 1
-        },
-        {
-          "name": "Lux",
-          "count": 1
-        },
-        {
-          "name": "Anivia",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Ebolav",
-      "tagLine": "Ebooo",
-      "leaguePoints": 400,
-      "wins": 34,
-      "losses": 31,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
     }
   ]
 }

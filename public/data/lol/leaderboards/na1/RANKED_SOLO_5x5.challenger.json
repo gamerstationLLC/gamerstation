@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T09:50:53.017Z",
+  "generatedAt": "2026-02-04T12:48:43.788Z",
   "region": "na1",
   "queue": "RANKED_SOLO_5x5",
   "tier": "CHALLENGER",
@@ -204,7 +204,7 @@
         },
         {
           "name": "Chogath",
-          "count": 1
+          "count": 2
         },
         {
           "name": "Quinn",
@@ -214,8 +214,8 @@
       "sampleGames": 6,
       "gameName": "1314",
       "tagLine": "ever",
-      "leaguePoints": 2192,
-      "wins": 168,
+      "leaguePoints": 2208,
+      "wins": 169,
       "losses": 86,
       "hotStreak": false,
       "inactive": false,
@@ -420,19 +420,19 @@
           "count": 2
         },
         {
-          "name": "Renekton",
+          "name": "Aurora",
           "count": 1
         },
         {
-          "name": "Aatrox",
+          "name": "Renekton",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "Kid Ink",
       "tagLine": "NA2",
-      "leaguePoints": 1941,
-      "wins": 199,
+      "leaguePoints": 1957,
+      "wins": 200,
       "losses": 139,
       "hotStreak": false,
       "inactive": false,
@@ -597,8 +597,8 @@
       "sampleGames": 6,
       "gameName": "not Rezz",
       "tagLine": "NA1",
-      "leaguePoints": 1815,
-      "wins": 163,
+      "leaguePoints": 1833,
+      "wins": 164,
       "losses": 92,
       "hotStreak": false,
       "inactive": false,
@@ -640,19 +640,19 @@
           "count": 2
         },
         {
-          "name": "RekSai",
+          "name": "Galio",
           "count": 1
         },
         {
-          "name": "Ryze",
+          "name": "RekSai",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "Zamudo",
       "tagLine": "LYON",
-      "leaguePoints": 1750,
-      "wins": 148,
+      "leaguePoints": 1765,
+      "wins": 149,
       "losses": 96,
       "hotStreak": false,
       "inactive": false,
@@ -846,37 +846,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "6S1uxtMI941vGrkbL1jmw3DTz2GTKJJFFCULfvLd_-SbL7D2hCTQCb9p4rekAlogDu-O-vpZXj0UPA",
-      "summonerId": null,
-      "summonerName": "Aldnoah#NA1",
-      "profileIconId": 6421,
-      "summonerLevel": 692,
-      "topChamps": [
-        {
-          "name": "Alistar",
-          "count": 2
-        },
-        {
-          "name": "Braum",
-          "count": 1
-        },
-        {
-          "name": "Corki",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Aldnoah",
-      "tagLine": "NA1",
-      "leaguePoints": 1668,
-      "wins": 139,
-      "losses": 104,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": true,
-      "freshBlood": false
-    },
-    {
       "puuid": "evpD_bAoiUecVQMmb2HCmcXmAxZS5zQpcntgdvdjO4o0IoXk-Uh5-V0K5nl6cxo2DPPq9dpIbovbrA",
       "summonerId": null,
       "summonerName": "mcqueen69#glub",
@@ -932,6 +901,37 @@
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "6S1uxtMI941vGrkbL1jmw3DTz2GTKJJFFCULfvLd_-SbL7D2hCTQCb9p4rekAlogDu-O-vpZXj0UPA",
+      "summonerId": null,
+      "summonerName": "Aldnoah#NA1",
+      "profileIconId": 6421,
+      "summonerLevel": 692,
+      "topChamps": [
+        {
+          "name": "Alistar",
+          "count": 2
+        },
+        {
+          "name": "Bard",
+          "count": 1
+        },
+        {
+          "name": "Braum",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Aldnoah",
+      "tagLine": "NA1",
+      "leaguePoints": 1648,
+      "wins": 139,
+      "losses": 105,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": true,
       "freshBlood": false
     },
     {
