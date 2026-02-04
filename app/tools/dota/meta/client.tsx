@@ -69,6 +69,15 @@ function fmtInt(n: number) {
   return x.toLocaleString();
 }
 
+// ✅ compact numbers on mobile so columns fit in portrait
+function fmtCompactInt(n: number) {
+  const x = Number.isFinite(n) ? Math.trunc(n) : 0;
+  if (x >= 1_000_000) return `${(Math.round((x / 1_000_000) * 10) / 10).toFixed(1)}M`;
+  if (x >= 10_000) return `${Math.round(x / 1000)}k`;
+  if (x >= 1_000) return `${(Math.round((x / 1000) * 10) / 10).toFixed(1)}k`;
+  return x.toString();
+}
+
 function sortLabel(sortBy: SortKey) {
   if (sortBy === "tier") return "Tier";
   if (sortBy === "pick") return "Picks";
@@ -150,20 +159,15 @@ type Row = {
 };
 
 const HEADER_BTN = [
-  "inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold transition",
+  // ✅ tighter on mobile
+  "inline-flex items-center gap-1 rounded-md border px-1.5 py-1 text-[11px] font-semibold transition sm:rounded-lg sm:px-2 sm:text-xs",
   "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600 hover:text-white",
   "focus:outline-none focus:ring-1 focus:ring-neutral-600",
 ].join(" ");
 
 const HEADER_BTN_DISABLED = [
-  "inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold",
+  "inline-flex items-center gap-1 rounded-md border px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-2 sm:text-xs",
   "border-neutral-800 bg-black text-neutral-500 opacity-60 cursor-not-allowed",
-].join(" ");
-
-const MINI_BTN = [
-  "inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm font-semibold transition",
-  "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600 hover:text-white",
-  "focus:outline-none focus:ring-1 focus:ring-neutral-600",
 ].join(" ");
 
 async function fetchLatestPatchClient(): Promise<string | null> {
@@ -286,7 +290,6 @@ export default function DotaMetaClient({
     // mode
     if (isMode(pMode)) {
       setMode(pMode);
-      // if pro, bracket isn't relevant, but we keep whatever user sent
     }
 
     // bracket (only meaningful for pub)
@@ -309,10 +312,12 @@ export default function DotaMetaClient({
     if (isSortKey(pSort)) {
       setSortBy(pSort);
 
-      // if user asks for ban sorting but they're not pro, clamp
-      // (we'll also handle this in setModeSafe)
       const rawDesc =
-        pDesc === "1" || pDesc === "true" ? true : pDesc === "0" || pDesc === "false" ? false : null;
+        pDesc === "1" || pDesc === "true"
+          ? true
+          : pDesc === "0" || pDesc === "false"
+          ? false
+          : null;
 
       if (rawDesc !== null) {
         setDesc(rawDesc);
@@ -391,7 +396,8 @@ export default function DotaMetaClient({
     const parts: string[] = [];
     parts.push(`Dota 2 Meta (GamerStation)`);
     parts.push(`Mode: ${mode === "pro" ? "Pro" : "Public"}`);
-    if (mode === "pub") parts.push(`Bracket: ${BRACKETS.find((b) => b.key === bracket)?.label ?? bracket}`);
+    if (mode === "pub")
+      parts.push(`Bracket: ${BRACKETS.find((b) => b.key === bracket)?.label ?? bracket}`);
     parts.push(`Sort: ${sortLabel(sortBy)} (${desc ? "high→low" : "low→high"})`);
     parts.push(`Min games: ${minGames}`);
     if (q.trim()) parts.push(`Search: ${q.trim()}`);
@@ -505,9 +511,8 @@ export default function DotaMetaClient({
 
       const diff = av - bv;
 
-if (sortBy === "tier") return desc ? diff : -diff;
-return desc ? -diff : diff;
-
+      if (sortBy === "tier") return desc ? diff : -diff;
+      return desc ? -diff : diff;
     });
 
     return finalRows.slice(0, 100);
@@ -575,7 +580,11 @@ return desc ? -diff : diff;
           </div>
 
           {/* ✅ Split copy buttons (link vs text) */}
-          
+          <div className="flex flex-wrap items-center gap-2">
+            
+
+            {copyStatus ? <span className="text-xs text-neutral-400">{copyStatus}</span> : null}
+          </div>
         </div>
       </div>
 
@@ -588,21 +597,22 @@ return desc ? -diff : diff;
           Data: <span className="text-neutral-200">OpenDota</span>
         </span>
         
-        
       </div>
 
       <div className="mt-3 text-xs text-neutral-500">
-        Tip: Swipe sideways on mobile to see all columns. Click column headers to toggle high→low.
+        Tip: Tap a hero to see individual performance. Click column headers to toggle high→low.
       </div>
-      <div className="mt-3 text-xs text-neutral-500">Tap on a hero to see individual performance.</div>
 
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
-        <div className="overflow-x-auto">
-          <div className="min-w-[640px]">
-            <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-3 py-2 text-xs text-neutral-400">
-              <div className="col-span-5 flex items-center justify-between gap-2">
-                <span>Hero</span>
+        {/* ✅ prevent forced sideways scroll on mobile */}
+        <div className="overflow-x-hidden">
+          <div className="w-full">
+            {/* Header */}
+            <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-2 py-1.5 text-[11px] text-neutral-400 sm:px-3 sm:py-2 sm:text-xs">
+              <div className="col-span-6 flex items-center justify-between gap-2">
+                <span className="hidden sm:inline">Hero</span>
+                <span className="sm:hidden">Hero</span>
 
                 <button
                   type="button"
@@ -614,7 +624,7 @@ return desc ? -diff : diff;
                 </button>
               </div>
 
-              <div className="col-span-3 flex items-center justify-end">
+              <div className="col-span-2 flex items-center justify-end">
                 <button
                   type="button"
                   onClick={() => onSortClick("pick")}
@@ -632,7 +642,7 @@ return desc ? -diff : diff;
                   className={HEADER_BTN}
                   title="Sort by Winrate"
                 >
-                  Winrate{sortArrow(sortBy === "winrate", desc)}
+                  Win{sortArrow(sortBy === "winrate", desc)}
                 </button>
               </div>
 
@@ -649,18 +659,21 @@ return desc ? -diff : diff;
               </div>
             </div>
 
+            {/* Body */}
             <div className="divide-y divide-neutral-800">
               {rows.length ? (
                 rows.map((r, idx) => (
                   <Link
                     key={r.id}
                     href={`/tools/dota/heroes/${r.slug}`}
-                    className="grid grid-cols-12 items-center px-3 py-2 text-sm hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+                    className="grid grid-cols-12 items-center px-2 py-1.5 text-[12px] hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-neutral-600 sm:px-3 sm:py-2 sm:text-sm"
                     title={`Open ${r.name}`}
                   >
-                    <div className="col-span-5 flex min-w-0 items-center justify-between gap-2">
+                    <div className="col-span-6 flex min-w-0 items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
-                        <div className="w-8 shrink-0 text-xs text-neutral-500">{idx + 1}.</div>
+                        <div className="w-5 shrink-0 text-[10px] text-neutral-500 sm:w-8 sm:text-xs">
+                          {idx + 1}.
+                        </div>
                         <HeroIcon relPath={r.relPath} />
                         <div className="min-w-0 truncate font-medium text-neutral-100">{r.name}</div>
                       </div>
@@ -668,7 +681,10 @@ return desc ? -diff : diff;
                       <TierPill tier={r.tier} />
                     </div>
 
-                    <div className="col-span-3 text-right tabular-nums text-neutral-200">{fmtInt(r.picks)}</div>
+                    <div className="col-span-2 text-right tabular-nums text-neutral-200">
+                      <span className="sm:hidden">{fmtCompactInt(r.picks)}</span>
+                      <span className="hidden sm:inline">{fmtInt(r.picks)}</span>
+                    </div>
 
                     <div
                       className={`col-span-2 text-right tabular-nums ${
@@ -683,7 +699,14 @@ return desc ? -diff : diff;
                     </div>
 
                     <div className="col-span-2 text-right tabular-nums text-neutral-200">
-                      {mode === "pro" ? fmtInt(r.bans) : "—"}
+                      {mode === "pro" ? (
+                        <>
+                          <span className="sm:hidden">{fmtCompactInt(r.bans)}</span>
+                          <span className="hidden sm:inline">{fmtInt(r.bans)}</span>
+                        </>
+                      ) : (
+                        "—"
+                      )}
                     </div>
                   </Link>
                 ))
@@ -716,7 +739,7 @@ function TierPill({ tier }: { tier: Tier }) {
 
   return (
     <span
-      className={`inline-flex h-6 min-w-[2.25rem] items-center justify-center rounded-lg border px-2 text-xs font-semibold ${cls}`}
+      className={`inline-flex h-5 min-w-[1.9rem] items-center justify-center rounded-md border px-1.5 text-[11px] font-semibold sm:h-6 sm:min-w-[2.25rem] sm:rounded-lg sm:px-2 sm:text-xs ${cls}`}
     >
       {tier}
     </span>
