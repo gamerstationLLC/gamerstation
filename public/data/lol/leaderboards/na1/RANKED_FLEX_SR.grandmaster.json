@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T13:53:13.182Z",
+  "generatedAt": "2026-02-04T19:49:44.059Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -366,33 +366,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "cdpyTCCTJESCGG3iEaU28tZXcOY2jsh6znhTagE2PewkBkNT5eLwPvZx6weydBAr3hUuveW8piVyrA",
-      "summonerId": null,
-      "summonerName": "thugger#0428",
-      "profileIconId": 6735,
-      "summonerLevel": 586,
-      "topChamps": [
-        {
-          "name": "Yasuo",
-          "count": 5
-        },
-        {
-          "name": "Yone",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "thugger",
-      "tagLine": "0428",
-      "leaguePoints": 369,
-      "wins": 55,
-      "losses": 25,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "19fJA0hWemy46I47T07LgnKLbAxqZefCp1zWvrWcOL0bwEcrvHPtpWSNbMmHa-B22v21bORvFbeHRA",
       "summonerId": null,
       "summonerName": "계산해 주세요#04BOT",
@@ -442,6 +415,33 @@
       "wins": 34,
       "losses": 19,
       "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "cdpyTCCTJESCGG3iEaU28tZXcOY2jsh6znhTagE2PewkBkNT5eLwPvZx6weydBAr3hUuveW8piVyrA",
+      "summonerId": null,
+      "summonerName": "thugger#0428",
+      "profileIconId": 6735,
+      "summonerLevel": 586,
+      "topChamps": [
+        {
+          "name": "Yasuo",
+          "count": 5
+        },
+        {
+          "name": "Yone",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "thugger",
+      "tagLine": "0428",
+      "leaguePoints": 354,
+      "wins": 55,
+      "losses": 26,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -1183,14 +1183,14 @@
       "topChamps": [
         {
           "name": "Jinx",
+          "count": 2
+        },
+        {
+          "name": "Ezreal",
           "count": 1
         },
         {
-          "name": "Lucian",
-          "count": 1
-        },
-        {
-          "name": "Sivir",
+          "name": "Caitlyn",
           "count": 1
         }
       ],
@@ -1369,7 +1369,7 @@
       "topChamps": [
         {
           "name": "Ezreal",
-          "count": 1
+          "count": 3
         },
         {
           "name": "Syndra",

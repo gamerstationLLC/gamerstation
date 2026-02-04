@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T14:07:27.138Z",
+  "generatedAt": "2026-02-04T20:07:55.164Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -79,11 +79,11 @@
           "count": 3
         },
         {
-          "name": "Ahri",
+          "name": "Hwei",
           "count": 1
         },
         {
-          "name": "Annie",
+          "name": "Naafiri",
           "count": 1
         }
       ],
@@ -199,11 +199,11 @@
           "count": 2
         },
         {
-          "name": "Ekko",
+          "name": "Diana",
           "count": 1
         },
         {
-          "name": "XinZhao",
+          "name": "Graves",
           "count": 1
         }
       ],
@@ -761,14 +761,14 @@
       "topChamps": [
         {
           "name": "Yone",
+          "count": 2
+        },
+        {
+          "name": "Ezreal",
           "count": 1
         },
         {
           "name": "Ekko",
-          "count": 1
-        },
-        {
-          "name": "Jhin",
           "count": 1
         }
       ],
@@ -853,15 +853,15 @@
       "summonerLevel": 547,
       "topChamps": [
         {
+          "name": "Ezreal",
+          "count": 2
+        },
+        {
           "name": "Kaisa",
           "count": 2
         },
         {
           "name": "Caitlyn",
-          "count": 1
-        },
-        {
-          "name": "Varus",
           "count": 1
         }
       ],
@@ -915,15 +915,15 @@
       "summonerLevel": 623,
       "topChamps": [
         {
-          "name": "Corki",
+          "name": "Jax",
           "count": 2
         },
         {
-          "name": "Jax",
+          "name": "Nautilus",
           "count": 1
         },
         {
-          "name": "Lissandra",
+          "name": "Lillia",
           "count": 1
         }
       ],
@@ -934,37 +934,6 @@
       "wins": 19,
       "losses": 13,
       "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "rSr8pycG8LgBHLuH0iZ-bAtSlQci4t3L_DQS8Ka5dYmdJ9PNfrfDzv7ShpRL_V-nqZjHe_4RSrADYg",
-      "summonerId": null,
-      "summonerName": "fortnite#poop",
-      "profileIconId": 6382,
-      "summonerLevel": 974,
-      "topChamps": [
-        {
-          "name": "Ekko",
-          "count": 2
-        },
-        {
-          "name": "Viego",
-          "count": 2
-        },
-        {
-          "name": "Yasuo",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "fortnite",
-      "tagLine": "poop",
-      "leaguePoints": 127,
-      "wins": 15,
-      "losses": 1,
-      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -1001,6 +970,37 @@
       "freshBlood": false
     },
     {
+      "puuid": "rSr8pycG8LgBHLuH0iZ-bAtSlQci4t3L_DQS8Ka5dYmdJ9PNfrfDzv7ShpRL_V-nqZjHe_4RSrADYg",
+      "summonerId": null,
+      "summonerName": "fortnite#poop",
+      "profileIconId": 6382,
+      "summonerLevel": 974,
+      "topChamps": [
+        {
+          "name": "Ekko",
+          "count": 2
+        },
+        {
+          "name": "Viego",
+          "count": 2
+        },
+        {
+          "name": "Yasuo",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "fortnite",
+      "tagLine": "poop",
+      "leaguePoints": 127,
+      "wins": 15,
+      "losses": 1,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
       "puuid": "AN7029UClUfWqeGHx-_-mNy786xubaZ_cGkxm8CKUhAw99XYDo58Ok4Jm0nIj0HtOEbaJA43qhlG6w",
       "summonerId": null,
       "summonerName": "艾卡西亚暴雨#你的男孩",
@@ -1009,7 +1009,15 @@
       "topChamps": [
         {
           "name": "Jayce",
-          "count": 6
+          "count": 4
+        },
+        {
+          "name": "Rumble",
+          "count": 1
+        },
+        {
+          "name": "Evelynn",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -1206,37 +1214,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "UwJlyYb9BfH5E6HF2NO2No4dMqJ1x4UJrY0fte46QTpcrVFk1Cdx0IRqChaX-jzy9u4Mgpe6a6iVow",
-      "summonerId": null,
-      "summonerName": "Riot Roflcopter#USA",
-      "profileIconId": 7050,
-      "summonerLevel": 755,
-      "topChamps": [
-        {
-          "name": "Neeko",
-          "count": 2
-        },
-        {
-          "name": "Pyke",
-          "count": 2
-        },
-        {
-          "name": "Senna",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Riot Roflcopter",
-      "tagLine": "USA",
-      "leaguePoints": 117,
-      "wins": 19,
-      "losses": 14,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "runGwg2J1s0kqFzXW_bQ2qoleeIAggpGe14unM5I8Kd_ZO65SnoY-3HqUtvNQrvcHUSaflvzYAM_jg",
       "summonerId": null,
       "summonerName": "XNG Steven#NA0",
@@ -1268,6 +1245,37 @@
       "freshBlood": false
     },
     {
+      "puuid": "UwJlyYb9BfH5E6HF2NO2No4dMqJ1x4UJrY0fte46QTpcrVFk1Cdx0IRqChaX-jzy9u4Mgpe6a6iVow",
+      "summonerId": null,
+      "summonerName": "Riot Roflcopter#USA",
+      "profileIconId": 7050,
+      "summonerLevel": 755,
+      "topChamps": [
+        {
+          "name": "Neeko",
+          "count": 2
+        },
+        {
+          "name": "Pyke",
+          "count": 2
+        },
+        {
+          "name": "Senna",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Riot Roflcopter",
+      "tagLine": "USA",
+      "leaguePoints": 117,
+      "wins": 19,
+      "losses": 14,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "JUIj0jsvFupDhHrTbtmsgRyHXZ50AOBroutXxYrZZqLFCVSOquxYba7wsQoL7lrLwi1cQ8KT9cLWGg",
       "summonerId": null,
       "summonerName": "TravelerDante#NA1",
@@ -1275,15 +1283,15 @@
       "summonerLevel": 606,
       "topChamps": [
         {
+          "name": "Poppy",
+          "count": 1
+        },
+        {
           "name": "Sejuani",
           "count": 1
         },
         {
           "name": "MasterYi",
-          "count": 1
-        },
-        {
-          "name": "Syndra",
           "count": 1
         }
       ],

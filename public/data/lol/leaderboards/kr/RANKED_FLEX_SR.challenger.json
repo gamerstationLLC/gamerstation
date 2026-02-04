@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T15:11:00.962Z",
+  "generatedAt": "2026-02-04T21:11:25.342Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -44,21 +44,21 @@
       "summonerLevel": 460,
       "topChamps": [
         {
-          "name": "Skarner",
-          "count": 4
+          "name": "Ivern",
+          "count": 3
         },
         {
-          "name": "Ivern",
-          "count": 2
+          "name": "Skarner",
+          "count": 3
         }
       ],
       "sampleGames": 6,
       "gameName": "SiO2nH2O",
       "tagLine": "실리카겔",
-      "leaguePoints": 783,
-      "wins": 49,
-      "losses": 24,
-      "hotStreak": false,
+      "leaguePoints": 837,
+      "wins": 52,
+      "losses": 25,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -103,23 +103,23 @@
       "topChamps": [
         {
           "name": "Akali",
-          "count": 2
-        },
-        {
-          "name": "Aurora",
-          "count": 2
+          "count": 3
         },
         {
           "name": "Akshan",
+          "count": 2
+        },
+        {
+          "name": "Vex",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "허엉3",
       "tagLine": "JJ2YA",
-      "leaguePoints": 731,
-      "wins": 58,
-      "losses": 46,
+      "leaguePoints": 741,
+      "wins": 60,
+      "losses": 48,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -164,20 +164,24 @@
       "summonerLevel": 380,
       "topChamps": [
         {
-          "name": "Qiyana",
-          "count": 3
+          "name": "Nocturne",
+          "count": 4
         },
         {
           "name": "Rammus",
-          "count": 3
+          "count": 1
+        },
+        {
+          "name": "Qiyana",
+          "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "chendian",
       "tagLine": "KR 1",
-      "leaguePoints": 700,
-      "wins": 72,
-      "losses": 54,
+      "leaguePoints": 685,
+      "wins": 74,
+      "losses": 57,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -191,24 +195,24 @@
       "summonerLevel": 208,
       "topChamps": [
         {
-          "name": "Sylas",
+          "name": "Yone",
           "count": 2
         },
         {
-          "name": "Yone",
+          "name": "Renekton",
           "count": 1
         },
         {
-          "name": "Ambessa",
+          "name": "Kennen",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "엄마아빠사랑해요",
       "tagLine": "L0ve",
-      "leaguePoints": 673,
-      "wins": 77,
-      "losses": 44,
+      "leaguePoints": 675,
+      "wins": 79,
+      "losses": 46,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -223,11 +227,11 @@
       "topChamps": [
         {
           "name": "Alistar",
-          "count": 1
+          "count": 3
         },
         {
-          "name": "Graves",
-          "count": 1
+          "name": "Leona",
+          "count": 2
         },
         {
           "name": "Nautilus",
@@ -237,10 +241,10 @@
       "sampleGames": 6,
       "gameName": "테크맥스",
       "tagLine": "kr2",
-      "leaguePoints": 672,
-      "wins": 63,
-      "losses": 45,
-      "hotStreak": true,
+      "leaguePoints": 663,
+      "wins": 64,
+      "losses": 47,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -285,14 +289,10 @@
       "topChamps": [
         {
           "name": "Nocturne",
-          "count": 4
+          "count": 5
         },
         {
-          "name": "Zilean",
-          "count": 1
-        },
-        {
-          "name": "Morgana",
+          "name": "Blitzcrank",
           "count": 1
         }
       ],
@@ -342,15 +342,15 @@
       "summonerLevel": 319,
       "topChamps": [
         {
-          "name": "Nautilus",
-          "count": 4
-        },
-        {
-          "name": "Leona",
-          "count": 1
-        },
-        {
           "name": "Seraphine",
+          "count": 2
+        },
+        {
+          "name": "Nautilus",
+          "count": 2
+        },
+        {
+          "name": "Yuumi",
           "count": 1
         }
       ],
@@ -392,6 +392,33 @@
       "wins": 39,
       "losses": 28,
       "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "d6BN9PumnuzX1nXc25b_zKd7Z3rna2JoI0KhdSgRKJ73oc1odqpBxNw6sn_fpfoByrdkawQi7smPqQ",
+      "summonerId": null,
+      "summonerName": "Sanchez7#7599",
+      "profileIconId": 7048,
+      "summonerLevel": 244,
+      "topChamps": [
+        {
+          "name": "Orianna",
+          "count": 5
+        },
+        {
+          "name": "Veigar",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Sanchez7",
+      "tagLine": "7599",
+      "leaguePoints": 576,
+      "wins": 67,
+      "losses": 54,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -484,37 +511,6 @@
       "leaguePoints": 543,
       "wins": 63,
       "losses": 31,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "d6BN9PumnuzX1nXc25b_zKd7Z3rna2JoI0KhdSgRKJ73oc1odqpBxNw6sn_fpfoByrdkawQi7smPqQ",
-      "summonerId": null,
-      "summonerName": "Sanchez7#7599",
-      "profileIconId": 7048,
-      "summonerLevel": 244,
-      "topChamps": [
-        {
-          "name": "Veigar",
-          "count": 4
-        },
-        {
-          "name": "Orianna",
-          "count": 1
-        },
-        {
-          "name": "Bard",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Sanchez7",
-      "tagLine": "7599",
-      "leaguePoints": 529,
-      "wins": 64,
-      "losses": 53,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
