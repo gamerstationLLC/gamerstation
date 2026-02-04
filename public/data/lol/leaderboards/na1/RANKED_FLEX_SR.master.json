@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T14:07:27.138Z",
+  "generatedAt": "2026-02-04T16:09:01.573Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -76,14 +76,14 @@
       "topChamps": [
         {
           "name": "Sona",
-          "count": 3
+          "count": 2
         },
         {
-          "name": "Ahri",
+          "name": "Akshan",
           "count": 1
         },
         {
-          "name": "Annie",
+          "name": "Ahri",
           "count": 1
         }
       ],
@@ -761,14 +761,14 @@
       "topChamps": [
         {
           "name": "Yone",
+          "count": 2
+        },
+        {
+          "name": "Ezreal",
           "count": 1
         },
         {
           "name": "Ekko",
-          "count": 1
-        },
-        {
-          "name": "Jhin",
           "count": 1
         }
       ],
@@ -939,37 +939,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "rSr8pycG8LgBHLuH0iZ-bAtSlQci4t3L_DQS8Ka5dYmdJ9PNfrfDzv7ShpRL_V-nqZjHe_4RSrADYg",
-      "summonerId": null,
-      "summonerName": "fortnite#poop",
-      "profileIconId": 6382,
-      "summonerLevel": 974,
-      "topChamps": [
-        {
-          "name": "Ekko",
-          "count": 2
-        },
-        {
-          "name": "Viego",
-          "count": 2
-        },
-        {
-          "name": "Yasuo",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "fortnite",
-      "tagLine": "poop",
-      "leaguePoints": 127,
-      "wins": 15,
-      "losses": 1,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "eC8mVcfZDSvPNB3U32PFDGK6vBBfd6fi76nLlnVEyIIYNrxaz5XZkJNFGvAw-g8ibdlWNc5fSUZ_Sw",
       "summonerId": null,
       "summonerName": "Buffing#2001",
@@ -1001,6 +970,37 @@
       "freshBlood": false
     },
     {
+      "puuid": "rSr8pycG8LgBHLuH0iZ-bAtSlQci4t3L_DQS8Ka5dYmdJ9PNfrfDzv7ShpRL_V-nqZjHe_4RSrADYg",
+      "summonerId": null,
+      "summonerName": "fortnite#poop",
+      "profileIconId": 6382,
+      "summonerLevel": 974,
+      "topChamps": [
+        {
+          "name": "Ekko",
+          "count": 2
+        },
+        {
+          "name": "Viego",
+          "count": 2
+        },
+        {
+          "name": "Yasuo",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "fortnite",
+      "tagLine": "poop",
+      "leaguePoints": 127,
+      "wins": 15,
+      "losses": 1,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
       "puuid": "AN7029UClUfWqeGHx-_-mNy786xubaZ_cGkxm8CKUhAw99XYDo58Ok4Jm0nIj0HtOEbaJA43qhlG6w",
       "summonerId": null,
       "summonerName": "艾卡西亚暴雨#你的男孩",
@@ -1009,7 +1009,11 @@
       "topChamps": [
         {
           "name": "Jayce",
-          "count": 6
+          "count": 5
+        },
+        {
+          "name": "Evelynn",
+          "count": 1
         }
       ],
       "sampleGames": 6,
