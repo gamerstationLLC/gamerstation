@@ -87,7 +87,8 @@ function sortLabel(sortBy: SortKey) {
 
 function sortArrow(active: boolean, desc: boolean) {
   if (!active) return "";
-  return desc ? " ↓" : " ↑";
+  // NBSP so it never wraps under on mobile
+  return desc ? "\u00A0↓" : "\u00A0↑";
 }
 
 function getRelPath(r: HeroStatsRow) {
@@ -159,14 +160,15 @@ type Row = {
 };
 
 const HEADER_BTN = [
-  // ✅ tighter on mobile
-  "inline-flex items-center gap-1 rounded-md border px-1.5 py-1 text-[11px] font-semibold transition sm:rounded-lg sm:px-2 sm:text-xs",
+  "inline-flex w-full items-center justify-center gap-1 rounded-md border px-1.5 py-1",
+  "text-[10px] font-semibold transition whitespace-nowrap leading-none sm:rounded-lg sm:px-2 sm:py-1 sm:text-xs",
   "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600 hover:text-white",
   "focus:outline-none focus:ring-1 focus:ring-neutral-600",
 ].join(" ");
 
 const HEADER_BTN_DISABLED = [
-  "inline-flex items-center gap-1 rounded-md border px-1.5 py-1 text-[11px] font-semibold sm:rounded-lg sm:px-2 sm:text-xs",
+  "inline-flex w-full items-center justify-center gap-1 rounded-md border px-1.5 py-1",
+  "text-[10px] font-semibold whitespace-nowrap leading-none sm:rounded-lg sm:px-2 sm:py-1 sm:text-xs",
   "border-neutral-800 bg-black text-neutral-500 opacity-60 cursor-not-allowed",
 ].join(" ");
 
@@ -199,35 +201,6 @@ function isBracket(x: string | null): x is BracketKey {
 }
 function isSortKey(x: string | null): x is SortKey {
   return x === "tier" || x === "pick" || x === "winrate" || x === "ban";
-}
-
-async function copyToClipboard(text: string) {
-  // Prefer modern clipboard API
-  try {
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  } catch {
-    // fall through to legacy
-  }
-
-  // Legacy fallback (works in more contexts)
-  try {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.setAttribute("readonly", "true");
-    ta.style.position = "fixed";
-    ta.style.top = "-1000px";
-    ta.style.left = "-1000px";
-    document.body.appendChild(ta);
-    ta.select();
-    const ok = document.execCommand("copy");
-    document.body.removeChild(ta);
-    return ok;
-  } catch {
-    return false;
-  }
 }
 
 export default function DotaMetaClient({
@@ -269,7 +242,6 @@ export default function DotaMetaClient({
   );
 
   const [patchLive, setPatchLive] = useState<string>(patch || "—");
-  const [copyStatus, setCopyStatus] = useState<string>("");
 
   useEffect(() => {
     setPatchLive(patch || "—");
@@ -285,40 +257,25 @@ export default function DotaMetaClient({
     const pQ = params.get("q");
     const pMin = params.get("minGames");
     const pSort = params.get("sort");
-    const pDesc = params.get("desc"); // "1"/"0"/"true"/"false"
+    const pDesc = params.get("desc");
 
-    // mode
-    if (isMode(pMode)) {
-      setMode(pMode);
-    }
+    if (isMode(pMode)) setMode(pMode);
+    if (isBracket(pBracket)) setBracket(pBracket);
+    if (typeof pQ === "string" && pQ.length) setQ(pQ);
 
-    // bracket (only meaningful for pub)
-    if (isBracket(pBracket)) {
-      setBracket(pBracket);
-    }
-
-    // search
-    if (typeof pQ === "string" && pQ.length) {
-      setQ(pQ);
-    }
-
-    // minGames
     if (typeof pMin === "string" && pMin.trim().length) {
       const n = Number(pMin);
       if (Number.isFinite(n) && n >= 0) setMinGamesText(String(Math.trunc(n)));
     }
 
-    // sort + desc
     if (isSortKey(pSort)) {
       setSortBy(pSort);
-
       const rawDesc =
         pDesc === "1" || pDesc === "true"
           ? true
           : pDesc === "0" || pDesc === "false"
           ? false
           : null;
-
       if (rawDesc !== null) {
         setDesc(rawDesc);
         setDirByKey((prev) => ({ ...prev, [pSort]: rawDesc }));
@@ -330,16 +287,13 @@ export default function DotaMetaClient({
   // Patch refresher
   useEffect(() => {
     let alive = true;
-
     async function refresh() {
       const latest = await fetchLatestPatchClient();
       if (!alive) return;
       if (latest) setPatchLive(latest);
     }
-
     refresh();
     const id = window.setInterval(refresh, 5 * 60 * 1000);
-
     return () => {
       alive = false;
       window.clearInterval(id);
@@ -373,54 +327,9 @@ export default function DotaMetaClient({
     }
   }
 
-  function buildShareUrl() {
-    const base =
-      typeof window !== "undefined"
-        ? `${window.location.origin}${window.location.pathname}`
-        : "/tools/dota/meta";
-
-    const sp = new URLSearchParams();
-    sp.set("mode", mode);
-
-    if (mode === "pub") sp.set("bracket", bracket);
-    if (q.trim()) sp.set("q", q.trim());
-    if (minGames > 0) sp.set("minGames", String(minGames));
-
-    sp.set("sort", sortBy);
-    sp.set("desc", desc ? "1" : "0");
-
-    return `${base}?${sp.toString()}`;
-  }
-
-  function buildTextSummary() {
-    const parts: string[] = [];
-    parts.push(`Dota 2 Meta (GamerStation)`);
-    parts.push(`Mode: ${mode === "pro" ? "Pro" : "Public"}`);
-    if (mode === "pub")
-      parts.push(`Bracket: ${BRACKETS.find((b) => b.key === bracket)?.label ?? bracket}`);
-    parts.push(`Sort: ${sortLabel(sortBy)} (${desc ? "high→low" : "low→high"})`);
-    parts.push(`Min games: ${minGames}`);
-    if (q.trim()) parts.push(`Search: ${q.trim()}`);
-    parts.push(`Patch: ${patchLive}`);
-    return parts.join(" | ");
-  }
-
-  async function onCopyLink() {
-    const ok = await copyToClipboard(buildShareUrl());
-    setCopyStatus(ok ? "Copied share link ✅" : "Copy failed ❌");
-    window.setTimeout(() => setCopyStatus(""), 1800);
-  }
-
-  async function onCopyText() {
-    const ok = await copyToClipboard(`${buildTextSummary()}\n${buildShareUrl()}`);
-    setCopyStatus(ok ? "Copied text ✅" : "Copy failed ❌");
-    window.setTimeout(() => setCopyStatus(""), 1800);
-  }
-
   const rows = useMemo((): Row[] => {
     const query = q.trim().toLowerCase();
 
-    // 1) Build base rows (depends on mode + bracket)
     const derivedBase = (initialRows || []).map(
       (r): Omit<Row, "score" | "tier" | "tierRank"> => {
         const displayName = (r.localized_name || r.name || `Hero ${r.id}`).toString();
@@ -445,11 +354,9 @@ export default function DotaMetaClient({
       }
     );
 
-    // 2) Apply *stable* filters that SHOULD affect tiers
     const stableFiltered = derivedBase.filter((r) => r.picks >= minGames);
     if (!stableFiltered.length) return [];
 
-    // 3) Compute tiers from the stable set (NOT from search results)
     const pickVals = stableFiltered.map((r) => Math.log1p(r.picks));
     const winVals = stableFiltered.map((r) => r.winrate);
 
@@ -478,18 +385,15 @@ export default function DotaMetaClient({
       tierById.set(byScore[i].id, tierFromPercentile(p));
     }
 
-    // 4) Attach tier + rank (still stable)
     let finalRows: Row[] = withScores.map((r) => {
       const tier = tierById.get(r.id) ?? "—";
       return { ...r, tier, tierRank: TIER_RANK[tier] ?? 9 };
     });
 
-    // 5) Apply search ONLY for display (tiers do NOT change)
     if (query) {
       finalRows = finalRows.filter((r) => r.name.toLowerCase().includes(query));
     }
 
-    // 6) Sort display rows
     finalRows.sort((a, b) => {
       const av =
         sortBy === "tier"
@@ -519,71 +423,74 @@ export default function DotaMetaClient({
   }, [initialRows, mode, bracketNum, q, minGames, sortBy, desc]);
 
   return (
-    <section className="rounded-2xl border border-neutral-800 bg-black/60 p-4">
-      {/* Controls */}
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        <div className="flex flex-col gap-2">
-          <div className="text-sm font-semibold">Filters</div>
+    <section
+      className={[
+        // ✅ keep it wide on mobile WITHOUT weird border bars
+        "-mx-4 sm:mx-0",
+        "rounded-2xl border border-neutral-800 bg-black/60",
+        "p-3 sm:p-4",
+        "overflow-hidden",
+      ].join(" ")}
+    >
+      {/* Controls (rounded card) */}
+      <div className="rounded-2xl border border-neutral-800 bg-black/40 p-3 sm:p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-2">
+            <div className="text-sm font-semibold">Filters</div>
 
-          <div className="flex flex-wrap gap-2">
-            <ToggleButton active={mode === "pub"} onClick={() => setModeSafe("pub")}>
-              Public (by rank)
-            </ToggleButton>
-            <ToggleButton active={mode === "pro"} onClick={() => setModeSafe("pro")}>
-              Pro
-            </ToggleButton>
+            <div className="flex flex-wrap gap-2">
+              <ToggleButton active={mode === "pub"} onClick={() => setModeSafe("pub")}>
+                Public (by rank)
+              </ToggleButton>
+              <ToggleButton active={mode === "pro"} onClick={() => setModeSafe("pro")}>
+                Pro
+              </ToggleButton>
 
-            <div className="mx-2 hidden h-8 w-px bg-neutral-800 lg:block" />
+              <div className="mx-2 hidden h-8 w-px bg-neutral-800 lg:block" />
 
-            <select
-              value={bracket}
-              onChange={(e) => setBracket(e.target.value as BracketKey)}
-              disabled={mode !== "pub"}
-              className="h-9 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none disabled:opacity-50"
-              title={mode !== "pub" ? "Rank bracket only applies to Public mode" : undefined}
-            >
-              {BRACKETS.map((b) => (
-                <option key={b.key} value={b.key}>
-                  {b.label}
-                </option>
-              ))}
-            </select>
+              <select
+                value={bracket}
+                onChange={(e) => setBracket(e.target.value as BracketKey)}
+                disabled={mode !== "pub"}
+                className="h-9 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none disabled:opacity-50"
+                title={mode !== "pub" ? "Rank bracket only applies to Public mode" : undefined}
+              >
+                {BRACKETS.map((b) => (
+                  <option key={b.key} value={b.key}>
+                    {b.label}
+                  </option>
+                ))}
+              </select>
 
-            <div className="ml-1 self-center text-xs text-neutral-500">
-              Sorting: <span className="text-neutral-300">{sortLabel(sortBy)}</span>{" "}
-              <span className="text-neutral-600">{desc ? "↓" : "↑"}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2 lg:items-end">
-          <div className="text-sm font-semibold">Search</div>
-          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search hero…"
-              className="h-9 w-full rounded-xl border border-neutral-800 bg-black px-3 text-sm text-white outline-none focus:border-neutral-600 sm:w-[260px]"
-            />
-
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-neutral-400">Min games</div>
-              <input
-                type="number"
-                value={minGamesText}
-                min={0}
-                step={50}
-                onChange={(e) => setMinGamesText(e.target.value)}
-                className="h-9 w-28 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none focus:border-neutral-600"
-              />
+              <div className="ml-1 self-center text-xs text-neutral-500">
+                Sorting: <span className="text-neutral-300">{sortLabel(sortBy)}</span>{" "}
+                <span className="text-neutral-600">{desc ? "↓" : "↑"}</span>
+              </div>
             </div>
           </div>
 
-          {/* ✅ Split copy buttons (link vs text) */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col gap-2 lg:items-end">
             
+            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search hero…"
+                className="h-9 w-full rounded-xl border border-neutral-800 bg-black px-3 text-sm text-white outline-none focus:border-neutral-600 sm:w-[260px]"
+              />
 
-            {copyStatus ? <span className="text-xs text-neutral-400">{copyStatus}</span> : null}
+              <div className="flex items-center gap-2">
+                <div className="text-xs text-neutral-400">Min games</div>
+                <input
+                  type="number"
+                  value={minGamesText}
+                  min={0}
+                  step={50}
+                  onChange={(e) => setMinGamesText(e.target.value)}
+                  className="h-9 w-28 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none focus:border-neutral-600"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -596,7 +503,6 @@ export default function DotaMetaClient({
         <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
           Data: <span className="text-neutral-200">OpenDota</span>
         </span>
-        
       </div>
 
       <div className="mt-3 text-xs text-neutral-500">
@@ -605,37 +511,27 @@ export default function DotaMetaClient({
 
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
-        {/* ✅ prevent forced sideways scroll on mobile */}
         <div className="overflow-x-hidden">
           <div className="w-full">
             {/* Header */}
-            <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-2 py-1.5 text-[11px] text-neutral-400 sm:px-3 sm:py-2 sm:text-xs">
-              <div className="col-span-6 flex items-center justify-between gap-2">
-                <span className="hidden sm:inline">Hero</span>
-                <span className="sm:hidden">Hero</span>
-
-                <button
-                  type="button"
-                  onClick={() => onSortClick("tier")}
-                  className={HEADER_BTN}
-                  title="Sort by Tier"
-                >
-                  Tier{sortArrow(sortBy === "tier", desc)}
-                </button>
+            <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-2 py-2 text-[10px] text-neutral-400 sm:px-3 sm:py-2 sm:text-xs">
+              {/* ✅ MOBILE SPANS: Hero=6, Picks=2, Win=2, Ban=2  (fixes overlap) */}
+              <div className="col-span-6 sm:col-span-5 flex items-center justify-between gap-2 min-w-0">
+                <span className="whitespace-nowrap">Hero</span>
+                <div className="w-[3.2rem] sm:w-auto">
+                  <button type="button" onClick={() => onSortClick("tier")} className={HEADER_BTN} title="Sort by Tier">
+                    Tier{sortArrow(sortBy === "tier", desc)}
+                  </button>
+                </div>
               </div>
 
-              <div className="col-span-2 flex items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => onSortClick("pick")}
-                  className={HEADER_BTN}
-                  title="Sort by Picks"
-                >
+              <div className="col-span-2 sm:col-span-3 flex items-center justify-end min-w-0">
+                <button type="button" onClick={() => onSortClick("pick")} className={HEADER_BTN} title="Sort by Picks">
                   Picks{sortArrow(sortBy === "pick", desc)}
                 </button>
               </div>
 
-              <div className="col-span-2 flex items-center justify-end">
+              <div className="col-span-2 sm:col-span-2 flex items-center justify-end min-w-0">
                 <button
                   type="button"
                   onClick={() => onSortClick("winrate")}
@@ -646,7 +542,7 @@ export default function DotaMetaClient({
                 </button>
               </div>
 
-              <div className="col-span-2 flex items-center justify-end">
+              <div className="col-span-2 sm:col-span-2 flex items-center justify-end min-w-0">
                 <button
                   type="button"
                   onClick={() => onSortClick("ban")}
@@ -654,7 +550,9 @@ export default function DotaMetaClient({
                   className={mode === "pro" ? HEADER_BTN : HEADER_BTN_DISABLED}
                   title={mode === "pro" ? "Sort by Bans" : "Bans available in Pro mode"}
                 >
-                  Bans{mode === "pro" ? sortArrow(sortBy === "ban", desc) : ""}
+                  <span className="sm:hidden">Ban</span>
+                  <span className="hidden sm:inline">Bans</span>
+                  {mode === "pro" ? sortArrow(sortBy === "ban", desc) : ""}
                 </button>
               </div>
             </div>
@@ -666,39 +564,52 @@ export default function DotaMetaClient({
                   <Link
                     key={r.id}
                     href={`/tools/dota/heroes/${r.slug}`}
-                    className="grid grid-cols-12 items-center px-2 py-1.5 text-[12px] hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-neutral-600 sm:px-3 sm:py-2 sm:text-sm"
+                    className="grid grid-cols-12 items-start sm:items-center px-2 py-2 text-[12px] hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-neutral-600 sm:px-3 sm:py-2 sm:text-sm"
                     title={`Open ${r.name}`}
                   >
-                    <div className="col-span-6 flex min-w-0 items-center justify-between gap-2">
+                    {/* ✅ same spans as header */}
+                    <div className="col-span-6 sm:col-span-5 flex min-w-0 items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
                         <div className="w-5 shrink-0 text-[10px] text-neutral-500 sm:w-8 sm:text-xs">
                           {idx + 1}.
                         </div>
                         <HeroIcon relPath={r.relPath} />
-                        <div className="min-w-0 truncate font-medium text-neutral-100">{r.name}</div>
+                        <div
+                          className={[
+                            "min-w-0 font-medium text-neutral-100",
+                            "whitespace-normal leading-[1.15] line-clamp-2",
+                            "sm:whitespace-nowrap sm:truncate sm:line-clamp-none",
+                          ].join(" ")}
+                        >
+                          {r.name}
+                        </div>
                       </div>
 
-                      <TierPill tier={r.tier} />
+                      <div className="self-center">
+                        <TierPill tier={r.tier} />
+                      </div>
                     </div>
 
-                    <div className="col-span-2 text-right tabular-nums text-neutral-200">
+                    <div className="col-span-2 sm:col-span-3 text-right tabular-nums text-neutral-200 self-center whitespace-nowrap text-[11px] sm:text-sm">
                       <span className="sm:hidden">{fmtCompactInt(r.picks)}</span>
                       <span className="hidden sm:inline">{fmtInt(r.picks)}</span>
                     </div>
 
-                    <div
-                      className={`col-span-2 text-right tabular-nums ${
-                        r.winrate >= 0.52
-                          ? "text-green-300"
-                          : r.winrate <= 0.48
-                          ? "text-red-300"
-                          : "text-neutral-200"
-                      }`}
-                    >
-                      {pct(r.winrate)}
+                    <div className="col-span-2 sm:col-span-2 text-right tabular-nums self-center whitespace-nowrap text-[11px] sm:text-sm">
+                      <span
+                        className={
+                          r.winrate >= 0.52
+                            ? "text-green-300"
+                            : r.winrate <= 0.48
+                            ? "text-red-300"
+                            : "text-neutral-200"
+                        }
+                      >
+                        {pct(r.winrate)}
+                      </span>
                     </div>
 
-                    <div className="col-span-2 text-right tabular-nums text-neutral-200">
+                    <div className="col-span-2 sm:col-span-2 text-right tabular-nums text-neutral-200 self-center whitespace-nowrap text-[11px] sm:text-sm">
                       {mode === "pro" ? (
                         <>
                           <span className="sm:hidden">{fmtCompactInt(r.bans)}</span>
