@@ -202,12 +202,12 @@ function sortArrow(active: boolean, desc: boolean) {
 export default function LolChampionTiersClient({
   initialRows,
   patch = "—",
-  cacheLabel = "~5 min",
+  
   hrefBase = "/calculators/lol/champions",
 }: {
   initialRows: ChampionStatsRow[];
   patch?: string;
-  cacheLabel?: string;
+  
   hrefBase?: string;
 }) {
   // “Ranked” vs “Pro” is a familiar tier-list convention.

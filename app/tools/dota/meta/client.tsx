@@ -229,7 +229,7 @@ async function copyToClipboard(text: string) {
 export default function DotaMetaClient({
   initialRows,
   patch = "—",
-  cacheLabel = "~5 min",
+  cacheLabel = "~10 min",
 }: {
   initialRows: HeroStatsRow[];
   patch?: string;
@@ -575,15 +575,7 @@ return desc ? -diff : diff;
           </div>
 
           {/* ✅ Split copy buttons (link vs text) */}
-          <div className="flex flex-wrap items-center gap-2">
-            <button type="button" className={MINI_BTN} onClick={onCopyLink}>
-              Copy Share Link
-            </button>
-            <button type="button" className={MINI_BTN} onClick={onCopyText}>
-              Copy Text Summary
-            </button>
-            {copyStatus ? <span className="text-xs text-neutral-400">{copyStatus}</span> : null}
-          </div>
+          
         </div>
       </div>
 
@@ -595,14 +587,8 @@ return desc ? -diff : diff;
         <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
           Data: <span className="text-neutral-200">OpenDota</span>
         </span>
-        <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
-          Cache: <span className="text-neutral-200">{cacheLabel}</span>
-        </span>
-        <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1">
-          Showing: <span className="text-neutral-200">{Math.min(rows.length, 100)}</span>
-          <span className="text-neutral-500">/</span>
-          <span className="text-neutral-200">{Math.min(100, rows.length)}</span>
-        </span>
+        
+        
       </div>
 
       <div className="mt-3 text-xs text-neutral-500">

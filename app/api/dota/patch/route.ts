@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-export const revalidate = 300; // 5 minutes
+export const revalidate = 600; // 5 minutes
 
 type AnyObj = Record<string, any>;
 

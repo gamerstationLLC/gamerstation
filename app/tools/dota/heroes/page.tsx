@@ -46,7 +46,7 @@ function iconUrl(r: HeroStatsRow) {
 
 async function getHeroStats(): Promise<HeroStatsRow[]> {
   const res = await fetch("https://api.opendota.com/api/heroStats", {
-    next: { revalidate: 300 }, // ~5 minutes
+    next: { revalidate: 600 }, // ~5 minutes
     headers: { Accept: "application/json" },
   });
   if (!res.ok) return [];
@@ -65,7 +65,7 @@ async function getPatchFromSelf(): Promise<string> {
         : "http://localhost:3000");
 
     const res = await fetch(`${base}/api/dota/patch`, {
-      next: { revalidate: 300 },
+      next: { revalidate: 600 },
       headers: { Accept: "application/json" },
     });
 
@@ -148,7 +148,7 @@ export default async function DotaHeroesIndexPage({
           </p>
 
           {/* ✅ Pills are now rendered ONLY in the client */}
-          <DotaHeroesClient heroes={heroes} initialQuery={initialQuery} patch={patch} cacheLabel="~5 min" />
+          <DotaHeroesClient heroes={heroes} initialQuery={initialQuery} patch={patch} cacheLabel="~10 min" />
         </div>
       </div>
     </main>
