@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-02-04T06:59:50.950Z",
+  "generatedAt": "2026-02-04T10:29:13.400Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
-  "count": 11,
+  "count": 13,
   "players": [
     {
       "puuid": "bVZdq4zJuZN-t7PMNMZEJloEIskZ0YnreXD06LKGT4Y959qWCAXhzlY15NVSrxFZLx71c05iPJp4Mw",
@@ -13,12 +13,12 @@
       "summonerLevel": 133,
       "topChamps": [
         {
-          "name": "Ryze",
-          "count": 2
+          "name": "Evelynn",
+          "count": 3
         },
         {
-          "name": "Evelynn",
-          "count": 2
+          "name": "JarvanIV",
+          "count": 1
         },
         {
           "name": "Brand",
@@ -45,7 +45,11 @@
       "topChamps": [
         {
           "name": "Varus",
-          "count": 6
+          "count": 5
+        },
+        {
+          "name": "Lucian",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -71,11 +75,11 @@
           "count": 3
         },
         {
-          "name": "Caitlyn",
+          "name": "Ambessa",
           "count": 1
         },
         {
-          "name": "Twitch",
+          "name": "Caitlyn",
           "count": 1
         }
       ],
@@ -102,11 +106,11 @@
           "count": 3
         },
         {
-          "name": "Kaisa",
+          "name": "Varus",
           "count": 2
         },
         {
-          "name": "Varus",
+          "name": "Kaisa",
           "count": 1
         }
       ],
@@ -160,15 +164,15 @@
       "summonerLevel": 882,
       "topChamps": [
         {
+          "name": "Katarina",
+          "count": 1
+        },
+        {
+          "name": "Zoe",
+          "count": 1
+        },
+        {
           "name": "Irelia",
-          "count": 1
-        },
-        {
-          "name": "Qiyana",
-          "count": 1
-        },
-        {
-          "name": "Evelynn",
           "count": 1
         }
       ],
@@ -191,15 +195,15 @@
       "summonerLevel": 436,
       "topChamps": [
         {
-          "name": "Gwen",
-          "count": 3
-        },
-        {
-          "name": "Twitch",
+          "name": "Nilah",
           "count": 1
         },
         {
-          "name": "Karthus",
+          "name": "Gwen",
+          "count": 1
+        },
+        {
+          "name": "Aphelios",
           "count": 1
         }
       ],
@@ -243,6 +247,29 @@
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "JhsefLq6wkhtq_wLbqPL6UYf5TT43mz__0xJeLaIx6GcuiCx5ynfBLqTraYm0FvQHkOHRf_nRZZs8Q",
+      "summonerId": null,
+      "summonerName": "TheMadHobbit#LOONY",
+      "profileIconId": 1625,
+      "summonerLevel": 771,
+      "topChamps": [
+        {
+          "name": "MissFortune",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "TheMadHobbit",
+      "tagLine": "LOONY",
+      "leaguePoints": 589,
+      "wins": 35,
+      "losses": 14,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
       "freshBlood": true
     },
     {
@@ -284,15 +311,15 @@
       "summonerLevel": 858,
       "topChamps": [
         {
+          "name": "Yunara",
+          "count": 1
+        },
+        {
+          "name": "JarvanIV",
+          "count": 1
+        },
+        {
           "name": "Ekko",
-          "count": 1
-        },
-        {
-          "name": "Taliyah",
-          "count": 1
-        },
-        {
-          "name": "Zoe",
           "count": 1
         }
       ],
@@ -334,6 +361,37 @@
       "wins": 37,
       "losses": 25,
       "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "0qldU32uhcR2onLYiqAUFY9PrfK_nRWt0p0NmCCuPgfFhthe89_pMbcSGX1sizD3-9vmtxHYy7eq7A",
+      "summonerId": null,
+      "summonerName": "Alexsmoove#GAY",
+      "profileIconId": 7015,
+      "summonerLevel": 583,
+      "topChamps": [
+        {
+          "name": "Nocturne",
+          "count": 2
+        },
+        {
+          "name": "Shen",
+          "count": 2
+        },
+        {
+          "name": "Olaf",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Alexsmoove",
+      "tagLine": "GAY",
+      "leaguePoints": 501,
+      "wins": 37,
+      "losses": 20,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
