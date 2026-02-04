@@ -92,7 +92,7 @@ export default function DotaHeroesClient({
   heroes,
   initialQuery,
   patch = "—",
-  cacheLabel = "~5 min",
+  cacheLabel = "~10 min",
 }: Props) {
   const [q, setQ] = useState(initialQuery ?? "");
 

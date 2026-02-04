@@ -34,7 +34,7 @@ type ImmortalJson = {
 
 async function getHeroStats(): Promise<HeroStatsRow[]> {
   const res = await fetch("https://api.opendota.com/api/heroStats", {
-    next: { revalidate: 300 },
+    next: { revalidate: 600 },
     headers: {
       Accept: "application/json",
       // Some CDNs behave better with an explicit UA
@@ -68,7 +68,7 @@ function extractLatestPatchName(data: any): string | null {
 async function getLatestPatch(): Promise<string> {
   try {
     const res = await fetch("https://api.opendota.com/api/patches", {
-      next: { revalidate: 300 },
+      next: { revalidate: 600 },
       headers: {
         Accept: "application/json",
         "User-Agent": "GamerStation (https://gamerstation.gg)",
@@ -129,7 +129,7 @@ export default async function DotaMetaPage() {
   const cacheLabel =
     immortal?.generated_at
       ? `Immortal updated ${new Date(immortal.generated_at).toLocaleString()}`
-      : "~5 min";
+      : "~10 min";
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
@@ -174,7 +174,7 @@ export default async function DotaMetaPage() {
           <h1 className="text-4xl font-bold tracking-tight">Dota 2 Meta</h1>
           <p className="mt-3 text-neutral-300">
             Highest pick rate + best win rate by rank bracket, plus pro trends. Data from OpenDota.
-            <span className="text-neutral-500"> (Cached ~5 minutes)</span>
+            <span className="text-neutral-500"> (Cached ~10 minutes)</span>
           </p>
 
           <div className="mt-6">

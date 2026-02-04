@@ -11,7 +11,9 @@ export const metadata = {
     "League of Legends champion tier list (S–D) based on pick rate, win rate, and ban rate (when applicable). Updated frequently.",
 };
 
-export const dynamic = "force-dynamic";
+// ✅ This page is perfect for ISR (local JSON reads)
+export const dynamic = "force-static";
+export const revalidate = 600; 
 
 // -----------------------------
 // Helpers (NO dynamic path patterns)
@@ -29,14 +31,8 @@ async function guessPatch(): Promise<string> {
   const patchJsonPath = path.join(process.cwd(), "public/data/lol/patch.json");
   const versionJsonPath = path.join(process.cwd(), "public/data/lol/version.json");
   const metaBuildsPath = path.join(process.cwd(), "public/data/lol/meta_builds.json");
-  const metaBuildsRankedPath = path.join(
-    process.cwd(),
-    "public/data/lol/meta_builds_ranked.json"
-  );
-  const metaBuildsCasualPath = path.join(
-    process.cwd(),
-    "public/data/lol/meta_builds_casual.json"
-  );
+  const metaBuildsRankedPath = path.join(process.cwd(), "public/data/lol/meta_builds_ranked.json");
+  const metaBuildsCasualPath = path.join(process.cwd(), "public/data/lol/meta_builds_casual.json");
 
   const patch1 = await readJsonIfExists<any>(patchJsonPath);
   const patch2 = await readJsonIfExists<any>(versionJsonPath);
@@ -68,6 +64,15 @@ async function loadChampionTierRows(): Promise<ChampionStatsRow[]> {
   return rows as ChampionStatsRow[];
 }
 
+function formatCacheLabel(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return "—";
+  if (seconds >= 3600) {
+    const hours = Math.round((seconds / 3600) * 10) / 10;
+    return `~${hours}h`;
+  }
+  return `~${Math.max(1, Math.round(seconds / 60))} min`;
+}
+
 function GSBrand() {
   return (
     <Link href="/" className="flex items-center gap-2">
@@ -77,20 +82,16 @@ function GSBrand() {
         className="h-10 w-10 rounded-xl bg-black p-1 shadow"
       />
       <span className="text-lg font-black text-white">
-        GamerStation
-        <span className="align-super text-[0.6em]">™</span>
+        GamerStation<span className="align-super text-[0.6em]">™</span>
       </span>
     </Link>
   );
 }
 
 export default async function LolChampionTiersPage() {
-  const [patch, initialRows] = await Promise.all([
-    guessPatch(),
-    loadChampionTierRows(),
-  ]);
+  const [patch, initialRows] = await Promise.all([guessPatch(), loadChampionTierRows()]);
 
-  const cacheLabel = "~5 min";
+  const cacheLabel = formatCacheLabel(revalidate);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-6">
@@ -124,10 +125,11 @@ export default async function LolChampionTiersPage() {
 
           <div className="ml-auto flex items-center gap-2">
             <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1 text-xs text-neutral-400">
-              Patch {patch}
+              Patch <span className="text-neutral-200">{patch}</span>
             </span>
+
             <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1 text-xs text-neutral-400">
-              Cache {cacheLabel}
+              Cache <span className="text-neutral-200">{cacheLabel}</span>
             </span>
           </div>
         </div>
@@ -140,18 +142,12 @@ export default async function LolChampionTiersPage() {
           </div>
         }
       >
-        <LolChampionTiersClient
-          initialRows={initialRows}
-          patch={patch}
-          cacheLabel={cacheLabel}
-          hrefBase="/calculators/lol/champions"
-        />
+        <LolChampionTiersClient initialRows={initialRows} patch={patch} hrefBase="/calculators/lol/champions" />
       </Suspense>
 
       <div className="mt-4 text-xs text-neutral-500">
-        Tiers are computed from a blended score (pick volume + winrate + banrate
-        when applicable). This is a meta snapshot, not a guarantee for every
-        matchup.
+        Tiers are computed from a blended score (pick volume + winrate + banrate when applicable). This is a meta
+        snapshot, not a guarantee for every matchup.
       </div>
     </main>
   );
