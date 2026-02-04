@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-04T21:11:25.342Z",
+  "generatedAt": "2026-02-04T23:26:57.263Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -157,6 +157,37 @@
       "freshBlood": false
     },
     {
+      "puuid": "TtYCK62ZcpKSw8a7rIKf_0R0CpNLW32tU0T60aeyPDaJi14GxR49B7CyN9iOi6--QqzOndLKh7HO_Q",
+      "summonerId": null,
+      "summonerName": "테크맥스#kr2",
+      "profileIconId": 5091,
+      "summonerLevel": 498,
+      "topChamps": [
+        {
+          "name": "Leona",
+          "count": 2
+        },
+        {
+          "name": "Alistar",
+          "count": 2
+        },
+        {
+          "name": "Vladimir",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "테크맥스",
+      "tagLine": "kr2",
+      "leaguePoints": 686,
+      "wins": 65,
+      "losses": 47,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "DzO3iC3QXIoi4KC-tkHINbKMkBDILeLRIL-M6fDRJZRCtdk9kaw-mv6_WPxFy4uG8l_M2zGdcpa0gQ",
       "summonerId": null,
       "summonerName": "chendian#KR 1",
@@ -219,37 +250,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "TtYCK62ZcpKSw8a7rIKf_0R0CpNLW32tU0T60aeyPDaJi14GxR49B7CyN9iOi6--QqzOndLKh7HO_Q",
-      "summonerId": null,
-      "summonerName": "테크맥스#kr2",
-      "profileIconId": 5091,
-      "summonerLevel": 498,
-      "topChamps": [
-        {
-          "name": "Alistar",
-          "count": 3
-        },
-        {
-          "name": "Leona",
-          "count": 2
-        },
-        {
-          "name": "Nautilus",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "테크맥스",
-      "tagLine": "kr2",
-      "leaguePoints": 663,
-      "wins": 64,
-      "losses": 47,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "p68SVFVxBS__qw_Kad98XYenXAqtSJMB-EQ6Jboy0PjtLJCn6uDQDSvjSpM4C4aAaTfM2oRFliL7UQ",
       "summonerId": null,
       "summonerName": "중증망상장애#KR1",
@@ -289,7 +289,11 @@
       "topChamps": [
         {
           "name": "Nocturne",
-          "count": 5
+          "count": 4
+        },
+        {
+          "name": "Ryze",
+          "count": 1
         },
         {
           "name": "Blitzcrank",
