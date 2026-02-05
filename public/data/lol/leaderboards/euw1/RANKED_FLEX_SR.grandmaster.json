@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T11:50:23.921Z",
+  "generatedAt": "2026-02-05T14:50:11.950Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -98,15 +98,15 @@
       "summonerLevel": 260,
       "topChamps": [
         {
-          "name": "Xerath",
-          "count": 1
+          "name": "Gwen",
+          "count": 2
         },
         {
           "name": "Belveth",
-          "count": 1
+          "count": 2
         },
         {
-          "name": "Shyvana",
+          "name": "Xerath",
           "count": 1
         }
       ],
@@ -671,11 +671,11 @@
           "count": 4
         },
         {
-          "name": "MonkeyKing",
+          "name": "Riven",
           "count": 1
         },
         {
-          "name": "Thresh",
+          "name": "MonkeyKing",
           "count": 1
         }
       ],
@@ -699,14 +699,14 @@
       "topChamps": [
         {
           "name": "Nami",
-          "count": 2
-        },
-        {
-          "name": "Karma",
-          "count": 2
+          "count": 4
         },
         {
           "name": "Seraphine",
+          "count": 1
+        },
+        {
+          "name": "Janna",
           "count": 1
         }
       ],
@@ -1059,6 +1059,29 @@
       "freshBlood": true
     },
     {
+      "puuid": "lzTJxHJp7uniHrdZOpdLw4upX-GZEmSZMPEjgt4Nig3v0ed7tz4y5BG5sq4IgIHhU_wvR5y5jQvkuw",
+      "summonerId": null,
+      "summonerName": "aoqn#222",
+      "profileIconId": 1133,
+      "summonerLevel": 83,
+      "topChamps": [
+        {
+          "name": "AurelionSol",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "aoqn",
+      "tagLine": "222",
+      "leaguePoints": 431,
+      "wins": 69,
+      "losses": 32,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "UHIVyAgPCoUGxgbfixi4Ihn81gkW7ACLtCrmsDDJfeQN7eZI_ToFAejJBYoEeuBJtOQzEa9-PUwl-Q",
       "summonerId": null,
       "summonerName": "小舟潮#Will",
@@ -1090,29 +1113,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "lzTJxHJp7uniHrdZOpdLw4upX-GZEmSZMPEjgt4Nig3v0ed7tz4y5BG5sq4IgIHhU_wvR5y5jQvkuw",
-      "summonerId": null,
-      "summonerName": "aoqn#222",
-      "profileIconId": 1133,
-      "summonerLevel": 83,
-      "topChamps": [
-        {
-          "name": "AurelionSol",
-          "count": 6
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "aoqn",
-      "tagLine": "222",
-      "leaguePoints": 421,
-      "wins": 68,
-      "losses": 30,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "6DmknYwjORWD0rVKjP_WD_DplTKx8LtNmo2DYfGQYxhtZd44RfCwI6K8YwE1TRYE9jqfWI4dJuMi0A",
       "summonerId": null,
       "summonerName": "Alber#XDD",
@@ -1120,7 +1120,7 @@
       "summonerLevel": 1162,
       "topChamps": [
         {
-          "name": "Nami",
+          "name": "Volibear",
           "count": 2
         },
         {
@@ -1128,7 +1128,7 @@
           "count": 1
         },
         {
-          "name": "Volibear",
+          "name": "Nami",
           "count": 1
         }
       ],
@@ -1322,7 +1322,7 @@
       "topChamps": [
         {
           "name": "Kaisa",
-          "count": 2
+          "count": 3
         },
         {
           "name": "Lucian",
@@ -1415,11 +1415,11 @@
       "topChamps": [
         {
           "name": "Yuumi",
-          "count": 3
+          "count": 4
         },
         {
           "name": "Soraka",
-          "count": 3
+          "count": 2
         }
       ],
       "sampleGames": 6,

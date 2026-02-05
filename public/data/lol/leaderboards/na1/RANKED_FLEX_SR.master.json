@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T11:15:55.011Z",
+  "generatedAt": "2026-02-05T14:15:41.247Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -354,12 +354,12 @@
       "summonerLevel": 69,
       "topChamps": [
         {
-          "name": "Thresh",
-          "count": 4
+          "name": "Viego",
+          "count": 3
         },
         {
-          "name": "Viego",
-          "count": 2
+          "name": "Thresh",
+          "count": 3
         }
       ],
       "sampleGames": 6,
@@ -675,6 +675,37 @@
       "wins": 43,
       "losses": 30,
       "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "L31Pxy-5gXGx_QYaWG3_ZJpQe4snhexCc2U59MK5pWQfGJC7V3K-sOw8jDqxXyPyuIrffnpDlSuscg",
+      "summonerId": null,
+      "summonerName": "CN SZ Rookie#1011",
+      "profileIconId": 6504,
+      "summonerLevel": 327,
+      "topChamps": [
+        {
+          "name": "Varus",
+          "count": 2
+        },
+        {
+          "name": "Sylas",
+          "count": 2
+        },
+        {
+          "name": "Aurora",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "CN SZ Rookie",
+      "tagLine": "1011",
+      "leaguePoints": 135,
+      "wins": 31,
+      "losses": 14,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
@@ -1480,37 +1511,6 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
-    },
-    {
-      "puuid": "L31Pxy-5gXGx_QYaWG3_ZJpQe4snhexCc2U59MK5pWQfGJC7V3K-sOw8jDqxXyPyuIrffnpDlSuscg",
-      "summonerId": null,
-      "summonerName": "CN SZ Rookie#1011",
-      "profileIconId": 6504,
-      "summonerLevel": 327,
-      "topChamps": [
-        {
-          "name": "Varus",
-          "count": 2
-        },
-        {
-          "name": "Sylas",
-          "count": 2
-        },
-        {
-          "name": "Aurora",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "CN SZ Rookie",
-      "tagLine": "1011",
-      "leaguePoints": 107,
-      "wins": 30,
-      "losses": 14,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
     },
     {
       "puuid": "UehCbwb_yt7hoDD8wFp1YGUcCAY6yO0kHsO1-26vU9y7V4Dd4LEUWbkHkPTE4-uCv-bU0GwaQ3NIag",
