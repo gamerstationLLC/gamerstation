@@ -38,8 +38,6 @@ type Mode = "ranked" | "pro";
 type RoleKey = "all" | "top" | "jungle" | "mid" | "bot" | "support";
 type SortKey = "tier" | "games" | "winrate" | "banrate";
 
-
-
 type Tier = "S" | "A" | "B" | "C" | "D" | "—";
 
 const TIER_RANK: Record<Tier, number> = {
@@ -133,11 +131,9 @@ function buildDdragonSquareUrl(patch: string, championName: string) {
   if (ver && ver !== "—") {
     return `https://ddragon.leagueoflegends.com/cdn/${ver}/img/champion/${cleanName}.png`;
   }
-  // fallback while patch loads
   return `https://ddragon.leagueoflegends.com/cdn/img/champion/${cleanName}.png`;
 }
 
-// ✅ fetch patch from your own API route (keep parity with Dota client)
 async function fetchLatestPatchClient(): Promise<string | null> {
   try {
     const res = await fetch("/api/lol/patch", { cache: "no-store" });
@@ -169,8 +165,6 @@ type Row = {
   tierRank: number;
 };
 
-const PILL = "rounded-full border border-neutral-800 bg-black/40 px-3 py-1";
-
 const BTN = [
   "inline-flex items-center justify-center rounded-xl border px-3 py-2 text-sm font-semibold transition",
   "border-neutral-800 bg-black text-neutral-300 hover:border-neutral-600 hover:text-white",
@@ -184,39 +178,37 @@ const BTN_ACTIVE = [
 ].join(" ");
 
 const TH_BTN = [
-  "inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold transition",
+  "inline-flex w-full items-center justify-center gap-1 rounded-md border px-1.5 py-1",
+  "text-[10px] font-semibold transition whitespace-nowrap leading-none sm:rounded-lg sm:px-2 sm:py-1 sm:text-xs",
   "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600 hover:text-white",
   "focus:outline-none focus:ring-1 focus:ring-neutral-600",
 ].join(" ");
 
 const TH_BTN_DISABLED = [
-  "inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold",
+  "inline-flex w-full items-center justify-center gap-1 rounded-md border px-1.5 py-1",
+  "text-[10px] font-semibold whitespace-nowrap leading-none sm:rounded-lg sm:px-2 sm:py-1 sm:text-xs",
   "border-neutral-800 bg-black text-neutral-500 opacity-60 cursor-not-allowed",
 ].join(" ");
 
 function sortArrow(active: boolean, desc: boolean) {
   if (!active) return "";
-  return desc ? " ↓" : " ↑";
+  return desc ? "\u00A0↓" : "\u00A0↑";
 }
 
 export default function LolChampionTiersClient({
   initialRows,
   patch = "—",
-  
   hrefBase = "/calculators/lol/champions",
 }: {
   initialRows: ChampionStatsRow[];
   patch?: string;
-  
   hrefBase?: string;
 }) {
-  // “Ranked” vs “Pro” is a familiar tier-list convention.
   const [mode, setMode] = useState<Mode>("ranked");
   const [role, setRole] = useState<RoleKey>("all");
 
-  // Tier lists default to Tier sort.
   const [sortBy, setSortBy] = useState<SortKey>("tier");
-  const [desc, setDesc] = useState(false); // for tier: S->D is “ascending tierRank”
+  const [desc, setDesc] = useState(false); // tier: S->D
   const [q, setQ] = useState("");
 
   const [minGamesText, setMinGamesText] = useState("20");
@@ -250,7 +242,6 @@ export default function LolChampionTiersClient({
   }, []);
 
   function onSortClick(key: SortKey) {
-    // Disable banrate sort outside pro mode (expectation: bans matter in pro).
     if (key === "banrate" && mode !== "pro") return;
 
     if (sortBy === key) {
@@ -259,9 +250,8 @@ export default function LolChampionTiersClient({
     }
     setSortBy(key);
 
-    // sensible defaults per column
-    if (key === "tier") setDesc(false); // S->D
-    else setDesc(true); // higher is better for games/winrate/banrate
+    if (key === "tier") setDesc(false);
+    else setDesc(true);
   }
 
   const rows = useMemo((): Row[] => {
@@ -283,9 +273,7 @@ export default function LolChampionTiersClient({
 
         const wins =
           clampMin0(Number(r.wins ?? 0)) ||
-          (Number.isFinite(r.winrate)
-            ? Math.round(clampMin0(Number(r.winrate)) * games)
-            : 0);
+          (Number.isFinite(r.winrate) ? Math.round(clampMin0(Number(r.winrate)) * games) : 0);
 
         const bans = clampMin0(Number(r.bans ?? 0));
 
@@ -327,7 +315,6 @@ export default function LolChampionTiersClient({
     if (query) filtered = filtered.filter((r) => r.name.toLowerCase().includes(query));
     filtered = filtered.filter((r) => r.games >= minGames);
 
-    // Score = z(games) + z(winrate) + small z(banrate) (banrate weighted higher in pro)
     const gVals = filtered.map((r) => Math.log1p(r.games));
     const wVals = filtered.map((r) => r.winrate);
     const bVals = filtered.map((r) => r.banrate);
@@ -341,8 +328,6 @@ export default function LolChampionTiersClient({
     const muB = mean(bVals);
     const sdB = std(bVals, muB);
 
-    // tuned to “feel” like tier lists:
-    // winrate dominates, games stabilizes, bans are a tie-breaker (or pro-focused)
     const W_GAMES = 0.30;
     const W_WIN = 0.65;
     const W_BAN = mode === "pro" ? 0.20 : 0.05;
@@ -355,7 +340,6 @@ export default function LolChampionTiersClient({
       return { ...r, score };
     });
 
-    // Score -> tier percentiles
     const byScore = [...withScores].sort((a, b) => b.score - a.score);
     const n = byScore.length;
 
@@ -370,192 +354,180 @@ export default function LolChampionTiersClient({
       return { ...r, tier, tierRank: TIER_RANK[tier] ?? 9 };
     });
 
-    // 6) Sort display rows
-finalRows.sort((a, b) => {
-  const av =
-    sortBy === "tier"
-      ? a.tierRank
-      : sortBy === "games"
-      ? a.games
-      : sortBy === "banrate"
-      ? a.bans
-      : a.winrate;
+    finalRows.sort((a, b) => {
+      const av =
+        sortBy === "tier"
+          ? a.tierRank
+          : sortBy === "games"
+          ? a.games
+          : sortBy === "banrate"
+          ? a.banrate
+          : a.winrate;
 
-  const bv =
-    sortBy === "tier"
-      ? b.tierRank
-      : sortBy === "games"
-      ? b.games
-      : sortBy === "banrate"
-      ? b.bans
-      : b.winrate;
+      const bv =
+        sortBy === "tier"
+          ? b.tierRank
+          : sortBy === "games"
+          ? b.games
+          : sortBy === "banrate"
+          ? b.banrate
+          : b.winrate;
 
-  const diff = av - bv;
-
-  // ↓ should mean highest → lowest
-  if (sortBy === "tier") return desc ? -diff : diff;
-  return desc ? -diff : diff;
-});
-
+      const diff = av - bv;
+      if (sortBy === "tier") return desc ? -diff : diff;
+      return desc ? -diff : diff;
+    });
 
     return finalRows.slice(0, 200);
   }, [initialRows, patchLive, mode, role, q, minGames, sortBy, desc]);
 
-  const totalShown = rows.length;
-
   return (
-    <section className="rounded-2xl border border-neutral-800 bg-black/60 p-4">
-      {/* Top controls — make it feel like a real tier list */}
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-        {/* Left: Mode + Role */}
-        <div className="flex flex-col gap-2">
-          <div className="text-sm font-semibold text-white">Tier List Filters</div>
+    <section
+      className={[
+        // ✅ WIDEN OUTER TAB ONLY ON MOBILE (like your Dota meta)
+        "-mx-4 sm:mx-0",
+        "rounded-2xl border border-neutral-800 bg-black/60",
+        "p-3 sm:p-4",
+        "overflow-hidden",
+      ].join(" ")}
+    >
+      {/* Controls */}
+      <div className="rounded-2xl border border-neutral-800 bg-black/40 p-3 sm:p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-2">
+            <div className="text-sm font-semibold text-white">Tier List Filters</div>
 
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setMode("ranked")}
-              className={mode === "ranked" ? BTN_ACTIVE : BTN}
-              title="Solo Queue / ranked ladder data"
-            >
-              Ranked
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("pro")}
-              className={mode === "pro" ? BTN_ACTIVE : BTN}
-              title="Pro-focused weighting (bans matter more)"
-            >
-              Pro
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => setMode("ranked")} className={mode === "ranked" ? BTN_ACTIVE : BTN}>
+                Ranked
+              </button>
+              <button type="button" onClick={() => setMode("pro")} className={mode === "pro" ? BTN_ACTIVE : BTN}>
+                Pro
+              </button>
 
-            <div className="mx-2 hidden h-8 w-px bg-neutral-800 lg:block" />
+              <div className="mx-2 hidden h-8 w-px bg-neutral-800 lg:block" />
 
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value as RoleKey)}
+                className="h-9 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none focus:border-neutral-600"
+                title="Filter by role"
+              >
+                <option value="all">All roles</option>
+                <option value="top">Top</option>
+                <option value="jungle">Jungle</option>
+                <option value="mid">Mid</option>
+                <option value="bot">Bot</option>
+                <option value="support">Support</option>
+              </select>
 
-            {/* Quick “Sort” indicator (people expect it) */}
-            <div className="ml-1 self-center text-xs text-neutral-500">
-              Sort:{" "}
-              <span className="text-neutral-200">
-                {sortBy === "tier"
-                  ? "Tier"
-                  : sortBy === "games"
-                  ? "Games"
-                  : sortBy === "winrate"
-                  ? "Win Rate"
-                  : "Ban Rate"}
-              </span>{" "}
-              <span className="text-neutral-600">{desc ? "↓" : "↑"}</span>
+              <div className="ml-1 self-center text-xs text-neutral-500">
+                Sort:{" "}
+                <span className="text-neutral-200">
+                  {sortBy === "tier"
+                    ? "Tier"
+                    : sortBy === "games"
+                    ? "Games"
+                    : sortBy === "winrate"
+                    ? "Win Rate"
+                    : "Ban Rate"}
+                </span>{" "}
+                <span className="text-neutral-600">{desc ? "↓" : "↑"}</span>
+              </div>
             </div>
           </div>
-          
-        </div>
 
-        {/* Right: Search + Min games */}
-        <div className="flex flex-col gap-2 lg:items-end">
-          <div className="text-sm font-semibold text-white">Find a Champion</div>
-          <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search (e.g., Ahri, Jinx, Lee Sin)…"
-              className="h-10 w-full rounded-xl border border-neutral-800 bg-black px-3 text-sm text-white outline-none focus:border-neutral-600 sm:w-[300px]"
-            />
-
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-neutral-400">Min games</div>
+          <div className="flex flex-col gap-2 lg:items-end">
+            <div className="text-sm font-semibold text-white">Find a Champion</div>
+            <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center">
               <input
-                type="number"
-                value={minGamesText}
-                min={0}
-                step={50}
-                onChange={(e) => setMinGamesText(e.target.value)}
-                className="h-10 w-28 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none focus:border-neutral-600"
-                title="Filter out low-sample champions"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search (e.g., Ahri, Jinx, Lee Sin)…"
+                className="h-9 w-full rounded-xl border border-neutral-800 bg-black px-3 text-sm text-white outline-none focus:border-neutral-600 sm:w-[300px]"
               />
-            
+
+              <div className="flex items-center gap-2">
+                <div className="text-xs text-neutral-400">Min games</div>
+                <input
+                  type="number"
+                  value={minGamesText}
+                  min={0}
+                  step={50}
+                  onChange={(e) => setMinGamesText(e.target.value)}
+                  className="h-9 w-28 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none focus:border-neutral-600"
+                  title="Filter out low-sample champions"
+                />
+              </div>
             </div>
-            
           </div>
         </div>
-        
       </div>
-      <div className="mt-2 text-neutral-500 text-xs">
-          Tip: On mobile, swipe sideways to see every column.
-        </div>
-
-      {/* Context row — THIS is what tier list players expect */}
-     
 
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
-        <div className="overflow-x-auto">
-          {/* wider min width so mobile understands it’s scrollable */}
-          <div className="min-w-[760px]">
-            <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-3 py-2 text-xs text-neutral-400">
-              <div className="col-span-5 flex items-center justify-between gap-2">
-                <span>Champion</span>
-
-                <button
-                  type="button"
-                  onClick={() => onSortClick("tier")}
-                  className={TH_BTN}
-                  title="Sort by Tier (S → D)"
-                >
-                  Tier{sortArrow(sortBy === "tier", desc)}
-                </button>
+        {/* ✅ NO horizontal scroll on mobile; keep desktop unchanged */}
+        <div className="overflow-x-hidden sm:overflow-x-auto">
+          <div className="w-full sm:min-w-[760px]">
+            {/* Header */}
+            <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-2 py-2 text-[10px] text-neutral-400 sm:px-3 sm:py-2 sm:text-xs">
+              {/* MOBILE: Champion=6, Games=2, Win=2, Ban=2 (fits everything) */}
+              <div className="col-span-6 sm:col-span-5 flex items-center justify-between gap-2 min-w-0">
+                <span className="whitespace-nowrap">Champion</span>
+                <div className="w-[3.2rem] sm:w-auto">
+                  <button type="button" onClick={() => onSortClick("tier")} className={TH_BTN} title="Sort by Tier">
+                    Tier{sortArrow(sortBy === "tier", desc)}
+                  </button>
+                </div>
               </div>
 
-              <div className="col-span-3 flex items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => onSortClick("games")}
-                  className={TH_BTN}
-                  title="Sort by Games played (sample size)"
-                >
+              <div className="col-span-2 sm:col-span-3 flex items-center justify-end min-w-0">
+                <button type="button" onClick={() => onSortClick("games")} className={TH_BTN} title="Sort by Games">
                   Games{sortArrow(sortBy === "games", desc)}
                 </button>
               </div>
 
-              <div className="col-span-2 flex items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => onSortClick("winrate")}
-                  className={TH_BTN}
-                  title="Sort by Win Rate"
-                >
+              <div className="col-span-2 sm:col-span-2 flex items-center justify-end min-w-0">
+                <button type="button" onClick={() => onSortClick("winrate")} className={TH_BTN} title="Sort by Win%">
                   Win%{sortArrow(sortBy === "winrate", desc)}
                 </button>
               </div>
 
-              <div className="col-span-2 flex items-center justify-end">
+              <div className="col-span-2 sm:col-span-2 flex items-center justify-end min-w-0">
                 <button
                   type="button"
                   onClick={() => onSortClick("banrate")}
+                  disabled={mode !== "pro"}
                   className={mode === "pro" ? TH_BTN : TH_BTN_DISABLED}
-                  title={mode === "pro" ? "Sort by Ban Rate (Pro)" : "Ban rate matters most in Pro mode"}
+                  title={mode === "pro" ? "Sort by Ban%" : "Ban% available in Pro mode"}
                 >
-                  Ban%{sortArrow(sortBy === "banrate", desc)}
+                  Ban%{mode === "pro" ? sortArrow(sortBy === "banrate", desc) : ""}
                 </button>
               </div>
             </div>
 
+            {/* Body */}
             <div className="divide-y divide-neutral-800">
               {rows.length ? (
                 rows.map((r, idx) => (
                   <Link
                     key={r.id}
                     href={`${hrefBase}/${r.slug}`}
-                    className="grid grid-cols-12 items-center px-3 py-2 text-sm hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-neutral-600"
+                    className="grid grid-cols-12 items-center px-2 py-2 text-[12px] hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-neutral-600 sm:px-3 sm:py-2 sm:text-sm"
                     title={`Open ${r.name}`}
                   >
-                    <div className="col-span-5 flex min-w-0 items-center justify-between gap-2">
+                    <div className="col-span-6 sm:col-span-5 flex min-w-0 items-center justify-between gap-2">
                       <div className="flex min-w-0 items-center gap-2">
-                        <div className="w-8 shrink-0 text-xs text-neutral-500">{idx + 1}.</div>
+                        <div className="w-5 shrink-0 text-[10px] text-neutral-500 sm:w-8 sm:text-xs tabular-nums">
+                          {idx + 1}.
+                        </div>
+
                         <ChampionIcon src={r.imgUrl} />
-                        <div className="min-w-0 truncate font-medium text-neutral-100">
+
+                        <div className="min-w-0 font-medium text-neutral-100 whitespace-nowrap truncate">
                           {r.name}
                           {r.role !== "all" ? (
-                            <span className="ml-2 rounded-md border border-neutral-800 bg-black/40 px-2 py-0.5 text-[11px] text-neutral-400">
+                            <span className="ml-2 rounded-md border border-neutral-800 bg-black/40 px-2 py-0.5 text-[10px] sm:text-[11px] text-neutral-400">
                               {shortRoleLabel(r.role)}
                             </span>
                           ) : null}
@@ -565,24 +537,22 @@ finalRows.sort((a, b) => {
                       <TierPill tier={r.tier} />
                     </div>
 
-                    <div className="col-span-3 text-right tabular-nums text-neutral-200">
+                    <div className="col-span-2 sm:col-span-3 text-right tabular-nums text-neutral-200 self-center whitespace-nowrap text-[11px] sm:text-sm">
                       {fmtInt(r.games)}
                     </div>
 
-                    <div
-                      className={`col-span-2 text-right tabular-nums ${
-                        r.winrate >= 0.52
-                          ? "text-green-300"
-                          : r.winrate <= 0.48
-                          ? "text-red-300"
-                          : "text-neutral-200"
-                      }`}
-                    >
-                      {pct(r.winrate)}
+                    <div className="col-span-2 sm:col-span-2 text-right tabular-nums self-center whitespace-nowrap text-[11px] sm:text-sm">
+                      <span
+                        className={
+                          r.winrate >= 0.52 ? "text-green-300" : r.winrate <= 0.48 ? "text-red-300" : "text-neutral-200"
+                        }
+                      >
+                        {pct(r.winrate)}
+                      </span>
                     </div>
 
-                    <div className="col-span-2 text-right tabular-nums text-neutral-200">
-                      {pct(r.banrate)}
+                    <div className="col-span-2 sm:col-span-2 text-right tabular-nums text-neutral-200 self-center whitespace-nowrap text-[11px] sm:text-sm">
+                      {mode === "pro" ? pct(r.banrate) : "—"}
                     </div>
                   </Link>
                 ))
@@ -596,16 +566,14 @@ finalRows.sort((a, b) => {
         </div>
       </div>
 
-      {/* “How to read” block — high ROI because it reduces bounce + confusion */}
       <div className="mt-3 rounded-2xl border border-neutral-800 bg-black/40 p-3 text-xs text-neutral-400">
         <div className="font-semibold text-neutral-200">How tiers are calculated</div>
         <div className="mt-1 leading-relaxed">
           Tiers are a snapshot from <span className="text-neutral-200">win rate</span> (primary),{" "}
           <span className="text-neutral-200">sample size</span> (stability), and{" "}
-          <span className="text-neutral-200">ban pressure</span> (Pro mode tie-breaker). Use this as a quick meta
-          overview — matchup and team comp still matter.
+          <span className="text-neutral-200">ban pressure</span> (Pro mode tie-breaker). Use this as a quick meta overview
+          — matchup and team comp still matter.
         </div>
-        
       </div>
     </section>
   );
@@ -627,7 +595,7 @@ function TierPill({ tier }: { tier: Tier }) {
 
   return (
     <span
-      className={`inline-flex h-6 min-w-[2.25rem] items-center justify-center rounded-lg border px-2 text-xs font-semibold ${cls}`}
+      className={`inline-flex h-5 min-w-[1.9rem] items-center justify-center rounded-md border px-1.5 text-[11px] font-semibold sm:h-6 sm:min-w-[2.25rem] sm:rounded-lg sm:px-2 sm:text-xs ${cls}`}
       title={`Tier ${tier}`}
     >
       {tier}
@@ -648,7 +616,7 @@ function ChampionIcon({ src }: { src: string }) {
       alt=""
       loading="lazy"
       referrerPolicy="no-referrer"
-      className="h-7 w-7 shrink-0 rounded-lg border border-neutral-800 bg-black/40 sm:h-8 sm:w-8"
+      className="h-7 w-7 shrink-0 rounded-lg border border-neutral-800 bg-black/40 sm:h-8 sm:w-8 object-cover object-center"
       onError={() => setOk(false)}
     />
   );

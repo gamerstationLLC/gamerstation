@@ -1,6 +1,7 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -18,13 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://gamerstation.gg"),
   title: "GamerStation",
   description: "Multi-game calculators, stats tools, and competitive gaming utilities.",
-
-  // ✅ IMPORTANT:
-  // Do NOT set metadata.icons here if you're using the App Router icon pipeline.
-  // Next will automatically serve:
-  // - app/favicon.ico      -> /favicon.ico
-  // - app/icon.png         -> /icon.png
-  // - app/apple-icon.png   -> /apple-icon.png
+  // ✅ Don't set metadata.icons if using App Router icon pipeline
 };
 
 export default function RootLayout({
@@ -34,8 +29,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9530220531970117"
+     crossOrigin="anonymous"></script>
+      </head>
+
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* ✅ No global footer here (prevents /privacy, /disclaimer, /contact from dominating internal links) */}
         {children}
         <Analytics />
       </body>
