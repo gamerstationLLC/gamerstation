@@ -1,10 +1,41 @@
 {
-  "generatedAt": "2026-02-05T02:59:25.180Z",
+  "generatedAt": "2026-02-05T09:47:58.015Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
   "count": 50,
   "players": [
+    {
+      "puuid": "hdeFiqBkZIs3Ee2RRPxZc217ZrvefeAab-Qwqrq14Odw6g6ij6Egi2fWyBZhmHlmo9mNRF6pdbxQXA",
+      "summonerId": null,
+      "summonerName": "송골매#bird",
+      "profileIconId": 6621,
+      "summonerLevel": 649,
+      "topChamps": [
+        {
+          "name": "Rumble",
+          "count": 2
+        },
+        {
+          "name": "Jax",
+          "count": 1
+        },
+        {
+          "name": "Vayne",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "송골매",
+      "tagLine": "bird",
+      "leaguePoints": 282,
+      "wins": 26,
+      "losses": 14,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
     {
       "puuid": "jtdr4rPDSagkQ8lNwXF1RG0_OKULOl_Ctxdg0BHJM46-sYLOrzR9edJvCJhnNvZGmuPLItE66nIrTg",
       "summonerId": null,
@@ -161,18 +192,18 @@
       "summonerId": null,
       "summonerName": "봇 도와주세요#KR1",
       "profileIconId": 5453,
-      "summonerLevel": 153,
+      "summonerLevel": 154,
       "topChamps": [
         {
           "name": "Ryze",
+          "count": 2
+        },
+        {
+          "name": "TwistedFate",
           "count": 1
         },
         {
           "name": "Ahri",
-          "count": 1
-        },
-        {
-          "name": "Yone",
           "count": 1
         }
       ],
@@ -366,7 +397,7 @@
       "topChamps": [
         {
           "name": "Zoe",
-          "count": 1
+          "count": 2
         },
         {
           "name": "Orianna",
@@ -451,7 +482,7 @@
       "summonerId": null,
       "summonerName": "김승훈#HUN",
       "profileIconId": 27,
-      "summonerLevel": 240,
+      "summonerLevel": 241,
       "topChamps": [
         {
           "name": "Vladimir",
@@ -464,37 +495,6 @@
       "leaguePoints": 182,
       "wins": 19,
       "losses": 7,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "hdeFiqBkZIs3Ee2RRPxZc217ZrvefeAab-Qwqrq14Odw6g6ij6Egi2fWyBZhmHlmo9mNRF6pdbxQXA",
-      "summonerId": null,
-      "summonerName": "송골매#bird",
-      "profileIconId": 6621,
-      "summonerLevel": 648,
-      "topChamps": [
-        {
-          "name": "Gangplank",
-          "count": 2
-        },
-        {
-          "name": "LeeSin",
-          "count": 1
-        },
-        {
-          "name": "Sylas",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "송골매",
-      "tagLine": "bird",
-      "leaguePoints": 179,
-      "wins": 22,
-      "losses": 13,
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
@@ -628,11 +628,11 @@
           "count": 3
         },
         {
-          "name": "Caitlyn",
+          "name": "Ahri",
           "count": 1
         },
         {
-          "name": "Lux",
+          "name": "Caitlyn",
           "count": 1
         }
       ],
@@ -826,15 +826,11 @@
       "topChamps": [
         {
           "name": "Jayce",
-          "count": 3
+          "count": 4
         },
         {
-          "name": "Vayne",
-          "count": 1
-        },
-        {
-          "name": "Varus",
-          "count": 1
+          "name": "Jax",
+          "count": 2
         }
       ],
       "sampleGames": 6,
@@ -856,15 +852,15 @@
       "summonerLevel": 655,
       "topChamps": [
         {
-          "name": "Braum",
+          "name": "Akali",
           "count": 1
         },
         {
-          "name": "Caitlyn",
+          "name": "Azir",
           "count": 1
         },
         {
-          "name": "Aphelios",
+          "name": "Ezreal",
           "count": 1
         }
       ],
@@ -950,14 +946,14 @@
       "topChamps": [
         {
           "name": "Poppy",
-          "count": 4
+          "count": 3
         },
         {
-          "name": "Jax",
+          "name": "Renekton",
           "count": 1
         },
         {
-          "name": "Rumble",
+          "name": "Jax",
           "count": 1
         }
       ],
@@ -1089,15 +1085,46 @@
       "freshBlood": false
     },
     {
-      "puuid": "Psu-7B551e8gYcLkQxkpRs7bJD5df8U5iV7rhyPQVFzJ3nKB3i2gHKxe_syqTNK-g5X1cbDX5L3mRQ",
+      "puuid": "v-K2HTG2R5z2NPafvGjnp_y7ijJVCBJ4AYWjgyvMOiS14IZCzcubbh5Lmndkm6HOocCTihus0LI2vQ",
       "summonerId": null,
-      "summonerName": "yaya#yqfxy",
-      "profileIconId": 7080,
-      "summonerLevel": 81,
+      "summonerName": "yaya#YQFXX",
+      "profileIconId": 6668,
+      "summonerLevel": 172,
       "topChamps": [
         {
           "name": "Yuumi",
-          "count": 2
+          "count": 3
+        },
+        {
+          "name": "Nami",
+          "count": 1
+        },
+        {
+          "name": "Nautilus",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "yaya",
+      "tagLine": "YQFXX",
+      "leaguePoints": 147,
+      "wins": 16,
+      "losses": 2,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "Psu-7B551e8gYcLkQxkpRs7bJD5df8U5iV7rhyPQVFzJ3nKB3i2gHKxe_syqTNK-g5X1cbDX5L3mRQ",
+      "summonerId": null,
+      "summonerName": "yaya#yqfxy",
+      "profileIconId": 7078,
+      "summonerLevel": 81,
+      "topChamps": [
+        {
+          "name": "Taric",
+          "count": 4
         },
         {
           "name": "Neeko",
@@ -1111,37 +1138,6 @@
       "sampleGames": 6,
       "gameName": "yaya",
       "tagLine": "yqfxy",
-      "leaguePoints": 147,
-      "wins": 16,
-      "losses": 2,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "v-K2HTG2R5z2NPafvGjnp_y7ijJVCBJ4AYWjgyvMOiS14IZCzcubbh5Lmndkm6HOocCTihus0LI2vQ",
-      "summonerId": null,
-      "summonerName": "yaya#YQFXX",
-      "profileIconId": 6668,
-      "summonerLevel": 172,
-      "topChamps": [
-        {
-          "name": "Nami",
-          "count": 2
-        },
-        {
-          "name": "Lulu",
-          "count": 1
-        },
-        {
-          "name": "Yuumi",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "yaya",
-      "tagLine": "YQFXX",
       "leaguePoints": 147,
       "wins": 16,
       "losses": 2,
@@ -1182,18 +1178,18 @@
       "summonerId": null,
       "summonerName": "HLE Pyeonsik#КR1",
       "profileIconId": 3795,
-      "summonerLevel": 657,
+      "summonerLevel": 658,
       "topChamps": [
         {
-          "name": "Yunara",
+          "name": "Aphelios",
           "count": 3
         },
         {
-          "name": "Lucian",
+          "name": "Yunara",
           "count": 2
         },
         {
-          "name": "Kaisa",
+          "name": "Varus",
           "count": 1
         }
       ],
@@ -1247,15 +1243,15 @@
       "summonerLevel": 214,
       "topChamps": [
         {
+          "name": "Kaisa",
+          "count": 2
+        },
+        {
           "name": "Aphelios",
           "count": 2
         },
         {
-          "name": "Kaisa",
-          "count": 1
-        },
-        {
-          "name": "Lucian",
+          "name": "Thresh",
           "count": 1
         }
       ],
@@ -1410,7 +1406,7 @@
           "count": 2
         },
         {
-          "name": "Kaisa",
+          "name": "Leona",
           "count": 1
         }
       ],

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T02:45:21.356Z",
+  "generatedAt": "2026-02-05T09:33:53.353Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -71,28 +71,59 @@
       "summonerLevel": 356,
       "topChamps": [
         {
-          "name": "Viktor",
+          "name": "Ryze",
           "count": 1
         },
         {
-          "name": "XinZhao",
+          "name": "Galio",
           "count": 1
         },
         {
-          "name": "Alistar",
+          "name": "Aphelios",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "히 틀 러",
       "tagLine": "DWH",
-      "leaguePoints": 761,
-      "wins": 53,
+      "leaguePoints": 807,
+      "wins": 55,
       "losses": 33,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
+    },
+    {
+      "puuid": "QW8wKDgB8WjZ_GWlKqwL_DHTGw28ql-hJMVSUEwUMp4lqBda1YiDs6ByJVbjMszZtXWGq_7qKlDR5A",
+      "summonerId": null,
+      "summonerName": "두 몽#KR1",
+      "profileIconId": 7,
+      "summonerLevel": 663,
+      "topChamps": [
+        {
+          "name": "Vi",
+          "count": 2
+        },
+        {
+          "name": "XinZhao",
+          "count": 1
+        },
+        {
+          "name": "Zaahen",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "두 몽",
+      "tagLine": "KR1",
+      "leaguePoints": 776,
+      "wins": 49,
+      "losses": 27,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
     },
     {
       "puuid": "ZmWpU3W546I4ObnCCkD-L9ge_xt-LGxo0gvDS0BwGkd94HLZQLseTw8OhrgmmeKFSmH__o-5uXOPZQ",
@@ -120,37 +151,6 @@
       "leaguePoints": 741,
       "wins": 60,
       "losses": 48,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "QW8wKDgB8WjZ_GWlKqwL_DHTGw28ql-hJMVSUEwUMp4lqBda1YiDs6ByJVbjMszZtXWGq_7qKlDR5A",
-      "summonerId": null,
-      "summonerName": "두 몽#KR1",
-      "profileIconId": 7,
-      "summonerLevel": 663,
-      "topChamps": [
-        {
-          "name": "LeeSin",
-          "count": 2
-        },
-        {
-          "name": "Vi",
-          "count": 2
-        },
-        {
-          "name": "Olaf",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "두 몽",
-      "tagLine": "KR1",
-      "leaguePoints": 727,
-      "wins": 47,
-      "losses": 27,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -226,15 +226,15 @@
       "summonerLevel": 208,
       "topChamps": [
         {
+          "name": "Akali",
+          "count": 2
+        },
+        {
           "name": "Yone",
           "count": 2
         },
         {
-          "name": "Renekton",
-          "count": 1
-        },
-        {
-          "name": "Kennen",
+          "name": "Jayce",
           "count": 1
         }
       ],
@@ -257,15 +257,15 @@
       "summonerLevel": 443,
       "topChamps": [
         {
-          "name": "LeeSin",
+          "name": "Vladimir",
           "count": 3
         },
         {
-          "name": "Jayce",
-          "count": 2
+          "name": "Malphite",
+          "count": 1
         },
         {
-          "name": "Vladimir",
+          "name": "Karthus",
           "count": 1
         }
       ],
@@ -528,15 +528,15 @@
       "summonerLevel": 516,
       "topChamps": [
         {
-          "name": "Lillia",
-          "count": 2
+          "name": "Yasuo",
+          "count": 1
         },
         {
-          "name": "Talon",
-          "count": 2
+          "name": "Yone",
+          "count": 1
         },
         {
-          "name": "Thresh",
+          "name": "Sylas",
           "count": 1
         }
       ],
