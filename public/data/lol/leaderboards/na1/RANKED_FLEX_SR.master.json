@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T16:37:01.737Z",
+  "generatedAt": "2026-02-05T20:14:52.702Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -196,7 +196,7 @@
       "summonerId": null,
       "summonerName": "SweeepNA#NA1",
       "profileIconId": 4149,
-      "summonerLevel": 269,
+      "summonerLevel": 270,
       "topChamps": [
         {
           "name": "Qiyana",
@@ -289,7 +289,7 @@
       "summonerId": null,
       "summonerName": "AQA#NA1",
       "profileIconId": 7070,
-      "summonerLevel": 1083,
+      "summonerLevel": 1085,
       "topChamps": [
         {
           "name": "Graves",
@@ -323,12 +323,12 @@
       "summonerLevel": 201,
       "topChamps": [
         {
-          "name": "Lucian",
+          "name": "Kaisa",
           "count": 2
         },
         {
-          "name": "Kaisa",
-          "count": 1
+          "name": "Lucian",
+          "count": 2
         },
         {
           "name": "Rumble",
@@ -409,7 +409,7 @@
       "summonerId": null,
       "summonerName": "Cylainius#NOXUS",
       "profileIconId": 7064,
-      "summonerLevel": 1420,
+      "summonerLevel": 1424,
       "topChamps": [
         {
           "name": "Darius",
@@ -439,8 +439,8 @@
       "puuid": "Kz9N7fZmSRauqvSe__yL7C3Nw0Rpm69tq_o-yJnNi3M3JVXzVhy5e-awNCyqHBqIpOcUuIDtGHswMQ",
       "summonerId": null,
       "summonerName": "Diamond#0416",
-      "profileIconId": 6940,
-      "summonerLevel": 547,
+      "profileIconId": 7091,
+      "summonerLevel": 550,
       "topChamps": [
         {
           "name": "Ezreal",
@@ -502,7 +502,7 @@
       "summonerId": null,
       "summonerName": "Josh LA#NA1",
       "profileIconId": 934,
-      "summonerLevel": 885,
+      "summonerLevel": 887,
       "topChamps": [
         {
           "name": "Cassiopeia",
@@ -652,8 +652,8 @@
       "puuid": "bvzm0-6tDB4WlnT3OpZSJhnVT985Gtuv0Pev-9y2kMkzFSRrIE3tRasmeSBYyQyrxtRjJ_c1eymLQg",
       "summonerId": null,
       "summonerName": "Kelly#diff",
-      "profileIconId": 6874,
-      "summonerLevel": 501,
+      "profileIconId": 6501,
+      "summonerLevel": 502,
       "topChamps": [
         {
           "name": "Sylas",
@@ -746,7 +746,7 @@
       "summonerId": null,
       "summonerName": "wisperance#NA5",
       "profileIconId": 7037,
-      "summonerLevel": 525,
+      "summonerLevel": 526,
       "topChamps": [
         {
           "name": "Taliyah",
@@ -780,15 +780,15 @@
       "summonerLevel": 844,
       "topChamps": [
         {
+          "name": "Briar",
+          "count": 1
+        },
+        {
           "name": "Ambessa",
           "count": 1
         },
         {
           "name": "Gangplank",
-          "count": 1
-        },
-        {
-          "name": "Sion",
           "count": 1
         }
       ],
@@ -928,37 +928,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "b5SIhM1I3vkAoNWguTeQkiQ1NfwmchlPN6rZtci3EDF2SbaN9I37lAt1EkDdpB01VZr7YLmLx_iAxw",
-      "summonerId": null,
-      "summonerName": "세인트 스푼킹#늙지않아",
-      "profileIconId": 4305,
-      "summonerLevel": 623,
-      "topChamps": [
-        {
-          "name": "Jax",
-          "count": 2
-        },
-        {
-          "name": "Nautilus",
-          "count": 1
-        },
-        {
-          "name": "Lillia",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "세인트 스푼킹",
-      "tagLine": "늙지않아",
-      "leaguePoints": 127,
-      "wins": 19,
-      "losses": 13,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "nJxKlfey-6fy2jxx-3veGRIJQ-CWMunMu5v9qKtSFhcYw6khl51XowCrgrwx6JJSfoAa_J91KtcMcQ",
       "summonerId": null,
       "summonerName": "Arch Tempered#NA1",
@@ -990,6 +959,37 @@
       "freshBlood": false
     },
     {
+      "puuid": "b5SIhM1I3vkAoNWguTeQkiQ1NfwmchlPN6rZtci3EDF2SbaN9I37lAt1EkDdpB01VZr7YLmLx_iAxw",
+      "summonerId": null,
+      "summonerName": "세인트 스푼킹#늙지않아",
+      "profileIconId": 4305,
+      "summonerLevel": 625,
+      "topChamps": [
+        {
+          "name": "Jax",
+          "count": 2
+        },
+        {
+          "name": "Nautilus",
+          "count": 1
+        },
+        {
+          "name": "Lillia",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "세인트 스푼킹",
+      "tagLine": "늙지않아",
+      "leaguePoints": 127,
+      "wins": 19,
+      "losses": 13,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
       "puuid": "rSr8pycG8LgBHLuH0iZ-bAtSlQci4t3L_DQS8Ka5dYmdJ9PNfrfDzv7ShpRL_V-nqZjHe_4RSrADYg",
       "summonerId": null,
       "summonerName": "fortnite#poop",
@@ -998,14 +998,14 @@
       "topChamps": [
         {
           "name": "Viego",
-          "count": 3
+          "count": 2
         },
         {
           "name": "Ekko",
           "count": 2
         },
         {
-          "name": "Yasuo",
+          "name": "Ryze",
           "count": 1
         }
       ],
@@ -1024,7 +1024,7 @@
       "puuid": "eC8mVcfZDSvPNB3U32PFDGK6vBBfd6fi76nLlnVEyIIYNrxaz5XZkJNFGvAw-g8ibdlWNc5fSUZ_Sw",
       "summonerId": null,
       "summonerName": "Buffing#2001",
-      "profileIconId": 6934,
+      "profileIconId": 7080,
       "summonerLevel": 1400,
       "topChamps": [
         {
@@ -1153,10 +1153,10 @@
         },
         {
           "name": "Camille",
-          "count": 1
+          "count": 2
         },
         {
-          "name": "Yone",
+          "name": "Kayle",
           "count": 1
         }
       ],
@@ -1176,7 +1176,7 @@
       "summonerId": null,
       "summonerName": "parky#NA1",
       "profileIconId": 2075,
-      "summonerLevel": 549,
+      "summonerLevel": 550,
       "topChamps": [
         {
           "name": "Syndra",
@@ -1273,7 +1273,7 @@
       "topChamps": [
         {
           "name": "Ezreal",
-          "count": 2
+          "count": 3
         },
         {
           "name": "Galio",
@@ -1420,42 +1420,11 @@
       "freshBlood": true
     },
     {
-      "puuid": "t68Gsn1CLD43jL71kE36FfXJmOqQyMAqTeE8yEMo5cZY9zqrIwFBwZWeVtjyZHSn0Fp0zZ2Hm5t2CA",
-      "summonerId": null,
-      "summonerName": "BarGrill#Croco",
-      "profileIconId": 683,
-      "summonerLevel": 883,
-      "topChamps": [
-        {
-          "name": "Garen",
-          "count": 2
-        },
-        {
-          "name": "Yorick",
-          "count": 2
-        },
-        {
-          "name": "Urgot",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "BarGrill",
-      "tagLine": "Croco",
-      "leaguePoints": 109,
-      "wins": 22,
-      "losses": 14,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "7D2ziSMfV7dGVVljua3NfwhFYOTAHsqxG1iUvY6kjMvWmUH_UbV17Ar1KWQMk2r2-QqQaAU9VJiEtg",
       "summonerId": null,
       "summonerName": "CNS Hacipuu#TEMU",
       "profileIconId": 7064,
-      "summonerLevel": 1016,
+      "summonerLevel": 1020,
       "topChamps": [
         {
           "name": "Mel",
@@ -1534,6 +1503,37 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
+    },
+    {
+      "puuid": "-_0Ec7CsWbIkWa4IPFkJe-U2t-LK49WnzYFQf6tc2iFvqGli16grDrOfO2KQys8GDpaKkHQDbC8aRw",
+      "summonerId": null,
+      "summonerName": "twtv yuitr#NA1",
+      "profileIconId": 6737,
+      "summonerLevel": 370,
+      "topChamps": [
+        {
+          "name": "Rell",
+          "count": 4
+        },
+        {
+          "name": "Leona",
+          "count": 1
+        },
+        {
+          "name": "Lulu",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "twtv yuitr",
+      "tagLine": "NA1",
+      "leaguePoints": 107,
+      "wins": 23,
+      "losses": 10,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     }
   ]
 }
