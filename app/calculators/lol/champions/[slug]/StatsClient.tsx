@@ -157,8 +157,14 @@ export default function StatsClient({
     return abilityList.filter((ab) => ab.key !== "P" && isNumericAbility(ab)).length;
   }, [abilityList]);
 
+  const champImg = useMemo(
+    () => `https://ddragon.leagueoflegends.com/cdn/${patch}/img/champion/${championId}.png`,
+    [patch, championId]
+  );
+
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6">
+    // ✅ Mobile edge-to-edge: remove the big side gutters on small screens
+    <main className="mx-auto w-full max-w-6xl px-2 py-6 sm:px-4">
       {/* ===== Header (matches your other pages) ===== */}
       <div className="mb-4">
         {/* Row 1 */}
@@ -174,12 +180,19 @@ export default function StatsClient({
         </div>
 
         {/* Row 2 */}
-        <div className="mt-3">
-          <h1 className="text-xl font-black text-white">
-            {championName} <span className="text-neutral-500">({championId})</span>
-          </h1>
-          <div className="ml-auto flex items-center gap-10">
-            <span className="rounded-full border border-neutral-800 bg-black/40 px-5 py-1 text-xs text-neutral-400">
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <img
+              src={champImg}
+              alt={championName}
+              className="h-10 w-10 shrink-0 rounded-xl bg-black p-0.5 shadow ring-1 ring-white/10"
+              loading="lazy"
+            />
+            <h1 className="truncate text-xl font-black text-white">{championName}</h1>
+          </div>
+
+          <div className="shrink-0">
+            <span className="rounded-full border border-neutral-800 bg-black/40 px-2 py-1 text-xs text-neutral-400">
               Patch {patch}
             </span>
           </div>
@@ -214,8 +227,6 @@ export default function StatsClient({
           >
             Open Damage Calc (import {championId})
           </Link>
-
-          
         </div>
       </div>
 
@@ -225,13 +236,11 @@ export default function StatsClient({
       </p>
 
       {/* Stats card */}
-      <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 sm:rounded-3xl sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="text-sm font-semibold text-white">Stats at Level</div>
-            <div className="mt-1 text-xs text-neutral-400">
-              Slide to see scaling from level 1 to 18.
-            </div>
+            <div className="mt-1 text-xs text-neutral-400">Slide to see scaling from level 1 to 18.</div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -298,9 +307,9 @@ export default function StatsClient({
       </div>
 
       {/* Abilities */}
-      <div className="mt-4 rounded-3xl border border-white/10 bg-white/5 p-4 sm:p-6">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 sm:rounded-3xl sm:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
               <div className="text-sm font-semibold text-white">Abilities</div>
               <span className="rounded-full border border-white/10 bg-black/30 px-2 py-0.5 text-[11px] text-neutral-400">
@@ -333,23 +342,26 @@ export default function StatsClient({
             const hasNumbers = isNumericAbility(ab);
 
             return (
-              <div key={ab.key} className="rounded-2xl border border-white/10 bg-black/30">
+              <div
+                key={ab.key}
+                className="overflow-hidden rounded-2xl border border-white/10 bg-black/30"
+              >
                 {/* Clickable header */}
                 <button
                   type="button"
                   onClick={() => setOpen((prev) => ({ ...prev, [ab.key]: !isOpen }))}
-                  className="w-full p-4 text-left"
+                  className="w-full min-w-0 p-4 text-left"
                   aria-expanded={isOpen}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="flex items-start gap-2">
+                      <div className="flex min-w-0 items-start gap-2">
                         <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-xs font-bold text-neutral-100">
                           {ab.key}
                         </span>
 
                         <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-2">
                             <div className="truncate text-sm font-semibold text-neutral-100">
                               {ab.name}
                             </div>
@@ -376,7 +388,8 @@ export default function StatsClient({
                           </div>
 
                           {ab.summary ? (
-                            <div className="mt-1 line-clamp-2 text-xs text-neutral-300">
+                            // ✅ Prevent weird tokens ({{ ... }}) from forcing overflow on mobile
+                            <div className="mt-1 line-clamp-2 break-words text-xs text-neutral-300">
                               {ab.summary}
                             </div>
                           ) : (

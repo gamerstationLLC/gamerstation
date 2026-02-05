@@ -99,6 +99,11 @@ function fmtWL(w: number, l: number) {
   return `${w}-${l} (${wr}%)`;
 }
 
+function fmtInt(n: number) {
+  const x = Number.isFinite(n) ? Math.trunc(n) : 0;
+  return x.toLocaleString();
+}
+
 function toRows(json: LeaderboardJson): LeaderboardRow[] {
   return (json.players ?? []).map((p, idx) => ({
     rank: idx + 1,
@@ -154,8 +159,6 @@ function getFallbackIconUrl(profileIconId: number | null, ddVersion: string): st
  * IMPORTANT:
  * Your build script should output topChamps[].name as the DDragon champ "id" (file name),
  * e.g. "Riven", "MonkeyKing", "KaiSa", etc.
- *
- * We keep a light sanitizer just in case, but DON'T change casing.
  */
 function champKey(idOrName: string) {
   return (idOrName || "").replace(/[^A-Za-z]/g, "");
@@ -172,6 +175,40 @@ function champIcon(champIdOrName: string, ddVersion: string) {
  */
 function champLink(champIdOrName: string) {
   return `/calculators/lol/champions/${encodeURIComponent(champKey(champIdOrName))}`;
+}
+
+/**
+ * ✅ Square champ icon that AUTO-SHRINKS with viewport.
+ * Uses a CSS variable --champ set on each row; clamped to keep it sane.
+ */
+function ChampSquareIcon({
+  src,
+  href,
+  ariaLabel,
+}: {
+  src: string;
+  href: string;
+  ariaLabel: string;
+}) {
+  return (
+    <Link href={href} aria-label={ariaLabel} className="relative block">
+      <div
+        className="shrink-0 overflow-hidden rounded-md border border-neutral-800 bg-black/40"
+        style={{
+          width: "clamp(16px, var(--champ), 26px)",
+          height: "clamp(16px, var(--champ), 26px)",
+        }}
+      >
+        <img
+          src={src}
+          alt=""
+          loading="lazy"
+          className="block h-full w-full object-cover object-center"
+          draggable={false}
+        />
+      </div>
+    </Link>
+  );
 }
 
 export default function LeaderboardClient({
@@ -262,7 +299,6 @@ export default function LeaderboardClient({
   const surfaceRow = "bg-neutral-950/60";
   const surfaceHover = "";
 
-  // ✅ your “pilled internal nav” pattern (same as Dota pages)
   const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
@@ -283,9 +319,8 @@ export default function LeaderboardClient({
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black" />
       </div>
 
-      <div className="relative px-6 py-16">
+      <div className="relative px-3 sm:px-6 py-16">
         <div className="mx-auto max-w-5xl">
-          {/* Row 1: Brand (left) + Tools (right) */}
           <header className="mb-8 flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 hover:opacity-90">
               <img
@@ -308,7 +343,6 @@ export default function LeaderboardClient({
           <h1 className="mt-2 text-4xl font-bold tracking-tight">LoL Leaderboard</h1>
           <p className="mt-3 text-neutral-300">Browse top players and see their stats + most played champs.</p>
 
-          {/* ✅ Move Hub + Meta BELOW the description, aligned left */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Link href="/calculators/lol/hub" className={navBtn}>
               LoL Hub
@@ -317,8 +351,8 @@ export default function LeaderboardClient({
               Meta
             </Link>
             <Link href="/tools/lol/champion-tiers" className={navBtn}>
-          Tiers List
-        </Link>
+              Tiers List
+            </Link>
           </div>
 
           <div className={`mt-6 rounded-2xl border p-4 ${surfaceCard}`}>
@@ -386,117 +420,115 @@ export default function LeaderboardClient({
             {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
           </div>
 
-          <div className="mt-6 overflow-x-auto rounded-2xl border border-neutral-800">
-            <div className="min-w-[760px]">
-              <div className={`grid grid-cols-12 gap-2 px-4 py-3 text-xs text-neutral-400 ${surfaceHeader}`}>
-                <div className="col-span-1">#</div>
-                <div className="col-span-4">Player</div>
-                <div className="col-span-2">LP</div>
-                <div className="col-span-3">W-L</div>
-                <div className="col-span-2">Most Played</div>
-              </div>
+          {/* ✅ mobile: no horizontal scroll; desktop unchanged (still scrolls if needed) */}
+          <div className="-mx-2 sm:mx-0 mt-6 overflow-x-hidden sm:overflow-x-auto rounded-2xl border border-neutral-800">
+            <div className="px-1 sm:px-0">
+              <div className="min-w-0 sm:min-w-[760px]">
+                {/* Header */}
+                <div
+                  className={`grid grid-cols-12 gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-xs text-neutral-400 ${surfaceHeader}`}
+                >
+                  <div className="col-span-1">#</div>
+                  <div className="col-span-4 sm:col-span-4">Player</div>
+                  <div className="col-span-3 sm:col-span-2 text-right">LP</div>
+                  <div className="col-span-2 sm:col-span-3 text-right">( W-L )</div>
+                  <div className="col-span-2 sm:col-span-2 text-right whitespace-nowrap">Most Played</div>
+                </div>
 
-              <div className={`divide-y divide-neutral-800 ${surfaceRow}`}>
-                {rows.length === 0 ? (
-                  <div className="px-4 py-10 text-sm text-neutral-400">
-                    {loading ? "Loading…" : "No rows found for this selection."}
-                  </div>
-                ) : (
-                  rows.map((r) => {
-                    const rowKey = `${r.region}-${r.queue}-${r.tier}-${r.puuid}`;
-                    const displayName = (r.summonerName ?? "").trim() || "Unknown";
+                {/* Body */}
+                <div className={`divide-y divide-neutral-800 ${surfaceRow}`}>
+                  {rows.length === 0 ? (
+                    <div className="px-2 sm:px-4 py-10 text-sm text-neutral-400">
+                      {loading ? "Loading…" : "No rows found for this selection."}
+                    </div>
+                  ) : (
+                    rows.map((r) => {
+                      const rowKey = `${r.region}-${r.queue}-${r.tier}-${r.puuid}`;
+                      const displayName = (r.summonerName ?? "").trim() || "Unknown";
 
-                    const preferredUrl = normalizeIconUrl(r.profileIconUrl);
-                    const fallbackUrl = getFallbackIconUrl(r.profileIconId ?? null, ddVersion);
+                      const preferredUrl = normalizeIconUrl(r.profileIconUrl);
+                      const fallbackUrl = getFallbackIconUrl(r.profileIconId ?? null, ddVersion);
 
-                    const isBroken = !!brokenIcons[rowKey];
-                    const finalUrl = !isBroken ? preferredUrl || fallbackUrl : fallbackUrl;
+                      const isBroken = !!brokenIcons[rowKey];
+                      const finalUrl = !isBroken ? preferredUrl || fallbackUrl : fallbackUrl;
 
-                    return (
-                      <div
-                        key={rowKey}
-                        className={`grid grid-cols-12 gap-2 px-4 py-3 text-sm transition ${surfaceHover}`}
-                      >
-                        <div className="col-span-1 text-neutral-400">{r.rank}</div>
+                      const champs = (r.topChamps ?? []).slice(0, 3);
 
-                        <div className="col-span-4 min-w-0 flex items-center gap-3">
-                          {finalUrl ? (
-                            <img
-                              src={finalUrl}
-                              alt=""
-                              className="h-8 w-8 rounded-xl border border-neutral-800 bg-black/40"
-                              loading="lazy"
-                              referrerPolicy="no-referrer"
-                              onError={() => setBrokenIcons((prev) => ({ ...prev, [rowKey]: true }))}
-                            />
-                          ) : (
-                            <div className="h-8 w-8 rounded-xl border border-neutral-800 bg-neutral-900/40" />
-                          )}
+                      return (
+                        <div
+                          key={rowKey}
+                          className={`grid grid-cols-12 items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 text-[11px] sm:text-sm transition ${surfaceHover}`}
+                          // ✅ This is the magic: icon target size scales with viewport
+                          // (6vw on tiny phones; clamp inside ChampSquareIcon keeps it sane)
+                          style={{ ["--champ" as any]: "6vw" }}
+                        >
+                          <div className="col-span-1 text-neutral-400 tabular-nums">{r.rank}</div>
 
-                          <div className="min-w-0">
-                            <div className="font-semibold text-neutral-200 whitespace-normal break-words leading-snug">
-                              {displayName}
+                          {/* Player */}
+                          <div className="col-span-4 sm:col-span-4 min-w-0 flex items-center gap-2">
+                            {finalUrl ? (
+                              <div className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-black/40">
+                                <img
+                                  src={finalUrl}
+                                  alt=""
+                                  loading="lazy"
+                                  referrerPolicy="no-referrer"
+                                  className="block h-full w-full object-cover object-center"
+                                  draggable={false}
+                                  onError={() => setBrokenIcons((prev) => ({ ...prev, [rowKey]: true }))}
+                                />
+                              </div>
+                            ) : (
+                              <div className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 rounded-xl border border-neutral-800 bg-neutral-900/40" />
+                            )}
+
+                            <div className="min-w-0">
+                              <div className="min-w-0 truncate font-semibold text-neutral-200 whitespace-nowrap">
+                                {displayName}
+                              </div>
                             </div>
                           </div>
 
-                          {r.flags?.hotStreak ? (
-                            <span className="ml-1 rounded-full border border-neutral-700 bg-neutral-950/70 px-2 py-0.5 text-[11px] text-neutral-100">
-                              Hot
+                          {/* LP */}
+                          <div className="col-span-3 sm:col-span-2 text-right tabular-nums text-neutral-200 whitespace-nowrap text-[13px] sm:text-sm">
+                            {fmtInt(r.lp)}
+                          </div>
+
+                          {/* ✅ W-L: never wraps; protected from overlap */}
+                          <div className="col-span-2 sm:col-span-3 text-right tabular-nums text-neutral-300 whitespace-nowrap text-[11px] sm:text-sm">
+                            <span className="sm:hidden">
+                              ({r.wins}-{r.losses})
                             </span>
-                          ) : null}
+                            <span className="hidden sm:inline">{fmtWL(r.wins, r.losses)}</span>
+                          </div>
 
-                          {r.flags?.inactive ? (
-                            <span className="ml-1 rounded-full border border-neutral-800 bg-neutral-950/40 px-2 py-0.5 text-[11px] text-neutral-400">
-                              Inactive
-                            </span>
-                          ) : null}
+                          {/* ✅ Most Played: wraps + shrinks icons automatically so it never overlaps W-L */}
+                          <div className="col-span-2 sm:col-span-2 flex items-center justify-end">
+                            <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
+                              {champs.length ? (
+                                champs.map((c) => (
+                                  <div key={c.name} className="relative">
+                                    <ChampSquareIcon
+                                      src={champIcon(c.name, ddVersion)}
+                                      href={champLink(c.name)}
+                                      ariaLabel={c.name}
+                                    />
+                                    {/* count badge desktop only */}
+                                    <span className="hidden sm:inline-block absolute -right-1 -bottom-1 rounded-full bg-black/90 border border-neutral-700 px-1.5 py-[1px] text-[10px] text-white">
+                                      {c.count}
+                                    </span>
+                                  </div>
+                                ))
+                              ) : (
+                                <span className="text-neutral-600">—</span>
+                              )}
+                            </div>
+                          </div>
                         </div>
-
-                        <div className="col-span-2 text-neutral-200">{r.lp}</div>
-                        <div className="col-span-3 text-neutral-300">{fmtWL(r.wins, r.losses)}</div>
-
-                        <div className="col-span-2 flex items-center gap-2">
-                          {(r.topChamps ?? []).slice(0, 3).map((c) => (
-                            <Link key={c.name} href={champLink(c.name)} className="relative group" aria-label={c.name}>
-                              <img
-                                src={champIcon(c.name, ddVersion)}
-                                className="
-                                  h-7 w-7 rounded-md border border-neutral-800 bg-black/40
-                                  transition
-                                  group-hover:shadow-[0_0_10px_rgba(0,255,255,0.6)]
-                                  group-hover:border-cyan-400
-                                "
-                                loading="lazy"
-                                alt=""
-                              />
-
-                              <span
-                                className="
-                                  absolute -right-1 -bottom-1 rounded-full
-                                  bg-black/90 border border-neutral-700
-                                  px-1.5 py-[1px] text-[10px] text-white
-                                "
-                              >
-                                {c.count}
-                              </span>
-
-                              <div
-                                className="
-                                  pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2
-                                  rounded-md border border-neutral-700 bg-black/90 px-2 py-1 text-xs
-                                  text-white opacity-0 transition group-hover:opacity-100
-                                "
-                              >
-                                {c.name}
-                              </div>
-                            </Link>
-                          ))}
-                          {(r.topChamps ?? []).length === 0 ? <span className="text-neutral-600">—</span> : null}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
+                      );
+                    })
+                  )}
+                </div>
               </div>
             </div>
           </div>
