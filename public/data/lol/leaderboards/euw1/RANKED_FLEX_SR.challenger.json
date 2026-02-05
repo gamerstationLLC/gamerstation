@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T14:42:21.025Z",
+  "generatedAt": "2026-02-05T17:03:42.076Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -512,11 +512,11 @@
       "summonerLevel": 1112,
       "topChamps": [
         {
-          "name": "Viego",
+          "name": "Zaahen",
           "count": 3
         },
         {
-          "name": "Zaahen",
+          "name": "Viego",
           "count": 2
         },
         {
@@ -574,15 +574,15 @@
       "summonerLevel": 176,
       "topChamps": [
         {
-          "name": "Corki",
-          "count": 1
-        },
-        {
           "name": "Ezreal",
+          "count": 2
+        },
+        {
+          "name": "Aphelios",
           "count": 1
         },
         {
-          "name": "Kalista",
+          "name": "Corki",
           "count": 1
         }
       ],
@@ -592,6 +592,33 @@
       "leaguePoints": 919,
       "wins": 61,
       "losses": 24,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "RJJpQXYzTpnqCJCc1kN6LuBJdf0Ldk9hUNMJyzuxzeclVa1KSYPTbX7mRVdgUBXHOnbdFDc-qN9Kdw",
+      "summonerId": null,
+      "summonerName": "GWENKlNG#GWEN",
+      "profileIconId": 5935,
+      "summonerLevel": 1414,
+      "topChamps": [
+        {
+          "name": "Gwen",
+          "count": 5
+        },
+        {
+          "name": "Briar",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "GWENKlNG",
+      "tagLine": "GWEN",
+      "leaguePoints": 916,
+      "wins": 52,
+      "losses": 34,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -654,33 +681,6 @@
       "leaguePoints": 877,
       "wins": 57,
       "losses": 44,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "RJJpQXYzTpnqCJCc1kN6LuBJdf0Ldk9hUNMJyzuxzeclVa1KSYPTbX7mRVdgUBXHOnbdFDc-qN9Kdw",
-      "summonerId": null,
-      "summonerName": "GWENKlNG#GWEN",
-      "profileIconId": 5935,
-      "summonerLevel": 1414,
-      "topChamps": [
-        {
-          "name": "Gwen",
-          "count": 5
-        },
-        {
-          "name": "Briar",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "GWENKlNG",
-      "tagLine": "GWEN",
-      "leaguePoints": 858,
-      "wins": 50,
-      "losses": 34,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -931,14 +931,14 @@
       "topChamps": [
         {
           "name": "TahmKench",
-          "count": 3
+          "count": 2
         },
         {
-          "name": "Gnar",
+          "name": "TwistedFate",
           "count": 1
         },
         {
-          "name": "Orianna",
+          "name": "Gnar",
           "count": 1
         }
       ],
@@ -1212,15 +1212,15 @@
       "summonerLevel": 597,
       "topChamps": [
         {
+          "name": "Jax",
+          "count": 1
+        },
+        {
+          "name": "XinZhao",
+          "count": 1
+        },
+        {
           "name": "Trundle",
-          "count": 1
-        },
-        {
-          "name": "Ambessa",
-          "count": 1
-        },
-        {
-          "name": "Volibear",
           "count": 1
         }
       ],
@@ -1398,7 +1398,7 @@
           "count": 5
         },
         {
-          "name": "Sona",
+          "name": "Smolder",
           "count": 1
         }
       ],
