@@ -59,9 +59,14 @@ const LADDER_TIER = (process.env.LADDER_TIER || "challenger").trim().toLowerCase
 
 const LADDER_MAX_PLAYERS = Number(process.env.LADDER_MAX_PLAYERS || 250);
 const REPROCESS_BOOTSTRAP = String(process.env.REPROCESS_BOOTSTRAP || "0") === "1";
+
+// ✅ STRICT RECENCY WINDOW (days)
 const CACHE_MAX_AGE_DAYS = Number(process.env.CACHE_MAX_AGE_DAYS || 90);
 const NOW_SEC = Math.floor(Date.now() / 1000);
 const START_TIME_SEC = NOW_SEC - CACHE_MAX_AGE_DAYS * 24 * 60 * 60;
+
+// ✅ ms cutoff for strict gameCreation check
+const CUTOFF_MS = Date.now() - CACHE_MAX_AGE_DAYS * 24 * 60 * 60 * 1000;
 
 // ✅ optional: seed via match ids/urls (regional-only)
 const SEED_MATCH_IDS = String(process.env.SEED_MATCH_IDS || "")
@@ -87,6 +92,7 @@ console.log("[env] RIOT_REGION (match-v5):", RIOT_REGION);
 console.log("[env] RIOT_PLATFORM (league/summoner):", RIOT_PLATFORM);
 console.log("[env] LADDER_TIER/QUEUE/MAX:", LADDER_TIER, LADDER_QUEUE, LADDER_MAX_PLAYERS);
 console.log("[env] Seed extras: SEED_MATCH_IDS:", SEED_MATCH_IDS.length, "SEED_MATCH_URLS:", SEED_MATCH_URLS.length);
+console.log(`[env] STRICT WINDOW: CACHE_MAX_AGE_DAYS=${CACHE_MAX_AGE_DAYS} startTime=${START_TIME_SEC} cutoff=${new Date(CUTOFF_MS).toISOString()}`);
 
 const QUEUE_RANKED = 420;
 const QUEUES_CASUAL = new Set<number>([400, 430]);
@@ -133,9 +139,7 @@ async function persistState(reason: string) {
     await writeJson(SEEN_PUUIDS_PATH, { puuids: Array.from(gSeenPuuids) } satisfies SeenPuuidsState);
     await writeJson(PUUID_CURSORS_PATH, gPuuidCursors);
     await writeJson(AGG_STATE_PATH, gAgg);
-    console.log(
-      `[checkpoint] persisted (${reason}) matches=${gSeenMatches.size} puuids=${gSeenPuuids.size}`
-    );
+    console.log(`[checkpoint] persisted (${reason}) matches=${gSeenMatches.size} puuids=${gSeenPuuids.size}`);
   } catch (e: any) {
     console.warn(`[checkpoint] persist failed (${reason}): ${e?.message || e}`);
   }
@@ -294,7 +298,8 @@ async function getMatchIdsByPuuidPaged(puuid: string, start: number, count: numb
   return Array.isArray(ids) ? ids.map(String) : [];
 }
 
-async function getMatch(matchId: string): Promise<any> {
+// ✅ read cache if present; if fetching, only write cache if opts.cacheWrite === true
+async function getMatch(matchId: string, opts?: { cacheWrite?: boolean }): Promise<any> {
   const cachePath = path.join(CACHE_MATCHES_DIR, `${matchId}.json`);
   try {
     const raw = await fs.readFile(cachePath, "utf-8");
@@ -302,7 +307,9 @@ async function getMatch(matchId: string): Promise<any> {
   } catch {
     const url = `${riotRegionalBase()}/lol/match/v5/matches/${encodeURIComponent(matchId)}`;
     const data = await fetchRegionalJson(url);
-    await fs.writeFile(cachePath, JSON.stringify(data), "utf-8");
+    if (opts?.cacheWrite) {
+      await fs.writeFile(cachePath, JSON.stringify(data), "utf-8");
+    }
     return data;
   }
 }
@@ -466,43 +473,6 @@ function bayesWr(wins: number, games: number) {
   return (wins + BAYES_K * PRIOR_WINRATE) / (games + BAYES_K);
 }
 
-function pickBestBuildForRole(
-  roleBucket: Record<string, AggBucket>,
-  opts: { allowLowSampleFallback: boolean }
-): { sig: string; data: AggBucket; score: number; lowSample: boolean } | null {
-  const entries = Object.entries(roleBucket || {});
-  let best: { sig: string; data: AggBucket; score: number; lowSample: boolean } | null = null;
-
-  function consider(sig: string, data: AggBucket, lowSample: boolean) {
-    const games = Number(data?.games || 0);
-    const wins = Number(data?.wins || 0);
-    if (games <= 0) return;
-
-    const wr = bayesWr(wins, games);
-    const score = wr * Math.log10(games + 1);
-
-    if (!best) {
-      best = { sig, data, score, lowSample };
-      return;
-    }
-
-    const bestGames = Number(best.data?.games || 0);
-    if (score > best.score) best = { sig, data, score, lowSample };
-    else if (score === best.score && games > bestGames) best = { sig, data, score, lowSample };
-  }
-
-  for (const [sig, data] of entries) {
-    const games = Number(data?.games || 0);
-    if (games < MIN_DISPLAY_SAMPLE) continue;
-    consider(sig, data, false);
-  }
-  if (best) return best;
-
-  if (!opts.allowLowSampleFallback) return null;
-  for (const [sig, data] of entries) consider(sig, data, true);
-  return best;
-}
-
 async function scanCacheAndIngest(agg: AggState) {
   let files = await fs.readdir(CACHE_MATCHES_DIR).catch(() => []);
   files = files.filter((f) => f.endsWith(".json"));
@@ -512,6 +482,8 @@ async function scanCacheAndIngest(agg: AggState) {
   console.log(`Cache rebuild: scanned ${limit} matches...`);
 
   let ingested = 0;
+  let skippedOldOrNoCreation = 0;
+
   for (let i = 0; i < limit; i++) {
     const f = files[i]!;
     const p = path.join(CACHE_MATCHES_DIR, f);
@@ -525,6 +497,13 @@ async function scanCacheAndIngest(agg: AggState) {
 
     const info = match?.info;
     if (!info) continue;
+
+    // ✅ STRICT window on cache ingest too
+    const created = Number(info?.gameCreation || 0);
+    if (!created || created < CUTOFF_MS) {
+      skippedOldOrNoCreation += 1;
+      continue;
+    }
 
     const queueId = Number(info?.queueId || 0);
     if (!shouldIngestQueue(queueId)) continue;
@@ -574,6 +553,10 @@ async function scanCacheAndIngest(agg: AggState) {
     ingested++;
   }
 
+  if (skippedOldOrNoCreation) {
+    console.log(`[cache] Skipped ${skippedOldOrNoCreation} cached matches due to strict age/no gameCreation.`);
+  }
+
   return ingested;
 }
 
@@ -595,7 +578,8 @@ async function seedPuuidsFromMatchIds(matchIds: string[]): Promise<string[]> {
 
   for (const mid of matchIds) {
     try {
-      const match = await getMatch(mid);
+      // ✅ do not cache these unless they pass strict filter (handled below in main loop)
+      const match = await getMatch(mid, { cacheWrite: false });
       const parts: any[] = Array.isArray(match?.info?.participants) ? match.info.participants : [];
       for (const p of parts) {
         const pu = String(p?.puuid || "").trim();
@@ -608,6 +592,7 @@ async function seedPuuidsFromMatchIds(matchIds: string[]): Promise<string[]> {
 
   return Array.from(new Set(puuids));
 }
+
 // ===============================
 // ✅ Ladder bootstrap (league-v4 + summoner-v4 -> PUUIDs)
 // ===============================
@@ -760,356 +745,8 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
 }
 
 // ===============================
-// Finalize outputs from cached Match-V5 JSONs
+// Main
 // ===============================
-
-type FinalizeRole = "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY";
-
-type BuildParts = {
-  boots: number | null;
-  core: number[];
-  items: number[];
-  summoners: number[];
-};
-
-type Leaf = { games: number; wins: number; build: BuildParts };
-
-type FinalizeAgg = Record<string, Record<string, Partial<Record<FinalizeRole, Record<string, Leaf>>>>>;
-
-function patchMajor(gameVersion: string | undefined): number | null {
-  if (!gameVersion) return null;
-  const m = String(gameVersion).match(/^(\d+)\./);
-  if (!m) return null;
-  const n = Number(m[1]);
-  return Number.isFinite(n) ? n : null;
-}
-
-function normPos(pos: string | undefined): FinalizeRole | null {
-  const p = (pos || "").toUpperCase();
-  if (p === "TOP") return "TOP";
-  if (p === "JUNGLE") return "JUNGLE";
-  if (p === "MIDDLE" || p === "MID") return "MIDDLE";
-  if (p === "BOTTOM" || p === "BOT") return "BOTTOM";
-  if (p === "UTILITY" || p === "SUPPORT") return "UTILITY";
-  return null;
-}
-
-async function listJsonFiles(dir: string, limit: number): Promise<string[]> {
-  const out: string[] = [];
-
-  async function walk(d: string) {
-    if (limit > 0 && out.length >= limit) return;
-    const entries = await fs.readdir(d, { withFileTypes: true });
-    for (const e of entries) {
-      if (limit > 0 && out.length >= limit) return;
-      const p = path.join(d, e.name);
-      if (e.isDirectory()) await walk(p);
-      else if (e.isFile() && e.name.toLowerCase().endsWith(".json")) out.push(p);
-    }
-  }
-
-  await walk(dir);
-  return out;
-}
-
-function bayesScore(wins: number, games: number, k: number, prior: number) {
-  const a = prior * k + wins;
-  const b = (1 - prior) * k + (games - wins);
-  return a / (a + b);
-}
-
-function incFinalize(
-  agg: FinalizeAgg,
-  patchKey: string,
-  champId: number,
-  role: FinalizeRole,
-  sig: string,
-  win: boolean,
-  build: BuildParts
-) {
-  const p = (agg[patchKey] ||= {});
-  const c = (p[String(champId)] ||= {});
-  const r = (c[role] ||= {});
-  const leaf = (r[sig] ||= { games: 0, wins: 0, build });
-  leaf.games += 1;
-  if (win) leaf.wins += 1;
-}
-
-function toNum(x: any): number {
-  const n = Number(x || 0);
-  return Number.isFinite(n) ? n : 0;
-}
-
-function uniqKeepOrder(nums: number[]): number[] {
-  const seen = new Set<number>();
-  const out: number[] = [];
-  for (const n of nums) {
-    if (!n || seen.has(n)) continue;
-    seen.add(n);
-    out.push(n);
-  }
-  return out;
-}
-
-type ItemsDdragon = { data?: Record<string, { tags?: string[] }> };
-
-async function loadBootSet(repoRoot: string): Promise<Set<number>> {
-  const p = path.join(repoRoot, "public", "data", "lol", "items.json");
-  const raw = await fs.readFile(p, "utf-8");
-  const json = JSON.parse(raw) as ItemsDdragon;
-
-  const boots = new Set<number>();
-  for (const [idStr, it] of Object.entries(json.data || {})) {
-    const id = Number(idStr);
-    if (!Number.isFinite(id) || id <= 0) continue;
-    const tags = Array.isArray(it.tags) ? it.tags : [];
-    if (tags.includes("Boots")) boots.add(id);
-  }
-  return boots;
-}
-
-function extractBootsAndCore(p: any, bootSet: Set<number>): BuildParts {
-  const raw = [
-    toNum(p?.item0),
-    toNum(p?.item1),
-    toNum(p?.item2),
-    toNum(p?.item3),
-    toNum(p?.item4),
-    toNum(p?.item5),
-  ].filter((x) => x > 0);
-
-  const items = uniqKeepOrder(raw);
-
-  let boots: number | null = null;
-  for (const id of items) {
-    if (bootSet.has(id)) {
-      boots = id;
-      break;
-    }
-  }
-
-  const core: number[] = [];
-  for (const id of items) {
-    if (boots && id === boots) continue;
-    core.push(id);
-    if (core.length >= 3) break;
-  }
-
-  const summoners = [toNum(p?.summoner1Id), toNum(p?.summoner2Id)]
-    .filter((x) => x > 0)
-    .sort((a, b) => a - b);
-
-  const displayItems = ([...(boots ? [boots] : []), ...core] as number[]).filter((x) => x > 0);
-
-  return { boots, core, items: displayItems, summoners };
-}
-
-function finalizeBuildSig(b: BuildParts): string {
-  const bPart = b.boots ? String(b.boots) : "0";
-  const cPart = b.core.join(",");
-  return `b=${bPart}|c=${cPart}`;
-}
-
-function topBuildsForRole(
-  roleMap: Record<string, Leaf>,
-  minDisplaySample: number,
-  bayesK: number,
-  priorWinrate: number
-) {
-  const entries = Object.entries(roleMap)
-    .map(([sig, leaf]) => {
-      const games = leaf.games;
-      const wins = leaf.wins;
-      const winrate = games > 0 ? wins / games : 0;
-      const score = bayesScore(wins, games, bayesK, priorWinrate);
-      return {
-        buildSig: sig,
-        ...leaf.build,
-        games,
-        wins,
-        winrate: Number(winrate.toFixed(4)),
-        score: Number(score.toFixed(6)),
-      };
-    })
-    .filter((x) => x.games >= minDisplaySample)
-    .sort((a, b) => {
-      if (b.games !== a.games) return b.games - a.games;
-      return b.score - a.score;
-    });
-
-  return entries.slice(0, 10);
-}
-
-async function writeFinalizeOut(outPath: string, queues: number[], agg: FinalizeAgg, minPatchMajor: number) {
-  const obj: any = {
-    generatedAt: new Date().toISOString(),
-    queues,
-    useTimeline: false,
-    patchMajorMinorOnly: false,
-    minSample: MIN_SAMPLE,
-    minDisplaySample: MIN_DISPLAY_SAMPLE,
-    bayesK: BAYES_K,
-    priorWinrate: PRIOR_WINRATE,
-    minPatchMajor,
-    patches: {},
-  };
-
-  for (const [patchKey, champs] of Object.entries(agg)) {
-    obj.patches[patchKey] = {};
-    for (const [champId, roles] of Object.entries(champs)) {
-      obj.patches[patchKey][champId] = {};
-      for (const [role, sigMap] of Object.entries(roles as any)) {
-        const top = topBuildsForRole(
-          sigMap as Record<string, Leaf>,
-          MIN_DISPLAY_SAMPLE,
-          BAYES_K,
-          PRIOR_WINRATE
-        );
-        if (top.length) obj.patches[patchKey][champId][role] = top;
-      }
-    }
-  }
-
-  await fs.mkdir(path.dirname(outPath), { recursive: true });
-  await fs.writeFile(outPath, JSON.stringify(obj, null, 2), "utf-8");
-}
-
-async function finalizeOutputsFromAggState(agg: AggState) {
-  const rankedQueues = [QUEUE_RANKED];
-  const casualQueues = Array.from(QUEUES_CASUAL);
-
-  const minPatchMajor = Number(process.env.MIN_PATCH_MAJOR || 16);
-
-  const rankedOut: any = {
-    generatedAt: new Date().toISOString(),
-    queues: rankedQueues,
-    useTimeline: USE_TIMELINE,
-    patchMajorMinorOnly: PATCH_MAJOR_MINOR_ONLY,
-    minSample: MIN_SAMPLE,
-    minDisplaySample: MIN_DISPLAY_SAMPLE,
-    bayesK: BAYES_K,
-    priorWinrate: PRIOR_WINRATE,
-    minPatchMajor,
-    patches: {} as Record<string, any>,
-  };
-
-  const casualOut: any = {
-    generatedAt: new Date().toISOString(),
-    queues: casualQueues,
-    useTimeline: USE_TIMELINE,
-    patchMajorMinorOnly: PATCH_MAJOR_MINOR_ONLY,
-    minSample: MIN_SAMPLE,
-    minDisplaySample: MIN_DISPLAY_SAMPLE,
-    bayesK: BAYES_K,
-    priorWinrate: PRIOR_WINRATE,
-    minPatchMajor,
-    patches: {} as Record<string, any>,
-  };
-
-  const debug = {
-    patchesTotal: 0,
-    patchesKept: 0,
-    bucketsRanked: 0,
-    bucketsCasual: 0,
-  };
-
-  const majorOfPatchKey = (patchKey: string): number | null => {
-    const m = String(patchKey).match(/^(\d+)\./);
-    if (!m) return null;
-    const n = Number(m[1]);
-    return Number.isFinite(n) ? n : null;
-  };
-
-  function topFromRoleBucket(roleBucket: Record<string, AggBucket>) {
-    const entries = Object.entries(roleBucket || {})
-      .map(([sig, b]) => {
-        const games = Number(b?.games || 0);
-        const wins = Number(b?.wins || 0);
-        const winrate = games > 0 ? wins / games : 0;
-        const score = bayesWr(wins, games);
-        return {
-          buildSig: sig,
-          boots: b?.boots ?? null,
-          core: Array.isArray(b?.core) ? b.core : [],
-          games,
-          wins,
-          winrate: Number(winrate.toFixed(4)),
-          score: Number(score.toFixed(6)),
-          lowSample: games < MIN_DISPLAY_SAMPLE,
-        };
-      })
-      .filter((x) => x.games >= MIN_DISPLAY_SAMPLE)
-      .sort((a, b) => {
-        if (b.games !== a.games) return b.games - a.games;
-        return b.score - a.score;
-      });
-
-    return entries.slice(0, 10);
-  }
-
-  for (const [patchKey, queuesObj] of Object.entries(agg || {})) {
-    debug.patchesTotal += 1;
-
-    const major = majorOfPatchKey(patchKey);
-    if (!major || major < minPatchMajor) continue;
-
-    debug.patchesKept += 1;
-
-    const rankedQueueObj = queuesObj?.[String(QUEUE_RANKED)] || null;
-    if (rankedQueueObj) {
-      for (const [champId, rolesObj] of Object.entries(rankedQueueObj)) {
-        for (const [role, roleBucket] of Object.entries(rolesObj as any)) {
-          const top = topFromRoleBucket(roleBucket as Record<string, AggBucket>);
-          if (!top.length) continue;
-
-          rankedOut.patches[patchKey] ||= {};
-          rankedOut.patches[patchKey][champId] ||= {};
-          rankedOut.patches[patchKey][champId][role] = top;
-
-          debug.bucketsRanked += 1;
-        }
-      }
-    }
-
-    for (const q of casualQueues) {
-      const qObj = queuesObj?.[String(q)] || null;
-      if (!qObj) continue;
-
-      for (const [champId, rolesObj] of Object.entries(qObj)) {
-        for (const [role, roleBucket] of Object.entries(rolesObj as any)) {
-          const top = topFromRoleBucket(roleBucket as Record<string, AggBucket>);
-          if (!top.length) continue;
-
-          casualOut.patches[patchKey] ||= {};
-          casualOut.patches[patchKey][champId] ||= {};
-          casualOut.patches[patchKey][champId][role] = top;
-
-          debug.bucketsCasual += 1;
-        }
-      }
-    }
-  }
-
-  console.log("[finalize-from-agg] DEBUG:", debug);
-
-  const rankedHasAny = Object.keys(rankedOut.patches || {}).length > 0;
-  if (!rankedHasAny) {
-    throw new Error("[finalize-from-agg] Ranked patches empty — refusing to overwrite output");
-  }
-
-  await fs.mkdir(path.dirname(OUT_RANKED_PATH), { recursive: true });
-  await fs.writeFile(OUT_RANKED_PATH, JSON.stringify(rankedOut, null, 2), "utf-8");
-  console.log(`[finalize-from-agg] Wrote: ${OUT_RANKED_PATH}`);
-
-  const casualHasAny = Object.keys(casualOut.patches || {}).length > 0;
-  if (!casualHasAny) {
-    console.warn("[finalize-from-agg] Casual empty — keeping previous file (no overwrite).");
-  } else {
-    await fs.mkdir(path.dirname(OUT_CASUAL_PATH), { recursive: true });
-    await fs.writeFile(OUT_CASUAL_PATH, JSON.stringify(casualOut, null, 2), "utf-8");
-    console.log(`[finalize-from-agg] Wrote: ${OUT_CASUAL_PATH}`);
-  }
-}
 
 async function main() {
   assertEnv();
@@ -1186,6 +823,16 @@ async function main() {
   let newPuuidsAdded = 0;
   let matchesProcessed = 0;
 
+  const strictDebug = {
+    skippedNoGameCreation: 0,
+    skippedOldByGameCreation: 0,
+    skippedNotTrackedQueue: 0,
+    skippedNoInfoOrMeta: 0,
+    skippedNoParticipants: 0,
+    skippedSeen: 0,
+    cachedWritten: 0,
+  };
+
   while (puuidQueue.length > 0) {
     if (shutdownRequested) break; // ✅ CHECKPOINTS (new)
     if (matchesProcessed >= MAX_MATCHES_PER_RUN) break;
@@ -1214,13 +861,16 @@ async function main() {
     for (const matchId of matchIds) {
       if (shutdownRequested) break; // ✅ CHECKPOINTS (new)
       if (matchesProcessed >= MAX_MATCHES_PER_RUN) break;
-      if (seenMatches.has(matchId)) continue;
 
-      seenMatches.add(matchId);
+      if (seenMatches.has(matchId)) {
+        strictDebug.skippedSeen += 1;
+        continue;
+      }
 
+      // ✅ IMPORTANT: do NOT mark seen yet — fetch + validate first
       let match: any;
       try {
-        match = await getMatch(matchId);
+        match = await getMatch(matchId, { cacheWrite: false }); // write only after strict filter passes
       } catch (e: any) {
         console.warn(`Failed match ${matchId}: ${e?.message || e}`);
         continue;
@@ -1228,14 +878,47 @@ async function main() {
 
       const info = match?.info;
       const metadata = match?.metadata;
-      if (!info || !metadata) continue;
+      if (!info || !metadata) {
+        strictDebug.skippedNoInfoOrMeta += 1;
+        continue;
+      }
+
+      // ✅ STRICT RECENCY FILTER (the one you asked for):
+      // Drop if missing gameCreation OR older than cutoff.
+      const created = Number(info?.gameCreation || 0);
+      if (!created) {
+        strictDebug.skippedNoGameCreation += 1;
+        continue;
+      }
+      if (created < CUTOFF_MS) {
+        strictDebug.skippedOldByGameCreation += 1;
+        continue;
+      }
 
       const queueId = Number(info?.queueId || 0);
-      if (!shouldIngestQueue(queueId)) continue;
+      if (!shouldIngestQueue(queueId)) {
+        strictDebug.skippedNotTrackedQueue += 1;
+        continue;
+      }
+
+      const participants: any[] = Array.isArray(info?.participants) ? info.participants : [];
+      if (!participants.length) {
+        strictDebug.skippedNoParticipants += 1;
+        continue;
+      }
+
+      // ✅ NOW that it’s valid, cache it + mark seen
+      try {
+        const cachePath = path.join(CACHE_MATCHES_DIR, `${matchId}.json`);
+        await fs.writeFile(cachePath, JSON.stringify(match), "utf-8");
+        strictDebug.cachedWritten += 1;
+      } catch {
+        // ignore cache write failures
+      }
+
+      seenMatches.add(matchId);
 
       const patch = patchFromGameVersion(info?.gameVersion || "");
-      const participants: any[] = Array.isArray(info?.participants) ? info.participants : [];
-      if (!participants.length) continue;
 
       let timeline: any = null;
       if (USE_TIMELINE) {
@@ -1294,6 +977,8 @@ async function main() {
       }
     }
   }
+
+  console.log("[strict] DEBUG:", strictDebug);
 
   // ✅ CHECKPOINTS: final flush (new)
   await persistState("end");
