@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T09:11:12.975Z",
+  "generatedAt": "2026-02-05T11:56:41.641Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -315,15 +315,15 @@
       "summonerLevel": 739,
       "topChamps": [
         {
+          "name": "Rengar",
+          "count": 1
+        },
+        {
+          "name": "JarvanIV",
+          "count": 1
+        },
+        {
           "name": "Varus",
-          "count": 1
-        },
-        {
-          "name": "Caitlyn",
-          "count": 1
-        },
-        {
-          "name": "Ziggs",
           "count": 1
         }
       ],
@@ -378,7 +378,7 @@
       "topChamps": [
         {
           "name": "Milio",
-          "count": 3
+          "count": 4
         },
         {
           "name": "Lulu",
@@ -560,7 +560,11 @@
       "topChamps": [
         {
           "name": "Darius",
-          "count": 5
+          "count": 4
+        },
+        {
+          "name": "Sett",
+          "count": 1
         },
         {
           "name": "Aatrox",
@@ -676,14 +680,14 @@
       "topChamps": [
         {
           "name": "Zoe",
-          "count": 3
+          "count": 2
         },
         {
-          "name": "Akali",
+          "name": "Fizz",
           "count": 1
         },
         {
-          "name": "Ziggs",
+          "name": "Akali",
           "count": 1
         }
       ],
@@ -937,6 +941,33 @@
       "leaguePoints": 183,
       "wins": 62,
       "losses": 44,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "ShngGAQ9RxksesHlZmFbJ5_OKePdC2637F0A0Cs4c1UFBVLXCFTAu_gmVuLADUJXyQ_8i4VK3oJkdA",
+      "summonerId": null,
+      "summonerName": "Lottò#Root",
+      "profileIconId": 7049,
+      "summonerLevel": 612,
+      "topChamps": [
+        {
+          "name": "Malphite",
+          "count": 5
+        },
+        {
+          "name": "Ornn",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Lottò",
+      "tagLine": "Root",
+      "leaguePoints": 183,
+      "wins": 29,
+      "losses": 29,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -1326,37 +1357,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "ShngGAQ9RxksesHlZmFbJ5_OKePdC2637F0A0Cs4c1UFBVLXCFTAu_gmVuLADUJXyQ_8i4VK3oJkdA",
-      "summonerId": null,
-      "summonerName": "Lottò#Root",
-      "profileIconId": 7049,
-      "summonerLevel": 612,
-      "topChamps": [
-        {
-          "name": "Malphite",
-          "count": 3
-        },
-        {
-          "name": "Garen",
-          "count": 2
-        },
-        {
-          "name": "Ornn",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Lottò",
-      "tagLine": "Root",
-      "leaguePoints": 176,
-      "wins": 28,
-      "losses": 28,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "AFx2RFU0ntSZ3Ey1PzW9OPDvchu23LaNL1iy31lu35osJUuotIKBkKagKS0kYYHXjRxuyUQ6lmE4kA",
       "summonerId": null,
       "summonerName": "Just in Time#Love",
@@ -1449,15 +1449,15 @@
       "summonerLevel": 821,
       "topChamps": [
         {
-          "name": "Teemo",
-          "count": 3
-        },
-        {
-          "name": "Akshan",
+          "name": "Yone",
           "count": 1
         },
         {
-          "name": "Ahri",
+          "name": "Jayce",
+          "count": 1
+        },
+        {
+          "name": "Twitch",
           "count": 1
         }
       ],
