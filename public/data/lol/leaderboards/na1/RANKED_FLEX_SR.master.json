@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T20:14:52.702Z",
+  "generatedAt": "2026-02-05T22:28:27.108Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -14,7 +14,7 @@
       "topChamps": [
         {
           "name": "Jayce",
-          "count": 3
+          "count": 4
         },
         {
           "name": "Mordekaiser",
@@ -44,12 +44,12 @@
       "summonerLevel": 1356,
       "topChamps": [
         {
-          "name": "Draven",
-          "count": 3
+          "name": "AurelionSol",
+          "count": 2
         },
         {
-          "name": "AurelionSol",
-          "count": 1
+          "name": "Draven",
+          "count": 2
         },
         {
           "name": "Twitch",
@@ -324,14 +324,14 @@
       "topChamps": [
         {
           "name": "Kaisa",
-          "count": 2
+          "count": 3
         },
         {
           "name": "Lucian",
           "count": 2
         },
         {
-          "name": "Rumble",
+          "name": "Leblanc",
           "count": 1
         }
       ],
@@ -431,6 +431,37 @@
       "wins": 26,
       "losses": 26,
       "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "PSKIbP9Fhl3mAQ6qkJCUIJgbHF0Sx5s1Kt65EIndVoVXCsJVRZEq0Klb7eHv58G6av7EkHL5SSDOzg",
+      "summonerId": null,
+      "summonerName": "King#D0NG",
+      "profileIconId": 6796,
+      "summonerLevel": 463,
+      "topChamps": [
+        {
+          "name": "Tryndamere",
+          "count": 2
+        },
+        {
+          "name": "Gangplank",
+          "count": 2
+        },
+        {
+          "name": "Varus",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "King",
+      "tagLine": "D0NG",
+      "leaguePoints": 152,
+      "wins": 39,
+      "losses": 32,
+      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -990,37 +1021,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "rSr8pycG8LgBHLuH0iZ-bAtSlQci4t3L_DQS8Ka5dYmdJ9PNfrfDzv7ShpRL_V-nqZjHe_4RSrADYg",
-      "summonerId": null,
-      "summonerName": "fortnite#poop",
-      "profileIconId": 6382,
-      "summonerLevel": 975,
-      "topChamps": [
-        {
-          "name": "Viego",
-          "count": 2
-        },
-        {
-          "name": "Ekko",
-          "count": 2
-        },
-        {
-          "name": "Ryze",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "fortnite",
-      "tagLine": "poop",
-      "leaguePoints": 127,
-      "wins": 15,
-      "losses": 1,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "eC8mVcfZDSvPNB3U32PFDGK6vBBfd6fi76nLlnVEyIIYNrxaz5XZkJNFGvAw-g8ibdlWNc5fSUZ_Sw",
       "summonerId": null,
       "summonerName": "Buffing#2001",
@@ -1043,6 +1043,37 @@
       "sampleGames": 6,
       "gameName": "Buffing",
       "tagLine": "2001",
+      "leaguePoints": 127,
+      "wins": 15,
+      "losses": 1,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "rSr8pycG8LgBHLuH0iZ-bAtSlQci4t3L_DQS8Ka5dYmdJ9PNfrfDzv7ShpRL_V-nqZjHe_4RSrADYg",
+      "summonerId": null,
+      "summonerName": "fortnite#poop",
+      "profileIconId": 6382,
+      "summonerLevel": 975,
+      "topChamps": [
+        {
+          "name": "Viego",
+          "count": 2
+        },
+        {
+          "name": "Pantheon",
+          "count": 1
+        },
+        {
+          "name": "Ryze",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "fortnite",
+      "tagLine": "poop",
       "leaguePoints": 127,
       "wins": 15,
       "losses": 1,
@@ -1083,7 +1114,7 @@
       "summonerId": null,
       "summonerName": "Paku#86th",
       "profileIconId": 5410,
-      "summonerLevel": 602,
+      "summonerLevel": 603,
       "topChamps": [
         {
           "name": "Anivia",
@@ -1148,12 +1179,12 @@
       "summonerLevel": 711,
       "topChamps": [
         {
-          "name": "Fiora",
-          "count": 2
+          "name": "Jayce",
+          "count": 1
         },
         {
-          "name": "Camille",
-          "count": 2
+          "name": "Zeri",
+          "count": 1
         },
         {
           "name": "Kayle",
@@ -1273,14 +1304,14 @@
       "topChamps": [
         {
           "name": "Ezreal",
-          "count": 3
+          "count": 2
         },
         {
-          "name": "Galio",
+          "name": "Sivir",
           "count": 1
         },
         {
-          "name": "Renekton",
+          "name": "Galio",
           "count": 1
         }
       ],
@@ -1300,7 +1331,7 @@
       "summonerId": null,
       "summonerName": "Jaggermicer#NA1",
       "profileIconId": 7070,
-      "summonerLevel": 804,
+      "summonerLevel": 805,
       "topChamps": [
         {
           "name": "Viego",
@@ -1445,37 +1476,6 @@
       "leaguePoints": 108,
       "wins": 21,
       "losses": 15,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "PSKIbP9Fhl3mAQ6qkJCUIJgbHF0Sx5s1Kt65EIndVoVXCsJVRZEq0Klb7eHv58G6av7EkHL5SSDOzg",
-      "summonerId": null,
-      "summonerName": "King#D0NG",
-      "profileIconId": 6796,
-      "summonerLevel": 462,
-      "topChamps": [
-        {
-          "name": "Gangplank",
-          "count": 4
-        },
-        {
-          "name": "Aatrox",
-          "count": 1
-        },
-        {
-          "name": "Tryndamere",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "King",
-      "tagLine": "D0NG",
-      "leaguePoints": 107,
-      "wins": 37,
-      "losses": 32,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
