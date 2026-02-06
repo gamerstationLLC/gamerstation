@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-06T17:12:27.250Z",
+  "generatedAt": "2026-02-06T21:37:03.183Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -44,24 +44,55 @@
       "summonerLevel": 222,
       "topChamps": [
         {
-          "name": "Akali",
-          "count": 2
-        },
-        {
-          "name": "Leblanc",
+          "name": "Ahri",
           "count": 1
         },
         {
-          "name": "Jayce",
+          "name": "Sylas",
+          "count": 1
+        },
+        {
+          "name": "Leblanc",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "엄마아빠사랑해요",
       "tagLine": "L0ve",
-      "leaguePoints": 833,
-      "wins": 91,
+      "leaguePoints": 884,
+      "wins": 93,
       "losses": 52,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "DzO3iC3QXIoi4KC-tkHINbKMkBDILeLRIL-M6fDRJZRCtdk9kaw-mv6_WPxFy4uG8l_M2zGdcpa0gQ",
+      "summonerId": null,
+      "summonerName": "chendian#KR 1",
+      "profileIconId": 23,
+      "summonerLevel": 386,
+      "topChamps": [
+        {
+          "name": "Qiyana",
+          "count": 3
+        },
+        {
+          "name": "Nocturne",
+          "count": 2
+        },
+        {
+          "name": "Rammus",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "chendian",
+      "tagLine": "KR 1",
+      "leaguePoints": 869,
+      "wins": 82,
+      "losses": 57,
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
@@ -99,41 +130,10 @@
       "freshBlood": false
     },
     {
-      "puuid": "DzO3iC3QXIoi4KC-tkHINbKMkBDILeLRIL-M6fDRJZRCtdk9kaw-mv6_WPxFy4uG8l_M2zGdcpa0gQ",
-      "summonerId": null,
-      "summonerName": "chendian#KR 1",
-      "profileIconId": 23,
-      "summonerLevel": 385,
-      "topChamps": [
-        {
-          "name": "Qiyana",
-          "count": 4
-        },
-        {
-          "name": "Nocturne",
-          "count": 1
-        },
-        {
-          "name": "Rammus",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "chendian",
-      "tagLine": "KR 1",
-      "leaguePoints": 819,
-      "wins": 80,
-      "losses": 57,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "ZmWpU3W546I4ObnCCkD-L9ge_xt-LGxo0gvDS0BwGkd94HLZQLseTw8OhrgmmeKFSmH__o-5uXOPZQ",
       "summonerId": null,
       "summonerName": "허엉3#JJ2YA",
-      "profileIconId": 23,
+      "profileIconId": 5991,
       "summonerLevel": 606,
       "topChamps": [
         {
@@ -226,28 +226,28 @@
       "puuid": "TtYCK62ZcpKSw8a7rIKf_0R0CpNLW32tU0T60aeyPDaJi14GxR49B7CyN9iOi6--QqzOndLKh7HO_Q",
       "summonerId": null,
       "summonerName": "테크맥스#kr2",
-      "profileIconId": 6925,
-      "summonerLevel": 504,
+      "profileIconId": 5091,
+      "summonerLevel": 505,
       "topChamps": [
         {
-          "name": "Thresh",
-          "count": 1
-        },
-        {
-          "name": "Blitzcrank",
-          "count": 1
+          "name": "Rakan",
+          "count": 2
         },
         {
           "name": "Leona",
+          "count": 2
+        },
+        {
+          "name": "Alistar",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "테크맥스",
       "tagLine": "kr2",
-      "leaguePoints": 716,
-      "wins": 67,
-      "losses": 48,
+      "leaguePoints": 713,
+      "wins": 69,
+      "losses": 51,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -382,18 +382,18 @@
       "summonerId": null,
       "summonerName": "중증망상장애#KR1",
       "profileIconId": 6759,
-      "summonerLevel": 450,
+      "summonerLevel": 451,
       "topChamps": [
         {
           "name": "Vladimir",
           "count": 2
         },
         {
-          "name": "Jayce",
+          "name": "Anivia",
           "count": 1
         },
         {
-          "name": "LeeSin",
+          "name": "Vayne",
           "count": 1
         }
       ],
@@ -529,37 +529,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "LO6ejuqX6D_HDyTJk9ChMHd9OFiS6ij9OWUP2iWYwUTSe4LQIRXRv_mZEMQdKU1aJQZRpn_SugW4Bw",
-      "summonerId": null,
-      "summonerName": "박건희사랑해#ΚR1",
-      "profileIconId": 6874,
-      "summonerLevel": 85,
-      "topChamps": [
-        {
-          "name": "Yone",
-          "count": 4
-        },
-        {
-          "name": "Yuumi",
-          "count": 1
-        },
-        {
-          "name": "Orianna",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "박건희사랑해",
-      "tagLine": "ΚR1",
-      "leaguePoints": 552,
-      "wins": 57,
-      "losses": 26,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "dxohf4Yoxr1_tF3hwqP-fyrUjODkQ8yCgM2lJciRrTs4RY2pgwDUAnvYl-1DYvNoBVOBOv0qo_pAuw",
       "summonerId": null,
       "summonerName": "언어는당신의인격#KR1",
@@ -620,6 +589,37 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": true
+    },
+    {
+      "puuid": "LO6ejuqX6D_HDyTJk9ChMHd9OFiS6ij9OWUP2iWYwUTSe4LQIRXRv_mZEMQdKU1aJQZRpn_SugW4Bw",
+      "summonerId": null,
+      "summonerName": "박건희사랑해#ΚR1",
+      "profileIconId": 6874,
+      "summonerLevel": 85,
+      "topChamps": [
+        {
+          "name": "Yone",
+          "count": 4
+        },
+        {
+          "name": "Yuumi",
+          "count": 1
+        },
+        {
+          "name": "Orianna",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "박건희사랑해",
+      "tagLine": "ΚR1",
+      "leaguePoints": 536,
+      "wins": 57,
+      "losses": 27,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
     },
     {
       "puuid": "ss0ctsaWy8JMDg5QlYh2mZHjDBA4NG5XXiCcHSSyUHSwLJ_pRgG2PpcBIEQSKnhw4QLjvVIJhyOXig",
