@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T23:39:48.187Z",
+  "generatedAt": "2026-02-06T02:52:04.227Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "GRANDMASTER",
@@ -253,15 +253,15 @@
       "summonerLevel": 945,
       "topChamps": [
         {
-          "name": "Ezreal",
+          "name": "MissFortune",
+          "count": 2
+        },
+        {
+          "name": "Jhin",
           "count": 1
         },
         {
-          "name": "Ashe",
-          "count": 1
-        },
-        {
-          "name": "Lissandra",
+          "name": "Vi",
           "count": 1
         }
       ],
@@ -389,37 +389,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "mhwa4UYsetbX9E0LWg_nTfa780woZepvpi0eau4z-jl12BAzHZqsUquaFDWowJeQZJAOdGt9Un8PBQ",
-      "summonerId": null,
-      "summonerName": "바위게 두마리#omg",
-      "profileIconId": 2072,
-      "summonerLevel": 108,
-      "topChamps": [
-        {
-          "name": "Nidalee",
-          "count": 1
-        },
-        {
-          "name": "RekSai",
-          "count": 1
-        },
-        {
-          "name": "Aatrox",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "바위게 두마리",
-      "tagLine": "omg",
-      "leaguePoints": 377,
-      "wins": 26,
-      "losses": 9,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "vNIGNPTdGfP-uL3tyRld134UNiRf6qbm4fmvUvhjJiEGPHKMI5di37Q1v_chh6AJMajIhzO6VT2VLA",
       "summonerId": null,
       "summonerName": "한번이겨봐#울산광역시",
@@ -441,6 +410,37 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": true
+    },
+    {
+      "puuid": "mhwa4UYsetbX9E0LWg_nTfa780woZepvpi0eau4z-jl12BAzHZqsUquaFDWowJeQZJAOdGt9Un8PBQ",
+      "summonerId": null,
+      "summonerName": "바위게 두마리#omg",
+      "profileIconId": 2072,
+      "summonerLevel": 108,
+      "topChamps": [
+        {
+          "name": "RekSai",
+          "count": 2
+        },
+        {
+          "name": "Nidalee",
+          "count": 1
+        },
+        {
+          "name": "Aatrox",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "바위게 두마리",
+      "tagLine": "omg",
+      "leaguePoints": 377,
+      "wins": 26,
+      "losses": 9,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
     },
     {
       "puuid": "ODGq95jrBv4jkW5zSCmgx0R4I5nQ2x7A0aq8lJOMwhLwEwNgZNAPAlLDShQONJWEC9PYhksSFPLc1Q",
@@ -1035,11 +1035,11 @@
           "count": 2
         },
         {
-          "name": "Hwei",
+          "name": "Vayne",
           "count": 1
         },
         {
-          "name": "Jax",
+          "name": "Irelia",
           "count": 1
         }
       ],
@@ -1062,15 +1062,15 @@
       "summonerLevel": 102,
       "topChamps": [
         {
+          "name": "Aatrox",
+          "count": 1
+        },
+        {
+          "name": "Sivir",
+          "count": 1
+        },
+        {
           "name": "Kaisa",
-          "count": 1
-        },
-        {
-          "name": "Jinx",
-          "count": 1
-        },
-        {
-          "name": "Varus",
           "count": 1
         }
       ],

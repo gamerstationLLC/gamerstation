@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T23:46:06.916Z",
+  "generatedAt": "2026-02-06T02:58:20.370Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -799,29 +799,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "h9c_lbMdobkgTnpzy8j5nRnwBQGXs5SiJej4PGe_2rmvt6APcItcLMsbkhNNxEsdie54xddQZHY-Mg",
-      "summonerId": null,
-      "summonerName": "구미호랑 놀자#KR1",
-      "profileIconId": 4655,
-      "summonerLevel": 341,
-      "topChamps": [
-        {
-          "name": "Ahri",
-          "count": 6
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "구미호랑 놀자",
-      "tagLine": "KR1",
-      "leaguePoints": 165,
-      "wins": 20,
-      "losses": 10,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "fRQylp25n47I89RMrGNYRLdpJ_PjWEyWvju0KAgHFjJyggWPy8fpgbMQWbmZSIu7_CJ1QSnb6SZ7Dw",
       "summonerId": null,
       "summonerName": "Cyble#KR1",
@@ -1042,15 +1019,15 @@
       "summonerLevel": 865,
       "topChamps": [
         {
+          "name": "Zaahen",
+          "count": 2
+        },
+        {
           "name": "Sylas",
           "count": 2
         },
         {
           "name": "TwistedFate",
-          "count": 1
-        },
-        {
-          "name": "Irelia",
           "count": 1
         }
       ],
@@ -1066,6 +1043,29 @@
       "freshBlood": false
     },
     {
+      "puuid": "h9c_lbMdobkgTnpzy8j5nRnwBQGXs5SiJej4PGe_2rmvt6APcItcLMsbkhNNxEsdie54xddQZHY-Mg",
+      "summonerId": null,
+      "summonerName": "구미호랑 놀자#KR1",
+      "profileIconId": 4655,
+      "summonerLevel": 341,
+      "topChamps": [
+        {
+          "name": "Ahri",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "구미호랑 놀자",
+      "tagLine": "KR1",
+      "leaguePoints": 155,
+      "wins": 20,
+      "losses": 11,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "e9i_YwVyJRgiOLUt6my8xhpDz81Das7e0iw3p3b76AFoSnqmEnAkTHMMDLd78mPMu_bPHYqv-vWn2A",
       "summonerId": null,
       "summonerName": "사스갓#KR1",
@@ -1073,15 +1073,15 @@
       "summonerLevel": 930,
       "topChamps": [
         {
-          "name": "Varus",
-          "count": 2
+          "name": "Lucian",
+          "count": 1
+        },
+        {
+          "name": "Kaisa",
+          "count": 1
         },
         {
           "name": "Jinx",
-          "count": 2
-        },
-        {
-          "name": "Pantheon",
           "count": 1
         }
       ],
@@ -1297,7 +1297,7 @@
       "puuid": "XVo21xJqUSpEHYd1s57_lkIzwXQZLpXEj7_ndQAZNRaStUz3KseffAIaHfMHWXURu9l0kFu1x_OEqg",
       "summonerId": null,
       "summonerName": "Finale#2004",
-      "profileIconId": 6860,
+      "profileIconId": 6818,
       "summonerLevel": 191,
       "topChamps": [
         {
