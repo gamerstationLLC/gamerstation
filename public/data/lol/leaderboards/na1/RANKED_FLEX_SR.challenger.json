@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-06T05:21:18.138Z",
+  "generatedAt": "2026-02-06T07:06:26.632Z",
   "region": "na1",
   "queue": "RANKED_FLEX_SR",
   "tier": "CHALLENGER",
@@ -14,14 +14,14 @@
       "topChamps": [
         {
           "name": "Evelynn",
-          "count": 4
+          "count": 3
         },
         {
-          "name": "Brand",
+          "name": "Garen",
           "count": 1
         },
         {
-          "name": "Graves",
+          "name": "Brand",
           "count": 1
         }
       ],
@@ -130,6 +130,68 @@
       "freshBlood": false
     },
     {
+      "puuid": "YlEOqHqqskp0sVNh3mmWAGT-xe_Fw7KFYU4dLBR-1wd-hJrPDdupzESH7j2S2gtM-lMMxPuHqtA7PQ",
+      "summonerId": null,
+      "summonerName": "Labubu#bunii",
+      "profileIconId": 3150,
+      "summonerLevel": 886,
+      "topChamps": [
+        {
+          "name": "Katarina",
+          "count": 2
+        },
+        {
+          "name": "Orianna",
+          "count": 1
+        },
+        {
+          "name": "Mel",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Labubu",
+      "tagLine": "bunii",
+      "leaguePoints": 878,
+      "wins": 59,
+      "losses": 35,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "4AQH7b6YYssRajp-EkNr8LvQet64cSHs1m2ajfNLZYzQ0xQ5vRaGX4IhNR4ZwOd17dpCcmP996FbSQ",
+      "summonerId": null,
+      "summonerName": "1v9#727",
+      "profileIconId": 5530,
+      "summonerLevel": 443,
+      "topChamps": [
+        {
+          "name": "Gwen",
+          "count": 2
+        },
+        {
+          "name": "Malphite",
+          "count": 1
+        },
+        {
+          "name": "Samira",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "1v9",
+      "tagLine": "727",
+      "leaguePoints": 871,
+      "wins": 54,
+      "losses": 28,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
       "puuid": "5xPInuVQZkLcVn1Lr0FMJqwiTmvM1W9dzdrAFG8mEVmNZmMiiS8Q1Pwa1PmCCCbb7VyxTk-14_eTrg",
       "summonerId": null,
       "summonerName": "Yax#9041",
@@ -156,68 +218,6 @@
       "wins": 41,
       "losses": 5,
       "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "YlEOqHqqskp0sVNh3mmWAGT-xe_Fw7KFYU4dLBR-1wd-hJrPDdupzESH7j2S2gtM-lMMxPuHqtA7PQ",
-      "summonerId": null,
-      "summonerName": "Labubu#bunii",
-      "profileIconId": 3150,
-      "summonerLevel": 886,
-      "topChamps": [
-        {
-          "name": "Milio",
-          "count": 1
-        },
-        {
-          "name": "Syndra",
-          "count": 1
-        },
-        {
-          "name": "Katarina",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Labubu",
-      "tagLine": "bunii",
-      "leaguePoints": 825,
-      "wins": 57,
-      "losses": 35,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "4AQH7b6YYssRajp-EkNr8LvQet64cSHs1m2ajfNLZYzQ0xQ5vRaGX4IhNR4ZwOd17dpCcmP996FbSQ",
-      "summonerId": null,
-      "summonerName": "1v9#727",
-      "profileIconId": 5530,
-      "summonerLevel": 442,
-      "topChamps": [
-        {
-          "name": "Gwen",
-          "count": 2
-        },
-        {
-          "name": "Samira",
-          "count": 1
-        },
-        {
-          "name": "Caitlyn",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "1v9",
-      "tagLine": "727",
-      "leaguePoints": 823,
-      "wins": 52,
-      "losses": 28,
-      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -547,9 +547,9 @@
       "sampleGames": 5,
       "gameName": "Alexsmoove",
       "tagLine": "GAY",
-      "leaguePoints": 476,
+      "leaguePoints": 458,
       "wins": 38,
-      "losses": 23,
+      "losses": 24,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,

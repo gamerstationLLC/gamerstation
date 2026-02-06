@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-06T02:21:32.276Z",
+  "generatedAt": "2026-02-06T08:09:28.395Z",
   "region": "euw1",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -13,23 +13,23 @@
       "summonerLevel": 920,
       "topChamps": [
         {
+          "name": "Varus",
+          "count": 1
+        },
+        {
           "name": "Kaisa",
           "count": 1
         },
         {
           "name": "Renekton",
           "count": 1
-        },
-        {
-          "name": "Jayce",
-          "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "cosmo",
       "tagLine": "FITX",
-      "leaguePoints": 252,
-      "wins": 24,
+      "leaguePoints": 281,
+      "wins": 25,
       "losses": 14,
       "hotStreak": true,
       "inactive": false,
@@ -183,37 +183,6 @@
       "wins": 24,
       "losses": 17,
       "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "EJXwlq61GzI_57PAu4Bp-AYCw5feVnwwFg3d7p6oUrdLT1nnaSocY3HPzeE-VO6o67XhLY7XK1MVag",
-      "summonerId": null,
-      "summonerName": "قطوة#69120",
-      "profileIconId": 1665,
-      "summonerLevel": 309,
-      "topChamps": [
-        {
-          "name": "Riven",
-          "count": 3
-        },
-        {
-          "name": "Jax",
-          "count": 1
-        },
-        {
-          "name": "MasterYi",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "قطوة",
-      "tagLine": "69120",
-      "leaguePoints": 198,
-      "wins": 30,
-      "losses": 16,
-      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
@@ -1275,15 +1244,15 @@
       "summonerLevel": 216,
       "topChamps": [
         {
+          "name": "Karma",
+          "count": 3
+        },
+        {
           "name": "Yunara",
           "count": 2
         },
         {
-          "name": "Karma",
-          "count": 2
-        },
-        {
-          "name": "Jinx",
+          "name": "Aphelios",
           "count": 1
         }
       ],
@@ -1494,6 +1463,37 @@
       "leaguePoints": 174,
       "wins": 25,
       "losses": 25,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "9sopQak9ObraNtDTmei5dz_2OrodLcLgWPM4ntRm9hAJJe5IOJi0eFV7S1-_mBYK0ApacQ_8YZim9g",
+      "summonerId": null,
+      "summonerName": "Wu Zhuang Tai#EUW",
+      "profileIconId": 6284,
+      "summonerLevel": 323,
+      "topChamps": [
+        {
+          "name": "Ryze",
+          "count": 2
+        },
+        {
+          "name": "Singed",
+          "count": 2
+        },
+        {
+          "name": "Galio",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Wu Zhuang Tai",
+      "tagLine": "EUW",
+      "leaguePoints": 174,
+      "wins": 22,
+      "losses": 15,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
