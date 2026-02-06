@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-06T12:49:09.113Z",
+  "generatedAt": "2026-02-06T15:36:49.556Z",
   "region": "na1",
   "queue": "RANKED_SOLO_5x5",
   "tier": "CHALLENGER",
@@ -103,11 +103,11 @@
       "topChamps": [
         {
           "name": "Sona",
-          "count": 4
+          "count": 3
         },
         {
           "name": "Lux",
-          "count": 1
+          "count": 2
         },
         {
           "name": "Zoe",
@@ -319,11 +319,11 @@
           "count": 3
         },
         {
-          "name": "Rakan",
+          "name": "Pyke",
           "count": 1
         },
         {
-          "name": "Riven",
+          "name": "Rakan",
           "count": 1
         }
       ],
@@ -378,24 +378,24 @@
       "topChamps": [
         {
           "name": "Riven",
-          "count": 4
+          "count": 3
         },
         {
-          "name": "Ambessa",
+          "name": "Irelia",
           "count": 1
         },
         {
-          "name": "Gnar",
+          "name": "Ambessa",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "Kid Ink",
       "tagLine": "NA2",
-      "leaguePoints": 2053,
-      "wins": 216,
+      "leaguePoints": 2069,
+      "wins": 217,
       "losses": 148,
-      "hotStreak": false,
+      "hotStreak": true,
       "inactive": false,
       "veteran": true,
       "freshBlood": false
@@ -778,9 +778,9 @@
       "sampleGames": 6,
       "gameName": "ーーーーーーーーーーーーーーーー",
       "tagLine": "ecchi",
-      "leaguePoints": 1689,
-      "wins": 185,
-      "losses": 166,
+      "leaguePoints": 1679,
+      "wins": 186,
+      "losses": 168,
       "hotStreak": false,
       "inactive": false,
       "veteran": true,
@@ -1093,37 +1093,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "h0bLN8oOKL8JUcvCJSyWS7qLVQTJ6IKIFPZDhBpGZQ0utnf345dHyN-6eWupASO0B4qkJsWqYVSQlA",
-      "summonerId": null,
-      "summonerName": "MILAH#dream",
-      "profileIconId": 29,
-      "summonerLevel": 157,
-      "topChamps": [
-        {
-          "name": "Ezreal",
-          "count": 2
-        },
-        {
-          "name": "Xayah",
-          "count": 1
-        },
-        {
-          "name": "Kayle",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "MILAH",
-      "tagLine": "dream",
-      "leaguePoints": 1608,
-      "wins": 137,
-      "losses": 94,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": true,
-      "freshBlood": false
-    },
-    {
       "puuid": "-G2u9hVk_spteM-psQs5xbkwxGZdxkd-O9CGVbNSqc6lHRUdN7vadq6BLuOoASp-bkT6q3hHnjN-5A",
       "summonerId": null,
       "summonerName": "DSG KryRa#777",
@@ -1177,6 +1146,37 @@
       "wins": 170,
       "losses": 133,
       "hotStreak": true,
+      "inactive": false,
+      "veteran": true,
+      "freshBlood": false
+    },
+    {
+      "puuid": "h0bLN8oOKL8JUcvCJSyWS7qLVQTJ6IKIFPZDhBpGZQ0utnf345dHyN-6eWupASO0B4qkJsWqYVSQlA",
+      "summonerId": null,
+      "summonerName": "MILAH#dream",
+      "profileIconId": 29,
+      "summonerLevel": 157,
+      "topChamps": [
+        {
+          "name": "Orianna",
+          "count": 1
+        },
+        {
+          "name": "Sivir",
+          "count": 1
+        },
+        {
+          "name": "Xayah",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "MILAH",
+      "tagLine": "dream",
+      "leaguePoints": 1600,
+      "wins": 138,
+      "losses": 95,
+      "hotStreak": false,
       "inactive": false,
       "veteran": true,
       "freshBlood": false
