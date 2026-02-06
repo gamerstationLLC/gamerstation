@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-05T22:12:15.288Z",
+  "generatedAt": "2026-02-06T05:15:19.691Z",
   "region": "na1",
   "queue": "RANKED_SOLO_5x5",
   "tier": "MASTER",
@@ -10,31 +10,62 @@
       "summonerId": null,
       "summonerName": "OCTANE#888",
       "profileIconId": 6923,
-      "summonerLevel": 85,
+      "summonerLevel": 86,
       "topChamps": [
         {
-          "name": "Syndra",
+          "name": "Aphelios",
+          "count": 2
+        },
+        {
+          "name": "Riven",
           "count": 1
         },
         {
-          "name": "Jhin",
-          "count": 1
-        },
-        {
-          "name": "Nidalee",
+          "name": "Cassiopeia",
           "count": 1
         }
       ],
       "sampleGames": 6,
       "gameName": "OCTANE",
       "tagLine": "888",
-      "leaguePoints": 853,
-      "wins": 72,
-      "losses": 61,
-      "hotStreak": true,
+      "leaguePoints": 951,
+      "wins": 77,
+      "losses": 62,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
       "freshBlood": false
+    },
+    {
+      "puuid": "NwG6EhX-Tsj2WRkFThspNdxWdneFvWYX4-dm9PUeZPgaz1j7qjnyh82LAlX4zLgSlfOidfvEIPdqxg",
+      "summonerId": null,
+      "summonerName": "Sanchovies#NA2",
+      "profileIconId": 4419,
+      "summonerLevel": 619,
+      "topChamps": [
+        {
+          "name": "Janna",
+          "count": 1
+        },
+        {
+          "name": "Zaahen",
+          "count": 1
+        },
+        {
+          "name": "Kayle",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Sanchovies",
+      "tagLine": "NA2",
+      "leaguePoints": 780,
+      "wins": 187,
+      "losses": 193,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     },
     {
       "puuid": "mllFu4vVf2xlNvDunnWvtvxzB0JrAAtWK6Tu77Ldm_b_Yq101ptQOLrPcssAaW4iLG_QldElSsK0_w",
@@ -59,13 +90,237 @@
       "sampleGames": 6,
       "gameName": "TF Blade",
       "tagLine": "133",
-      "leaguePoints": 742,
-      "wins": 46,
+      "leaguePoints": 772,
+      "wins": 47,
       "losses": 12,
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
+    },
+    {
+      "puuid": "bzpW9iDk29I5KK9tDLeVzjYMHVevZnSPwDQr1VgwTv1ugvxLX80Ak9veQ5iuBgqv6rAfJNIjoC06ag",
+      "summonerId": null,
+      "summonerName": "Dantes#Zaahn",
+      "profileIconId": 3589,
+      "summonerLevel": 108,
+      "topChamps": [
+        {
+          "name": "Zaahen",
+          "count": 5
+        },
+        {
+          "name": "Hecarim",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Dantes",
+      "tagLine": "Zaahn",
+      "leaguePoints": 770,
+      "wins": 50,
+      "losses": 25,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "CSg7kNb5GP9Lf_M58lxnb5fzfdwyKxX_wZMNyA_I4TuTzxFnjYamLT0TL5JykCq4RRPMvxTxnW4Ovg",
+      "summonerId": null,
+      "summonerName": "Altya#God",
+      "profileIconId": 6500,
+      "summonerLevel": 142,
+      "topChamps": [
+        {
+          "name": "Smolder",
+          "count": 5
+        },
+        {
+          "name": "Lucian",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Altya",
+      "tagLine": "God",
+      "leaguePoints": 767,
+      "wins": 86,
+      "losses": 72,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "VnKkBWu-5_JizFtldBR-7TXQ-PAv67MKnFubQLwwfH34mF-sf99_aHA6-UUT6ndpOahXN5fi8n2aqQ",
+      "summonerId": null,
+      "summonerName": "pentaless#NA4",
+      "profileIconId": 29,
+      "summonerLevel": 70,
+      "topChamps": [
+        {
+          "name": "Nunu",
+          "count": 5
+        },
+        {
+          "name": "Ivern",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "pentaless",
+      "tagLine": "NA4",
+      "leaguePoints": 766,
+      "wins": 52,
+      "losses": 36,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "yGXD6p20eyl0EBqB26YAVudoWNxtIWkeE4xgAjrjuCLSPE7rDxSYf-5RYZhX5hvW6eq-ZmVvJDc7vg",
+      "summonerId": null,
+      "summonerName": "TumericTed#Spork",
+      "profileIconId": 5453,
+      "summonerLevel": 279,
+      "topChamps": [
+        {
+          "name": "Yunara",
+          "count": 2
+        },
+        {
+          "name": "Senna",
+          "count": 1
+        },
+        {
+          "name": "Lucian",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "TumericTed",
+      "tagLine": "Spork",
+      "leaguePoints": 765,
+      "wins": 73,
+      "losses": 50,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "28YMTkxIFhNCGhRPopBFC5Vk4pBhonBJKUAF5dPug8A22bOC8j5MEV5fj_niEc0o6CF1nKhyYFoLdw",
+      "summonerId": null,
+      "summonerName": "WATERMELONWARIOR#WMLN",
+      "profileIconId": 4966,
+      "summonerLevel": 115,
+      "topChamps": [
+        {
+          "name": "Amumu",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "WATERMELONWARIOR",
+      "tagLine": "WMLN",
+      "leaguePoints": 754,
+      "wins": 93,
+      "losses": 95,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": true,
+      "freshBlood": false
+    },
+    {
+      "puuid": "Hr1cbH3gAnv6Z1mtQT3Z5l3mkeOvJFNKGv6oKvd0MmY87nKOz3zJc8CKmzuo9tl5u27vS9KSks9wdA",
+      "summonerId": null,
+      "summonerName": "Keanu#Sera",
+      "profileIconId": 4794,
+      "summonerLevel": 955,
+      "topChamps": [
+        {
+          "name": "Sona",
+          "count": 2
+        },
+        {
+          "name": "Zoe",
+          "count": 2
+        },
+        {
+          "name": "Soraka",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Keanu",
+      "tagLine": "Sera",
+      "leaguePoints": 742,
+      "wins": 62,
+      "losses": 64,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "AH8lS6tMv5EncX-hdnH7WuDDy3dYaFxAJa-J8-DJ22o-8IPhG0JMVjsumU_ICo-sf2ceFNciVwkoDw",
+      "summonerId": null,
+      "summonerName": "Arowe#NA1",
+      "profileIconId": 5506,
+      "summonerLevel": 656,
+      "topChamps": [
+        {
+          "name": "Alistar",
+          "count": 5
+        },
+        {
+          "name": "Bard",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Arowe",
+      "tagLine": "NA1",
+      "leaguePoints": 736,
+      "wins": 107,
+      "losses": 94,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": true,
+      "freshBlood": false
+    },
+    {
+      "puuid": "oAaUlcgmxWq1Zl94tfus3NLxJEIXy7pIeAtl7onHMq_ktqwi7BPw0d5J00OItsjoJMCAqD2Do9OcyQ",
+      "summonerId": null,
+      "summonerName": "JokerStatus#NA1",
+      "profileIconId": 4071,
+      "summonerLevel": 935,
+      "topChamps": [
+        {
+          "name": "Renekton",
+          "count": 3
+        },
+        {
+          "name": "Khazix",
+          "count": 1
+        },
+        {
+          "name": "Zed",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "JokerStatus",
+      "tagLine": "NA1",
+      "leaguePoints": 736,
+      "wins": 81,
+      "losses": 68,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": true,
+      "freshBlood": false
     },
     {
       "puuid": "H39NfAGSX-rmJx63vM21Toz6y7KTbvQaLTbrycOGKXxe4fVwyuNMmPjkQbcqsrN5qhaKKl0tjodaPQ",
@@ -130,37 +385,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "oAaUlcgmxWq1Zl94tfus3NLxJEIXy7pIeAtl7onHMq_ktqwi7BPw0d5J00OItsjoJMCAqD2Do9OcyQ",
-      "summonerId": null,
-      "summonerName": "JokerStatus#NA1",
-      "profileIconId": 4071,
-      "summonerLevel": 935,
-      "topChamps": [
-        {
-          "name": "Renekton",
-          "count": 4
-        },
-        {
-          "name": "Zed",
-          "count": 1
-        },
-        {
-          "name": "Talon",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "JokerStatus",
-      "tagLine": "NA1",
-      "leaguePoints": 732,
-      "wins": 80,
-      "losses": 67,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "5uOTWO8pxgBXqW9-K7Va8tWsJZ7vyxEVgL7W2Hv68t0d8p7z9cbgizMUd31CY3YjPsP68AkECDMjjQ",
       "summonerId": null,
       "summonerName": "Sir Raizel#NA1",
@@ -169,7 +393,15 @@
       "topChamps": [
         {
           "name": "Udyr",
-          "count": 6
+          "count": 4
+        },
+        {
+          "name": "Zaahen",
+          "count": 1
+        },
+        {
+          "name": "Graves",
+          "count": 1
         }
       ],
       "sampleGames": 6,
@@ -182,6 +414,68 @@
       "inactive": false,
       "veteran": false,
       "freshBlood": false
+    },
+    {
+      "puuid": "2-rD8fq3b6zVwzf4YLH-KSoDZPMH0_6hWf9EOze7MNM48ry44tmka1XtaPOnbUML9X8QkfgolLsokA",
+      "summonerId": null,
+      "summonerName": "Lunisolar#eProd",
+      "profileIconId": 3839,
+      "summonerLevel": 67,
+      "topChamps": [
+        {
+          "name": "Lucian",
+          "count": 3
+        },
+        {
+          "name": "Vayne",
+          "count": 1
+        },
+        {
+          "name": "Orianna",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Lunisolar",
+      "tagLine": "eProd",
+      "leaguePoints": 730,
+      "wins": 126,
+      "losses": 100,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "sQjTBPv2pFEjqUZkH_4eh4Ur5xGFjxHwDDItCmOb3hty3-GGu-oA4jSgGIHb5LawWKG88XrgAmX7kQ",
+      "summonerId": null,
+      "summonerName": "Sodium11#02024",
+      "profileIconId": 4080,
+      "summonerLevel": 875,
+      "topChamps": [
+        {
+          "name": "Janna",
+          "count": 3
+        },
+        {
+          "name": "Seraphine",
+          "count": 2
+        },
+        {
+          "name": "Sona",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Sodium11",
+      "tagLine": "02024",
+      "leaguePoints": 717,
+      "wins": 70,
+      "losses": 66,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     },
     {
       "puuid": "J0EFMF2pEvw0O-fvmjT_WzRM9EUT5JQ-T76XvXMXFug98Li_V3XZUNWLDxKjUKBCZGXiz0iTjXkHhg",
@@ -209,6 +503,118 @@
       "leaguePoints": 716,
       "wins": 80,
       "losses": 70,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "1EvHPr9BdHcEDAg6r9n4mHLV7N-IxFk7ZLf6VlCZHUMO2SpdJe4Q9zumSAQUZq-L7bg1yryLTAmpfQ",
+      "summonerId": null,
+      "summonerName": "Wrath#power",
+      "profileIconId": 4473,
+      "summonerLevel": 590,
+      "topChamps": [
+        {
+          "name": "Poppy",
+          "count": 4
+        },
+        {
+          "name": "Shen",
+          "count": 1
+        },
+        {
+          "name": "Riven",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Wrath",
+      "tagLine": "power",
+      "leaguePoints": 716,
+      "wins": 68,
+      "losses": 49,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "rIKYLEEn8GIzvepHG04RO4poCNgJ4SZrpVoHREHTxxkIFmG8kZK_NfBvNa2mCow0W7UTk9jYulMMrQ",
+      "summonerId": null,
+      "summonerName": "Frigault#NA1",
+      "profileIconId": 6832,
+      "summonerLevel": 425,
+      "topChamps": [
+        {
+          "name": "Cassiopeia",
+          "count": 2
+        },
+        {
+          "name": "JarvanIV",
+          "count": 1
+        },
+        {
+          "name": "Syndra",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Frigault",
+      "tagLine": "NA1",
+      "leaguePoints": 715,
+      "wins": 50,
+      "losses": 27,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "buGDyPaqaTUJWOqbpJkpzzzCH-u0McFswoa8k2Q2n45EXFAI4fPm07rxncdMCCfdBStFNRou-0LxkQ",
+      "summonerId": null,
+      "summonerName": "Mister Yasuo#YAS",
+      "profileIconId": 6735,
+      "summonerLevel": 930,
+      "topChamps": [
+        {
+          "name": "Yasuo",
+          "count": 6
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Mister Yasuo",
+      "tagLine": "YAS",
+      "leaguePoints": 714,
+      "wins": 116,
+      "losses": 108,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "Ax-SRKVrhYSkwH5eYdwWdSbCmbswxUIIUNFLUWMN2sHh65cgfXtm9GlJOC7gTP6Y-5JobvDaAMsvBw",
+      "summonerId": null,
+      "summonerName": "burnbooks#KLED",
+      "profileIconId": 7050,
+      "summonerLevel": 991,
+      "topChamps": [
+        {
+          "name": "Kled",
+          "count": 5
+        },
+        {
+          "name": "Thresh",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "burnbooks",
+      "tagLine": "KLED",
+      "leaguePoints": 712,
+      "wins": 108,
+      "losses": 103,
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
@@ -246,46 +652,54 @@
       "freshBlood": true
     },
     {
-      "puuid": "28YMTkxIFhNCGhRPopBFC5Vk4pBhonBJKUAF5dPug8A22bOC8j5MEV5fj_niEc0o6CF1nKhyYFoLdw",
+      "puuid": "ciqA5Gxr8C5rwja6SzEiJmKLKtqHLTbxLM-qv3U1xryWu0VD2h8az-yEwa30UjtpJB93ZAOHi_bmmw",
       "summonerId": null,
-      "summonerName": "WATERMELONWARIOR#WMLN",
-      "profileIconId": 4966,
-      "summonerLevel": 115,
+      "summonerName": "Spongebob#P4NTS",
+      "profileIconId": 3587,
+      "summonerLevel": 338,
       "topChamps": [
         {
-          "name": "Amumu",
-          "count": 6
+          "name": "Lucian",
+          "count": 2
+        },
+        {
+          "name": "Ezreal",
+          "count": 1
+        },
+        {
+          "name": "Caitlyn",
+          "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "WATERMELONWARIOR",
-      "tagLine": "WMLN",
-      "leaguePoints": 712,
-      "wins": 91,
-      "losses": 95,
-      "hotStreak": true,
+      "gameName": "Spongebob",
+      "tagLine": "P4NTS",
+      "leaguePoints": 710,
+      "wins": 50,
+      "losses": 31,
+      "hotStreak": false,
       "inactive": false,
-      "veteran": true,
-      "freshBlood": false
+      "veteran": false,
+      "freshBlood": true
     },
     {
-      "puuid": "QEVdWxqYRGthxCOn9umU_1VNW64C0nsueaPqKBZbwYMmDeJ8QdZId7nSNQanjuG33HuFXGBhVp6wsA",
+      "puuid": "0jbPs9nWg1Aw-1rw4mEDJjqisag4qoIOSHrPP16BXkzLolb2QLuptrVZmcJrqi93qacLk8bAqvhl4Q",
       "summonerId": null,
-      "summonerName": "A Kind Elephant#smile",
-      "profileIconId": 1162,
-      "summonerLevel": 315,
+      "summonerName": "cirno#abc",
+      "profileIconId": 5874,
+      "summonerLevel": 105,
       "topChamps": [
         {
-          "name": "Warwick",
+          "name": "Kassadin",
           "count": 6
         }
       ],
       "sampleGames": 6,
-      "gameName": "A Kind Elephant",
-      "tagLine": "smile",
-      "leaguePoints": 710,
-      "wins": 106,
-      "losses": 107,
+      "gameName": "cirno",
+      "tagLine": "abc",
+      "leaguePoints": 708,
+      "wins": 108,
+      "losses": 92,
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
@@ -313,6 +727,37 @@
       "leaguePoints": 708,
       "wins": 56,
       "losses": 52,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "tmPEiFMnAIyrD8sMWgVO9QcdMes3kiUbhHnCDbdGvqpqiHc3th7nSaqeDKFpCkVMCDgGT85Lmz2gvg",
+      "summonerId": null,
+      "summonerName": "yevawl#ERN",
+      "profileIconId": 29,
+      "summonerLevel": 62,
+      "topChamps": [
+        {
+          "name": "Khazix",
+          "count": 2
+        },
+        {
+          "name": "Taliyah",
+          "count": 2
+        },
+        {
+          "name": "Kindred",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "yevawl",
+      "tagLine": "ERN",
+      "leaguePoints": 706,
+      "wins": 85,
+      "losses": 76,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -381,35 +826,182 @@
       "freshBlood": false
     },
     {
-      "puuid": "tmPEiFMnAIyrD8sMWgVO9QcdMes3kiUbhHnCDbdGvqpqiHc3th7nSaqeDKFpCkVMCDgGT85Lmz2gvg",
+      "puuid": "qpDt983ZhuYRskK30n7JLUhBpkz6ygXs1YeV2bA1f7cyhaNSaobB4GeGl4UTXUWsRJ8MOyOHFrMndQ",
       "summonerId": null,
-      "summonerName": "yevawl#ERN",
-      "profileIconId": 29,
-      "summonerLevel": 62,
+      "summonerName": "Gallant#NA10",
+      "profileIconId": 6298,
+      "summonerLevel": 268,
       "topChamps": [
         {
-          "name": "Taliyah",
+          "name": "Yasuo",
+          "count": 4
+        },
+        {
+          "name": "Yone",
           "count": 2
-        },
-        {
-          "name": "Khazix",
-          "count": 1
-        },
-        {
-          "name": "MasterYi",
-          "count": 1
         }
       ],
       "sampleGames": 6,
-      "gameName": "yevawl",
-      "tagLine": "ERN",
-      "leaguePoints": 702,
-      "wins": 84,
-      "losses": 75,
+      "gameName": "Gallant",
+      "tagLine": "NA10",
+      "leaguePoints": 704,
+      "wins": 188,
+      "losses": 177,
       "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
+    },
+    {
+      "puuid": "xkUMy1mUa38N2eQNgyqAQw-jo83CtlLnstWmzASNAPO6oCuZtRtrVns2X69arb7XNriKk1Wv16lL2w",
+      "summonerId": null,
+      "summonerName": "Alonica#PKWY",
+      "profileIconId": 19,
+      "summonerLevel": 733,
+      "topChamps": [
+        {
+          "name": "Aphelios",
+          "count": 2
+        },
+        {
+          "name": "Corki",
+          "count": 1
+        },
+        {
+          "name": "Olaf",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Alonica",
+      "tagLine": "PKWY",
+      "leaguePoints": 703,
+      "wins": 113,
+      "losses": 93,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "APzlGS5J28esbFtjkhrEut0Kkmow77bDvoW_V_zxihA65wc7TDq7eDokE6Yyqx-zcXjOh2-ia5BbbQ",
+      "summonerId": null,
+      "summonerName": "DualSwordz#NA1",
+      "profileIconId": 5410,
+      "summonerLevel": 984,
+      "topChamps": [
+        {
+          "name": "Rell",
+          "count": 5
+        },
+        {
+          "name": "Leona",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "DualSwordz",
+      "tagLine": "NA1",
+      "leaguePoints": 703,
+      "wins": 99,
+      "losses": 85,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "HHynwsCQsw5eYN7JQKIlEJwbRxM3BGo7gIeju3FYEYjodSqFrBSHibSV3V281GsVD0IsIyBw0RpYPA",
+      "summonerId": null,
+      "summonerName": "frake#1111",
+      "profileIconId": 5314,
+      "summonerLevel": 791,
+      "topChamps": [
+        {
+          "name": "Ryze",
+          "count": 2
+        },
+        {
+          "name": "Galio",
+          "count": 1
+        },
+        {
+          "name": "Irelia",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "frake",
+      "tagLine": "1111",
+      "leaguePoints": 702,
+      "wins": 86,
+      "losses": 81,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "DSELMsSBkf_bcoL69k0AUCkFaEcyWf3_JMWIgq2QOaT5gf6sF8Z3EQwOENBTeRMG3dDhXac_Nof2UA",
+      "summonerId": null,
+      "summonerName": "JOkey#1102",
+      "profileIconId": 5506,
+      "summonerLevel": 799,
+      "topChamps": [
+        {
+          "name": "Nautilus",
+          "count": 2
+        },
+        {
+          "name": "Karma",
+          "count": 2
+        },
+        {
+          "name": "Rell",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "JOkey",
+      "tagLine": "1102",
+      "leaguePoints": 702,
+      "wins": 64,
+      "losses": 50,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "JH9LAVWwJ137_192NrpXYcaZGSkkYr_VkfGV78RyBMh4xQENzrh2e831Ae5jHOTJiZ75YDqIna_FSw",
+      "summonerId": null,
+      "summonerName": "intra#yawn",
+      "profileIconId": 3183,
+      "summonerLevel": 1063,
+      "topChamps": [
+        {
+          "name": "Gnar",
+          "count": 2
+        },
+        {
+          "name": "Aurora",
+          "count": 2
+        },
+        {
+          "name": "Jayce",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "intra",
+      "tagLine": "yawn",
+      "leaguePoints": 701,
+      "wins": 107,
+      "losses": 96,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
     },
     {
       "puuid": "VzlaM7VQZMyhcVblUgB3oiQ_KxXZbX_VrC323aR8kfCs5TCf4jbVJBQaPm1kcjXXebvIwr9USTF65g",
@@ -443,6 +1035,95 @@
       "freshBlood": true
     },
     {
+      "puuid": "ZUzXvaMQn9Qy2L84EJvIt29ZYApJ-qLL9nOxTu10UhtkM1y9J6L3vdDzbCx5ttgcW9gdROfZDQ50Ww",
+      "summonerId": null,
+      "summonerName": "step it up#NA1",
+      "profileIconId": 4404,
+      "summonerLevel": 394,
+      "topChamps": [
+        {
+          "name": "Kassadin",
+          "count": 4
+        },
+        {
+          "name": "Vayne",
+          "count": 1
+        },
+        {
+          "name": "Katarina",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "step it up",
+      "tagLine": "NA1",
+      "leaguePoints": 701,
+      "wins": 84,
+      "losses": 68,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": true,
+      "freshBlood": false
+    },
+    {
+      "puuid": "Pknnoe6cycU8Avafo9wnMWNbTd0JCnSyAZ2wIk-NsG0fZc08BrFSzkURLV17JT-d_CAnfspToVq-Jw",
+      "summonerId": null,
+      "summonerName": "PenguEmoteGamer#PENGU",
+      "profileIconId": 5371,
+      "summonerLevel": 637,
+      "topChamps": [
+        {
+          "name": "Yuumi",
+          "count": 5
+        },
+        {
+          "name": "Caitlyn",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "PenguEmoteGamer",
+      "tagLine": "PENGU",
+      "leaguePoints": 701,
+      "wins": 82,
+      "losses": 65,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "9b0b5CdNL4GeK4OSz7oJVKhi6Sxw8pvgoqcZ2PBhOz--_ex6gAIX1nNj-7MfCYknew10eOe2JDk9-Q",
+      "summonerId": null,
+      "summonerName": "owo#BR7",
+      "profileIconId": 6254,
+      "summonerLevel": 92,
+      "topChamps": [
+        {
+          "name": "Shaco",
+          "count": 4
+        },
+        {
+          "name": "Gragas",
+          "count": 1
+        },
+        {
+          "name": "Zed",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "owo",
+      "tagLine": "BR7",
+      "leaguePoints": 701,
+      "wins": 81,
+      "losses": 60,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
       "puuid": "TR0mDOzJq_25KtZK1tOdus3gc8bh15C4OoLay57zrroRMvEA5N0-7f5YMaD2IbAwF5J0HxCbp28POA",
       "summonerId": null,
       "summonerName": "I am Chris#NA1",
@@ -468,6 +1149,99 @@
       "inactive": false,
       "veteran": true,
       "freshBlood": false
+    },
+    {
+      "puuid": "jyTUK97HiqD_0DcxsbL3Du9Fwylp3DIFyR9aRwUbmgHxolKFPRhPBmBm9ms97ALUfQKVg8D4XTEXig",
+      "summonerId": null,
+      "summonerName": "Pholix X#NA1",
+      "profileIconId": 5168,
+      "summonerLevel": 1248,
+      "topChamps": [
+        {
+          "name": "Katarina",
+          "count": 4
+        },
+        {
+          "name": "Blitzcrank",
+          "count": 1
+        },
+        {
+          "name": "Xerath",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "Pholix X",
+      "tagLine": "NA1",
+      "leaguePoints": 699,
+      "wins": 72,
+      "losses": 49,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "c9lfVsGeNtLqPCcnc6Q-RiRdEOBRIkJFYV8R8byNL6E9JJnmtVvSX7ES07qYyOs-gO5mYsVD1URQZQ",
+      "summonerId": null,
+      "summonerName": "qad#NA1",
+      "profileIconId": 3790,
+      "summonerLevel": 694,
+      "topChamps": [
+        {
+          "name": "Senna",
+          "count": 3
+        },
+        {
+          "name": "Ziggs",
+          "count": 2
+        },
+        {
+          "name": "Jinx",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "qad",
+      "tagLine": "NA1",
+      "leaguePoints": 699,
+      "wins": 57,
+      "losses": 49,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "-dHVrYmFFSsLsvRGke_WY8RCoVLdTP7feI1isdnzQeaLNKtMaK-ZmxKTipvDXTEjKsZ5btQ0L3MNFg",
+      "summonerId": null,
+      "summonerName": "kaylee#cake",
+      "profileIconId": 3023,
+      "summonerLevel": 954,
+      "topChamps": [
+        {
+          "name": "Nami",
+          "count": 4
+        },
+        {
+          "name": "Janna",
+          "count": 1
+        },
+        {
+          "name": "Milio",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "kaylee",
+      "tagLine": "cake",
+      "leaguePoints": 697,
+      "wins": 94,
+      "losses": 80,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
     },
     {
       "puuid": "dyg6p10dAQgQkRxeJLU5jMYOc6vkpCrQBaNthsZ8P-On8gDyWhVvpZEpzk80Eb-2G1d1-2FaTbjpPg",
@@ -498,6 +1272,37 @@
       "hotStreak": true,
       "inactive": false,
       "veteran": true,
+      "freshBlood": false
+    },
+    {
+      "puuid": "NOg5D1Gt8Rw6N1UqKnvFKmMTtPnsqkNhefkgjq7eY12lqGEKdgk0i5Hzr3EpktnzUi6AJJSzOy55aQ",
+      "summonerId": null,
+      "summonerName": "EnelT#666",
+      "profileIconId": 3584,
+      "summonerLevel": 330,
+      "topChamps": [
+        {
+          "name": "Taliyah",
+          "count": 2
+        },
+        {
+          "name": "Viego",
+          "count": 2
+        },
+        {
+          "name": "MonkeyKing",
+          "count": 2
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "EnelT",
+      "tagLine": "666",
+      "leaguePoints": 697,
+      "wins": 64,
+      "losses": 51,
+      "hotStreak": true,
+      "inactive": false,
+      "veteran": false,
       "freshBlood": false
     },
     {
@@ -594,35 +1399,27 @@
       "freshBlood": true
     },
     {
-      "puuid": "jyTUK97HiqD_0DcxsbL3Du9Fwylp3DIFyR9aRwUbmgHxolKFPRhPBmBm9ms97ALUfQKVg8D4XTEXig",
+      "puuid": "Vxa2JNjfKcIKNsCs3i0gErGytqDfe9JLw9r1NwheUibfJL88P7rh0rF562SmDQ1SIK8JttxpBnX8Nw",
       "summonerId": null,
-      "summonerName": "Pholix X#NA1",
-      "profileIconId": 5168,
-      "summonerLevel": 1248,
+      "summonerName": "L0ganMD#069",
+      "profileIconId": 7050,
+      "summonerLevel": 169,
       "topChamps": [
         {
-          "name": "Katarina",
-          "count": 4
-        },
-        {
-          "name": "Blitzcrank",
-          "count": 1
-        },
-        {
-          "name": "Xerath",
-          "count": 1
+          "name": "Briar",
+          "count": 6
         }
       ],
       "sampleGames": 6,
-      "gameName": "Pholix X",
-      "tagLine": "NA1",
+      "gameName": "L0ganMD",
+      "tagLine": "069",
       "leaguePoints": 695,
-      "wins": 71,
-      "losses": 48,
-      "hotStreak": true,
+      "wins": 87,
+      "losses": 74,
+      "hotStreak": false,
       "inactive": false,
       "veteran": false,
-      "freshBlood": false
+      "freshBlood": true
     },
     {
       "puuid": "-UGK9ZoE-X4j5kmUeUjnJIaPqUIJyVETsBbIVDU2-pFe0rVnlCa-oFrGVZmscg11CWme_KzdUpXkXw",
@@ -656,37 +1453,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "buGDyPaqaTUJWOqbpJkpzzzCH-u0McFswoa8k2Q2n45EXFAI4fPm07rxncdMCCfdBStFNRou-0LxkQ",
-      "summonerId": null,
-      "summonerName": "Mister Yasuo#YAS",
-      "profileIconId": 6735,
-      "summonerLevel": 929,
-      "topChamps": [
-        {
-          "name": "Yasuo",
-          "count": 4
-        },
-        {
-          "name": "Yone",
-          "count": 1
-        },
-        {
-          "name": "Yuumi",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Mister Yasuo",
-      "tagLine": "YAS",
-      "leaguePoints": 694,
-      "wins": 115,
-      "losses": 108,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "W8UphOblPUlSZn2vYnjzoeLIQNbWI6yvMUlPgl8G7R6pSiX2Qmb9gvBOSOp9rKJ6yDxTko2HAdStjw",
       "summonerId": null,
       "summonerName": "Fear#qewq",
@@ -713,784 +1479,6 @@
       "wins": 105,
       "losses": 84,
       "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "Z2RbQNayAuBk34pwhhPIUQIy-5T0dqXNlN7pEk9IVxCX8owJiDLbo50BSuSLYoCC_Qhnaa5lzMT74A",
-      "summonerId": null,
-      "summonerName": "Blueguy256#NA1",
-      "profileIconId": 6622,
-      "summonerLevel": 733,
-      "topChamps": [
-        {
-          "name": "Pyke",
-          "count": 3
-        },
-        {
-          "name": "Braum",
-          "count": 1
-        },
-        {
-          "name": "Poppy",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Blueguy256",
-      "tagLine": "NA1",
-      "leaguePoints": 694,
-      "wins": 82,
-      "losses": 66,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "ciqA5Gxr8C5rwja6SzEiJmKLKtqHLTbxLM-qv3U1xryWu0VD2h8az-yEwa30UjtpJB93ZAOHi_bmmw",
-      "summonerId": null,
-      "summonerName": "Spongebob#P4NTS",
-      "profileIconId": 3587,
-      "summonerLevel": 338,
-      "topChamps": [
-        {
-          "name": "Ezreal",
-          "count": 3
-        },
-        {
-          "name": "Jayce",
-          "count": 1
-        },
-        {
-          "name": "Sylas",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Spongebob",
-      "tagLine": "P4NTS",
-      "leaguePoints": 694,
-      "wins": 48,
-      "losses": 29,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "JrZoxqZ_ccRFtkkvSdt132rQO0If9-ClTbKCv3aszvwoEyDcuENHtsghBNGFnrUZnF-n60Grc_2V_w",
-      "summonerId": null,
-      "summonerName": "blank faces#tears",
-      "profileIconId": 3788,
-      "summonerLevel": 1541,
-      "topChamps": [
-        {
-          "name": "Zac",
-          "count": 2
-        },
-        {
-          "name": "Pantheon",
-          "count": 1
-        },
-        {
-          "name": "Morgana",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "blank faces",
-      "tagLine": "tears",
-      "leaguePoints": 693,
-      "wins": 142,
-      "losses": 150,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "Hr1cbH3gAnv6Z1mtQT3Z5l3mkeOvJFNKGv6oKvd0MmY87nKOz3zJc8CKmzuo9tl5u27vS9KSks9wdA",
-      "summonerId": null,
-      "summonerName": "Keanu#Sera",
-      "profileIconId": 4794,
-      "summonerLevel": 955,
-      "topChamps": [
-        {
-          "name": "Mel",
-          "count": 3
-        },
-        {
-          "name": "Sona",
-          "count": 2
-        },
-        {
-          "name": "Senna",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Keanu",
-      "tagLine": "Sera",
-      "leaguePoints": 692,
-      "wins": 58,
-      "losses": 60,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "AH8lS6tMv5EncX-hdnH7WuDDy3dYaFxAJa-J8-DJ22o-8IPhG0JMVjsumU_ICo-sf2ceFNciVwkoDw",
-      "summonerId": null,
-      "summonerName": "Arowe#NA1",
-      "profileIconId": 5506,
-      "summonerLevel": 655,
-      "topChamps": [
-        {
-          "name": "Alistar",
-          "count": 4
-        },
-        {
-          "name": "Bard",
-          "count": 1
-        },
-        {
-          "name": "Braum",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Arowe",
-      "tagLine": "NA1",
-      "leaguePoints": 690,
-      "wins": 103,
-      "losses": 92,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": true,
-      "freshBlood": false
-    },
-    {
-      "puuid": "0jbPs9nWg1Aw-1rw4mEDJjqisag4qoIOSHrPP16BXkzLolb2QLuptrVZmcJrqi93qacLk8bAqvhl4Q",
-      "summonerId": null,
-      "summonerName": "cirno#abc",
-      "profileIconId": 5874,
-      "summonerLevel": 104,
-      "topChamps": [
-        {
-          "name": "Kassadin",
-          "count": 6
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "cirno",
-      "tagLine": "abc",
-      "leaguePoints": 689,
-      "wins": 107,
-      "losses": 92,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "9PYyv64t5gg0YDakYgKbqHCg4s5RzRit2BrSp8JV2XPFh3c9oYg7XcpRyB4lYnsK2tFrd375y69C7Q",
-      "summonerId": null,
-      "summonerName": "Mimilou#285",
-      "profileIconId": 29,
-      "summonerLevel": 135,
-      "topChamps": [
-        {
-          "name": "Senna",
-          "count": 1
-        },
-        {
-          "name": "Bard",
-          "count": 1
-        },
-        {
-          "name": "Leona",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Mimilou",
-      "tagLine": "285",
-      "leaguePoints": 687,
-      "wins": 115,
-      "losses": 108,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "gIGDKV6TpPw_JOSw6r1dzGEVFRMgDKJeZMxRf4ENefG_6GoHhkjD747xEN2OAgIFUsGzNFBts4m0Dg",
-      "summonerId": null,
-      "summonerName": "how boring#r u",
-      "profileIconId": 3588,
-      "summonerLevel": 101,
-      "topChamps": [
-        {
-          "name": "Jax",
-          "count": 3
-        },
-        {
-          "name": "Nasus",
-          "count": 1
-        },
-        {
-          "name": "Darius",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "how boring",
-      "tagLine": "r u",
-      "leaguePoints": 684,
-      "wins": 120,
-      "losses": 98,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": true,
-      "freshBlood": false
-    },
-    {
-      "puuid": "XD7WiKPcuXns3tewGfur6eqTej1Ptvr9T0qw68dC82r5lyILzvsS_2qDCwsEb-uOBiqLwONi42e5Ww",
-      "summonerId": null,
-      "summonerName": "PhuongDepTrai#BMW",
-      "profileIconId": 5933,
-      "summonerLevel": 796,
-      "topChamps": [
-        {
-          "name": "Mel",
-          "count": 1
-        },
-        {
-          "name": "Ziggs",
-          "count": 1
-        },
-        {
-          "name": "Nautilus",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "PhuongDepTrai",
-      "tagLine": "BMW",
-      "leaguePoints": 681,
-      "wins": 92,
-      "losses": 85,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "CSg7kNb5GP9Lf_M58lxnb5fzfdwyKxX_wZMNyA_I4TuTzxFnjYamLT0TL5JykCq4RRPMvxTxnW4Ovg",
-      "summonerId": null,
-      "summonerName": "Altya#God",
-      "profileIconId": 6500,
-      "summonerLevel": 141,
-      "topChamps": [
-        {
-          "name": "Corki",
-          "count": 3
-        },
-        {
-          "name": "Smolder",
-          "count": 1
-        },
-        {
-          "name": "Draven",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Altya",
-      "tagLine": "God",
-      "leaguePoints": 681,
-      "wins": 81,
-      "losses": 71,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "pSGDBXN0S0-Ic0pzUqxW5PJEqul-k1Y9U6PM6bp75OddW4_jcW59595leDzxLHAvTEgf0W7hRr_fCQ",
-      "summonerId": null,
-      "summonerName": "Gpdz#NA1",
-      "profileIconId": 3777,
-      "summonerLevel": 837,
-      "topChamps": [
-        {
-          "name": "Syndra",
-          "count": 2
-        },
-        {
-          "name": "Cassiopeia",
-          "count": 2
-        },
-        {
-          "name": "Mel",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Gpdz",
-      "tagLine": "NA1",
-      "leaguePoints": 681,
-      "wins": 70,
-      "losses": 64,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "1EvHPr9BdHcEDAg6r9n4mHLV7N-IxFk7ZLf6VlCZHUMO2SpdJe4Q9zumSAQUZq-L7bg1yryLTAmpfQ",
-      "summonerId": null,
-      "summonerName": "Wrath#power",
-      "profileIconId": 4473,
-      "summonerLevel": 590,
-      "topChamps": [
-        {
-          "name": "Poppy",
-          "count": 5
-        },
-        {
-          "name": "Riven",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Wrath",
-      "tagLine": "power",
-      "leaguePoints": 681,
-      "wins": 65,
-      "losses": 47,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "ppkwrHPs3UnDsGA5MBKYE5Sq5z8w4NoQdo63FCjd5p8ci6Wzdu8gD0Xvgzry946VyJw3giODTYDQDw",
-      "summonerId": null,
-      "summonerName": "CNS Tepo#Ichi",
-      "profileIconId": 6860,
-      "summonerLevel": 332,
-      "topChamps": [
-        {
-          "name": "Zoe",
-          "count": 2
-        },
-        {
-          "name": "Ahri",
-          "count": 1
-        },
-        {
-          "name": "Mel",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "CNS Tepo",
-      "tagLine": "Ichi",
-      "leaguePoints": 680,
-      "wins": 47,
-      "losses": 30,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "3JCI7x-b0SsX1k-mpeMfc1oI3h7Z--SXCG34DfjvXls6HDKVGUIhg6hwDheaiViwubpTHmpZNmkxdA",
-      "summonerId": null,
-      "summonerName": "footlover69#hehe",
-      "profileIconId": 6238,
-      "summonerLevel": 274,
-      "topChamps": [
-        {
-          "name": "Ahri",
-          "count": 3
-        },
-        {
-          "name": "Anivia",
-          "count": 1
-        },
-        {
-          "name": "Azir",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "footlover69",
-      "tagLine": "hehe",
-      "leaguePoints": 679,
-      "wins": 125,
-      "losses": 151,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "b6S0bAyt8K05WHdL1WUrjeipA0DWJbHjOInIzN6QtGB9oBNEf-QAOaKxRWgS04yCtz_Asy3SWDz4eA",
-      "summonerId": null,
-      "summonerName": "MrMemox23#2305",
-      "profileIconId": 588,
-      "summonerLevel": 376,
-      "topChamps": [
-        {
-          "name": "Tristana",
-          "count": 2
-        },
-        {
-          "name": "KogMaw",
-          "count": 1
-        },
-        {
-          "name": "Kaisa",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "MrMemox23",
-      "tagLine": "2305",
-      "leaguePoints": 679,
-      "wins": 84,
-      "losses": 80,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "dlLqFmyqDdCjagBxQeMoLDbJfm_CMSk5n19KfVZi8mgYx0w5XS9KT48pc9yFiPnWLM-VGSizNK_7lA",
-      "summonerId": null,
-      "summonerName": "winter#3456",
-      "profileIconId": 6923,
-      "summonerLevel": 1113,
-      "topChamps": [
-        {
-          "name": "Hwei",
-          "count": 2
-        },
-        {
-          "name": "Naafiri",
-          "count": 2
-        },
-        {
-          "name": "Caitlyn",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "winter",
-      "tagLine": "3456",
-      "leaguePoints": 679,
-      "wins": 71,
-      "losses": 58,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "W5eArSAxG3XdvSomr4n4PuKE7E9TWbBQpxRGpQnav-FoT_nmTEpzDaxb1TpmNWUVIv5nsSuDUD58GA",
-      "summonerId": null,
-      "summonerName": "padovinho#marlo",
-      "profileIconId": 4086,
-      "summonerLevel": 45,
-      "topChamps": [
-        {
-          "name": "Vladimir",
-          "count": 6
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "padovinho",
-      "tagLine": "marlo",
-      "leaguePoints": 678,
-      "wins": 101,
-      "losses": 69,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "yfXQ7vVGjEaONH0hOL9rKHmyr9p5bz_qSToIili-BRqtxI72Yvaf0JTVcto8h97_XDoDwmtkrxWzRg",
-      "summonerId": null,
-      "summonerName": "사미라의 검은 악마#EVIL",
-      "profileIconId": 7,
-      "summonerLevel": 116,
-      "topChamps": [
-        {
-          "name": "Samira",
-          "count": 4
-        },
-        {
-          "name": "Poppy",
-          "count": 1
-        },
-        {
-          "name": "Ambessa",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "사미라의 검은 악마",
-      "tagLine": "EVIL",
-      "leaguePoints": 678,
-      "wins": 79,
-      "losses": 75,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "ZmAMAg8HLKIKFAiV_LBRXo65sLlR6yM1dVnsv5Al-RmGgwCFFAC5NLp62o8oNmFyJuFOhuTtrQwPZQ",
-      "summonerId": null,
-      "summonerName": "Nouology#11111",
-      "profileIconId": 773,
-      "summonerLevel": 727,
-      "topChamps": [
-        {
-          "name": "Neeko",
-          "count": 1
-        },
-        {
-          "name": "Lulu",
-          "count": 1
-        },
-        {
-          "name": "Bard",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Nouology",
-      "tagLine": "11111",
-      "leaguePoints": 677,
-      "wins": 97,
-      "losses": 86,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "KLVTuX9O5kY24x7S6tAE8d2dfMQBPzwqj3GtafKUjC7V0rKVAQK0i8ix_m5Qq4xrItO3he7yPdl3rw",
-      "summonerId": null,
-      "summonerName": "Infectrix#NA1",
-      "profileIconId": 977,
-      "summonerLevel": 301,
-      "topChamps": [
-        {
-          "name": "Khazix",
-          "count": 1
-        },
-        {
-          "name": "Gwen",
-          "count": 1
-        },
-        {
-          "name": "XinZhao",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Infectrix",
-      "tagLine": "NA1",
-      "leaguePoints": 677,
-      "wins": 74,
-      "losses": 66,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
-      "puuid": "rH-86UtQ7Bk6vBGFj0TamZpHRTyX-63RzHqxSZ3GDbhIcaH59_9MAMeByLYwSPCdnTLanj46i4lyYg",
-      "summonerId": null,
-      "summonerName": "Sock#poke",
-      "profileIconId": 7050,
-      "summonerLevel": 944,
-      "topChamps": [
-        {
-          "name": "Varus",
-          "count": 4
-        },
-        {
-          "name": "Sion",
-          "count": 1
-        },
-        {
-          "name": "Poppy",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Sock",
-      "tagLine": "poke",
-      "leaguePoints": 677,
-      "wins": 58,
-      "losses": 50,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "WDhVJDvj6_p4bU-lH-ipADXFExNAkrMuZCQBuWUB6gHPQRehj8hpIYOpHhreWCoR6zl6ce0BuN4Wjg",
-      "summonerId": null,
-      "summonerName": "AatroxRuns#3779",
-      "profileIconId": 7050,
-      "summonerLevel": 143,
-      "topChamps": [
-        {
-          "name": "Nautilus",
-          "count": 3
-        },
-        {
-          "name": "Alistar",
-          "count": 3
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "AatroxRuns",
-      "tagLine": "3779",
-      "leaguePoints": 676,
-      "wins": 97,
-      "losses": 100,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "uuapw45ceiH8teiW2cUscYqZuC7qLqctn42_B8H_VV1tIV8exM302BKLYlt71p60aek7nJU9PH2SUA",
-      "summonerId": null,
-      "summonerName": "cannedmeat025#NA1",
-      "profileIconId": 1450,
-      "summonerLevel": 716,
-      "topChamps": [
-        {
-          "name": "Milio",
-          "count": 2
-        },
-        {
-          "name": "Yuumi",
-          "count": 1
-        },
-        {
-          "name": "Sona",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "cannedmeat025",
-      "tagLine": "NA1",
-      "leaguePoints": 676,
-      "wins": 93,
-      "losses": 81,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "F5W4QzbDKvejm-r6GaqnsESJizkEgDycwa1bUrB-KbAbkq0olfCVCUt0iCIp1uch-V9Xowy61iBidA",
-      "summonerId": null,
-      "summonerName": "Somberly#king",
-      "profileIconId": 5424,
-      "summonerLevel": 394,
-      "topChamps": [
-        {
-          "name": "Galio",
-          "count": 4
-        },
-        {
-          "name": "Nautilus",
-          "count": 2
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Somberly",
-      "tagLine": "king",
-      "leaguePoints": 676,
-      "wins": 80,
-      "losses": 79,
-      "hotStreak": true,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "2-rD8fq3b6zVwzf4YLH-KSoDZPMH0_6hWf9EOze7MNM48ry44tmka1XtaPOnbUML9X8QkfgolLsokA",
-      "summonerId": null,
-      "summonerName": "Lunisolar#eProd",
-      "profileIconId": 3839,
-      "summonerLevel": 66,
-      "topChamps": [
-        {
-          "name": "Lucian",
-          "count": 3
-        },
-        {
-          "name": "Caitlyn",
-          "count": 2
-        },
-        {
-          "name": "Vayne",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "Lunisolar",
-      "tagLine": "eProd",
-      "leaguePoints": 674,
-      "wins": 119,
-      "losses": 95,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
-      "puuid": "nggiIdRzr8kKgjv4r08yDM_FmZ6GaKllbSV3oh7_4Kz6HxXrCwSh9YGAGwpWy3ROEagTwaaY9QkBfQ",
-      "summonerId": null,
-      "summonerName": "PSI Hoàng Tử C1#1997",
-      "profileIconId": 7050,
-      "summonerLevel": 599,
-      "topChamps": [
-        {
-          "name": "JarvanIV",
-          "count": 2
-        },
-        {
-          "name": "Pyke",
-          "count": 1
-        },
-        {
-          "name": "Nautilus",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "PSI Hoàng Tử C1",
-      "tagLine": "1997",
-      "leaguePoints": 674,
-      "wins": 98,
-      "losses": 94,
-      "hotStreak": true,
       "inactive": false,
       "veteran": false,
       "freshBlood": true
