@@ -5,6 +5,8 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
+import ClientSideRailAds from "@/components/ClientSideRailAds";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -18,8 +20,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://gamerstation.gg"),
   title: "GamerStation",
-  description: "Multi-game calculators, stats tools, and competitive gaming utilities.",
-  // ✅ Don't set metadata.icons if using App Router icon pipeline
+  description:
+    "Multi-game calculators, stats tools, and competitive gaming utilities.",
 };
 
 export default function RootLayout({
@@ -29,12 +31,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9530220531970117"
-     crossOrigin="anonymous"></script>
-      </head>
+      <head />
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {/* Load AdSense ONCE */}
+        <Script
+          async
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9530220531970117"
+          crossOrigin="anonymous"
+        />
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* Desktop side rails (hidden on homepage) */}
+        <ClientSideRailAds />
+
         {children}
         <Analytics />
       </body>
