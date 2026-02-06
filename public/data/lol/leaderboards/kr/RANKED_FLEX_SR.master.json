@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-06T21:51:05.535Z",
+  "generatedAt": "2026-02-06T23:56:18.944Z",
   "region": "kr",
   "queue": "RANKED_FLEX_SR",
   "tier": "MASTER",
@@ -85,6 +85,37 @@
       "leaguePoints": 198,
       "wins": 60,
       "losses": 57,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": true
+    },
+    {
+      "puuid": "6wYNeCbTUKh3E7PIJ7DxqEXVPL1SgcKjYgcQYZme48re-tX-N95yb3_lb8B5HL8pyXJ2eCrZCUpHRQ",
+      "summonerId": null,
+      "summonerName": "사 관#S 2",
+      "profileIconId": 6635,
+      "summonerLevel": 289,
+      "topChamps": [
+        {
+          "name": "Ambessa",
+          "count": 4
+        },
+        {
+          "name": "Aphelios",
+          "count": 1
+        },
+        {
+          "name": "Warwick",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "사 관",
+      "tagLine": "S 2",
+      "leaguePoints": 197,
+      "wins": 21,
+      "losses": 12,
       "hotStreak": false,
       "inactive": false,
       "veteran": false,
@@ -637,37 +668,6 @@
       "freshBlood": true
     },
     {
-      "puuid": "6wYNeCbTUKh3E7PIJ7DxqEXVPL1SgcKjYgcQYZme48re-tX-N95yb3_lb8B5HL8pyXJ2eCrZCUpHRQ",
-      "summonerId": null,
-      "summonerName": "사 관#S 2",
-      "profileIconId": 6635,
-      "summonerLevel": 289,
-      "topChamps": [
-        {
-          "name": "Ambessa",
-          "count": 3
-        },
-        {
-          "name": "Aphelios",
-          "count": 1
-        },
-        {
-          "name": "Warwick",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "사 관",
-      "tagLine": "S 2",
-      "leaguePoints": 167,
-      "wins": 20,
-      "losses": 12,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": true
-    },
-    {
       "puuid": "N-RPLg-5gjmoV8VHQx48bfRkW7nosUxIBYOhj9D35Rn2gluKgUSICny2mldhAnLFd7JdsSjbJPWdVw",
       "summonerId": null,
       "summonerName": "보석바밤바#8637",
@@ -993,37 +993,6 @@
       "freshBlood": false
     },
     {
-      "puuid": "Psu-7B551e8gYcLkQxkpRs7bJD5df8U5iV7rhyPQVFzJ3nKB3i2gHKxe_syqTNK-g5X1cbDX5L3mRQ",
-      "summonerId": null,
-      "summonerName": "yaya#yqfxy",
-      "profileIconId": 7078,
-      "summonerLevel": 81,
-      "topChamps": [
-        {
-          "name": "Taric",
-          "count": 4
-        },
-        {
-          "name": "Neeko",
-          "count": 1
-        },
-        {
-          "name": "Lulu",
-          "count": 1
-        }
-      ],
-      "sampleGames": 6,
-      "gameName": "yaya",
-      "tagLine": "yqfxy",
-      "leaguePoints": 147,
-      "wins": 16,
-      "losses": 2,
-      "hotStreak": false,
-      "inactive": false,
-      "veteran": false,
-      "freshBlood": false
-    },
-    {
       "puuid": "v-K2HTG2R5z2NPafvGjnp_y7ijJVCBJ4AYWjgyvMOiS14IZCzcubbh5Lmndkm6HOocCTihus0LI2vQ",
       "summonerId": null,
       "summonerName": "yaya#YQFXX",
@@ -1046,6 +1015,37 @@
       "sampleGames": 6,
       "gameName": "yaya",
       "tagLine": "YQFXX",
+      "leaguePoints": 147,
+      "wins": 16,
+      "losses": 2,
+      "hotStreak": false,
+      "inactive": false,
+      "veteran": false,
+      "freshBlood": false
+    },
+    {
+      "puuid": "Psu-7B551e8gYcLkQxkpRs7bJD5df8U5iV7rhyPQVFzJ3nKB3i2gHKxe_syqTNK-g5X1cbDX5L3mRQ",
+      "summonerId": null,
+      "summonerName": "yaya#yqfxy",
+      "profileIconId": 7078,
+      "summonerLevel": 81,
+      "topChamps": [
+        {
+          "name": "Taric",
+          "count": 4
+        },
+        {
+          "name": "Neeko",
+          "count": 1
+        },
+        {
+          "name": "Lulu",
+          "count": 1
+        }
+      ],
+      "sampleGames": 6,
+      "gameName": "yaya",
+      "tagLine": "yqfxy",
       "leaguePoints": 147,
       "wins": 16,
       "losses": 2,
@@ -1113,7 +1113,7 @@
       "summonerId": null,
       "summonerName": "재 간#둥 이",
       "profileIconId": 5968,
-      "summonerLevel": 888,
+      "summonerLevel": 889,
       "topChamps": [
         {
           "name": "Fizz",
