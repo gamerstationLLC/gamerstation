@@ -1,20 +1,40 @@
 // app/components/ClientSideRailAds.tsx
 "use client";
 
-import Script from "next/script";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
+
+declare global {
+  interface Window {
+    adsbygoogle?: any[];
+  }
+}
 
 export default function ClientSideRailAds() {
   const pathname = usePathname();
+  const initialized = useRef(false);
 
   // Hide on homepage
   if (pathname === "/") return null;
+
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    try {
+      window.adsbygoogle = window.adsbygoogle || [];
+      window.adsbygoogle.push({});
+      window.adsbygoogle.push({});
+    } catch {
+      // If blocked, do nothing
+    }
+  }, []);
 
   return (
     <>
       {/* LEFT RAIL */}
       <div className="hidden 2xl:block fixed top-24 left-4 w-[160px] min-h-[600px] z-40">
-        <div className="w-full h-full bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-[0_0_40px_rgba(0,255,255,0.04)] p-2">
+        <div className="w-full h-full bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-2">
           <ins
             className="adsbygoogle"
             style={{ display: "block" }}
@@ -28,7 +48,7 @@ export default function ClientSideRailAds() {
 
       {/* RIGHT RAIL */}
       <div className="hidden 2xl:block fixed top-24 right-4 w-[160px] min-h-[600px] z-40">
-        <div className="w-full h-full bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 shadow-[0_0_40px_rgba(0,255,255,0.04)] p-2">
+        <div className="w-full h-full bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-2">
           <ins
             className="adsbygoogle"
             style={{ display: "block" }}
@@ -39,14 +59,6 @@ export default function ClientSideRailAds() {
           />
         </div>
       </div>
-
-      {/* Push both ads */}
-      <Script id="adsbygoogle-init" strategy="afterInteractive">
-        {`
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
-        `}
-      </Script>
     </>
   );
 }

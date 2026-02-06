@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://gamerstation.gg"),
   title: "GamerStation",
-  description: "Multi-game calculators, stats tools, and competitive gaming utilities.",
-  // ✅ Don't set metadata.icons if using App Router icon pipeline
+  description:
+    "Multi-game calculators, stats tools, and competitive gaming utilities.",
 };
 
 export default function RootLayout({
@@ -32,7 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head />
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {/* Load AdSense ONCE */}
         <Script
           async
@@ -41,7 +43,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
 
-        {/* Bulletproof: client-side route check (hide on "/") */}
+        {/* Desktop side rails (hidden on homepage) */}
         <ClientSideRailAds />
 
         {children}
