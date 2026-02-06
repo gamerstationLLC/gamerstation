@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
+// ✅ Correct path for App Router component under /app/components
 import ClientSideRailAds from "@/components/ClientSideRailAds";
 
 const geistSans = Geist({
@@ -32,9 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head />
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* Load AdSense ONCE */}
         <Script
           async
