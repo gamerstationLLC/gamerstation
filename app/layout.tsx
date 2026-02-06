@@ -5,7 +5,7 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-import SideRailAds from "@/components/SideRailAds";
+import ClientSideRailAds from "@/components/ClientSideRailAds";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +33,7 @@ export default function RootLayout({
     <html lang="en">
       <head />
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* Load AdSense ONCE */}
         <Script
           async
           strategy="afterInteractive"
@@ -40,7 +41,8 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
 
-        <SideRailAds />
+        {/* Bulletproof: client-side route check (hide on "/") */}
+        <ClientSideRailAds />
 
         {children}
         <Analytics />
