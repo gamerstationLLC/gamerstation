@@ -254,8 +254,20 @@ jobs:
           #
           # Adjust these two folders if your static/override outputs live somewhere else.
           git add -A \
-            public/data/lol/static \
-            public/data/lol/overrides
+           # ✅ Stage ONLY repo-owned static LoL data (and only if present)
+CANDIDATES=(
+  "public/data/lol/champions_index.json"
+  "public/data/lol/champions_full.json"
+  "public/data/lol/items.json"
+  "public/data/lol/spells_overrides.json"
+  "public/data/lol/version.json"
+)
+
+for p in "${CANDIDATES[@]}"; do
+  if [ -e "$p" ]; then
+    git add -A "$p"
+  fi
+done
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
