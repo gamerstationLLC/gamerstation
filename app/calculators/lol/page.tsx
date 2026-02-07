@@ -66,16 +66,21 @@ async function getLatestDdragonVersion(): Promise<string> {
   let fallback = "unknown";
 
   try {
-    const local = await readPublicJson<{ version?: string }>("data/lol/version.json");
+    const local = await readPublicJson<{ version?: string }>(
+      "data/lol/version.json"
+    );
     fallback = local.version ?? fallback;
   } catch {
     // ignore
   }
 
   try {
-    const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
-      next: { revalidate: 21600 }, // 6 hours
-    });
+    const res = await fetch(
+      "https://ddragon.leagueoflegends.com/api/versions.json",
+      {
+        next: { revalidate: 21600 }, // 6 hours
+      }
+    );
     if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
     const versions = (await res.json()) as string[];
     return versions?.[0] ?? fallback;
@@ -89,7 +94,9 @@ async function loadLolIndex(version: string): Promise<{
   champions: ChampionIndexRow[];
 }> {
   // ✅ Read from disk: /public/data/lol/champions_full.json
-  const json = await readPublicJson<LolChampionFile>("data/lol/champions_full.json");
+  const json = await readPublicJson<LolChampionFile>(
+    "data/lol/champions_full.json"
+  );
 
   const patch = version;
 
@@ -120,7 +127,9 @@ async function loadLolIndex(version: string): Promise<{
   return { patch, champions };
 }
 
-async function loadLolItems(version: string): Promise<{ patch: string; items: ItemRow[] }> {
+async function loadLolItems(
+  version: string
+): Promise<{ patch: string; items: ItemRow[] }> {
   // ✅ Read from disk: /public/data/lol/items.json
   const json = await readPublicJson<LolItemsFile>("data/lol/items.json");
 
@@ -180,6 +189,9 @@ function LoadingShell() {
   );
 }
 
+const topButtonClass =
+  "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
 export default async function LolCalculatorPage() {
   const version = await getLatestDdragonVersion();
 
@@ -191,34 +203,30 @@ export default async function LolCalculatorPage() {
   return (
     <main className="min-h-screen bg-black text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
-       <header className="flex items-center gap-3">
-  {/* GS brand */}
-  <Link href="/" className="flex items-center gap-2 hover:opacity-90">
-    <img
-      src="/gs-logo-v2.png"
-      alt="GamerStation"
-      className="
-        h-10 w-10 rounded-xl bg-black p-1
-        shadow-[0_0_30px_rgba(0,255,255,0.35)]
-      "
-    />
-    <span className="text-lg font-black tracking-tight">
-      GamerStation<span className="align-super text-[0.6em]">™</span>
-    </span>
-  </Link>
+        <header className="flex items-center gap-3">
+          {/* GS brand */}
+          <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+            <img
+              src="/gs-logo-v2.png"
+              alt="GamerStation"
+              className="
+                h-10 w-10 rounded-xl bg-black p-1
+                shadow-[0_0_30px_rgba(0,255,255,0.35)]
+              "
+            />
+            <span className="text-lg font-black tracking-tight">
+              GamerStation<span className="align-super text-[0.6em]">™</span>
+            </span>
+          </Link>
 
-  {/* Top-right: ONLY Calculators */}
-  <div className="ml-auto">
-    <Link
-      href="/calculators/lol/hub"
-      className="rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]"
-    >
-      LoL Hub
-    </Link>
-  </div>
-</header>
+          {/* Top-right: ONLY Calculators */}
+          <div className="ml-auto">
+            <Link href="/calculators/lol/hub" className={topButtonClass}>
+              LoL Hub
+            </Link>
+          </div>
+        </header>
 
-          
         <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
           League of Legends Damage Calculator
         </h1>
@@ -228,9 +236,22 @@ export default async function LolCalculatorPage() {
         </p>
 
         <p className="mt-3 text-neutral-300 max-w-3xl">
-          Choose a champion and see how much damage you can deal in a combo or over a short time
-          window. [Summoner&apos;s Rift Only]
+          Choose a champion and see how much damage you can deal in a combo or
+          over a short time window. [Summoner&apos;s Rift Only]
         </p>
+
+        {/* ✅ 3 buttons right above the inputs card (i.e., above LolClient) */}
+        <div className="mt-1 flex flex-wrap items-center gap-2 py-2">
+          <Link href="/tools/lol/meta" className={topButtonClass}>
+           Meta
+          </Link>
+          <Link href="/tools/lol/champion-tiers" className={topButtonClass}>
+            Champion Tiers
+          </Link>
+          <Link href="/calculators/lol/champions" className={topButtonClass}>
+            Index
+          </Link>
+        </div>
 
         {/* ✅ Required by Next when LolClient uses useSearchParams() */}
         <Suspense fallback={<LoadingShell />}>

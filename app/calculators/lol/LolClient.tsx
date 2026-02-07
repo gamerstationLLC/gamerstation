@@ -1593,17 +1593,14 @@ useEffect(() => {
         </div>
       </div>
 
-      <div
-        className={`mt-10 grid gap-6 lg:grid-cols-2 ${
-          uiMode === "simple" ? "lg:items-stretch" : "lg:items-start"
-        }`}
-      >
-        {/* Inputs */}
-        <section
-          className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 ${
-            mobileTab !== "inputs" ? "hidden lg:block" : ""
-          }`}
-        >
+      
+<div className="mt-10 grid gap-6 lg:grid-cols-2 lg:items-start">
+  {/* Inputs */}
+  <section
+    className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 ${
+      mobileTab !== "inputs" ? "hidden lg:block" : ""
+    }`}
+  >
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Inputs</h2>
             <button
@@ -2324,62 +2321,74 @@ useEffect(() => {
           )}
         </section>
 
-        {/* Right column (desktop) + Results tab (mobile) */}
-        <section
-          className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 flex flex-col ${
-            uiMode === "simple" ? "h-full" : "self-start"
-          } ${mobileTab !== "results" ? "hidden lg:flex" : ""}`}
-        >
-          <div className="hidden lg:flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Selected champion</h2>
-          </div>
+        {/* ✅ FIX #2 — REPLACE your entire Right column <section> opening tag with this */}
+  <section
+    className={`rounded-2xl border border-neutral-800 bg-neutral-950 p-6 flex flex-col
+      lg:sticky lg:top-6 lg:self-start lg:h-fit
+      ${mobileTab !== "results" ? "hidden lg:flex" : ""}`}
+  >
+  {/* ✅ Collapsible: Selected champion (desktop only) */}
+  <div className="hidden lg:block">
+    <details
+      className="group rounded-2xl border border-neutral-800 bg-black"
+      open={false}
+    >
+      <summary className="cursor-pointer list-none select-none px-4 py-3 flex items-center justify-between">
+        <div className="text-sm font-semibold text-white">Selected champion</div>
+        <div className="text-xs text-neutral-500 group-open:hidden">Show</div>
+        <div className="text-xs text-neutral-500 hidden group-open:block">Hide</div>
+      </summary>
 
-          <div className="hidden lg:block mt-6 space-y-3">
-            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-neutral-300">Name</span>
-              <span className="font-semibold">{selected?.name ?? "—"}</span>
-            </div>
+      <div className="px-4 pb-4 pt-1 space-y-3">
+        <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-neutral-300">Name</span>
+          <span className="font-semibold">{selected?.name ?? "—"}</span>
+        </div>
 
-            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-neutral-300">Title</span>
-              <span className="font-semibold text-neutral-200">{selected?.title ?? "—"}</span>
-            </div>
+        <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-neutral-300">Title</span>
+          <span className="font-semibold text-neutral-200">{selected?.title ?? "—"}</span>
+        </div>
 
-            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-neutral-300">Level</span>
-              <span className="font-semibold text-neutral-200">{lvl}</span>
-            </div>
+        <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-neutral-300">Level</span>
+          <span className="font-semibold text-neutral-200">{lvl}</span>
+        </div>
 
-            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-neutral-300">HP (at level)</span>
-              <span className="font-semibold text-neutral-200">{fmt(champHp, 1)}</span>
-            </div>
+        <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-neutral-300">HP (at level)</span>
+          <span className="font-semibold text-neutral-200">{fmt(champHp, 1)}</span>
+        </div>
 
-            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-neutral-300">Armor (at level)</span>
-              <span className="font-semibold text-neutral-200">{fmt(champArmor, 1)}</span>
-            </div>
+        <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-neutral-300">Armor (at level)</span>
+          <span className="font-semibold text-neutral-200">{fmt(champArmor, 1)}</span>
+        </div>
 
-            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-neutral-300">MR (at level)</span>
-              <span className="font-semibold text-neutral-200">{fmt(champMr, 1)}</span>
-            </div>
+        <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-neutral-300">MR (at level)</span>
+          <span className="font-semibold text-neutral-200">{fmt(champMr, 1)}</span>
+        </div>
 
-            <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-neutral-300">Resource</span>
-              <span className="font-semibold text-neutral-200">
-                {(selected as any)?.partype ?? "—"}
-              </span>
-            </div>
-          </div>
+        <div className="rounded-xl border border-neutral-800 bg-black px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-neutral-300">Resource</span>
+          <span className="font-semibold text-neutral-200">
+            {(selected as any)?.partype ?? "—"}
+          </span>
+        </div>
+      </div>
+    </details>
+  </div>
 
-          {/* Results */}
-          <div
-            ref={resultsRef}
-            className={`mt-6 rounded-2xl border border-neutral-800 bg-black p-3 ${
-              uiMode === "simple" ? "min-h-[240px]" : ""
-            }`}
-          >
+  {/* Results (scrolls with page like normal) */}
+  <div
+    ref={resultsRef}
+    className={`mt-6 rounded-2xl border border-neutral-800 bg-black p-3 ${
+      uiMode === "simple" ? "min-h-[240px]" : ""
+    }`}
+  >
+    
+          
             <div className="flex items-center justify-between gap-2">
               <div className="text-sm font-semibold">Results</div>
 
