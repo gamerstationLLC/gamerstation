@@ -2,7 +2,7 @@ name: Auto Update LoL Data
 
 on:
   schedule:
-    - cron: "15 */8 * * *" # every 6 hours
+    - cron: "15 */8 * * *" # every 8 hours
   workflow_dispatch:
     inputs:
       rebuild:
@@ -21,6 +21,10 @@ jobs:
   lol:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,7 +33,6 @@ jobs:
 
       # ✅ Always start from latest origin/main (NO MERGE COMMITS here)
       - name: Sync with main (pre-build)
-        shell: bash
         run: |
           set -e
           git fetch origin main
@@ -59,14 +62,12 @@ jobs:
             lol-riot-cache-v1
 
       - name: Debug - Cache hit
-        shell: bash
         run: |
           echo "cache-hit=${{ steps.riot_cache.outputs.cache-hit }}"
           du -sh scripts/riot/cache/* 2>/dev/null || true
 
       # ✅ Hard prune cache files older than 90d by mtime
       - name: Prune old Riot cache (90 days)
-        shell: bash
         run: |
           set -e
           echo "Pruning Riot cache older than 90 days..."
@@ -95,7 +96,6 @@ jobs:
       # ✅ Decide crawl mode (scheduled runs should NOT reprocess/reset)
       - name: Set crawl mode
         id: mode
-        shell: bash
         run: |
           set -e
           REBUILD="false"
@@ -130,7 +130,6 @@ jobs:
           fi
 
       # ✅ CRITICAL: NEVER fail the job here.
-      # If API expires (401/403) or anything else breaks, we STILL want finalize+commit.
       - name: Crawl Riot matches into cache/state (soft timeout, never fails job)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
@@ -147,7 +146,6 @@ jobs:
           MAX_NEW_PUUIDS_PER_RUN: ${{ env.MAX_NEW_PUUIDS_PER_RUN }}
           MATCHES_PER_PUUID: ${{ env.MATCHES_PER_PUUID }}
 
-# 🔽 ADD THIS
           CHECKPOINT_EVERY: "100"
 
           # pipeline knobs
@@ -159,7 +157,6 @@ jobs:
           RESET_CURSORS: ${{ env.RESET_CURSORS }}
           CACHE_SCAN_LIMIT: "0"
           CACHE_MAX_AGE_DAYS: "90"
-        shell: bash
         run: |
           set +e
           timeout 17940 npm run lol:update:meta
@@ -189,12 +186,38 @@ jobs:
           MIN_PATCH_MAJOR: "16"
         run: npm run lol:finalize:meta
 
+      # ✅ Upload meta builds to Blob (never fails job)
+      - name: Upload meta builds to Vercel Blob (never fails job)
+        if: always()
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          # IMPORTANT: keep this as ONE LINE to avoid whitespace issues
+          BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
+          BLOB_CACHE_SECONDS: "300"
+        run: |
+          set +e
+
+          if [ -z "$BLOB_READ_WRITE_TOKEN" ]; then
+            echo "BLOB_READ_WRITE_TOKEN missing in GitHub Secrets. Skipping Blob upload."
+            exit 0
+          fi
+
+          if [ ! -f "public/data/lol/meta_builds_ranked.json" ] && [ ! -f "public/data/lol/meta_builds_casual.json" ]; then
+            echo "No meta builds outputs exist; skipping Blob upload."
+            exit 0
+          fi
+
+          node scripts/blob/upload-data.mjs
+          EC=$?
+          echo "Blob upload exit code: $EC"
+          echo "Continuing regardless..."
+          exit 0
+
       - name: Debug - What will be committed
         if: always()
-        shell: bash
         run: |
           echo "== Output sizes =="
-          ls -lh public/data/lol/meta_builds_ranked.json public/data/lol/meta_builds_casual.json || true
+          ls -lh public/data/lol/meta_builds_ranked.json public/data/lol/meta_builds_casual.json 2>/dev/null || true
 
           echo "== Git status (repo) =="
           git status --porcelain || true
@@ -202,23 +225,23 @@ jobs:
           echo "== Diffstat =="
           git diff --stat || true
 
-      - name: Commit & push (if changed)
+      # ✅ Commit only static/overrides (NOT blob-managed meta builds, not other workflows)
+      - name: Commit & push (static/overrides only; if changed)
         if: always()
-        shell: bash
         run: |
           set -e
 
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          # ✅ Stage ONLY what this workflow owns
-          # - include LoL static/overrides + meta builds
-          # - explicitly exclude leaderboards + champion tiers (just in case paths overlap)
+          # Stage LoL public data EXCEPT blob-managed high churn outputs + other workflows
           git add public/data/lol \
+            ':!public/data/lol/meta_builds_ranked.json' \
+            ':!public/data/lol/meta_builds_casual.json' \
             ':!public/data/lol/leaderboards' \
             ':!public/data/lol/leaderboards/**' \
             ':!public/data/lol/*leaderboard*.json' \
-            ':!public/data/lol/champion_tiers' \
+            ':!public/data/lol/champion_tiers.json' \
             ':!public/data/lol/champion_tiers/**' \
             ':!public/data/lol/*tier*.json'
 
@@ -227,7 +250,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "chore(lol): refresh LoL data"
+          git commit -m "chore(lol): refresh LoL static/overrides"
 
           for i in 1 2 3 4 5; do
             echo "Attempt $i: pulling latest origin/main (merge, no rebase)..."
@@ -235,7 +258,7 @@ jobs:
             git pull --no-rebase origin main || true
 
             echo "Attempt $i: pushing..."
-            if git push; then
+            if git push origin main; then
               echo "Push succeeded."
               exit 0
             fi

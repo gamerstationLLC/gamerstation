@@ -47,22 +47,102 @@ type OverridesEntry = {
 };
 type SpellsOverridesFile = Record<string, OverridesEntry>;
 
+/* -------------------- Blob helpers (local-test friendly) -------------------- */
+
+function blobUrl(pathname: string) {
+  const base = process.env.NEXT_PUBLIC_BLOB_BASE_URL;
+  if (!base) return null;
+  return `${base.replace(/\/+$/, "")}/${pathname.replace(/^\/+/, "")}`;
+}
+
+async function fetchJsonFromBlob<T>(pathname: string): Promise<T | null> {
+  const url = blobUrl(pathname);
+  if (!url) return null;
+
+  try {
+    const res = await fetch(url, {
+      // These data files change often; avoid stale caches server-side.
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
+async function readJsonAbs<T>(absPath: string): Promise<T> {
+  const raw = await fs.readFile(absPath, "utf-8");
+  return JSON.parse(raw) as T;
+}
+
+/**
+ * For this route we want:
+ * - Local FS first (works in dev without env vars, and works at build time)
+ * - Blob fallback if you move these files out of repo later
+ */
+async function readJsonLocalFirstBlobFallback<T>(
+  localAbsPath: string,
+  blobPathname: string
+): Promise<T | null> {
+  try {
+    return await readJsonAbs<T>(localAbsPath);
+  } catch {
+    // try blob
+  }
+  return await fetchJsonFromBlob<T>(blobPathname);
+}
+
+/* -------------------- paths (static, no dynamic tracing) -------------------- */
+
+const CHAMPIONS_FULL_LOCAL = path.join(
+  process.cwd(),
+  "public",
+  "data",
+  "lol",
+  "champions_full.json"
+);
+const VERSION_LOCAL = path.join(process.cwd(), "public", "data", "lol", "version.json");
+const OVERRIDES_LOCAL = path.join(
+  process.cwd(),
+  "public",
+  "data",
+  "lol",
+  "spells_overrides.json"
+);
+
+// Blob pathnames (relative to NEXT_PUBLIC_BLOB_BASE_URL)
+const CHAMPIONS_FULL_BLOB = "data/lol/champions_full.json";
+const VERSION_BLOB = "data/lol/version.json";
+const OVERRIDES_BLOB = "data/lol/spells_overrides.json";
+
+/* -------------------- data loaders -------------------- */
+
 async function readChampionsFull(): Promise<ChampionsFullFile> {
-  const p = path.join(process.cwd(), "public", "data", "lol", "champions_full.json");
-  const raw = await fs.readFile(p, "utf-8");
-  return JSON.parse(raw) as ChampionsFullFile;
+  const file =
+    (await readJsonLocalFirstBlobFallback<ChampionsFullFile>(
+      CHAMPIONS_FULL_LOCAL,
+      CHAMPIONS_FULL_BLOB
+    )) ?? null;
+
+  if (!file) {
+    // Keep behavior consistent: if file missing, throw so callers can catch.
+    throw new Error("champions_full.json missing (local and blob)");
+  }
+  return file;
 }
 
 async function readPatchFallback(): Promise<string | undefined> {
-  try {
-    const p = path.join(process.cwd(), "public", "data", "lol", "version.json");
-    const raw = await fs.readFile(p, "utf-8");
-    const json = JSON.parse(raw) as { version?: string };
-    return json.version;
-  } catch {
-    return undefined;
-  }
+  const json =
+    (await readJsonLocalFirstBlobFallback<{ version?: string }>(
+      VERSION_LOCAL,
+      VERSION_BLOB
+    )) ?? null;
+
+  return json?.version;
 }
+
+/* ------------------- slug + champion helpers ------------------- */
 
 function normalizeSlug(s: unknown) {
   if (typeof s !== "string") return "";
@@ -146,19 +226,20 @@ let overridesPromise: Promise<SpellsOverridesFile | null> | null = null;
 async function readSpellsOverrides(): Promise<SpellsOverridesFile | null> {
   if (!overridesPromise) {
     overridesPromise = (async () => {
-      const p = path.join(process.cwd(), "public", "data", "lol", "spells_overrides.json");
-      try {
-        const raw = await fs.readFile(p, "utf-8");
-        return JSON.parse(raw) as SpellsOverridesFile;
-      } catch {
-        return null;
-      }
+      const file =
+        (await readJsonLocalFirstBlobFallback<SpellsOverridesFile>(
+          OVERRIDES_LOCAL,
+          OVERRIDES_BLOB
+        )) ?? null;
+      return file;
     })();
   }
   return overridesPromise;
 }
 
-async function findOverridesEntryByChampionId(championId: string): Promise<OverridesEntry | null> {
+async function findOverridesEntryByChampionId(
+  championId: string
+): Promise<OverridesEntry | null> {
   const file = await readSpellsOverrides();
   if (!file) return null;
 
@@ -205,14 +286,9 @@ function buildAbilitiesFromChampion(
     const summary = tooltip ? shortSummaryFromText(tooltip) : undefined;
 
     const cooldown =
-      asNumArray(dd?.cooldown) ??
-      parseSlashNums(dd?.cooldownBurn) ??
-      undefined;
+      asNumArray(dd?.cooldown) ?? parseSlashNums(dd?.cooldownBurn) ?? undefined;
 
-    const cost =
-      asNumArray(dd?.cost) ??
-      parseSlashNums(dd?.costBurn) ??
-      undefined;
+    const cost = asNumArray(dd?.cost) ?? parseSlashNums(dd?.costBurn) ?? undefined;
 
     const base = baseFromOverrides(key);
     const oType = overrides?.[key]?.type;

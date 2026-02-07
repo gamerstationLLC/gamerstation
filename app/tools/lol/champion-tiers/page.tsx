@@ -1,9 +1,8 @@
 // app/tools/lol/champion-tiers/page.tsx
-import fs from "node:fs/promises";
-import path from "node:path";
 import Link from "next/link";
 import { Suspense } from "react";
 import LolChampionTiersClient, { type ChampionStatsRow } from "./client";
+import { readPublicJson } from "@/lib/server/readPublicJson";
 
 export const metadata = {
   title: "LoL Champion Tiers (S–D) | GamerStation",
@@ -11,55 +10,36 @@ export const metadata = {
     "League of Legends champion tier list (S–D) based on pick rate, win rate, and ban rate (when applicable). Updated frequently.",
 };
 
-// ✅ This page is perfect for ISR (local JSON reads)
+// ✅ ISR is perfect here (fetch JSON w/ revalidate)
 export const dynamic = "force-static";
-export const revalidate = 600; 
+export const revalidate = 600;
 
 // -----------------------------
-// Helpers (NO dynamic path patterns)
+// Helpers (Blob-friendly)
 // -----------------------------
-async function readJsonIfExists<T>(absPath: string): Promise<T | null> {
+async function readJsonSafe<T>(pathname: string): Promise<T | null> {
   try {
-    const raw = await fs.readFile(absPath, "utf-8");
-    return JSON.parse(raw) as T;
+    return await readPublicJson<T>(pathname);
   } catch {
     return null;
   }
 }
 
 async function guessPatch(): Promise<string> {
-  const patchJsonPath = path.join(process.cwd(), "public/data/lol/patch.json");
-  const versionJsonPath = path.join(process.cwd(), "public/data/lol/version.json");
-  const metaBuildsPath = path.join(process.cwd(), "public/data/lol/meta_builds.json");
-  const metaBuildsRankedPath = path.join(process.cwd(), "public/data/lol/meta_builds_ranked.json");
-  const metaBuildsCasualPath = path.join(process.cwd(), "public/data/lol/meta_builds_casual.json");
+  // Prefer your canonical "version.json" (your pipeline writes this)
+  const v1 = await readJsonSafe<any>("data/lol/version.json");
+  const v2 = await readJsonSafe<any>("data/lol/patch.json");
 
-  const patch1 = await readJsonIfExists<any>(patchJsonPath);
-  const patch2 = await readJsonIfExists<any>(versionJsonPath);
-  const patch3 = await readJsonIfExists<any>(metaBuildsPath);
-  const patch4 = await readJsonIfExists<any>(metaBuildsRankedPath);
-  const patch5 = await readJsonIfExists<any>(metaBuildsCasualPath);
-
-  const patchObj = patch1 ?? patch2 ?? patch3 ?? patch4 ?? patch5;
-
-  const p = (patchObj?.patch ?? patchObj?.version ?? patchObj?.dataDragon ?? "")
-    .toString()
-    .trim();
-
+  const p = String(v1?.version ?? v1?.patch ?? v2?.version ?? v2?.patch ?? "").trim();
   return p || "—";
 }
 
 async function loadChampionTierRows(): Promise<ChampionStatsRow[]> {
-  const tiersPathA = path.join(process.cwd(), "public/data/lol/champion_tiers.json");
-  const tiersPathB = path.join(process.cwd(), "public/data/lol/champion-tiers.json");
-  const metaBuildsPath = path.join(process.cwd(), "public/data/lol/meta_builds.json");
+  // Champion tiers should come from the output file, not meta builds
+  const rowsA = await readJsonSafe<ChampionStatsRow[]>("data/lol/champion_tiers.json");
+  const rowsB = await readJsonSafe<ChampionStatsRow[]>("data/lol/champion-tiers.json");
 
-  const rows1 = await readJsonIfExists<ChampionStatsRow[]>(tiersPathA);
-  const rows2 = await readJsonIfExists<ChampionStatsRow[]>(tiersPathB);
-  const rows3 = await readJsonIfExists<any>(metaBuildsPath);
-
-  const rows = rows1 ?? rows2 ?? rows3;
-
+  const rows = rowsA ?? rowsB;
   if (!Array.isArray(rows)) return [];
   return rows as ChampionStatsRow[];
 }
@@ -90,7 +70,6 @@ function GSBrand() {
 
 export default async function LolChampionTiersPage() {
   const [patch, initialRows] = await Promise.all([guessPatch(), loadChampionTierRows()]);
-
   const cacheLabel = formatCacheLabel(revalidate);
 
   return (
@@ -142,7 +121,11 @@ export default async function LolChampionTiersPage() {
           </div>
         }
       >
-        <LolChampionTiersClient initialRows={initialRows} patch={patch} hrefBase="/calculators/lol/champions" />
+        <LolChampionTiersClient
+          initialRows={initialRows}
+          patch={patch}
+          hrefBase="/calculators/lol/champions"
+        />
       </Suspense>
 
       <div className="mt-4 text-xs text-neutral-500">

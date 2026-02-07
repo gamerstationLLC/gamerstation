@@ -1,79 +1,38 @@
 // app/calculators/lol/ap-ad/page.tsx
-import fs from "node:fs/promises";
-import path from "node:path";
 import Link from "next/link";
 import { Suspense } from "react";
 import ApAdClient, { type ChampionRow } from "./client";
+import { blobUrl } from "@/lib/blob";
 
 export type ItemRow = Record<string, any>;
 export type SpellsOverrides = Record<string, any>;
 
 /**
- * If your client uses useSearchParams(), Next may require a Suspense boundary.
- * Keeping this page dynamic also prevents build-time prerender failures when data files are missing.
+ * Keeping this page dynamic prevents build-time failures if data is temporarily missing
+ * and avoids Next trying to prerender client-side search param usage.
  */
 export const dynamic = "force-dynamic";
 
-async function readJson<T>(absPath: string): Promise<T> {
-  const raw = await fs.readFile(absPath, "utf-8");
-  return JSON.parse(raw) as T;
-}
-
 /**
- * IMPORTANT (fix for build error):
- * Next's file tracing hates `path.join(process.cwd(), rel)` where `rel` is a loop variable,
- * because it becomes "dynamic" and it tries to match thousands of files.
+ * Fetch JSON from either:
+ * - Vercel Blob (when NEXT_PUBLIC_BLOB_BASE_URL is set)
+ * - Local /public fallback (when it is not set)
  *
- * Solution: use a SMALL, STATIC, ABSOLUTE list of candidate paths.
+ * IMPORTANT:
+ * This avoids fs/path and fixes Next file tracing issues entirely.
  */
-const CANDIDATE_ABS_PATHS = {
-  patch: [
-    path.join(process.cwd(), "public", "data", "lol", "versions.json"),
-    path.join(process.cwd(), "data", "lol", "versions.json"),
-    path.join(process.cwd(), "public", "data", "lol", "version.json"),
-    path.join(process.cwd(), "data", "lol", "version.json"),
-  ] as const,
-
-  champions: [
-    path.join(process.cwd(), "public", "data", "lol", "champions_index.json"),
-    path.join(process.cwd(), "public", "data", "lol", "champions.json"),
-    path.join(process.cwd(), "public", "data", "lol", "champions_full.json"),
-    path.join(process.cwd(), "data", "lol", "champions_index.json"),
-    path.join(process.cwd(), "data", "lol", "champions.json"),
-    path.join(process.cwd(), "data", "lol", "champions_full.json"),
-    path.join(process.cwd(), "public", "data", "lol", "ddragon", "championFull.json"),
-    path.join(process.cwd(), "public", "data", "lol", "ddragon", "champion.json"),
-  ] as const,
-
-  items: [
-    path.join(process.cwd(), "public", "data", "lol", "items.json"),
-    path.join(process.cwd(), "public", "data", "lol", "items_index.json"),
-    path.join(process.cwd(), "public", "data", "lol", "items_full.json"),
-    path.join(process.cwd(), "public", "data", "lol", "item.json"),
-    path.join(process.cwd(), "data", "lol", "items.json"),
-    path.join(process.cwd(), "data", "lol", "items_index.json"),
-    path.join(process.cwd(), "data", "lol", "items_full.json"),
-    path.join(process.cwd(), "public", "data", "lol", "ddragon", "item.json"),
-    path.join(process.cwd(), "public", "data", "lol", "ddragon", "items.json"),
-  ] as const,
-
-  overrides: [
-    path.join(process.cwd(), "public", "data", "lol", "spells_overrides.json"),
-    path.join(process.cwd(), "data", "lol", "spells_overrides.json"),
-    path.join(process.cwd(), "public", "data", "lol", "overrides", "spells_overrides.json"),
-    path.join(process.cwd(), "data", "lol", "overrides", "spells_overrides.json"),
-  ] as const,
-} as const;
-
-async function readFirstJsonAbs<T>(candidatesAbs: readonly string[]): Promise<T | null> {
-  for (const abs of candidatesAbs) {
-    try {
-      return await readJson<T>(abs);
-    } catch {
-      // keep trying
-    }
+async function fetchJson<T>(pathname: string): Promise<T | null> {
+  try {
+    const url = blobUrl(pathname); // returns "/data/..." locally or "https://.../data/..." in prod
+    const res = await fetch(url, {
+      // keep it fresh-ish; Blob CDN cache is controlled by upload script cacheControlMaxAge
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 function normalizeChampionRows(data: any): ChampionRow[] {
@@ -91,7 +50,11 @@ function normalizeItemRows(data: any): ItemRow[] {
 }
 
 async function loadPatch(): Promise<string> {
-  const v = (await readFirstJsonAbs<any>(CANDIDATE_ABS_PATHS.patch)) ?? null;
+  // Your project has used a few different names historically — try them safely.
+  const v =
+    (await fetchJson<any>("data/lol/versions.json")) ??
+    (await fetchJson<any>("data/lol/version.json")) ??
+    null;
 
   if (Array.isArray(v) && v[0]) return String(v[0]);
   if (typeof v === "string") return v;
@@ -104,14 +67,34 @@ async function loadPatch(): Promise<string> {
 export default async function Page() {
   const patch = await loadPatch();
 
-  const championsRaw = (await readFirstJsonAbs<any>(CANDIDATE_ABS_PATHS.champions)) ?? null;
+  // Champions (try common filenames)
+  const championsRaw =
+    (await fetchJson<any>("data/lol/champions_index.json")) ??
+    (await fetchJson<any>("data/lol/champions.json")) ??
+    (await fetchJson<any>("data/lol/champions_full.json")) ??
+    (await fetchJson<any>("data/lol/ddragon/championFull.json")) ??
+    (await fetchJson<any>("data/lol/ddragon/champion.json")) ??
+    null;
+
   const champions = normalizeChampionRows(championsRaw);
 
-  const itemsRaw = (await readFirstJsonAbs<any>(CANDIDATE_ABS_PATHS.items)) ?? null;
+  // Items (try common filenames)
+  const itemsRaw =
+    (await fetchJson<any>("data/lol/items.json")) ??
+    (await fetchJson<any>("data/lol/items_index.json")) ??
+    (await fetchJson<any>("data/lol/items_full.json")) ??
+    (await fetchJson<any>("data/lol/item.json")) ??
+    (await fetchJson<any>("data/lol/ddragon/item.json")) ??
+    (await fetchJson<any>("data/lol/ddragon/items.json")) ??
+    null;
+
   const items = normalizeItemRows(itemsRaw);
 
-  // Load spell overrides (numeric truth for spell damage)
-  const overrides = (await readFirstJsonAbs<SpellsOverrides>(CANDIDATE_ABS_PATHS.overrides)) ?? {};
+  // Spell overrides (numeric truth for spell damage)
+  const overrides =
+    (await fetchJson<SpellsOverrides>("data/lol/spells_overrides.json")) ??
+    (await fetchJson<SpellsOverrides>("data/lol/overrides/spells_overrides.json")) ??
+    {};
 
   const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
@@ -149,8 +132,6 @@ export default async function Page() {
             </Link>
           </div>
         </header>
-
-       
 
         <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
           League of Legends AP / AD Stat Impact

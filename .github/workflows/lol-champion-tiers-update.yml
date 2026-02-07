@@ -2,34 +2,34 @@ name: Update LoL Champion Tiers
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # every 2 hours
+    - cron: "0 */6 * * *" # every 6 hours
   workflow_dispatch: {}
 
 concurrency:
   group: lol-tier-update
   cancel-in-progress: false
 
+# No commits in this workflow
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   tiers:
     runs-on: ubuntu-latest
-
-    # IMPORTANT:
-    # Job timeout must be > 90m so the runner is not killed.
-    # We soft-timeout the crawl step at 90m, then still finalize+commit.
     timeout-minutes: 180
+
+    defaults:
+      run:
+        shell: bash
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       # ✅ Always start from latest origin/main
       - name: Sync with main (pre-build)
-        shell: bash
         run: |
           set -e
           git fetch origin main
@@ -47,7 +47,6 @@ jobs:
 
       # ✅ Optional: prune any tiers cache older than 90d (safe if dirs don't exist)
       - name: Prune old Champion Tiers cache (90 days)
-        shell: bash
         run: |
           set -e
           echo "Pruning champion tiers cache older than 90 days (if present)..."
@@ -66,26 +65,25 @@ jobs:
           done
 
       # ✅ Soft timeout: stop the crawl after 90 minutes, but DO NOT kill the job.
-      # ✅ CRITICAL: NEVER fail the job here (expired RIOT_API_KEY or timeout should not block finalize+commit)
+      # ✅ CRITICAL: NEVER fail the job here (expired RIOT_API_KEY or timeout should not block finalize+upload)
       - name: Build LoL champion tiers (soft-timeout 90m; never fails job)
-        shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
 
-          # ✅ what your script actually reads
-          RIOT_REGION: "americas"   # match-v5 (americas/europe/asia)
-          RIOT_PLATFORM: "na1"      # league/summoner (na1/euw1/kr/etc)
+          # what your script reads
+          RIOT_REGION: "americas"
+          RIOT_PLATFORM: "na1"
 
-          # ✅ matchlist filters + budgets
-          TIERS_QUEUE_IDS: "420,440"          # ranked solo + flex (you can set just "420")
-          TIERS_DAYS_BACK: "14"               # startTime window
-          TIERS_MAX_MATCHES_PER_RUN: "2500"   # cap total matches processed per run
-          TIERS_MAX_NEW_PUUIDS_PER_RUN: "500" # snowball cap
-          TIERS_MATCHES_PER_PUUID: "20"       # how many IDs per puuid page
-          TIERS_GAP_MS: "300"                 # spacing between requests
-          TIERS_REPROCESS_BOOTSTRAP: "0"      # keep off unless you want reprocessing
+          # matchlist filters + budgets
+          TIERS_QUEUE_IDS: "420,440"
+          TIERS_DAYS_BACK: "14"
+          TIERS_MAX_MATCHES_PER_RUN: "2500"
+          TIERS_MAX_NEW_PUUIDS_PER_RUN: "500"
+          TIERS_MATCHES_PER_PUUID: "20"
+          TIERS_GAP_MS: "300"
+          TIERS_REPROCESS_BOOTSTRAP: "0"
 
-          # ✅ ladder bootstrap knobs
+          # ladder bootstrap knobs
           LADDER_QUEUE: "RANKED_SOLO_5x5"
           LADDER_TIER: "challenger"
           LADDER_MAX_PLAYERS: "300"
@@ -95,12 +93,11 @@ jobs:
 
           # 5400s = 90 minutes
           timeout --signal=SIGTERM --kill-after=30s 5400 npm run lol:champion-tiers
-
           EC=$?
 
           # GNU timeout uses exit code 124 when it times out.
           if [ "$EC" -eq 124 ]; then
-            echo "Crawl hit 90-minute soft timeout. Proceeding to finalize+commit with what we have."
+            echo "Crawl hit 90-minute soft timeout. Proceeding to finalize+upload with what we have."
           else
             echo "Crawl exited with code: $EC (continuing regardless)."
           fi
@@ -108,10 +105,9 @@ jobs:
           # Never fail job here
           exit 0
 
-      # ✅ Finalize ALWAYS runs (if crawl timed out or key expired, we still try to finalize)
+      # ✅ Finalize ALWAYS runs (never fails)
       - name: Finalize LoL champion tiers (never fails job)
         if: always()
-        shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
         run: |
@@ -119,13 +115,12 @@ jobs:
           npm run lol:finalize:champion-tiers
           EC=$?
           echo "Finalize exit code: $EC"
-          echo "Continuing to debug/commit regardless..."
+          echo "Continuing to debug/upload regardless..."
           exit 0
 
       # ✅ Debug
       - name: Debug - Output + git diff
         if: always()
-        shell: bash
         run: |
           echo "== Output sample =="
           ls -lah public/data/lol || true
@@ -137,44 +132,29 @@ jobs:
           echo "== Diffstat (champion_tiers.json) =="
           git diff --stat -- public/data/lol/champion_tiers.json || true
 
-      # ✅ Commit → Push: stage ONLY this workflow's json; merge-pull loop (NO rebase)
-      - name: Commit & push (if changed)
+      # ✅ Upload to Blob instead of committing (stops redeploy spam)
+      - name: Upload champion tiers to Vercel Blob (never fails job)
         if: always()
-        shell: bash
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          # IMPORTANT: keep this on ONE LINE to avoid whitespace issues
+          BLOB_UPLOADS: "public/data/lol/champion_tiers.json=data/lol/champion_tiers.json"
+          BLOB_CACHE_SECONDS: "900"
         run: |
-          set -e
+          set +e
 
-          git config user.name "gamerstation-bot"
-          git config user.email "actions@users.noreply.github.com"
+          if [ -z "$BLOB_READ_WRITE_TOKEN" ]; then
+            echo "BLOB_READ_WRITE_TOKEN missing in GitHub Secrets. Skipping Blob upload."
+            exit 0
+          fi
 
           if [ ! -f "public/data/lol/champion_tiers.json" ]; then
-            echo "No public/data/lol/champion_tiers.json exists; nothing to commit."
+            echo "No public/data/lol/champion_tiers.json exists; nothing to upload."
             exit 0
           fi
 
-          git add public/data/lol/champion_tiers.json
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git commit -m "chore(lol): refresh champion tiers"
-
-          for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing latest origin/main (merge, no rebase)..."
-            git fetch origin main
-            git pull origin main --no-rebase || true
-
-            echo "Attempt $i: pushing..."
-            if git push origin main; then
-              echo "Push succeeded."
-              exit 0
-            fi
-
-            echo "Attempt $i failed. Retrying in 5s..."
-            sleep 5
-          done
-
-          echo "Push failed after retries."
-          exit 1
+          node scripts/blob/upload-data.mjs
+          EC=$?
+          echo "Blob upload exit code: $EC"
+          echo "Continuing regardless..."
+          exit 0

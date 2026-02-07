@@ -57,3 +57,6 @@ scripts/dota/cache/
 
 # Riot / LoL caches (never commit)
 scripts/riot/cache/
+
+.vercel
+.env*.local
