@@ -20,7 +20,7 @@ const TIERS: TierKey[] = ["CHALLENGER", "GRANDMASTER", "MASTER"];
 // -------------------------
 // Tuning (anti-429 defaults)
 const RETRY_MAX = 6;
-const REQUEST_TIMEOUT_MS = 20_000;
+const REQUEST_TIMEOUT_MS = 30_000;
 
 // Top N players to output per leaderboard
 const TOP_N = Number(process.env.LEADERBOARD_TOP_N || "") || 100;
