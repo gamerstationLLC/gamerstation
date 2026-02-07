@@ -925,6 +925,8 @@ export default function MetaClient() {
             const activeRole = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData[0];
             const activeEntry = activeRole ? bestBuildForRole(c.roleMap[activeRole]) : null;
 
+const champHref = `/calculators/lol/champions/${c.champId}`;
+
             const canCopy = canUseClipboard() && (!!activeEntry || !!best);
             const copyToastKey = `${c.champKey}-${activeRole || "best"}`;
 
@@ -943,17 +945,37 @@ export default function MetaClient() {
                   className="flex w-full cursor-pointer items-start justify-between gap-3 bg-white/[0.02] px-4 py-3 text-left hover:bg-white/[0.04] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
                 >
                   <div className="flex min-w-0 gap-3">
-                    <img
-                      src={champIconUrl(vForIcons, c.champId)}
-                      alt={c.name}
-                      className="mt-0.5 h-9 w-9 shrink-0 rounded-xl border border-white/10 bg-white/[0.02] object-cover sm:h-10 sm:w-10"
-                      loading="lazy"
-                      onError={(e) => {
-                        const img = e.currentTarget;
-                        img.onerror = null;
-                        img.src = champIconUrl("16.1.1", c.champId);
-                      }}
-                    />
+                    <Link
+  href={champHref}
+  prefetch={false}
+  onClick={(e) => e.stopPropagation()}
+  onKeyDown={(e) => e.stopPropagation()}
+  className="
+    group mt-0.5 shrink-0 rounded-xl
+    focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60
+  "
+  aria-label={`Open ${c.name} page`}
+>
+  <img
+    src={champIconUrl(vForIcons, c.champId)}
+    alt={c.name}
+    className="
+      h-9 w-9 rounded-xl object-cover sm:h-10 sm:w-10
+      border border-white/10 bg-white/[0.02]
+      transition
+      group-hover:border-cyan-400/60
+      group-hover:shadow-[0_0_20px_rgba(0,255,255,0.45)]
+    "
+    loading="lazy"
+    draggable={false}
+    onError={(e) => {
+      const img = e.currentTarget;
+      img.onerror = null;
+      img.src = champIconUrl("16.1.1", c.champId);
+    }}
+  />
+</Link>
+
 
                     <div className="min-w-0">
                       <div className="flex items-baseline gap-2">
