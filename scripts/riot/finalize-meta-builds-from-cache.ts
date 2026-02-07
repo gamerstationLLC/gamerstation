@@ -113,7 +113,15 @@ function bayesScore(wins: number, games: number, k: number, prior: number) {
   return a / (a + b);
 }
 
-function inc(agg: Agg, patchKey: string, champId: number, role: Role, sig: string, win: boolean, build: BuildParts) {
+function inc(
+  agg: Agg,
+  patchKey: string,
+  champId: number,
+  role: Role,
+  sig: string,
+  win: boolean,
+  build: BuildParts
+) {
   const p = (agg[patchKey] ||= {});
   const c = (p[String(champId)] ||= {});
   const r = (c[role] ||= {});
@@ -186,7 +194,9 @@ function extractBootsAndCore(p: any, bootSet: Set<number>): BuildParts {
     .filter((x) => x > 0)
     .sort((a, b) => a - b);
 
-  const displayItems = ([...(boots ? [boots] : []), ...core] as number[]).filter((x) => x > 0);
+  const displayItems = ([...(boots ? [boots] : []), ...core] as number[]).filter(
+    (x) => x > 0
+  );
 
   return { boots, core, items: displayItems, summoners };
 }
@@ -197,7 +207,12 @@ function buildSig(b: BuildParts): string {
   return `b=${bPart}|c=${cPart}`;
 }
 
-function topBuildsForRole(roleMap: Record<string, Leaf>, minDisplaySample: number, bayesK: number, priorWinrate: number) {
+function topBuildsForRole(
+  roleMap: Record<string, Leaf>,
+  minDisplaySample: number,
+  bayesK: number,
+  priorWinrate: number
+) {
   const entries = Object.entries(roleMap)
     .map(([sig, leaf]) => {
       const games = leaf.games;
@@ -223,11 +238,18 @@ function topBuildsForRole(roleMap: Record<string, Leaf>, minDisplaySample: numbe
   return entries.slice(0, 10);
 }
 
-function computedHasAnyPatches(obj: OutJson): boolean {
+// Stronger “has any data” check: patch->champ->role must have at least one non-empty build list
+function computedHasAnyBuilds(obj: OutJson): boolean {
   const patches = obj.patches || {};
   for (const pk of Object.keys(patches)) {
     const champs = patches[pk] || {};
-    if (Object.keys(champs).length > 0) return true;
+    for (const champId of Object.keys(champs)) {
+      const roles = champs[champId] || {};
+      for (const role of Object.keys(roles as any)) {
+        const builds = (roles as any)[role];
+        if (Array.isArray(builds) && builds.length > 0) return true;
+      }
+    }
   }
   return false;
 }
@@ -311,7 +333,12 @@ async function buildComputedOut(params: {
     for (const [champId, roles] of Object.entries(champs)) {
       obj.patches[patchKey]![champId] = {};
       for (const [role, sigMap] of Object.entries(roles as any)) {
-        const top = topBuildsForRole(sigMap as Record<string, Leaf>, params.minDisplaySample, params.bayesK, params.priorWinrate);
+        const top = topBuildsForRole(
+          sigMap as Record<string, Leaf>,
+          params.minDisplaySample,
+          params.bayesK,
+          params.priorWinrate
+        );
         if (top.length) (obj.patches[patchKey]![champId] as any)[role] = top;
       }
     }
@@ -324,7 +351,13 @@ async function buildComputedOut(params: {
 
 async function main() {
   const repoRoot = process.cwd();
-  const cacheMatchesDir = path.join(repoRoot, "scripts", "riot", "cache", "matches");
+  const cacheMatchesDir = path.join(
+    repoRoot,
+    "scripts",
+    "riot",
+    "cache",
+    "matches"
+  );
   const outDir = path.join(repoRoot, "public", "data", "lol");
 
   // queues
@@ -343,7 +376,7 @@ async function main() {
   const bootSet = await loadBootSet(repoRoot);
 
   const files = await listJsonFiles(cacheMatchesDir);
-  
+
   if (!files.length) {
     console.error("No cached matches found at:", cacheMatchesDir);
     process.exit(1);
@@ -362,12 +395,11 @@ async function main() {
     badChamp: 0,
     badRole: 0,
     keptParticipants: 0,
+    rankedParticipants: 0,
+    casualParticipants: 0,
   };
 
-  if (debug) {
-  console.log("[debug] found files:");
-  for (const f of files) console.log(" -", f);
-}
+  console.log("[debug] found files:", files.length);
 
   for (const fp of files) {
     let match: RiotMatch | null = null;
@@ -427,12 +459,23 @@ async function main() {
 
       debug.keptParticipants += 1;
 
-      if (rankedQueues.includes(q)) inc(rankedAgg, patchKey, champId, role, sig, win, build);
-      if (casualQueues.includes(q)) inc(casualAgg, patchKey, champId, role, sig, win, build);
+      if (rankedQueues.includes(q)) {
+        debug.rankedParticipants += 1;
+        inc(rankedAgg, patchKey, champId, role, sig, win, build);
+      }
+      if (casualQueues.includes(q)) {
+        debug.casualParticipants += 1;
+        inc(casualAgg, patchKey, champId, role, sig, win, build);
+      }
     }
   }
 
   console.log("[finalize] DEBUG:", debug);
+  console.log(
+    `[finalize] agg keys: ranked=${Object.keys(rankedAgg).length} casual=${Object.keys(
+      casualAgg
+    ).length}`
+  );
 
   // Build computed outputs
   const computedRanked = await buildComputedOut({
@@ -460,48 +503,48 @@ async function main() {
   });
 
   // ✅ If computed is empty, refuse to write (prevents nukes)
-  const rankedHas = computedHasAnyPatches(computedRanked);
-const casualHas = computedHasAnyPatches(computedCasual);
+  const rankedHas = computedHasAnyBuilds(computedRanked);
+  const casualHas = computedHasAnyBuilds(computedCasual);
 
-if (!rankedHas) {
-  console.warn("[finalize] Ranked computed output empty. Refusing to overwrite ranked file.");
-  process.exit(0);
-}
+  const rankedPath = path.join(outDir, "meta_builds_ranked.json");
+  const casualPath = path.join(outDir, "meta_builds_casual.json");
 
-const rankedPath = path.join(outDir, "meta_builds_ranked.json");
-const casualPath = path.join(outDir, "meta_builds_casual.json");
+  // ranked: require data, otherwise do nothing
+  if (!rankedHas) {
+    console.warn(
+      "[finalize] Ranked computed output empty. Refusing to overwrite ranked file."
+    );
+    process.exit(0);
+  }
 
-const existingRanked = await readJsonIfExists<OutJson>(rankedPath);
-const existingCasual = await readJsonIfExists<OutJson>(casualPath);
+  const existingRanked = await readJsonIfExists<OutJson>(rankedPath);
+  const existingCasual = await readJsonIfExists<OutJson>(casualPath);
 
-// ranked: always update if it has data
-const mergedRanked = mergeOutputs(existingRanked, computedRanked);
-await fs.mkdir(path.dirname(rankedPath), { recursive: true });
-await fs.writeFile(rankedPath, JSON.stringify(mergedRanked, null, 2), "utf-8");
-console.log(`[finalize] Wrote (merged): ${rankedPath}`);
-
-// casual: only update if it has data
-if (casualHas) {
-  const mergedCasual = mergeOutputs(existingCasual, computedCasual);
-  await fs.mkdir(path.dirname(casualPath), { recursive: true });
-  await fs.writeFile(casualPath, JSON.stringify(mergedCasual, null, 2), "utf-8");
-  console.log(`[finalize] Wrote (merged): ${casualPath}`);
-} else {
-  console.warn("[finalize] Casual computed output empty. Keeping existing casual file.");
-}
-
-
-  const mergedCasual = mergeOutputs(existingCasual, computedCasual);
-
+  // ranked: always update if it has data
+  const mergedRanked = mergeOutputs(existingRanked, computedRanked);
   await fs.mkdir(path.dirname(rankedPath), { recursive: true });
   await fs.writeFile(rankedPath, JSON.stringify(mergedRanked, null, 2), "utf-8");
-
-  await fs.mkdir(path.dirname(casualPath), { recursive: true });
-  await fs.writeFile(casualPath, JSON.stringify(mergedCasual, null, 2), "utf-8");
-
   console.log(`[finalize] Wrote (merged): ${rankedPath}`);
-  console.log(`[finalize] Wrote (merged): ${casualPath}`);
-  console.log(`[finalize] Patch bucket key: "${patchKey}" (major >= ${MIN_PATCH_MAJOR})`);
+
+  // casual: ONLY write if computed has any builds
+  if (casualHas) {
+    const mergedCasual = mergeOutputs(existingCasual, computedCasual);
+    await fs.mkdir(path.dirname(casualPath), { recursive: true });
+    await fs.writeFile(
+      casualPath,
+      JSON.stringify(mergedCasual, null, 2),
+      "utf-8"
+    );
+    console.log(`[finalize] Wrote (merged): ${casualPath}`);
+  } else {
+    console.warn(
+      "[finalize] Casual computed output empty. Keeping existing casual file (no write)."
+    );
+  }
+
+  console.log(
+    `[finalize] Patch bucket key: "${patchKey}" (major >= ${MIN_PATCH_MAJOR})`
+  );
 }
 
 main().catch((e) => {

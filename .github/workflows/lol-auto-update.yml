@@ -177,14 +177,28 @@ jobs:
           exit 0
 
       # ✅ Offline finalize: uses cached matches; merges; never wipes outputs
-      - name: Finalize meta builds outputs from cache
+      - name: Finalize meta builds outputs from cache (ranked + casual)
         if: always()
         env:
           MIN_DISPLAY_SAMPLE: "25"
           BAYES_K: "100"
           PRIOR_WINRATE: "0.5"
           MIN_PATCH_MAJOR: "16"
-        run: npm run lol:finalize:meta
+        run: |
+          set +e
+          npm run lol:finalize:meta
+          EC=$?
+          echo "Finalize exit code: $EC"
+
+          echo "== Post-finalize outputs =="
+          ls -lh public/data/lol/meta_builds_ranked.json public/data/lol/meta_builds_casual.json 2>/dev/null || true
+
+          # If casual is missing, scream in logs (but don't fail the workflow)
+          if [ ! -f "public/data/lol/meta_builds_casual.json" ]; then
+            echo "::warning::meta_builds_casual.json is missing after finalize. This is a finalize-script issue (not blob upload)."
+          fi
+
+          exit 0
 
       # ✅ Upload meta builds to Blob (never fails job)
       - name: Upload meta builds to Vercel Blob (never fails job)
