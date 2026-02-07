@@ -105,9 +105,7 @@ export default async function ChampionsPickerPage() {
             </div>
           </header>
 
-          <h1 className="mt-2 text-4xl font-bold tracking-tight">
-            LoL Champion Index
-          </h1>
+          <h1 className="mt-2 text-4xl font-bold tracking-tight">LoL Champion Index</h1>
           <p className="mt-3 text-neutral-300">
             Search a champion to open their stats page. Patch:{" "}
             <span className="font-medium text-white">{patch}</span>

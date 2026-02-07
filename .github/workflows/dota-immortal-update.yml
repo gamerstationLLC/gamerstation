@@ -19,8 +19,9 @@ concurrency:
   group: dota-immortal-update
   cancel-in-progress: false
 
+# We are not committing, so read is enough.
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   immortal:
@@ -31,18 +32,17 @@ jobs:
       run:
         shell: bash
 
-    # ✅ Centralize knobs so build/finalize stay in sync
     env:
-      # No key needed for free usage; leaving this here is harmless.
+      # Optional; safe if unset.
       OPENDOTA_API_KEY: ${{ secrets.OPENDOTA_API_KEY }}
 
-      # Default crawl knobs (safe + much bigger intake than before)
+      # Crawl knobs
       DOTA_IMMORTAL_WINDOW_DAYS: "60"
       DOTA_PUBLICMATCHES_PAGES: "40"
       DOTA_MAX_NEW_MATCHES: "1000"
       DOTA_REQ_DELAY_MS: "250"
 
-      # Finalize thresholds (tune as you like; these are realistic for Immortal once cache grows)
+      # Finalize thresholds
       DOTA_IMMORTAL_MIN_RANK_TIER: "80"
       DOTA_IMMORTAL_MIN_HEROES: "60"
       DOTA_IMMORTAL_MIN_TOTAL_PICKS: "2000"
@@ -51,15 +51,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
-      # ✅ Always start from latest origin/main
-      - name: Sync with main (pre-build)
-        run: |
-          set -e
-          git fetch origin main
-          git checkout main
-          git reset --hard origin/main
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -70,7 +62,6 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # ✅ Optional: wipe cache/state if user requested a rebuild
       - name: Rebuild toggle (wipe immortal_v2 cache/state)
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.rebuild == 'true' }}
         run: |
@@ -79,7 +70,6 @@ jobs:
           rm -rf scripts/dota/cache/immortal_v2 || true
           mkdir -p scripts/dota/cache/immortal_v2
 
-      # ✅ Optional: more aggressive crawl settings on demand
       - name: Aggressive toggle (bigger intake)
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.aggressive == 'true' }}
         run: |
@@ -90,7 +80,6 @@ jobs:
           echo "DOTA_MAX_NEW_MATCHES=1200" >> $GITHUB_ENV
           echo "DOTA_REQ_DELAY_MS=250" >> $GITHUB_ENV
 
-      # ✅ Prune cache older than 30d (safe if dirs don't exist)
       - name: Prune old Dota Immortal cache (30 days)
         run: |
           set -e
@@ -109,8 +98,7 @@ jobs:
             fi
           done
 
-      # ✅ Soft timeout: stop the BUILD after 90 minutes, but DO NOT kill the job.
-      # ✅ CRITICAL: NEVER fail the job here (timeout/429/etc should not block finalize+commit)
+      # ✅ Soft timeout: stop BUILD after 90 minutes, but never fail job
       - name: Build Dota Immortal cache (soft-timeout 90m; never fails job)
         run: |
           set +e
@@ -125,17 +113,15 @@ jobs:
           timeout --signal=SIGTERM --kill-after=30s 5400 npm run dota:immortal:build
           EC=$?
 
-          # GNU timeout uses exit code 124 when it times out.
           if [ "$EC" -eq 124 ]; then
-            echo "Build hit 90-minute soft timeout. Proceeding to finalize+commit with what we have."
+            echo "Build hit 90-minute soft timeout. Proceeding to finalize+upload with what we have."
           else
             echo "Build exited with code: $EC (continuing regardless)."
           fi
 
-          # Never fail job here
           exit 0
 
-      # ✅ Finalize ALWAYS runs
+      # ✅ Finalize ALWAYS runs (never fails job)
       - name: Finalize Dota Immortal JSON (never fails job)
         if: always()
         run: |
@@ -148,22 +134,15 @@ jobs:
           npm run dota:immortal:finalize
           EC=$?
           echo "Finalize exit code: $EC"
-          echo "Continuing to debug/commit regardless..."
+          echo "Continuing to debug/upload regardless..."
           exit 0
 
-      # ✅ Debug
-      - name: Debug - Output + git diff
+      - name: Debug - Output + checkpoints
         if: always()
         run: |
           echo "== Output sample =="
           ls -lah public/data/dota || true
           ls -lah public/data/dota/immortal_hero_stats.json || true
-
-          echo "== Git status (immortal_hero_stats.json) =="
-          git status --porcelain -- public/data/dota/immortal_hero_stats.json || true
-
-          echo "== Diffstat (immortal_hero_stats.json) =="
-          git diff --stat -- public/data/dota/immortal_hero_stats.json || true
 
           echo "== Checkpoints =="
           ls -lah scripts/dota/cache/immortal_v2/state || true
@@ -172,43 +151,29 @@ jobs:
           cat scripts/dota/cache/immortal_v2/state/last_attempt.json 2>/dev/null || true
           cat scripts/dota/cache/immortal_v2/state/last_success.json 2>/dev/null || true
 
-      # ✅ Commit → Push: stage ONLY this workflow's json; merge-pull loop (NO rebase)
-      - name: Commit & push (if changed)
+      # ✅ Upload to Blob (never fails job)
+      - name: Upload Dota Immortal output to Vercel Blob (never fails job)
         if: always()
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          BLOB_UPLOADS: >-
+            public/data/dota/immortal_hero_stats.json=data/dota/immortal_hero_stats.json
+          BLOB_CACHE_SECONDS: "900"
         run: |
-          set -e
+          set +e
 
-          git config user.name "gamerstation-bot"
-          git config user.email "actions@users.noreply.github.com"
+          if [ -z "$BLOB_READ_WRITE_TOKEN" ]; then
+            echo "BLOB_READ_WRITE_TOKEN is missing in GitHub Secrets. Skipping upload."
+            exit 0
+          fi
 
           if [ ! -f "public/data/dota/immortal_hero_stats.json" ]; then
-            echo "No public/data/dota/immortal_hero_stats.json exists; nothing to commit."
+            echo "No public/data/dota/immortal_hero_stats.json exists; nothing to upload."
             exit 0
           fi
 
-          git add public/data/dota/immortal_hero_stats.json
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git commit -m "chore(dota): refresh immortal hero stats"
-
-          for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing latest origin/main (merge, no rebase)..."
-            git fetch origin main
-            git pull origin main --no-rebase || true
-
-            echo "Attempt $i: pushing..."
-            if git push origin main; then
-              echo "Push succeeded."
-              exit 0
-            fi
-
-            echo "Attempt $i failed. Retrying in 5s..."
-            sleep 5
-          done
-
-          echo "Push failed after retries."
-          exit 1
+          node scripts/blob/upload-data.mjs
+          EC=$?
+          echo "Blob upload exit code: $EC"
+          echo "Continuing regardless..."
+          exit 0

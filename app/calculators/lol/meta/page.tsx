@@ -1,3 +1,4 @@
+// app/calculators/lol/meta/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import MetaClient from "./client";
@@ -48,7 +49,6 @@ export default function Page() {
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-8">
         {/* Header */}
         <header className="flex items-center justify-between gap-3">
-          {/* ✅ Match your previous brand treatment */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90">
             <img
               src="/gs-logo-v2.png"
@@ -60,7 +60,6 @@ export default function Page() {
             </span>
           </Link>
 
-          {/* Top-right global nav (Tools only) */}
           <div className="flex items-center gap-2">
             <Link href="/tools" className={navBtn}>
               Tools

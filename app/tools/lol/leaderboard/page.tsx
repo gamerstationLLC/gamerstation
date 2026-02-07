@@ -1,8 +1,7 @@
 // app/tools/lol/leaderboard/page.tsx
 import type { Metadata } from "next";
 import LeaderboardClient, { type LeaderboardRow } from "./client";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { readPublicJson } from "@/lib/server/readPublicJson";
 
 export const metadata: Metadata = {
   title: "LoL Leaderboard | GamerStation",
@@ -10,6 +9,9 @@ export const metadata: Metadata = {
     "League of Legends leaderboards by region and queue. Browse top players and jump into profile pages.",
   alternates: { canonical: "/tools/lol/leaderboard" },
 };
+
+// ✅ ISR is perfect here (Blob-backed JSON)
+export const revalidate = 300; // 5 minutes
 
 type RegionKey = "na1" | "euw1" | "kr";
 type QueueKey = "RANKED_SOLO_5x5" | "RANKED_FLEX_SR";
@@ -44,24 +46,24 @@ const DEFAULT_REGION: RegionKey = "na1";
 const DEFAULT_QUEUE: QueueKey = "RANKED_SOLO_5x5";
 const DEFAULT_TIER: TierKey = "CHALLENGER";
 
-async function readLeaderboardJson(
+function buildLeaderboardPath(region: RegionKey, queue: QueueKey, tier: TierKey) {
+  // matches your existing output folder structure:
+  // public/data/lol/leaderboards/<region>/<queue>.<tierLower>.json
+  return `data/lol/leaderboards/${region}/${queue}.${tier.toLowerCase()}.json`;
+}
+
+async function loadLeaderboardJson(
   region: RegionKey,
   queue: QueueKey,
   tier: TierKey
 ): Promise<LeaderboardJson | null> {
-  const file = path.join(
-    process.cwd(),
-    "public",
-    "data",
-    "lol",
-    "leaderboards",
-    region,
-    `${queue}.${tier.toLowerCase()}.json`
-  );
+  const pathname = buildLeaderboardPath(region, queue, tier);
 
   try {
-    const raw = await fs.readFile(file, "utf8");
-    return JSON.parse(raw) as LeaderboardJson;
+    // ✅ disk-first; if missing, fetches from Blob using NEXT_PUBLIC_BLOB_BASE_URL
+    return await readPublicJson<LeaderboardJson>(pathname, {
+      revalidateSeconds: revalidate,
+    });
   } catch {
     return null;
   }
@@ -96,7 +98,7 @@ function toRows(json: LeaderboardJson | null): LeaderboardRow[] {
 }
 
 export default async function LolLeaderboardPage() {
-  const json = await readLeaderboardJson(DEFAULT_REGION, DEFAULT_QUEUE, DEFAULT_TIER);
+  const json = await loadLeaderboardJson(DEFAULT_REGION, DEFAULT_QUEUE, DEFAULT_TIER);
   const rows = toRows(json);
 
   return (

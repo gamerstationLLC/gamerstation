@@ -2,7 +2,7 @@ name: Update LoL Leaderboards
 
 on:
   schedule:
-    - cron: "0 */3 * * *" # every 2 hours
+    - cron: "0 */3 * * *" # every 3 hours
   workflow_dispatch: {}
 
 concurrency:
@@ -10,22 +10,25 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   leaderboards:
     runs-on: ubuntu-latest
     timeout-minutes: 240
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
-      # Always start from latest origin/main
+      # ✅ Always start from latest origin/main
       - name: Sync with main (pre-build)
-        shell: bash
         run: |
           set -e
           git fetch origin main
@@ -43,7 +46,6 @@ jobs:
 
       # Build (never fail job)
       - name: Build LoL leaderboards (never fails job)
-        shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           LEADERBOARD_TOP_N: "50"
@@ -62,7 +64,6 @@ jobs:
       # Finalize (never fail job)
       - name: Finalize LoL leaderboards (never fails job)
         if: always()
-        shell: bash
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
           LEADERBOARD_FINALIZE_CONCURRENCY: "2"
@@ -73,12 +74,11 @@ jobs:
           npm run lol:finalize:leaderboards
           EC=$?
           echo "Finalize exit code: $EC"
-          echo "Continuing to commit/push regardless..."
+          echo "Continuing to upload regardless..."
           exit 0
 
       - name: Debug - Output + git diff
         if: always()
-        shell: bash
         run: |
           echo "== Output sample =="
           ls -lah public/data/lol || true
@@ -91,54 +91,57 @@ jobs:
           echo "== Diffstat (leaderboards) =="
           git diff --stat -- public/data/lol/leaderboards || true
 
-      # Commit ONLY if full dataset exists
-      - name: Commit & push (only if dataset is valid)
+      - name: Upload leaderboards to Vercel Blob (only if dataset is valid; never fails job)
         if: always()
-        shell: bash
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          BLOB_CACHE_SECONDS: "300"
         run: |
-          set -e
+          set +e
 
-          git config user.name "gamerstation-bot"
-          git config user.email "actions@users.noreply.github.com"
+          if [ -z "$BLOB_READ_WRITE_TOKEN" ]; then
+            echo "BLOB_READ_WRITE_TOKEN missing in GitHub Secrets. Skipping Blob upload."
+            exit 0
+          fi
 
-          # Guard: folder must exist
           if [ ! -d "public/data/lol/leaderboards" ]; then
-            echo "No leaderboards directory exists; skipping commit."
+            echo "No leaderboards directory exists; skipping upload."
             exit 0
           fi
 
-          # Guard: must contain JSON files
           JSON_COUNT=$(find public/data/lol/leaderboards -type f -name "*.json" | wc -l | tr -d ' ')
+          echo "Found $JSON_COUNT leaderboard json files."
+
           if [ "$JSON_COUNT" -lt 5 ]; then
-            echo "Only $JSON_COUNT json files found — dataset incomplete. Skipping commit."
+            echo "Only $JSON_COUNT json files found — dataset incomplete. Skipping upload."
             exit 0
           fi
 
-          # Stage only this workflow’s output
-          git add -A public/data/lol/leaderboards
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
+          # Safety: avoid env var blowups if the folder gets huge
+          # (GitHub env size limits can bite you if this ever becomes thousands of files)
+          MAX_FILES=800
+          if [ "$JSON_COUNT" -gt "$MAX_FILES" ]; then
+            echo "Too many files ($JSON_COUNT). Cap is $MAX_FILES to avoid env-size issues. Skipping upload."
             exit 0
           fi
 
-          git commit -m "chore(lol): refresh LoL Leaderboards"
+          SPEC=""
+          while IFS= read -r file; do
+            # file is already relative (no leading ./ from find)
+            rel="$file"
+            blob="data/lol/leaderboards/${rel#public/data/lol/leaderboards/}"
 
-          # Your preferred merge-pull loop
-          for i in 1 2 3 4 5; do
-            echo "Attempt $i: syncing latest main (merge)..."
-            git fetch origin main
-            git pull --no-rebase origin main || true
-
-            echo "Attempt $i: pushing..."
-            if git push origin main; then
-              echo "Push succeeded."
-              exit 0
+            if [ -z "$SPEC" ]; then
+              SPEC="${rel}=${blob}"
+            else
+              SPEC="${SPEC};${rel}=${blob}"
             fi
+          done < <(find public/data/lol/leaderboards -type f -name "*.json" | sort)
 
-            echo "Attempt $i failed. Retrying in 5s..."
-            sleep 5
-          done
+          export BLOB_UPLOADS="$SPEC"
 
-          echo "Push failed after retries."
-          exit 1
+          node scripts/blob/upload-data.mjs
+          EC=$?
+          echo "Blob upload exit code: $EC"
+          echo "Continuing regardless..."
+          exit 0
