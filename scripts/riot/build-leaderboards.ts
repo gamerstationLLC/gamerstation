@@ -20,7 +20,7 @@ const TIERS: TierKey[] = ["CHALLENGER", "GRANDMASTER", "MASTER"];
 // -------------------------
 // Tuning (anti-429 defaults)
 const RETRY_MAX = 6;
-const REQUEST_TIMEOUT_MS = 12_000;
+const REQUEST_TIMEOUT_MS = 20_000;
 
 // Top N players to output per leaderboard
 const TOP_N = Number(process.env.LEADERBOARD_TOP_N || "") || 100;
@@ -81,7 +81,22 @@ function sleep(ms: number) {
 }
 
 // -------------------------
-// Simple global rate limiter
+// Abort / timeout detection (Node/undici can say "The operation was canceled.")
+function isAbortLike(err: any) {
+  const name = String(err?.name || "").toLowerCase();
+  const msg = String(err?.message || err || "").toLowerCase();
+  return (
+    name.includes("abort") ||
+    msg.includes("abort") ||
+    msg.includes("timeout") ||
+    msg.includes("canceled") ||
+    msg.includes("cancelled") ||
+    msg.includes("operation was canceled")
+  );
+}
+
+// -------------------------
+// Simple global rate limiter (serialized)
 let _limiterChain: Promise<void> = Promise.resolve();
 let _lastReqAt = 0;
 
@@ -93,9 +108,14 @@ async function withRateLimit<T>(fn: () => Promise<T>): Promise<T> {
   await gate;
   try {
     const now = Date.now();
-    const wait = Math.max(0, REQ_MIN_GAP_MS - (now - _lastReqAt));
+
+    // Add tiny jitter to avoid perfectly periodic bursts across endpoints
+    const jitter = Math.floor(Math.random() * 60); // 0..59ms
+    const wait = Math.max(0, REQ_MIN_GAP_MS + jitter - (now - _lastReqAt));
+
     if (wait > 0) await sleep(wait);
     _lastReqAt = Date.now();
+
     return await fn();
   } finally {
     release();
@@ -103,20 +123,24 @@ async function withRateLimit<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 // -------------------------
-// Windows-safe fetch timeout
+// Fetch timeout
 const IS_WIN = process.platform === "win32";
 
 async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
-  const finalInit: RequestInit = { ...init };
+  // ✅ Important: start timeout ONLY after we pass the rate-limit gate.
+  // Otherwise AbortSignal.timeout can expire while we are waiting in the limiter queue.
+  return await withRateLimit(async () => {
+    const finalInit: RequestInit = { ...init };
 
-  if (!IS_WIN) {
-    // Node 20+: AbortSignal.timeout exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const sig = (AbortSignal as any).timeout ? (AbortSignal as any).timeout(timeoutMs) : undefined;
-    if (sig) finalInit.signal = sig;
-  }
+    if (!IS_WIN) {
+      // Node 20+: AbortSignal.timeout exists
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const sig = (AbortSignal as any).timeout ? (AbortSignal as any).timeout(timeoutMs) : undefined;
+      if (sig) finalInit.signal = sig;
+    }
 
-  return await withRateLimit(() => fetch(url, finalInit));
+    return await fetch(url, finalInit);
+  });
 }
 
 async function riotGetJson<T>(url: string): Promise<T> {
@@ -126,11 +150,24 @@ async function riotGetJson<T>(url: string): Promise<T> {
     try {
       res = await fetchWithTimeout(url, { headers: headers() }, REQUEST_TIMEOUT_MS);
     } catch (err: any) {
+      const abortLike = isAbortLike(err);
+
+      if (DEBUG) {
+        console.log(
+          `[warn] fetch failed abortLike=${abortLike} attempt=${attempt}/${RETRY_MAX} url=${url} err=${String(
+            err?.message || err
+          )}`
+        );
+      }
+
       if (attempt < RETRY_MAX) {
         await sleep(350 * (attempt + 1));
         continue;
       }
-      throw new Error(`Riot GET network/timeout failed: ${url} :: ${String(err)}`);
+
+      throw new Error(
+        `Riot GET ${abortLike ? "aborted/timeout" : "network"} failed: ${url} :: ${String(err)}`
+      );
     }
 
     if (res.status === 429) {
@@ -740,7 +777,9 @@ async function warmCachesForPlayers(
         // light progress
         progressSumm = tasks.filter(([, f]) => f.needSummoner).length;
         progressMatch = tasks.filter(([, f]) => f.needMatches).length;
-        console.log(`[warm] ${platform} pass=${pass}/${WARM_MAX_PASSES} remaining summ=${progressSumm} matches=${progressMatch}`);
+        console.log(
+          `[warm] ${platform} pass=${pass}/${WARM_MAX_PASSES} remaining summ=${progressSumm} matches=${progressMatch}`
+        );
       }
 
       return null;
