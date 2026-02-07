@@ -248,16 +248,14 @@ jobs:
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          # Stage LoL public data EXCEPT blob-managed high churn outputs + other workflows
-          git add public/data/lol \
-            ':!public/data/lol/meta_builds_ranked.json' \
-            ':!public/data/lol/meta_builds_casual.json' \
-            ':!public/data/lol/leaderboards' \
-            ':!public/data/lol/leaderboards/**' \
-            ':!public/data/lol/*leaderboard*.json' \
-            ':!public/data/lol/champion_tiers.json' \
-            ':!public/data/lol/champion_tiers/**' \
-            ':!public/data/lol/*tier*.json'
+          # ✅ IMPORTANT:
+          # Don't `git add public/data/lol` (it traverses ignored paths like /leaderboards and exits 1).
+          # Instead, stage ONLY repo-owned directories.
+          #
+          # Adjust these two folders if your static/override outputs live somewhere else.
+          git add -A \
+            public/data/lol/static \
+            public/data/lol/overrides
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
