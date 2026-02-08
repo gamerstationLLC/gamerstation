@@ -1,4 +1,3 @@
-// lib/blob.ts
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -10,10 +9,6 @@ function normalizeBase(b: string) {
   return String(b ?? "").trim().replace(/\/+$/, "");
 }
 
-/**
- * Returns absolute public Blob URL if a base is configured.
- * Otherwise returns "/<pathname>".
- */
 export function blobUrl(pathnameInput: string): string {
   const pathname = normalizePath(pathnameInput);
   if (!pathname) return "/";
@@ -27,49 +22,45 @@ export function blobUrl(pathnameInput: string): string {
   return `${normalizeBase(base)}/${pathname}`;
 }
 
-export const blob = blobUrl;
-
-// Disk-first → Blob fallback JSON reader (DEV)
-// ✅ Blob-first in production (VERCEL/prod) → disk fallback
-
+/**
+ * PRODUCTION:
+ *   Blob first → Disk fallback
+ *
+ * DEVELOPMENT:
+ *   Disk first → Blob fallback
+ */
 export async function readPublicJson<T = any>(pathnameInput: string): Promise<T> {
   const pathname = normalizePath(pathnameInput);
   if (!pathname) throw new Error("Invalid path");
 
-  const hasBlobBase = Boolean(
-    process.env.BLOB_BASE_URL || process.env.NEXT_PUBLIC_BLOB_BASE_URL
-  );
-
-  const preferBlob =
-    hasBlobBase && (process.env.VERCEL === "1" || process.env.NODE_ENV === "production");
-
   const localPath = path.join(process.cwd(), "public", pathname);
   const url = blobUrl(pathname);
 
-  // ✅ 1) Blob first in prod
-  if (preferBlob) {
+  const isProd =
+    process.env.VERCEL === "1" ||
+    process.env.NODE_ENV === "production";
+
+  // ✅ Production: Blob first
+  if (isProd) {
     try {
       const res = await fetch(url, { cache: "no-store" });
       if (res.ok) return (await res.json()) as T;
-    } catch {
-      // fall through
-    }
+    } catch {}
   }
 
-  // ✅ 2) Disk fallback
+  // ✅ Disk fallback
   try {
     const raw = await fs.readFile(localPath, "utf8");
     return JSON.parse(raw) as T;
-  } catch {
-    // fall through
-  }
+  } catch {}
 
-  // ✅ 3) Blob fallback (dev or disk missing)
+  // ✅ Final Blob attempt
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) {
-    throw new Error(`Failed to load JSON from disk or Blob: ${pathname} (${res.status})`);
+    throw new Error(
+      `Failed to load JSON from disk or Blob: ${pathname} (${res.status})`
+    );
   }
+
   return (await res.json()) as T;
 }
-
-

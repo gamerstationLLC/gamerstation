@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import ApAdClient, { type ChampionRow } from "./client";
-import { blobUrl } from "@/lib/blob";
+import { blobUrl } from "@/lib/blob-fetch";
 
 export type ItemRow = Record<string, any>;
 export type SpellsOverrides = Record<string, any>;

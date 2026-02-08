@@ -1,7 +1,7 @@
 // lib/server/readPublicJson.ts
 import fs from "node:fs/promises";
 import path from "node:path";
-import { blobUrl } from "@/lib/blob";
+import { blobUrl } from "@/lib/blob-fetch";
 
 type ReadPublicJsonOptions = {
   /**
