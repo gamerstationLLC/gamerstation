@@ -1,6 +1,6 @@
 // PART 1 / 3
 "use client";
-import { blobUrl } from "@/lib/blob";
+import { blobUrl } from "@/lib/blob-client";;
 ;
 import Link from "next/link";
 
