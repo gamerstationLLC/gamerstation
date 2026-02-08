@@ -61,3 +61,10 @@ scripts/riot/cache/
 .vercel
 .env*.local
 
+public/data/lol/meta_builds_ranked.json
+public/data/lol/meta_builds_casual.json
+public/data/lol/leaderboards/**
+public/data/lol/champion_tiers.json
+public/data/lol/champion-tiers.json   # if both versions exist
+
+app/calculators/wow/pve/upgrade-checker

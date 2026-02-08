@@ -1,8 +1,7 @@
 // app/tools/dota/meta/page.tsx
 import Link from "next/link";
-import fs from "node:fs/promises";
-import path from "node:path";
 import DotaMetaClient, { HeroStatsRow } from "./client";
+import { readPublicJson } from "@/lib/blob"; // ✅ Blob-first
 
 export const metadata = {
   title: "Dota 2 Meta | GamerStation",
@@ -10,13 +9,13 @@ export const metadata = {
     "Dota 2 meta heroes by rank bracket and pro trends. Pick rate + win rate with frequent updates. Data via OpenDota.",
 };
 
-// ✅ IMPORTANT: don’t let this run in Edge + don’t bake a bad fetch into static HTML
+// ✅ keep this
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 type PatchEntry = {
-  name?: string; // e.g. "7.40"
-  date?: number; // unix seconds
+  name?: string;
+  date?: number;
   [key: string]: any;
 };
 
@@ -37,7 +36,6 @@ async function getHeroStats(): Promise<HeroStatsRow[]> {
     next: { revalidate: 600 },
     headers: {
       Accept: "application/json",
-      // Some CDNs behave better with an explicit UA
       "User-Agent": "GamerStation (https://gamerstation.gg)",
     },
   });
@@ -54,7 +52,6 @@ function extractLatestPatchName(data: any): string | null {
 
   if (!list.length) return null;
 
-  // safest: sort by date desc in case ordering changes
   const sorted = [...list].sort((a, b) => {
     const ad = Number(a.date ?? 0);
     const bd = Number(b.date ?? 0);
@@ -84,27 +81,38 @@ async function getLatestPatch(): Promise<string> {
   }
 }
 
+// ✅ NOW Blob-first instead of fs
 async function readImmortalJson(): Promise<ImmortalJson | null> {
   try {
-    const abs = path.join(process.cwd(), "public", "data", "dota", "immortal_hero_stats.json");
-    const raw = await fs.readFile(abs, "utf-8");
-    return JSON.parse(raw) as ImmortalJson;
+    return await readPublicJson<ImmortalJson>(
+      "data/dota/immortal_hero_stats.json"
+    );
   } catch {
     return null;
   }
 }
 
 export default async function DotaMetaPage() {
-  const [rows, patch, immortal] = await Promise.all([getHeroStats(), getLatestPatch(), readImmortalJson()]);
+  const [rows, patch, immortal] = await Promise.all([
+    getHeroStats(),
+    getLatestPatch(),
+    readImmortalJson(),
+  ]);
 
-  // Build map hero_id -> { picks, wins }
   const immByHero = new Map<number, { picks: number; wins: number }>();
   const immRows = Array.isArray(immortal?.rows) ? immortal!.rows! : [];
+
   for (const r of immRows) {
     const id = Number(r.hero_id);
     const picks = Number(r.picks);
     const wins = Number(r.wins);
-    if (Number.isFinite(id) && id > 0 && Number.isFinite(picks) && Number.isFinite(wins)) {
+
+    if (
+      Number.isFinite(id) &&
+      id > 0 &&
+      Number.isFinite(picks) &&
+      Number.isFinite(wins)
+    ) {
       immByHero.set(id, {
         picks: Math.max(0, Math.trunc(picks)),
         wins: Math.max(0, Math.trunc(wins)),
@@ -112,7 +120,6 @@ export default async function DotaMetaPage() {
     }
   }
 
-  // Inject Immortal bucket into the shape the client expects: 8_pick / 8_win
   const mergedRows: HeroStatsRow[] = (rows || []).map((h) => {
     const id = Number(h.id);
     const imm = immByHero.get(id);
@@ -125,15 +132,15 @@ export default async function DotaMetaPage() {
     } as HeroStatsRow;
   });
 
-  // Optional: nicer label; if you want to keep "~5 min" hardcoded, you can.
   const cacheLabel =
     immortal?.generated_at
-      ? `Immortal updated ${new Date(immortal.generated_at).toLocaleString()}`
+      ? `Immortal updated ${new Date(
+          immortal.generated_at
+        ).toLocaleString()}`
       : "~10 min";
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.10]"
@@ -159,7 +166,8 @@ export default async function DotaMetaPage() {
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">™</span>
+                GamerStation
+                <span className="align-super text-[0.6em]">™</span>
               </span>
             </Link>
 
@@ -171,14 +179,25 @@ export default async function DotaMetaPage() {
             </Link>
           </header>
 
-          <h1 className="text-4xl font-bold tracking-tight">Dota 2 Meta</h1>
+          <h1 className="text-4xl font-bold tracking-tight">
+            Dota 2 Meta
+          </h1>
+
           <p className="mt-3 text-neutral-300">
-            Highest pick rate + best win rate by rank bracket, plus pro trends. Data from OpenDota.
-            <span className="text-neutral-500"> (Cached ~10 minutes)</span>
+            Highest pick rate + best win rate by rank bracket, plus pro trends.
+            Data from OpenDota.
+            <span className="text-neutral-500">
+              {" "}
+              (Cached ~10 minutes)
+            </span>
           </p>
 
           <div className="mt-6">
-            <DotaMetaClient initialRows={mergedRows} patch={patch} cacheLabel={cacheLabel} />
+            <DotaMetaClient
+              initialRows={mergedRows}
+              patch={patch}
+              cacheLabel={cacheLabel}
+            />
           </div>
         </div>
       </div>

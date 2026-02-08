@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import LolChampionTiersClient, { type ChampionStatsRow } from "./client";
-import { readPublicJson } from "@/lib/server/readPublicJson";
+import { readPublicJson } from "@/lib/blob"; // ✅ switched to Blob-first helper
 
 export const metadata = {
   title: "LoL Champion Tiers (S–D) | GamerStation",
@@ -10,12 +10,11 @@ export const metadata = {
     "League of Legends champion tier list (S–D) based on pick rate, win rate, and ban rate (when applicable). Updated frequently.",
 };
 
-// ✅ ISR is perfect here (fetch JSON w/ revalidate)
 export const dynamic = "force-static";
 export const revalidate = 600;
 
 // -----------------------------
-// Helpers (Blob-friendly)
+// Helpers (Blob-first now)
 // -----------------------------
 async function readJsonSafe<T>(pathname: string): Promise<T | null> {
   try {
@@ -26,18 +25,23 @@ async function readJsonSafe<T>(pathname: string): Promise<T | null> {
 }
 
 async function guessPatch(): Promise<string> {
-  // Prefer your canonical "version.json" (your pipeline writes this)
   const v1 = await readJsonSafe<any>("data/lol/version.json");
   const v2 = await readJsonSafe<any>("data/lol/patch.json");
 
-  const p = String(v1?.version ?? v1?.patch ?? v2?.version ?? v2?.patch ?? "").trim();
+  const p = String(
+    v1?.version ?? v1?.patch ?? v2?.version ?? v2?.patch ?? ""
+  ).trim();
+
   return p || "—";
 }
 
 async function loadChampionTierRows(): Promise<ChampionStatsRow[]> {
-  // Champion tiers should come from the output file, not meta builds
-  const rowsA = await readJsonSafe<ChampionStatsRow[]>("data/lol/champion_tiers.json");
-  const rowsB = await readJsonSafe<ChampionStatsRow[]>("data/lol/champion-tiers.json");
+  const rowsA = await readJsonSafe<ChampionStatsRow[]>(
+    "data/lol/champion_tiers.json"
+  );
+  const rowsB = await readJsonSafe<ChampionStatsRow[]>(
+    "data/lol/champion-tiers.json"
+  );
 
   const rows = rowsA ?? rowsB;
   if (!Array.isArray(rows)) return [];
@@ -69,14 +73,16 @@ function GSBrand() {
 }
 
 export default async function LolChampionTiersPage() {
-  const [patch, initialRows] = await Promise.all([guessPatch(), loadChampionTierRows()]);
+  const [patch, initialRows] = await Promise.all([
+    guessPatch(),
+    loadChampionTierRows(),
+  ]);
+
   const cacheLabel = formatCacheLabel(revalidate);
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-6">
-      {/* Header: Tools top-right, title below brand, meta below title */}
       <div className="mb-4">
-        {/* Row 1 */}
         <div className="flex items-center justify-between gap-3">
           <GSBrand />
 
@@ -88,12 +94,12 @@ export default async function LolChampionTiersPage() {
           </Link>
         </div>
 
-        {/* Row 2: Title (below GamerStation) */}
         <div className="mt-3">
-          <h1 className="text-xl font-black text-white">LoL Champion Tiers</h1>
+          <h1 className="text-xl font-black text-white">
+            LoL Champion Tiers
+          </h1>
         </div>
 
-        {/* Row 3: Meta below title + patch/cache right */}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
             href="/calculators/lol/meta"
@@ -108,7 +114,9 @@ export default async function LolChampionTiersPage() {
             </span>
 
             <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1 text-xs text-neutral-400">
-              Cache <span className="text-neutral-200">{cacheLabel}</span>
+              Cache <span className="text-neutral-200">
+                {cacheLabel}
+              </span>
             </span>
           </div>
         </div>
@@ -129,8 +137,9 @@ export default async function LolChampionTiersPage() {
       </Suspense>
 
       <div className="mt-4 text-xs text-neutral-500">
-        Tiers are computed from a blended score (pick volume + winrate + banrate when applicable). This is a meta
-        snapshot, not a guarantee for every matchup.
+        Tiers are computed from a blended score (pick volume + winrate +
+        banrate when applicable). This is a meta snapshot, not a guarantee
+        for every matchup.
       </div>
     </main>
   );

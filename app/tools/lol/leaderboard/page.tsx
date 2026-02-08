@@ -1,7 +1,7 @@
 // app/tools/lol/leaderboard/page.tsx
 import type { Metadata } from "next";
 import LeaderboardClient, { type LeaderboardRow } from "./client";
-import { readPublicJson } from "@/lib/server/readPublicJson";
+import { readPublicJson } from "@/lib/blob"; // ✅ switched to Blob-first helper
 
 export const metadata: Metadata = {
   title: "LoL Leaderboard | GamerStation",
@@ -25,16 +25,13 @@ type LeaderboardJson = {
   count: number;
   players: Array<{
     puuid: string;
-
     summonerId: string;
     summonerName: string;
     profileIconId?: number | null;
     summonerLevel?: number | null;
-
     leaguePoints: number;
     wins: number;
     losses: number;
-
     hotStreak?: boolean;
     inactive?: boolean;
     veteran?: boolean;
@@ -46,9 +43,11 @@ const DEFAULT_REGION: RegionKey = "na1";
 const DEFAULT_QUEUE: QueueKey = "RANKED_SOLO_5x5";
 const DEFAULT_TIER: TierKey = "CHALLENGER";
 
-function buildLeaderboardPath(region: RegionKey, queue: QueueKey, tier: TierKey) {
-  // matches your existing output folder structure:
-  // public/data/lol/leaderboards/<region>/<queue>.<tierLower>.json
+function buildLeaderboardPath(
+  region: RegionKey,
+  queue: QueueKey,
+  tier: TierKey
+) {
   return `data/lol/leaderboards/${region}/${queue}.${tier.toLowerCase()}.json`;
 }
 
@@ -60,10 +59,8 @@ async function loadLeaderboardJson(
   const pathname = buildLeaderboardPath(region, queue, tier);
 
   try {
-    // ✅ disk-first; if missing, fetches from Blob using NEXT_PUBLIC_BLOB_BASE_URL
-    return await readPublicJson<LeaderboardJson>(pathname, {
-      revalidateSeconds: revalidate,
-    });
+    // ✅ Blob-first in production, disk fallback in dev
+    return await readPublicJson<LeaderboardJson>(pathname);
   } catch {
     return null;
   }
@@ -71,23 +68,20 @@ async function loadLeaderboardJson(
 
 function toRows(json: LeaderboardJson | null): LeaderboardRow[] {
   if (!json?.players?.length) return [];
+
   return json.players.map((p, idx) => ({
     rank: idx + 1,
     puuid: p.puuid,
-
     summonerId: p.summonerId ?? null,
     summonerName: p.summonerName ?? null,
     profileIconId: p.profileIconId ?? null,
     summonerLevel: p.summonerLevel ?? null,
-
     region: json.region,
     queue: json.queue,
     tier: json.tier,
-
     lp: p.leaguePoints,
     wins: p.wins,
     losses: p.losses,
-
     flags: {
       hotStreak: !!p.hotStreak,
       inactive: !!p.inactive,
@@ -98,7 +92,12 @@ function toRows(json: LeaderboardJson | null): LeaderboardRow[] {
 }
 
 export default async function LolLeaderboardPage() {
-  const json = await loadLeaderboardJson(DEFAULT_REGION, DEFAULT_QUEUE, DEFAULT_TIER);
+  const json = await loadLeaderboardJson(
+    DEFAULT_REGION,
+    DEFAULT_QUEUE,
+    DEFAULT_TIER
+  );
+
   const rows = toRows(json);
 
   return (

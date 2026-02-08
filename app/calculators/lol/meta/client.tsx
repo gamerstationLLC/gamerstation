@@ -1,6 +1,7 @@
 // PART 1 / 3
 "use client";
-
+import { blobUrl } from "@/lib/blob-client";
+;
 import Link from "next/link";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -336,10 +337,14 @@ export default function MetaClient() {
     (async () => {
       setMeta(null);
 
-      const url =
-        mode === "ranked"
-          ? "/data/lol/meta_builds_ranked.json"
-          : "/data/lol/meta_builds_casual.json";
+      
+
+const url =
+  mode === "ranked"
+    ? blobUrl("data/lol/meta_builds_ranked.json")
+    : blobUrl("data/lol/meta_builds_casual.json");
+
+
 
       const json = await safeFetchJson<MetaJson>(url);
       if (!json || !json.patches) throw new Error(`Failed to load meta json: ${url}`);

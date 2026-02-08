@@ -46,6 +46,17 @@ export default function WoWPvEHubPage() {
         </p>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          
+          <Link
+            href="/calculators/wow/pve/upgrade-checker"
+            className="rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">Item Upgrades</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Compare impact of items from WoW.
+            </div>
+          </Link>
+          
           {/* Mythic+ Scaling */}
           <Link
             href="/calculators/wow/pve/mythic-plus"
