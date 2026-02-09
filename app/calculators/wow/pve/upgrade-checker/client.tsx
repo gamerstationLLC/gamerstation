@@ -183,6 +183,7 @@ function normalizeStats(stats: FullItem["stats"]): Record<string, number> {
   const out: Record<string, number> = {};
   if (!stats) return out;
 
+  // array: [{type,value}]
   if (Array.isArray(stats)) {
     for (const s of stats) {
       if (!s) continue;
@@ -195,6 +196,7 @@ function normalizeStats(stats: FullItem["stats"]): Record<string, number> {
     return out;
   }
 
+  // object: {KEY: value}
   if (typeof stats === "object") {
     for (const [k, v] of Object.entries(stats)) {
       out[k] = (out[k] ?? 0) + getStatNumber(v);
@@ -276,6 +278,7 @@ function computeComparison(
   profile: DamageProfile
 ) {
   const hasBoth = Boolean(aFull && bFull);
+  const weightsLoaded = Boolean(weightsJson); // ✅ distinguish "not loaded" vs "missing"
 
   const ilvlA = aFull ? toNumber(aFull.ilvl) : null;
   const ilvlB = bFull ? toNumber(bFull.ilvl) : null;
@@ -283,7 +286,7 @@ function computeComparison(
   const aStats = normalizeStats(aFull?.stats);
   const bStats = normalizeStats(bFull?.stats);
 
-  const weights = pickWeights(weightsJson, spec, focus, profile);
+  const weights = weightsLoaded ? pickWeights(weightsJson, spec, focus, profile) : {};
 
   const aScore = computeWeightedScore(aStats, weights);
   const bScore = computeWeightedScore(bStats, weights);
@@ -319,11 +322,23 @@ function computeComparison(
   let verdict: {
     label: "Ready" | "Upgrade" | "Downgrade" | "Sidegrade";
     sub: string;
-  } = { label: "Ready", sub: "Select two items to compare." };
+  } = {
+    label: "Ready",
+    sub: "Select two items to compare.",
+  };
 
   if (hasBoth) {
-    if (!Object.keys(weights).length) {
-      verdict = { label: "Sidegrade", sub: "No weights found for this spec" };
+    if (!weightsLoaded) {
+      // ✅ don’t show scary "no weights" until weights are actually loaded
+      verdict = {
+        label: "Ready",
+        sub: "Weights not loaded yet (click an item search to load data).",
+      };
+    } else if (!Object.keys(weights).length) {
+      verdict = {
+        label: "Sidegrade",
+        sub: "No weights found for this spec/profile (check stats_weights.json)",
+      };
     } else if (scoreDelta > 0.5) {
       verdict = { label: "Upgrade", sub: `+${scoreDelta.toFixed(1)} score` };
     } else if (scoreDelta < -0.5) {
@@ -343,6 +358,7 @@ function computeComparison(
     bScore,
     scoreDelta,
     weights,
+    weightsLoaded,
   };
 }
 
@@ -356,6 +372,7 @@ function ComparisonPanel({
   profile,
   isByIdLoaded,
   isByIdLoading,
+  isIndexLoaded,
 }: {
   a: ItemIndexRow | null;
   b: ItemIndexRow | null;
@@ -366,6 +383,7 @@ function ComparisonPanel({
   profile: DamageProfile;
   isByIdLoaded: boolean;
   isByIdLoading: boolean;
+  isIndexLoaded: boolean; // ✅ tells us if weights are even expected to be loaded yet
 }) {
   const aFull = a ? itemsById[a.id] : null;
   const bFull = b ? itemsById[b.id] : null;
@@ -479,10 +497,15 @@ function ComparisonPanel({
             </div>
           </div>
 
-          {!Object.keys(data.weights).length ? (
+          {/* ✅ FIX: only show red "no weights" if weights were actually loaded */}
+          {data.hasBoth && isIndexLoaded && data.weightsLoaded && !Object.keys(data.weights).length ? (
             <div className="mt-3 text-xs text-rose-300">
               No weights found for this spec/profile in{" "}
               <span className="text-rose-200">stats_weights.json</span>
+            </div>
+          ) : data.hasBoth && !isIndexLoaded ? (
+            <div className="mt-3 text-xs text-neutral-500">
+              Weights not loaded yet — click an item search box to load data.
             </div>
           ) : null}
         </div>
@@ -793,8 +816,8 @@ function ItemPicker({
 
             <div className="text-xs text-neutral-400">
               ID: {picked.id}
-              {pickedSlot ? ` • Slot: ${pickedSlot}` : ("" as any)}
-              {pickedIlvl != null ? ` • ilvl: ${pickedIlvl}` : ("" as any)}
+              {pickedSlot ? ` • Slot: ${pickedSlot}` : ""}
+              {pickedIlvl != null ? ` • ilvl: ${pickedIlvl}` : ""}
               {full?.required_level != null
                 ? ` • Req lvl: ${full.required_level}`
                 : ""}
@@ -819,15 +842,10 @@ function ItemPicker({
 }
 
 /**
- * ✅ NEW BEHAVIOR (what you asked for):
+ * LAZY LOAD BEHAVIOR:
  * - NOTHING loads on initial page render
  * - items_index + stats_weights load on first interaction with the search box
  * - items_by_id loads only when an item is selected
- *
- * Expected in /public:
- *  - /data/wow/items_index.json
- *  - /data/wow/items_by_id.json
- *  - /data/wow/stats_weights.json
  */
 export default function UpgradeCheckerClient() {
   const [spec, setSpec] = useState<SpecKey>("arms_warrior");
@@ -837,14 +855,12 @@ export default function UpgradeCheckerClient() {
   const [itemA, setItemA] = useState<ItemIndexRow | null>(null);
   const [itemB, setItemB] = useState<ItemIndexRow | null>(null);
 
-  // Data
   const [itemsIndex, setItemsIndex] = useState<ItemIndexRow[]>([]);
   const [itemsById, setItemsById] = useState<Record<number, FullItem>>({});
   const [statWeights, setStatWeights] = useState<WowStatWeightsJson | null>(
     null
   );
 
-  // Lazy-load state
   const [isIndexLoading, setIsIndexLoading] = useState(false);
   const [isIndexLoaded, setIsIndexLoaded] = useState(false);
   const [indexError, setIndexError] = useState<string | null>(null);
@@ -1006,9 +1022,7 @@ export default function UpgradeCheckerClient() {
 
         <p className="mt-4 text-xs text-neutral-500">
           {!isIndexLoaded ? (
-            <>
-              Data loads on first interaction. Click a search box to load items.
-            </>
+            <>Data loads on first interaction. Click a search box to load items.</>
           ) : (
             <>
               Weights loaded from{" "}
@@ -1065,6 +1079,7 @@ export default function UpgradeCheckerClient() {
         profile={profile}
         isByIdLoaded={isByIdLoaded}
         isByIdLoading={isByIdLoading}
+        isIndexLoaded={isIndexLoaded}
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3 px-1">
