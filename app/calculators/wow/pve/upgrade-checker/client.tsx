@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export type ItemIndexRow = {
   id: number;
@@ -246,12 +246,14 @@ function ItemPicker({
   itemsById,
   picked,
   onPick,
+  isLoading,
 }: {
   title: string;
   itemsIndex: ItemIndexRow[];
   itemsById: Record<number, FullItem>;
   picked: ItemIndexRow | null;
   onPick: (item: ItemIndexRow | null) => void;
+  isLoading: boolean;
 }) {
   const [q, setQ] = useState("");
 
@@ -288,12 +290,19 @@ function ItemPicker({
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder={itemsIndex.length ? "Search item name…" : "No items…"}
+          placeholder={
+            isLoading
+              ? "Loading items…"
+              : itemsIndex.length
+              ? "Search item name…"
+              : "No items…"
+          }
           className={input}
           autoComplete="off"
+          disabled={isLoading || !itemsIndex.length}
         />
 
-        {q.trim() && (
+        {q.trim() && !isLoading && (
           <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-neutral-800 bg-black">
             {suggestions.length ? (
               suggestions.map((s) => {
@@ -326,7 +335,9 @@ function ItemPicker({
       </div>
 
       <div className="mt-4 rounded-xl border border-neutral-800 bg-black p-4">
-        {picked ? (
+        {isLoading ? (
+          <div className="text-sm text-neutral-400">Loading item data…</div>
+        ) : picked ? (
           <div className="space-y-2">
             <div className="text-sm font-semibold text-white">{pickedName}</div>
 
@@ -610,14 +621,21 @@ function ComparisonPanel({
               <div className="mt-3 hidden sm:block">
                 <div className="mx-auto w-full max-w-[900px]">
                   {/* Header */}
-<div className="grid grid-cols-12 items-center gap-2 text-[11px] text-neutral-500">
-  <div className="col-span-6">Stat</div>
-  <div className="col-span-2 text-right whitespace-nowrap">Cur</div>
-  <div className="col-span-2 text-right whitespace-nowrap">New</div>
-  <div className="col-span-1 text-right whitespace-nowrap">Δ</div>
-  <div className="col-span-1 text-right whitespace-nowrap">Imp</div>
-</div>
-
+                  <div className="grid grid-cols-12 items-center gap-2 text-[11px] text-neutral-500">
+                    <div className="col-span-6">Stat</div>
+                    <div className="col-span-2 text-right whitespace-nowrap">
+                      Cur
+                    </div>
+                    <div className="col-span-2 text-right whitespace-nowrap">
+                      New
+                    </div>
+                    <div className="col-span-1 text-right whitespace-nowrap">
+                      Δ
+                    </div>
+                    <div className="col-span-1 text-right whitespace-nowrap">
+                      Imp
+                    </div>
+                  </div>
 
                   {/* Rows */}
                   <div className="mt-2 divide-y divide-neutral-900">
@@ -687,7 +705,10 @@ function ComparisonPanel({
                               cls: "text-green-400 font-semibold",
                             }
                           : r.delta < 0
-                          ? { text: `${r.delta}`, cls: "text-red-400 font-semibold" }
+                          ? {
+                              text: `${r.delta}`,
+                              cls: "text-red-400 font-semibold",
+                            }
                           : { text: "0", cls: "text-neutral-400" };
 
                       const impact =
@@ -728,7 +749,9 @@ function ComparisonPanel({
                             className={`col-span-2 text-right ${impact.cls}`}
                             title={
                               r.weight
-                                ? `Δ ${r.delta} × weight ${r.weight} = ${r.weightedDelta.toFixed(2)}`
+                                ? `Δ ${r.delta} × weight ${r.weight} = ${r.weightedDelta.toFixed(
+                                    2
+                                  )}`
                                 : "No weight for this stat"
                             }
                           >
@@ -764,21 +787,102 @@ function ComparisonPanel({
   );
 }
 
-export default function UpgradeCheckerClient({
-  itemsIndex,
-  itemsById,
-  statWeights,
-}: {
-  itemsIndex: ItemIndexRow[];
-  itemsById: Record<number, FullItem>;
-  statWeights?: WowStatWeightsJson | null;
-}) {
+/**
+ * ✅ NEW BEHAVIOR:
+ * - No longer receives huge JSON via props (which bloats initial RSC payload)
+ * - Instead fetches from /public after first paint (perceived faster initial load)
+ *
+ * Expected files in /public:
+ *  - /data/wow/items_index.json
+ *  - /data/wow/items_by_id.json
+ *  - /data/wow/stats_weights.json
+ */
+export default function UpgradeCheckerClient() {
   const [spec, setSpec] = useState<SpecKey>("arms_warrior");
   const [focus, setFocus] = useState<ContentFocus>("mplus");
   const [profile, setProfile] = useState<DamageProfile>("aoe");
 
   const [itemA, setItemA] = useState<ItemIndexRow | null>(null);
   const [itemB, setItemB] = useState<ItemIndexRow | null>(null);
+
+  const [itemsIndex, setItemsIndex] = useState<ItemIndexRow[]>([]);
+  const [itemsById, setItemsById] = useState<Record<number, FullItem>>({});
+  const [statWeights, setStatWeights] = useState<WowStatWeightsJson | null>(
+    null
+  );
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const didStartRef = useRef(false);
+
+  useEffect(() => {
+    if (didStartRef.current) return;
+    didStartRef.current = true;
+
+    const controller = new AbortController();
+
+    async function load() {
+      setIsLoading(true);
+      setLoadError(null);
+
+      try {
+        const [idxRes, byIdRes, wRes] = await Promise.all([
+          fetch("/data/wow/items_index.json", {
+            signal: controller.signal,
+            cache: "force-cache",
+          }),
+          fetch("/data/wow/items_by_id.json", {
+            signal: controller.signal,
+            cache: "force-cache",
+          }),
+          fetch("/data/wow/stats_weights.json", {
+            signal: controller.signal,
+            cache: "force-cache",
+          }),
+        ]);
+
+        if (!idxRes.ok)
+          throw new Error(
+            `items_index.json failed (${idxRes.status} ${idxRes.statusText})`
+          );
+        if (!byIdRes.ok)
+          throw new Error(
+            `items_by_id.json failed (${byIdRes.status} ${byIdRes.statusText})`
+          );
+        if (!wRes.ok)
+          throw new Error(
+            `stats_weights.json failed (${wRes.status} ${wRes.statusText})`
+          );
+
+        const [idx, byId, weights] = await Promise.all([
+          idxRes.json(),
+          byIdRes.json(),
+          wRes.json(),
+        ]);
+
+        // Basic shape sanity (avoid runtime nukes if file is wrong)
+        setItemsIndex(Array.isArray(idx) ? (idx as ItemIndexRow[]) : []);
+        setItemsById(
+          byId && typeof byId === "object" ? (byId as Record<number, FullItem>) : {}
+        );
+        setStatWeights(
+          weights && typeof weights === "object"
+            ? (weights as WowStatWeightsJson)
+            : null
+        );
+
+        setIsLoading(false);
+      } catch (e: any) {
+        if (e?.name === "AbortError") return;
+        setIsLoading(false);
+        setLoadError(e?.message ? String(e.message) : "Failed to load data.");
+      }
+    }
+
+    load();
+    return () => controller.abort();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -790,6 +894,7 @@ export default function UpgradeCheckerClient({
               value={spec}
               onChange={(e) => setSpec(e.target.value as SpecKey)}
               className={`${input} mt-3`}
+              disabled={isLoading}
             >
               {SPECS.map((s) => (
                 <option key={s.key} value={s.key}>
@@ -829,10 +934,30 @@ export default function UpgradeCheckerClient({
         </div>
 
         <p className="mt-4 text-xs text-neutral-500">
-          Weights loaded from{" "}
-          <span className="text-neutral-300">stats_weights.json</span>.
-          {statWeights?.version ? ` v${statWeights.version}.` : ""}
+          {isLoading ? (
+            <>Loading data from public JSON…</>
+          ) : loadError ? (
+            <>
+              <span className="text-rose-300 font-semibold">
+                Data load error:
+              </span>{" "}
+              <span className="text-rose-200">{loadError}</span>
+            </>
+          ) : (
+            <>
+              Weights loaded from{" "}
+              <span className="text-neutral-300">stats_weights.json</span>.
+              {statWeights?.version ? ` v${statWeights.version}.` : ""}
+            </>
+          )}
         </p>
+
+        {!isLoading && !loadError && !itemsIndex.length ? (
+          <div className="mt-3 text-xs text-rose-300">
+            items_index.json loaded but contained 0 items (check file path / JSON
+            shape).
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -842,6 +967,7 @@ export default function UpgradeCheckerClient({
           itemsById={itemsById}
           picked={itemA}
           onPick={setItemA}
+          isLoading={isLoading || !!loadError}
         />
         <ItemPicker
           title="New Item"
@@ -849,6 +975,7 @@ export default function UpgradeCheckerClient({
           itemsById={itemsById}
           picked={itemB}
           onPick={setItemB}
+          isLoading={isLoading || !!loadError}
         />
       </div>
 
@@ -864,7 +991,11 @@ export default function UpgradeCheckerClient({
 
       <div className="flex flex-wrap items-center justify-between gap-3 px-1">
         <div className="text-xs text-neutral-600">
-          {itemsIndex.length
+          {isLoading
+            ? "Loading…"
+            : loadError
+            ? "0 items loaded"
+            : itemsIndex.length
             ? `${itemsIndex.length.toLocaleString()} items loaded`
             : "0 items loaded"}
         </div>
@@ -876,6 +1007,7 @@ export default function UpgradeCheckerClient({
             setItemB(null);
           }}
           className="text-xs text-neutral-400 hover:text-white transition"
+          disabled={isLoading}
         >
           Clear both
         </button>
