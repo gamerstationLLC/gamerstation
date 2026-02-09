@@ -18,6 +18,27 @@ type ReadPublicJsonOptions = {
 };
 
 /**
+ * Paths that should ALWAYS be read from Blob in production (high-churn / blob-managed datasets).
+ * Add only the datasets that your CI uploads to Blob (and are not reliably present on disk in prod).
+ */
+const BLOB_ONLY_PREFIXES = [
+  // LoL leaderboards JSONs
+  "data/lol/leaderboards/",
+
+  // LoL meta builds JSONs
+  "data/lol/meta_builds_",
+
+  // LoL champion tiers (if you store/upload these to Blob)
+  "data/lol/champion_tiers/",
+  "data/lol/champ_tiers/",
+  "data/lol/tiers/",
+];
+
+function isBlobOnlyPath(p: string) {
+  return BLOB_ONLY_PREFIXES.some((pref) => p.startsWith(pref));
+}
+
+/**
  * Read JSON from:
  *  1) local disk: /public/<pathname>
  *  2) Blob (absolute url from NEXT_PUBLIC_BLOB_BASE_URL)
@@ -30,7 +51,6 @@ export async function readPublicJson<T>(
   pathnameInput: string,
   opts: ReadPublicJsonOptions = {}
 ): Promise<T> {
-  const preferBlob = Boolean(opts.preferBlob);
   const revalidateSeconds =
     typeof opts.revalidateSeconds === "number" ? opts.revalidateSeconds : 900;
 
@@ -39,6 +59,10 @@ export async function readPublicJson<T>(
     .replace(/^\/+/, ""); // remove leading slashes
 
   if (!pathname) throw new Error("readPublicJson: missing pathname");
+
+  // Force Blob for specific prefixes (or if caller requested preferBlob)
+  const forcedBlob = isBlobOnlyPath(pathname);
+  const preferBlob = forcedBlob || Boolean(opts.preferBlob);
 
   // 1) Try disk first (unless preferBlob)
   if (!preferBlob) {
@@ -58,7 +82,9 @@ export async function readPublicJson<T>(
   // So require NEXT_PUBLIC_BLOB_BASE_URL for this path.
   if (!/^https?:\/\//i.test(url)) {
     throw new Error(
-      `readPublicJson: disk read failed and NEXT_PUBLIC_BLOB_BASE_URL is not set (needed to fetch ${pathname}).`
+      `readPublicJson: ${
+        preferBlob ? "preferBlob/forcedBlob is true" : "disk read failed"
+      } and NEXT_PUBLIC_BLOB_BASE_URL is not set (needed to fetch ${pathname}).`
     );
   }
 

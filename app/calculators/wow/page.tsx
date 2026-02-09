@@ -1,13 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
-export default function WoWPage() {
+export const metadata: Metadata = {
+  title:
+    "WoW PvE Calculators – Stat Impact, Mythic+ Scaling & Mistake Analysis | GamerStation",
+  description:
+    "World of Warcraft PvE calculators for raid and Mythic+. Analyze stat impact, Mythic+ scaling, and DPS loss from downtime or mistakes using fast, non-simulation tools.",
+};
+
+export default function WoWPvEHubPage() {
   const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-10 sm:py-16">
-        {/* ✅ Standard GS header: brand left, ONLY Calculators top-right */}
+    <main className="min-h-screen bg-black text-white px-6 py-16">
+      <div className="mx-auto max-w-5xl">
+        {/* ✅ Standard GS header */}
         <header className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 hover:opacity-90">
             <img
@@ -30,53 +38,69 @@ export default function WoWPage() {
           </div>
         </header>
 
-        {/* Title + intro */}
-        <div className="mt-8 sm:mt-10">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            World of Warcraft
-          </h1>
-          <p className="mt-2 text-sm sm:text-base text-neutral-300">
-            Choose a category to get started.
-          </p>
-        </div>
+        {/* Back link */}
+        
+        <h1 className="mt-8 text-4xl font-bold">WoW Hub</h1>
+        <p className="mt-3 text-neutral-300">
+          Pick a utility to get started.
+        </p>
 
-        {/* Cards */}
-        <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-          {/* PvE */}
-          <Link
-            href="/calculators/wow/pve"
-            className="
-              rounded-2xl border border-neutral-800
-              p-5 sm:p-6
-              transition
-              hover:border-neutral-600
-              active:scale-[0.99]
-              focus:outline-none focus:ring-2 focus:ring-cyan-400/30
-            "
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          
+<Link
+            href="/calculators/wow/damage-calculator"
+            className="rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
           >
-            <div className="text-base font-semibold">PvE</div>
+            <div className="text-sm font-semibold">Damage Calculator</div>
             <div className="mt-2 text-sm text-neutral-400">
-              Mythic+ scaling, dungeon math, PvE tools.
+              Calculate damages for your WoW characters.
             </div>
           </Link>
 
-          {/* PvP (Coming Soon) */}
-          <div
-            className="
-              rounded-2xl border border-neutral-800 bg-neutral-950
-              p-5 sm:p-6
-              opacity-60 cursor-not-allowed select-none
-            "
-            aria-disabled="true"
+          <Link
+            href="/calculators/wow/upgrade-checker"
+            className="rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
           >
-            <div className="text-base font-semibold">
-              PvP{" "}
-              <span className="ml-1 text-xs text-neutral-400">(coming soon)</span>
+            <div className="text-sm font-semibold">Item Upgrades</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Compare impact of items from WoW.
             </div>
-            <div className="mt-2 text-sm text-neutral-500">
-              Arena & RBG calculators.
+          </Link>
+          
+          {/* Mythic+ Scaling */}
+          <Link
+            href="/calculators/wow/mythic-plus"
+            className="rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">Mythic+ Scaling</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Enemy health & damage multipliers by key level.
             </div>
-          </div>
+          </Link>
+
+          {/* Uptime / Mistake Impact */}
+          <Link
+            href="/calculators/wow/uptime"
+            className="rounded-2xl border border-neutral-800  p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">
+              Uptime / Mistake Impact
+            </div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Estimate DPS loss from downtime and missed cooldowns.
+            </div>
+          </Link>
+
+          {/* Stat Impact */}
+          <Link
+            href="/calculators/wow/stat-impact"
+            className="rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
+          >
+            <div className="text-sm font-semibold">Stat Impact</div>
+            <div className="mt-2 text-sm text-neutral-400">
+              Rough stat value estimates by content type (ST vs AoE).
+            </div>
+          </Link>
         </div>
       </div>
     </main>

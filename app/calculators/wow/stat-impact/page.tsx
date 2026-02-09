@@ -1,14 +1,15 @@
+// app/calculators/wow/pve/stat-impact/page.tsx
 import Link from "next/link";
-import UptimeClient from "./UptimeClient";
+import StatImpactClient from "./StatImpactClient";
+
 
 export const metadata = {
-  title: "WoW Uptime & Mistake DPS Loss Calculator | GamerStation",
+  title: "WoW Stat Impact Calculator | GamerStation",
   description:
-    "Estimate DPS loss in WoW PvE from downtime, missed globals, and delayed cooldowns. A fast tool to understand mistake impact in raids and Mythic+.",
+    "Directional stat priority calculator for World of Warcraft PvE.",
 };
 
-
-export default function UptimePage() {
+export default function StatImpactPage() {
  const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
@@ -32,20 +33,20 @@ export default function UptimePage() {
           </Link>
 
           <div className="ml-auto">
-            <Link href="/calculators/wow/pve" className={navBtn}>
-              WoW PvE
+             <Link href="/calculators/wow" className={navBtn}>
+              WoW Hub
             </Link>
           </div>
         </header>
 
-
-        <h1 className="mt-8 text-4xl font-bold">Uptime / Mistake Impact</h1>
+        <h1 className="mt-8 text-4xl font-bold">Stat Impact</h1>
         <p className="mt-3 text-neutral-300">
-          Estimate DPS loss from downtime and missed cooldown usage.
+          Import a character, choose a spec + content type, and get directional
+          stat priority (non-sim).
         </p>
 
         <div className="mt-10">
-          <UptimeClient />
+          <StatImpactClient />
         </div>
       </div>
     </main>

@@ -28,8 +28,8 @@ export default function WoWUpgradeCheckerPage() {
           </Link>
 
           <div className="ml-auto">
-            <Link href="/calculators/wow/pve" className={navBtn}>
-              WoW PvE
+            <Link href="/calculators/wow" className={navBtn}>
+              WoW Hub
             </Link>
           </div>
         </header>

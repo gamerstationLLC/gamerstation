@@ -1,16 +1,15 @@
-// app/calculators/wow/pve/stat-impact/page.tsx
 import Link from "next/link";
-import StatImpactClient from "./StatImpactClient";
-
+import MythicPlusClient from "./MythicPlusClient";
 
 export const metadata = {
-  title: "WoW Stat Impact Calculator | GamerStation",
+  title:
+    "WoW Mythic+ Scaling Calculator – Health & Damage by Key Level | GamerStation",
   description:
-    "Directional stat priority calculator for World of Warcraft PvE.",
+    "WoW Mythic+ scaling calculator showing enemy health and damage multipliers by key level. Plan pulls and cooldowns for higher keys.",
 };
 
-export default function StatImpactPage() {
- const navBtn =
+export default function MythicPlusPage() {
+  const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
@@ -33,20 +32,22 @@ export default function StatImpactPage() {
           </Link>
 
           <div className="ml-auto">
-            <Link href="/calculators/wow/pve" className={navBtn}>
-              WoW PvE
+             <Link href="/calculators/wow" className={navBtn}>
+              WoW Hub
             </Link>
           </div>
         </header>
 
-        <h1 className="mt-8 text-4xl font-bold">Stat Impact</h1>
+        {/* Back link */}
+        
+
+        <h1 className="mt-8 text-4xl font-bold">Mythic+ Scaling</h1>
         <p className="mt-3 text-neutral-300">
-          Import a character, choose a spec + content type, and get directional
-          stat priority (non-sim).
+          See how enemy health and damage scale by keystone level.
         </p>
 
         <div className="mt-10">
-          <StatImpactClient />
+          <MythicPlusClient />
         </div>
       </div>
     </main>

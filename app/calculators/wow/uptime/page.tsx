@@ -1,15 +1,15 @@
 import Link from "next/link";
-import MythicPlusClient from "./MythicPlusClient";
+import UptimeClient from "./UptimeClient";
 
 export const metadata = {
-  title:
-    "WoW Mythic+ Scaling Calculator – Health & Damage by Key Level | GamerStation",
+  title: "WoW Uptime & Mistake DPS Loss Calculator | GamerStation",
   description:
-    "WoW Mythic+ scaling calculator showing enemy health and damage multipliers by key level. Plan pulls and cooldowns for higher keys.",
+    "Estimate DPS loss in WoW PvE from downtime, missed globals, and delayed cooldowns. A fast tool to understand mistake impact in raids and Mythic+.",
 };
 
-export default function MythicPlusPage() {
-  const navBtn =
+
+export default function UptimePage() {
+ const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
@@ -32,22 +32,20 @@ export default function MythicPlusPage() {
           </Link>
 
           <div className="ml-auto">
-            <Link href="/calculators/wow/pve" className={navBtn}>
-              WoW PvE
+            <Link href="/calculators/wow" className={navBtn}>
+              WoW Hub
             </Link>
           </div>
         </header>
 
-        {/* Back link */}
-        
 
-        <h1 className="mt-8 text-4xl font-bold">Mythic+ Scaling</h1>
+        <h1 className="mt-8 text-4xl font-bold">Uptime / Mistake Impact</h1>
         <p className="mt-3 text-neutral-300">
-          See how enemy health and damage scale by keystone level.
+          Estimate DPS loss from downtime and missed cooldown usage.
         </p>
 
         <div className="mt-10">
-          <MythicPlusClient />
+          <UptimeClient />
         </div>
       </div>
     </main>
