@@ -1,14 +1,22 @@
-import dotenv from "dotenv";
 import path from "path";
 import fs from "fs/promises";
+import dotenv from "dotenv";
 
-dotenv.config({ path: path.join(process.cwd(), ".env.local") });
+// ✅ Load .env.local IF it exists (local dev), otherwise rely on GH Actions env/secrets
+try {
+  dotenv.config({ path: path.join(process.cwd(), ".env.local") });
+} catch {
+  // ignore
+}
 
 const clientId = process.env.BLIZZARD_CLIENT_ID;
 const clientSecret = process.env.BLIZZARD_CLIENT_SECRET;
 
 if (!clientId || !clientSecret) {
-  console.error("Missing BLIZZARD_CLIENT_ID / BLIZZARD_CLIENT_SECRET in .env.local");
+  console.error(
+    "Missing BLIZZARD_CLIENT_ID / BLIZZARD_CLIENT_SECRET. " +
+      "Set them in .env.local (local) or GitHub Secrets (Actions)."
+  );
   process.exit(1);
 }
 
@@ -19,37 +27,18 @@ type ItemIndexRow = {
   ilvl?: number; // item.level
 };
 
-type NormStatKey =
-  | "str"
-  | "agi"
-  | "int"
-  | "sta"
-  | "crit"
-  | "haste"
-  | "mastery"
-  | "vers"
-  | "leech"
-  | "avoid"
-  | "speed";
-
-type NormStats = Partial<Record<NormStatKey, number>>;
-
 type ItemDetailsRow = ItemIndexRow & {
   quality?: string;
   item_class?: string;
   item_subclass?: string;
 
   /**
-   * ✅ Human-friendly normalized stats for UI + scoring.
-   * Example:
-   * { agi: 412, crit: 287, haste: 190, mastery: 0, vers: 133 }
+   * ✅ UI expects Blizzard stat keys, so this must be a record like:
+   * { STRENGTH: 123, CRIT_RATING: 456, ... }
    */
-  stats?: NormStats;
+  stats?: Record<string, number>;
 
-  /**
-   * ✅ Keep raw stats too (optional, but nice for debugging/regeneration)
-   * Blizzard preview_item.stats -> [{type,value}]
-   */
+  /** ✅ Keep raw array too (optional but useful) */
   stats_raw?: Array<{ type: string; value: number }>;
 
   required_level?: number;
@@ -121,7 +110,6 @@ async function pickLatestRaidInstanceId(
 
   const raids: Array<{ id: number; name?: string }> = [];
 
-  // We must look up each instance to know its category.
   for (const inst of instances) {
     try {
       const detail = await getInstanceDetail(token, inst.id);
@@ -137,7 +125,6 @@ async function pickLatestRaidInstanceId(
 
   if (!raids.length) return null;
 
-  // pick highest ID among raids
   raids.sort((a, b) => b.id - a.id);
   return raids[0];
 }
@@ -183,15 +170,15 @@ async function collectDungeonItemIds(
       const detail = await getInstanceDetail(token, inst.id);
       const cat = String(detail?.category?.type ?? "").toUpperCase();
 
-      // Keep only actual dungeons.
       if (!cat.includes("DUNGEON")) continue;
 
       const ids = await collectLootItemIdsFromInstance(token, inst.id);
 
-      // Only keep instances that actually drop loot via journal items
       if (ids.length > 0) {
         allItemIds.push(...ids);
-        console.log(`Dungeon: ${detail?.name ?? inst.name ?? inst.id} → ${ids.length} item IDs`);
+        console.log(
+          `Dungeon: ${detail?.name ?? inst.name ?? inst.id} → ${ids.length} item IDs`
+        );
       }
     } catch {
       // ignore
@@ -202,40 +189,42 @@ async function collectDungeonItemIds(
 }
 
 /* ============================
-   ✅ Stat normalization helpers
+   ✅ Stats normalization for UI
+   We store Blizzard-style keys:
+   STRENGTH, AGILITY, INTELLECT, STAMINA,
+   CRIT_RATING, HASTE_RATING, MASTERY_RATING, VERSATILITY,
+   plus LEECH, AVOIDANCE, SPEED
 ============================ */
-function addStat(out: NormStats, k: NormStatKey, v: number) {
+function addStat(out: Record<string, number>, k: string, v: number) {
   out[k] = (out[k] ?? 0) + v;
 }
 
-function normalizeStatsFromBlizzard(
-  raw: Array<{ type?: string; value?: number }> | undefined
-): NormStats {
-  const out: NormStats = {};
-
+function statsRecordFromRaw(raw: Array<{ type?: string; value?: number }> | undefined) {
+  const out: Record<string, number> = {};
   for (const s of raw ?? []) {
-    const t = String(s?.type ?? "").toUpperCase();
-    const v = Number(s?.value ?? 0);
-    if (!Number.isFinite(v) || v === 0) continue;
+    const type = String(s?.type ?? "").toUpperCase().trim();
+    const value = Number(s?.value ?? 0);
+    if (!type || !Number.isFinite(value) || value === 0) continue;
 
-    // Blizzard preview_item.stats "type.type" strings:
-    // STRENGTH, AGILITY, INTELLECT, STAMINA,
-    // CRIT_RATING, HASTE_RATING, MASTERY_RATING, VERSATILITY,
-    // plus tertiary: LEECH, AVOIDANCE, SPEED
-    if (t === "STRENGTH") addStat(out, "str", v);
-    else if (t === "AGILITY") addStat(out, "agi", v);
-    else if (t === "INTELLECT") addStat(out, "int", v);
-    else if (t === "STAMINA") addStat(out, "sta", v);
-    else if (t.includes("CRIT")) addStat(out, "crit", v);
-    else if (t.includes("HASTE")) addStat(out, "haste", v);
-    else if (t.includes("MASTERY")) addStat(out, "mastery", v);
-    else if (t.includes("VERSATILITY") || t === "VERSATILITY") addStat(out, "vers", v);
-    else if (t.includes("LEECH")) addStat(out, "leech", v);
-    else if (t.includes("AVOID")) addStat(out, "avoid", v);
-    else if (t === "SPEED" || t.includes("SPEED")) addStat(out, "speed", v);
-    // else: ignore unknown stats for now
+    // Keep as Blizzard-like keys
+    // Some sources may already be clean like "CRIT_RATING"
+    // If we see "CRIT" or similar, normalize to the expected keys.
+    if (type === "STRENGTH") addStat(out, "STRENGTH", value);
+    else if (type === "AGILITY") addStat(out, "AGILITY", value);
+    else if (type === "INTELLECT") addStat(out, "INTELLECT", value);
+    else if (type === "STAMINA") addStat(out, "STAMINA", value);
+    else if (type.includes("CRIT")) addStat(out, "CRIT_RATING", value);
+    else if (type.includes("HASTE")) addStat(out, "HASTE_RATING", value);
+    else if (type.includes("MASTERY")) addStat(out, "MASTERY_RATING", value);
+    else if (type.includes("VERSATILITY")) addStat(out, "VERSATILITY", value);
+    else if (type.includes("LEECH")) addStat(out, "LEECH", value);
+    else if (type.includes("AVOID")) addStat(out, "AVOIDANCE", value);
+    else if (type.includes("SPEED")) addStat(out, "SPEED", value);
+    else {
+      // Keep unknown keys too, but they may not have pretty labels
+      addStat(out, type, value);
+    }
   }
-
   return out;
 }
 
@@ -249,7 +238,7 @@ async function fetchItemDetails(token: string, itemId: number): Promise<ItemDeta
       value: Number(s.value ?? 0),
     })) ?? [];
 
-  const stats = normalizeStatsFromBlizzard(stats_raw);
+  const stats = statsRecordFromRaw(stats_raw);
 
   return {
     id: item.id,
@@ -260,10 +249,7 @@ async function fetchItemDetails(token: string, itemId: number): Promise<ItemDeta
     item_class: item.item_class?.name,
     item_subclass: item.item_subclass?.name,
 
-    // ✅ normalized for UI/scoring
     stats,
-
-    // ✅ keep raw too (optional)
     stats_raw,
 
     required_level: item.required_level,
@@ -280,11 +266,15 @@ async function main() {
   if (!raidId) {
     console.log("⚠️ Could not find a RAID instance in journal data.");
   } else {
-    console.log(`✅ Raid picked: ${raidPicked?.name ?? "(unknown)"} (instance ${raidId})`);
+    console.log(
+      `✅ Raid picked: ${raidPicked?.name ?? "(unknown)"} (instance ${raidId})`
+    );
   }
 
   // 2) Collect item IDs
-  const raidItemIds = raidId ? await collectLootItemIdsFromInstance(token, raidId) : [];
+  const raidItemIds = raidId
+    ? await collectLootItemIdsFromInstance(token, raidId)
+    : [];
   console.log(`Raid loot item IDs: ${raidItemIds.length}`);
 
   const dungeonItemIds = await collectDungeonItemIds(token, raidId);
@@ -293,7 +283,7 @@ async function main() {
   const allIds = uniq([...raidItemIds, ...dungeonItemIds]);
   console.log(`Total unique item IDs to fetch: ${allIds.length}`);
 
-  // 3) Fetch items (sequential to keep it simple + safe)
+  // 3) Fetch items
   const itemsById: Record<string, ItemDetailsRow> = {};
   const index: ItemIndexRow[] = [];
 
@@ -309,7 +299,6 @@ async function main() {
       ok++;
       if (ok % 50 === 0) console.log(`Fetched ${ok}/${allIds.length}...`);
 
-      // small courtesy delay (avoids bursts)
       await sleep(30);
     } catch (e: any) {
       fail++;
@@ -319,7 +308,7 @@ async function main() {
 
   index.sort((a, b) => a.name.localeCompare(b.name));
 
-  // 4) Write outputs (overwrite every run)
+  // 4) Write outputs
   const outDir = path.join(process.cwd(), "public", "data", "wow");
   await fs.mkdir(outDir, { recursive: true });
 
@@ -331,7 +320,9 @@ async function main() {
 
   console.log("");
   console.log(`✅ Wrote items_index (${index.length}) → ${indexPath}`);
-  console.log(`✅ Wrote items_by_id (${Object.keys(itemsById).length}) → ${byIdPath}`);
+  console.log(
+    `✅ Wrote items_by_id (${Object.keys(itemsById).length}) → ${byIdPath}`
+  );
   console.log(`Done. ok=${ok} fail=${fail}`);
 }
 

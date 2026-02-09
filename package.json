@@ -23,7 +23,8 @@
     "lol:finalize:champion-tiers": "npx tsx ./scripts/riot/finalize-champion-tiers-from-cache.ts",
     "dota:immortal:build": "npx tsx scripts/dota/build-immortal-from-explorer.ts",
     "dota:immortal:finalize": "npx tsx scripts/dota/finalize-immortal-from-cache.ts",
-    "dota:immortal": "npm run dota:immortal:build && npm run dota:immortal:finalize"
+    "dota:immortal": "npm run dota:immortal:build && npm run dota:immortal:finalize",
+    "wow:update": "npx tsx scripts/wow/build-wow-items.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",

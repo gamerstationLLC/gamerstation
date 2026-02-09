@@ -1,0 +1,433 @@
+{
+  "version": 1,
+  "specs": {
+    "arms_warrior": {
+      "mplus": {
+        "st": {
+          "STRENGTH": 0.3,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.55,
+          "HASTE_RATING": 0.55,
+          "MASTERY_RATING": 0.5,
+          "VERSATILITY": 0.45
+        },
+        "aoe": {
+          "STRENGTH": 0.3,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.55,
+          "HASTE_RATING": 0.6,
+          "MASTERY_RATING": 0.55,
+          "VERSATILITY": 0.45
+        }
+      },
+      "raid": {
+        "st": {
+          "STRENGTH": 0.3,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.55,
+          "HASTE_RATING": 0.55,
+          "MASTERY_RATING": 0.53,
+          "VERSATILITY": 0.45
+        },
+        "aoe": {
+          "STRENGTH": 0.3,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.58,
+          "HASTE_RATING": 0.6,
+          "MASTERY_RATING": 0.55,
+          "VERSATILITY": 0.45
+        }
+      }
+    },
+
+    "fury_warrior": {
+      "mplus": {
+        "st": {
+          "STRENGTH": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.65,
+          "HASTE_RATING": 0.6,
+          "MASTERY_RATING": 0.45,
+          "VERSATILITY": 0.5
+        },
+        "aoe": {
+          "STRENGTH": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.6,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.5,
+          "VERSATILITY": 0.5
+        }
+      },
+      "raid": {
+        "st": {
+          "STRENGTH": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.65,
+          "HASTE_RATING": 0.6,
+          "MASTERY_RATING": 0.45,
+          "VERSATILITY": 0.5
+        },
+        "aoe": {
+          "STRENGTH": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.62,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.48,
+          "VERSATILITY": 0.5
+        }
+      }
+    },
+
+    "prot_warrior": {
+      "mplus": {
+        "st": {
+          "STRENGTH": 0.25,
+          "STAMINA": 0.2,
+          "HASTE_RATING": 0.6,
+          "VERSATILITY": 0.65,
+          "MASTERY_RATING": 0.55,
+          "CRIT_RATING": 0.3
+        },
+        "aoe": {
+          "STRENGTH": 0.25,
+          "STAMINA": 0.2,
+          "HASTE_RATING": 0.6,
+          "VERSATILITY": 0.65,
+          "MASTERY_RATING": 0.55,
+          "CRIT_RATING": 0.3
+        }
+      },
+      "raid": {
+        "st": {
+          "STRENGTH": 0.25,
+          "STAMINA": 0.2,
+          "HASTE_RATING": 0.55,
+          "VERSATILITY": 0.7,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.3
+        },
+        "aoe": {
+          "STRENGTH": 0.25,
+          "STAMINA": 0.2,
+          "HASTE_RATING": 0.55,
+          "VERSATILITY": 0.7,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.3
+        }
+      }
+    },
+
+    "havoc_dh": {
+      "mplus": {
+        "st": {
+          "AGILITY": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.6,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.5,
+          "VERSATILITY": 0.5
+        },
+        "aoe": {
+          "AGILITY": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.55,
+          "HASTE_RATING": 0.7,
+          "MASTERY_RATING": 0.55,
+          "VERSATILITY": 0.5
+        }
+      },
+      "raid": {
+        "st": {
+          "AGILITY": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.6,
+          "HASTE_RATING": 0.6,
+          "MASTERY_RATING": 0.55,
+          "VERSATILITY": 0.5
+        },
+        "aoe": {
+          "AGILITY": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.55,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.55,
+          "VERSATILITY": 0.5
+        }
+      }
+    },
+
+    "vengeance_dh": {
+      "mplus": {
+        "st": {
+          "AGILITY": 0.25,
+          "STAMINA": 0.25,
+          "HASTE_RATING": 0.65,
+          "VERSATILITY": 0.65,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.3
+        },
+        "aoe": {
+          "AGILITY": 0.25,
+          "STAMINA": 0.25,
+          "HASTE_RATING": 0.65,
+          "VERSATILITY": 0.65,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.3
+        }
+      },
+      "raid": {
+        "st": {
+          "AGILITY": 0.25,
+          "STAMINA": 0.25,
+          "HASTE_RATING": 0.6,
+          "VERSATILITY": 0.7,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.3
+        },
+        "aoe": {
+          "AGILITY": 0.25,
+          "STAMINA": 0.25,
+          "HASTE_RATING": 0.6,
+          "VERSATILITY": 0.7,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.3
+        }
+      }
+    },
+
+    "fire_mage": {
+      "mplus": {
+        "st": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.7,
+          "HASTE_RATING": 0.55,
+          "MASTERY_RATING": 0.6,
+          "VERSATILITY": 0.45
+        },
+        "aoe": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.65,
+          "HASTE_RATING": 0.6,
+          "MASTERY_RATING": 0.65,
+          "VERSATILITY": 0.45
+        }
+      },
+      "raid": {
+        "st": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.75,
+          "HASTE_RATING": 0.5,
+          "MASTERY_RATING": 0.6,
+          "VERSATILITY": 0.45
+        },
+        "aoe": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "CRIT_RATING": 0.7,
+          "HASTE_RATING": 0.55,
+          "MASTERY_RATING": 0.65,
+          "VERSATILITY": 0.45
+        }
+      }
+    },
+
+    "frost_mage": {
+      "mplus": {
+        "st": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "HASTE_RATING": 0.7,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.45
+        },
+        "aoe": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "HASTE_RATING": 0.7,
+          "MASTERY_RATING": 0.65,
+          "CRIT_RATING": 0.45,
+          "VERSATILITY": 0.45
+        }
+      },
+      "raid": {
+        "st": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "HASTE_RATING": 0.75,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.45,
+          "VERSATILITY": 0.45
+        },
+        "aoe": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "HASTE_RATING": 0.7,
+          "MASTERY_RATING": 0.65,
+          "CRIT_RATING": 0.45,
+          "VERSATILITY": 0.45
+        }
+      }
+    },
+
+    "arcane_mage": {
+      "mplus": {
+        "st": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "MASTERY_RATING": 0.7,
+          "HASTE_RATING": 0.6,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.45
+        },
+        "aoe": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "MASTERY_RATING": 0.7,
+          "HASTE_RATING": 0.6,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.45
+        }
+      },
+      "raid": {
+        "st": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "MASTERY_RATING": 0.75,
+          "HASTE_RATING": 0.55,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.45
+        },
+        "aoe": {
+          "INTELLECT": 0.32,
+          "STAMINA": 0.05,
+          "MASTERY_RATING": 0.75,
+          "HASTE_RATING": 0.55,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.45
+        }
+      }
+    },
+
+    "ret_paladin": {
+      "mplus": {
+        "st": {
+          "STRENGTH": 0.32,
+          "STAMINA": 0.05,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.5
+        },
+        "aoe": {
+          "STRENGTH": 0.32,
+          "STAMINA": 0.05,
+          "HASTE_RATING": 0.7,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.5
+        }
+      },
+      "raid": {
+        "st": {
+          "STRENGTH": 0.32,
+          "STAMINA": 0.05,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.65,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.5
+        },
+        "aoe": {
+          "STRENGTH": 0.32,
+          "STAMINA": 0.05,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.65,
+          "CRIT_RATING": 0.5,
+          "VERSATILITY": 0.5
+        }
+      }
+    },
+
+    "prot_paladin": {
+      "mplus": {
+        "st": {
+          "STRENGTH": 0.25,
+          "STAMINA": 0.25,
+          "HASTE_RATING": 0.7,
+          "VERSATILITY": 0.7,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.3
+        },
+        "aoe": {
+          "STRENGTH": 0.25,
+          "STAMINA": 0.25,
+          "HASTE_RATING": 0.7,
+          "VERSATILITY": 0.7,
+          "MASTERY_RATING": 0.6,
+          "CRIT_RATING": 0.3
+        }
+      },
+      "raid": {
+        "st": {
+          "STRENGTH": 0.25,
+          "STAMINA": 0.25,
+          "HASTE_RATING": 0.65,
+          "VERSATILITY": 0.75,
+          "MASTERY_RATING": 0.65,
+          "CRIT_RATING": 0.3
+        },
+        "aoe": {
+          "STRENGTH": 0.25,
+          "STAMINA": 0.25,
+          "HASTE_RATING": 0.65,
+          "VERSATILITY": 0.75,
+          "MASTERY_RATING": 0.65,
+          "CRIT_RATING": 0.3
+        }
+      }
+    },
+
+    "holy_paladin": {
+      "mplus": {
+        "st": {
+          "INTELLECT": 0.3,
+          "STAMINA": 0.1,
+          "HASTE_RATING": 0.7,
+          "MASTERY_RATING": 0.65,
+          "CRIT_RATING": 0.6,
+          "VERSATILITY": 0.5
+        },
+        "aoe": {
+          "INTELLECT": 0.3,
+          "STAMINA": 0.1,
+          "HASTE_RATING": 0.7,
+          "MASTERY_RATING": 0.65,
+          "CRIT_RATING": 0.6,
+          "VERSATILITY": 0.5
+        }
+      },
+      "raid": {
+        "st": {
+          "INTELLECT": 0.3,
+          "STAMINA": 0.1,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.7,
+          "CRIT_RATING": 0.6,
+          "VERSATILITY": 0.5
+        },
+        "aoe": {
+          "INTELLECT": 0.3,
+          "STAMINA": 0.1,
+          "HASTE_RATING": 0.65,
+          "MASTERY_RATING": 0.7,
+          "CRIT_RATING": 0.6,
+          "VERSATILITY": 0.5
+        }
+      }
+    }
+  }
+}

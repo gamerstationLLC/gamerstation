@@ -1,0 +1,108 @@
+name: Auto Update WoW Data
+
+on:
+  schedule:
+    # 12:00am EST (America/New_York)
+    # ✅ Use 05:00 UTC to represent midnight EST (standard time).
+    # If DST shifts, you can change this to 04:00 UTC for midnight EDT.
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: wow-auto-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  wow:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ✅ Always start from latest origin/main (NO MERGE COMMITS here)
+      - name: Sync with main (pre-build)
+        run: |
+          set -e
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      # ✅ Generate WoW JSONs (static files, no Blob)
+      - name: Update WoW items + weights
+        env:
+          BLIZZARD_CLIENT_ID: ${{ secrets.BLIZZARD_CLIENT_ID }}
+          BLIZZARD_CLIENT_SECRET: ${{ secrets.BLIZZARD_CLIENT_SECRET }}
+        run: |
+          set -euo pipefail
+
+          # If your wow:update script also generates weights, this is enough.
+          # Otherwise keep wow:update and wow:update:weights both.
+          if npm run -s wow:update >/dev/null 2>&1; then
+            npm run wow:update
+          else
+            echo "Missing script wow:update in package.json"
+            exit 1
+          fi
+
+          if npm run -s wow:update:weights >/dev/null 2>&1; then
+            npm run wow:update:weights
+          fi
+
+      # ✅ Commit only if these files changed (patch/loot changes)
+      - name: Commit & push WoW data only (if changed)
+        run: |
+          set -euo pipefail
+
+          git config user.name "gamerstation-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          CANDIDATES=(
+            "public/data/wow/items_index.json"
+            "public/data/wow/items_by_id.json"
+            "public/data/wow/stats_weights.json"
+          )
+
+          for p in "${CANDIDATES[@]}"; do
+            if [ -e "$p" ]; then
+              git add -A "$p"
+            fi
+          done
+
+          if git diff --cached --quiet; then
+            echo "No WoW changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore(wow): refresh WoW items/weights"
+
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git pull --no-rebase origin main || true
+            if git push origin main; then
+              echo "Push succeeded."
+              exit 0
+            fi
+            sleep 5
+          done
+
+          echo "Push failed after retries."
+          exit 1
