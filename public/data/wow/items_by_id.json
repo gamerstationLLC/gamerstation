@@ -24414,45 +24414,6 @@
     ],
     "required_level": 27
   },
-  "27528": {
-    "id": 27528,
-    "name": "Gauntlets of Desolation",
-    "slot": "HAND",
-    "ilvl": 32,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Mail",
-    "stats": {
-      "INTELLECT": 3,
-      "AGILITY": 3,
-      "STAMINA": 4,
-      "CRIT_RATING": 3,
-      "HASTE_RATING": 3
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 3
-      },
-      {
-        "type": "AGILITY",
-        "value": 3
-      },
-      {
-        "type": "STAMINA",
-        "value": 4
-      },
-      {
-        "type": "CRIT_RATING",
-        "value": 3
-      },
-      {
-        "type": "HASTE_RATING",
-        "value": 3
-      }
-    ],
-    "required_level": 27
-  },
   "27529": {
     "id": 27529,
     "name": "Figurine of the Colossus",
@@ -107579,45 +107540,6 @@
     ],
     "required_level": 30
   },
-  "133488": {
-    "id": 133488,
-    "name": "Polished Mirror Helm",
-    "slot": "HEAD",
-    "ilvl": 35,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Mail",
-    "stats": {
-      "INTELLECT": 16,
-      "AGILITY": 16,
-      "STAMINA": 25,
-      "CRIT_RATING": 8,
-      "HASTE_RATING": 25
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 16
-      },
-      {
-        "type": "AGILITY",
-        "value": 16
-      },
-      {
-        "type": "STAMINA",
-        "value": 25
-      },
-      {
-        "type": "CRIT_RATING",
-        "value": 8
-      },
-      {
-        "type": "HASTE_RATING",
-        "value": 25
-      }
-    ],
-    "required_level": 30
-  },
   "133489": {
     "id": 133489,
     "name": "Ice-Steeped Sandals",
@@ -158531,6 +158453,45 @@
     ],
     "required_level": 60
   },
+  "178699": {
+    "id": 178699,
+    "name": "Sapgorger Belt",
+    "slot": "WAIST",
+    "ilvl": 158,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 6,
+      "AGILITY": 6,
+      "STAMINA": 9,
+      "HASTE_RATING": 8,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 6
+      },
+      {
+        "type": "AGILITY",
+        "value": 6
+      },
+      {
+        "type": "STAMINA",
+        "value": 9
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 60
+  },
   "178700": {
     "id": 178700,
     "name": "Clasp of Waning Shadow",
@@ -158605,6 +158566,45 @@
       {
         "type": "MASTERY_RATING",
         "value": 9
+      }
+    ],
+    "required_level": 60
+  },
+  "178702": {
+    "id": 178702,
+    "name": "Bands of the Undergrowth",
+    "slot": "WRIST",
+    "ilvl": 158,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 7,
+      "CRIT_RATING": 5,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 7
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
       }
     ],
     "required_level": 60
@@ -168291,6 +168291,18 @@
   "183199": {
     "id": 183199,
     "name": "Withering Ground",
+    "slot": "NON_EQUIP",
+    "ilvl": 145,
+    "quality": "UNCOMMON",
+    "item_class": "Consumable",
+    "item_subclass": "Other",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "183202": {
+    "id": 183202,
+    "name": "Deadly Tandem",
     "slot": "NON_EQUIP",
     "ilvl": 145,
     "quality": "UNCOMMON",
@@ -184358,6 +184370,45 @@
       {
         "type": "VERSATILITY",
         "value": 7
+      }
+    ],
+    "required_level": 58
+  },
+  "193759": {
+    "id": 193759,
+    "name": "Egg Tender's Leggings",
+    "slot": "LEGS",
+    "ilvl": 250,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 11,
+      "AGILITY": 11,
+      "STAMINA": 16,
+      "HASTE_RATING": 8,
+      "VERSATILITY": 13
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 11
+      },
+      {
+        "type": "AGILITY",
+        "value": 11
+      },
+      {
+        "type": "STAMINA",
+        "value": 16
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 13
       }
     ],
     "required_level": 58
