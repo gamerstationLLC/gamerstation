@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import UpgradeCheckerClient from "./client";
-import { readPublicJson } from "@/lib/blob";
 
 export const metadata: Metadata = {
   title: "WoW Item Upgrade Checker | GamerStation",
@@ -9,82 +8,9 @@ export const metadata: Metadata = {
     "Compare two World of Warcraft items and estimate upgrade value by spec and content type (Raid / Mythic+).",
 };
 
-type ItemIndexRow = {
-  id: number;
-  name: string;
-  slot?: string;
-  ilvl?: number;
-};
-
-type FullItem = {
-  id: number;
-  name: string;
-  slot?: string;
-  ilvl?: number;
-  stats?: Record<string, number>;
-  description?: string;
-};
-
-type StatKey =
-  | "STRENGTH"
-  | "AGILITY"
-  | "INTELLECT"
-  | "STAMINA"
-  | "CRIT_RATING"
-  | "HASTE_RATING"
-  | "MASTERY_RATING"
-  | "VERSATILITY";
-
-type SpecKey =
-  | "havoc_dh"
-  | "vengeance_dh"
-  | "fire_mage"
-  | "frost_mage"
-  | "arcane_mage"
-  | "ret_paladin"
-  | "prot_paladin"
-  | "holy_paladin"
-  | "arms_warrior"
-  | "fury_warrior"
-  | "prot_warrior";
-
-type StatWeightsJson = {
-  version?: number;
-  // Shape: specs[spec][content][profile][STAT] = weight
-  specs: Partial<
-    Record<
-      SpecKey,
-      Partial<
-        Record<
-          "mplus" | "raid",
-          Partial<Record<"st" | "aoe", Partial<Record<StatKey, number>>>>
-        >
-      >
-    >
-  >;
-};
-
-export default async function WoWUpgradeCheckerPage() {
+export default function WoWUpgradeCheckerPage() {
   const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
-
-  // ✅ Static disk JSON (disk-first, blob fallback via readPublicJson)
-  const itemsIndex =
-    (await readPublicJson<ItemIndexRow[]>("data/wow/items_index.json").catch(
-      () => []
-    )) ?? [];
-
-  const itemsById =
-    (await readPublicJson<Record<number, FullItem>>(
-      "data/wow/items_by_id.json"
-    ).catch(() => ({}))) ?? {};
-
-  // ✅ Load stat weights too
-  // NOTE: your file is currently named stats_weights.json (plural)
-  const statWeights =
-    (await readPublicJson<StatWeightsJson>(
-      "data/wow/stats_weights.json"
-    ).catch(() => null)) ?? null;
 
   return (
     <main className="min-h-screen bg-black text-white px-6 py-16">
@@ -114,11 +40,8 @@ export default async function WoWUpgradeCheckerPage() {
         </p>
 
         <div className="mt-10">
-          <UpgradeCheckerClient
-            itemsIndex={itemsIndex}
-            itemsById={itemsById}
-            statWeights={statWeights}
-          />
+          {/* ✅ Client now fetches JSON from /public after first paint */}
+          <UpgradeCheckerClient />
         </div>
       </div>
     </main>
