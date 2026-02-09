@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 export type ItemIndexRow = {
   id: number;
@@ -183,7 +183,6 @@ function normalizeStats(stats: FullItem["stats"]): Record<string, number> {
   const out: Record<string, number> = {};
   if (!stats) return out;
 
-  // array: [{type,value}]
   if (Array.isArray(stats)) {
     for (const s of stats) {
       if (!s) continue;
@@ -196,7 +195,6 @@ function normalizeStats(stats: FullItem["stats"]): Record<string, number> {
     return out;
   }
 
-  // object: {KEY: value}
   if (typeof stats === "object") {
     for (const [k, v] of Object.entries(stats)) {
       out[k] = (out[k] ?? 0) + getStatNumber(v);
@@ -237,126 +235,6 @@ function Badge({ label }: { label: string }) {
     <span className={`${base} border-neutral-800 text-neutral-200`}>
       {label}
     </span>
-  );
-}
-
-function ItemPicker({
-  title,
-  itemsIndex,
-  itemsById,
-  picked,
-  onPick,
-  isLoading,
-}: {
-  title: string;
-  itemsIndex: ItemIndexRow[];
-  itemsById: Record<number, FullItem>;
-  picked: ItemIndexRow | null;
-  onPick: (item: ItemIndexRow | null) => void;
-  isLoading: boolean;
-}) {
-  const [q, setQ] = useState("");
-
-  const suggestions = useMemo(() => {
-    const qq = q.trim().toLowerCase();
-    if (!qq) return [];
-    return itemsIndex
-      .filter((r) => toText(r.name).toLowerCase().includes(qq))
-      .slice(0, 10);
-  }, [q, itemsIndex]);
-
-  const full = picked ? itemsById[picked.id] : null;
-
-  const pickedName = picked ? toText(picked.name) : "";
-  const pickedSlot = picked?.slot ? toText(picked.slot) : "";
-  const pickedIlvl = toNumber(picked?.ilvl);
-
-  return (
-    <div className={card}>
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-sm font-semibold">{title}</div>
-        {picked ? (
-          <button
-            type="button"
-            onClick={() => onPick(null)}
-            className="text-sm text-neutral-300 hover:text-white transition"
-          >
-            Clear
-          </button>
-        ) : null}
-      </div>
-
-      <div className="mt-4 relative">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={
-            isLoading
-              ? "Loading items…"
-              : itemsIndex.length
-              ? "Search item name…"
-              : "No items…"
-          }
-          className={input}
-          autoComplete="off"
-          disabled={isLoading || !itemsIndex.length}
-        />
-
-        {q.trim() && !isLoading && (
-          <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-neutral-800 bg-black">
-            {suggestions.length ? (
-              suggestions.map((s) => {
-                const sName = toText(s.name);
-                const sIlvl = toNumber(s.ilvl);
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => {
-                      onPick(s);
-                      setQ("");
-                    }}
-                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm text-neutral-200 hover:bg-neutral-900 transition"
-                  >
-                    <span className="truncate font-semibold">{sName}</span>
-                    <span className="shrink-0 text-xs text-neutral-400">
-                      {sIlvl != null ? `ilvl ${sIlvl}` : "—"}
-                    </span>
-                  </button>
-                );
-              })
-            ) : (
-              <div className="px-3 py-2 text-sm text-neutral-500">
-                No results.
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="mt-4 rounded-xl border border-neutral-800 bg-black p-4">
-        {isLoading ? (
-          <div className="text-sm text-neutral-400">Loading item data…</div>
-        ) : picked ? (
-          <div className="space-y-2">
-            <div className="text-sm font-semibold text-white">{pickedName}</div>
-
-            <div className="text-xs text-neutral-400">
-              ID: {picked.id}
-              {pickedSlot ? ` • Slot: ${pickedSlot}` : ""}
-              {pickedIlvl != null ? ` • ilvl: ${pickedIlvl}` : ""}
-              {full?.required_level != null
-                ? ` • Req lvl: ${full.required_level}`
-                : ""}
-            </div>
-          </div>
-        ) : (
-          <div className="text-sm text-neutral-400">
-            Pick an item to compare.
-          </div>
-        )}
-      </div>
-    </div>
   );
 }
 
@@ -441,17 +319,11 @@ function computeComparison(
   let verdict: {
     label: "Ready" | "Upgrade" | "Downgrade" | "Sidegrade";
     sub: string;
-  } = {
-    label: "Ready",
-    sub: "Select two items to compare.",
-  };
+  } = { label: "Ready", sub: "Select two items to compare." };
 
   if (hasBoth) {
     if (!Object.keys(weights).length) {
-      verdict = {
-        label: "Sidegrade",
-        sub: "No weights found for this spec (check JSON)",
-      };
+      verdict = { label: "Sidegrade", sub: "No weights found for this spec" };
     } else if (scoreDelta > 0.5) {
       verdict = { label: "Upgrade", sub: `+${scoreDelta.toFixed(1)} score` };
     } else if (scoreDelta < -0.5) {
@@ -482,6 +354,8 @@ function ComparisonPanel({
   spec,
   focus,
   profile,
+  isByIdLoaded,
+  isByIdLoading,
 }: {
   a: ItemIndexRow | null;
   b: ItemIndexRow | null;
@@ -490,6 +364,8 @@ function ComparisonPanel({
   spec: SpecKey;
   focus: ContentFocus;
   profile: DamageProfile;
+  isByIdLoaded: boolean;
+  isByIdLoading: boolean;
 }) {
   const aFull = a ? itemsById[a.id] : null;
   const bFull = b ? itemsById[b.id] : null;
@@ -507,6 +383,8 @@ function ComparisonPanel({
 
   const topRows = data.rows.slice(0, 18);
 
+  const needsDetails = Boolean((a || b) && !isByIdLoaded);
+
   return (
     <div className={card}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -523,6 +401,14 @@ function ComparisonPanel({
             {focus === "mplus" ? "Mythic+" : "Raid"} •{" "}
             {profile === "aoe" ? "AoE" : "Single Target"}
           </div>
+
+          {needsDetails ? (
+            <div className="mt-2 text-xs text-neutral-400">
+              {isByIdLoading
+                ? "Loading item details…"
+                : "Select an item to load details…"}
+            </div>
+          ) : null}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -531,7 +417,6 @@ function ComparisonPanel({
         </div>
       </div>
 
-      {/* ✅ Desktop layout: fixed left panel + fluid right panel */}
       <div className="mt-5 grid gap-4 lg:grid-cols-[360px_1fr]">
         <div className="rounded-xl border border-neutral-800 bg-black p-4">
           <div className="text-xs text-neutral-500">Upgrade score</div>
@@ -617,10 +502,8 @@ function ComparisonPanel({
             </div>
           ) : (
             <>
-              {/* ✅ Desktop: use grid-cols-12 (NO arbitrary grid templates) so Tailwind can't "drop" the class */}
               <div className="mt-3 hidden sm:block">
                 <div className="mx-auto w-full max-w-[900px]">
-                  {/* Header */}
                   <div className="grid grid-cols-12 items-center gap-2 text-[11px] text-neutral-500">
                     <div className="col-span-6">Stat</div>
                     <div className="col-span-2 text-right whitespace-nowrap">
@@ -637,7 +520,6 @@ function ComparisonPanel({
                     </div>
                   </div>
 
-                  {/* Rows */}
                   <div className="mt-2 divide-y divide-neutral-900">
                     {topRows.map((r) => {
                       const d = diffLabel(r.delta);
@@ -685,7 +567,6 @@ function ComparisonPanel({
                 </div>
               </div>
 
-              {/* Mobile: unchanged */}
               <div className="mt-3 sm:hidden">
                 <div className="overflow-hidden rounded-xl border border-neutral-800 bg-black">
                   <div className="grid grid-cols-12 gap-2 px-3 py-2 text-[11px] text-neutral-500 border-b border-neutral-900">
@@ -787,12 +668,163 @@ function ComparisonPanel({
   );
 }
 
+function ItemPicker({
+  title,
+  itemsIndex,
+  itemsById,
+  picked,
+  onPick,
+  onFirstInteract,
+  isIndexLoaded,
+  isIndexLoading,
+  indexError,
+  isByIdLoaded,
+  isByIdLoading,
+}: {
+  title: string;
+  itemsIndex: ItemIndexRow[];
+  itemsById: Record<number, FullItem>;
+  picked: ItemIndexRow | null;
+  onPick: (item: ItemIndexRow | null) => void;
+  onFirstInteract: () => void;
+
+  isIndexLoaded: boolean;
+  isIndexLoading: boolean;
+  indexError: string | null;
+
+  isByIdLoaded: boolean;
+  isByIdLoading: boolean;
+}) {
+  const [q, setQ] = useState("");
+
+  const suggestions = useMemo(() => {
+    const qq = q.trim().toLowerCase();
+    if (!qq) return [];
+    return itemsIndex
+      .filter((r) => toText(r.name).toLowerCase().includes(qq))
+      .slice(0, 10);
+  }, [q, itemsIndex]);
+
+  const full = picked ? itemsById[picked.id] : null;
+
+  const pickedName = picked ? toText(picked.name) : "";
+  const pickedSlot = picked?.slot ? toText(picked.slot) : "";
+  const pickedIlvl = toNumber(picked?.ilvl);
+
+  const inputPlaceholder = indexError
+    ? "Failed to load items"
+    : isIndexLoading
+    ? "Loading items…"
+    : isIndexLoaded
+    ? "Search item name…"
+    : "Click to load items…";
+
+  return (
+    <div className={card}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-sm font-semibold">{title}</div>
+        {picked ? (
+          <button
+            type="button"
+            onClick={() => onPick(null)}
+            className="text-sm text-neutral-300 hover:text-white transition"
+          >
+            Clear
+          </button>
+        ) : null}
+      </div>
+
+      <div className="mt-4 relative">
+        <input
+          value={q}
+          onChange={(e) => {
+            if (!isIndexLoaded && !isIndexLoading) onFirstInteract();
+            setQ(e.target.value);
+          }}
+          onFocus={() => {
+            if (!isIndexLoaded && !isIndexLoading) onFirstInteract();
+          }}
+          placeholder={inputPlaceholder}
+          className={input}
+          autoComplete="off"
+          disabled={!!indexError}
+        />
+
+        {indexError ? (
+          <div className="mt-2 text-xs text-rose-300">{indexError}</div>
+        ) : null}
+
+        {q.trim() && isIndexLoaded && (
+          <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-xl border border-neutral-800 bg-black">
+            {suggestions.length ? (
+              suggestions.map((s) => {
+                const sName = toText(s.name);
+                const sIlvl = toNumber(s.ilvl);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => {
+                      onPick(s);
+                      setQ("");
+                    }}
+                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm text-neutral-200 hover:bg-neutral-900 transition"
+                  >
+                    <span className="truncate font-semibold">{sName}</span>
+                    <span className="shrink-0 text-xs text-neutral-400">
+                      {sIlvl != null ? `ilvl ${sIlvl}` : "—"}
+                    </span>
+                  </button>
+                );
+              })
+            ) : (
+              <div className="px-3 py-2 text-sm text-neutral-500">
+                No results.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 rounded-xl border border-neutral-800 bg-black p-4">
+        {picked ? (
+          <div className="space-y-2">
+            <div className="text-sm font-semibold text-white">{pickedName}</div>
+
+            <div className="text-xs text-neutral-400">
+              ID: {picked.id}
+              {pickedSlot ? ` • Slot: ${pickedSlot}` : ("" as any)}
+              {pickedIlvl != null ? ` • ilvl: ${pickedIlvl}` : ("" as any)}
+              {full?.required_level != null
+                ? ` • Req lvl: ${full.required_level}`
+                : ""}
+            </div>
+
+            {!isByIdLoaded ? (
+              <div className="text-xs text-neutral-500">
+                {isByIdLoading
+                  ? "Loading full item details…"
+                  : "Select an item to load full details…"}
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="text-sm text-neutral-400">
+            Pick an item to compare.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /**
- * ✅ NEW BEHAVIOR:
- * - No longer receives huge JSON via props (which bloats initial RSC payload)
- * - Instead fetches from /public after first paint (perceived faster initial load)
+ * ✅ NEW BEHAVIOR (what you asked for):
+ * - NOTHING loads on initial page render
+ * - items_index + stats_weights load on first interaction with the search box
+ * - items_by_id loads only when an item is selected
  *
- * Expected files in /public:
+ * Expected in /public:
  *  - /data/wow/items_index.json
  *  - /data/wow/items_by_id.json
  *  - /data/wow/stats_weights.json
@@ -805,84 +837,124 @@ export default function UpgradeCheckerClient() {
   const [itemA, setItemA] = useState<ItemIndexRow | null>(null);
   const [itemB, setItemB] = useState<ItemIndexRow | null>(null);
 
+  // Data
   const [itemsIndex, setItemsIndex] = useState<ItemIndexRow[]>([]);
   const [itemsById, setItemsById] = useState<Record<number, FullItem>>({});
   const [statWeights, setStatWeights] = useState<WowStatWeightsJson | null>(
     null
   );
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  // Lazy-load state
+  const [isIndexLoading, setIsIndexLoading] = useState(false);
+  const [isIndexLoaded, setIsIndexLoaded] = useState(false);
+  const [indexError, setIndexError] = useState<string | null>(null);
 
-  const didStartRef = useRef(false);
+  const [isByIdLoading, setIsByIdLoading] = useState(false);
+  const [isByIdLoaded, setIsByIdLoaded] = useState(false);
+  const [byIdError, setByIdError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (didStartRef.current) return;
-    didStartRef.current = true;
+  const indexControllerRef = useRef<AbortController | null>(null);
+  const byIdControllerRef = useRef<AbortController | null>(null);
 
-    const controller = new AbortController();
+  async function ensureIndexLoaded() {
+    if (isIndexLoaded || isIndexLoading) return;
+    setIndexError(null);
+    setIsIndexLoading(true);
 
-    async function load() {
-      setIsLoading(true);
-      setLoadError(null);
+    try {
+      indexControllerRef.current?.abort();
+      const controller = new AbortController();
+      indexControllerRef.current = controller;
 
-      try {
-        const [idxRes, byIdRes, wRes] = await Promise.all([
-          fetch("/data/wow/items_index.json", {
-            signal: controller.signal,
-            cache: "force-cache",
-          }),
-          fetch("/data/wow/items_by_id.json", {
-            signal: controller.signal,
-            cache: "force-cache",
-          }),
-          fetch("/data/wow/stats_weights.json", {
-            signal: controller.signal,
-            cache: "force-cache",
-          }),
-        ]);
+      const [idxRes, wRes] = await Promise.all([
+        fetch("/data/wow/items_index.json", {
+          signal: controller.signal,
+          cache: "force-cache",
+        }),
+        fetch("/data/wow/stats_weights.json", {
+          signal: controller.signal,
+          cache: "force-cache",
+        }),
+      ]);
 
-        if (!idxRes.ok)
-          throw new Error(
-            `items_index.json failed (${idxRes.status} ${idxRes.statusText})`
-          );
-        if (!byIdRes.ok)
-          throw new Error(
-            `items_by_id.json failed (${byIdRes.status} ${byIdRes.statusText})`
-          );
-        if (!wRes.ok)
-          throw new Error(
-            `stats_weights.json failed (${wRes.status} ${wRes.statusText})`
-          );
-
-        const [idx, byId, weights] = await Promise.all([
-          idxRes.json(),
-          byIdRes.json(),
-          wRes.json(),
-        ]);
-
-        // Basic shape sanity (avoid runtime nukes if file is wrong)
-        setItemsIndex(Array.isArray(idx) ? (idx as ItemIndexRow[]) : []);
-        setItemsById(
-          byId && typeof byId === "object" ? (byId as Record<number, FullItem>) : {}
+      if (!idxRes.ok)
+        throw new Error(
+          `items_index.json failed (${idxRes.status} ${idxRes.statusText})`
         );
-        setStatWeights(
-          weights && typeof weights === "object"
-            ? (weights as WowStatWeightsJson)
-            : null
+      if (!wRes.ok)
+        throw new Error(
+          `stats_weights.json failed (${wRes.status} ${wRes.statusText})`
         );
 
-        setIsLoading(false);
-      } catch (e: any) {
-        if (e?.name === "AbortError") return;
-        setIsLoading(false);
-        setLoadError(e?.message ? String(e.message) : "Failed to load data.");
-      }
+      const [idx, weights] = await Promise.all([idxRes.json(), wRes.json()]);
+
+      setItemsIndex(Array.isArray(idx) ? (idx as ItemIndexRow[]) : []);
+      setStatWeights(
+        weights && typeof weights === "object"
+          ? (weights as WowStatWeightsJson)
+          : null
+      );
+
+      setIsIndexLoaded(true);
+      setIsIndexLoading(false);
+    } catch (e: any) {
+      if (e?.name === "AbortError") return;
+      setIsIndexLoading(false);
+      setIndexError(e?.message ? String(e.message) : "Failed to load items.");
     }
+  }
 
-    load();
-    return () => controller.abort();
-  }, []);
+  async function ensureItemsByIdLoaded() {
+    if (isByIdLoaded || isByIdLoading) return;
+    setByIdError(null);
+    setIsByIdLoading(true);
+
+    try {
+      byIdControllerRef.current?.abort();
+      const controller = new AbortController();
+      byIdControllerRef.current = controller;
+
+      const res = await fetch("/data/wow/items_by_id.json", {
+        signal: controller.signal,
+        cache: "force-cache",
+      });
+
+      if (!res.ok)
+        throw new Error(
+          `items_by_id.json failed (${res.status} ${res.statusText})`
+        );
+
+      const byId = await res.json();
+      setItemsById(
+        byId && typeof byId === "object"
+          ? (byId as Record<number, FullItem>)
+          : {}
+      );
+
+      setIsByIdLoaded(true);
+      setIsByIdLoading(false);
+    } catch (e: any) {
+      if (e?.name === "AbortError") return;
+      setIsByIdLoading(false);
+      setByIdError(e?.message ? String(e.message) : "Failed to load details.");
+    }
+  }
+
+  function pickA(it: ItemIndexRow | null) {
+    setItemA(it);
+    if (it && !isByIdLoaded && !isByIdLoading) void ensureItemsByIdLoaded();
+  }
+
+  function pickB(it: ItemIndexRow | null) {
+    setItemB(it);
+    if (it && !isByIdLoaded && !isByIdLoading) void ensureItemsByIdLoaded();
+  }
+
+  const footerText = indexError
+    ? "0 items loaded"
+    : isIndexLoaded
+    ? `${itemsIndex.length.toLocaleString()} items loaded`
+    : "Items not loaded yet";
 
   return (
     <div className="space-y-6">
@@ -894,7 +966,6 @@ export default function UpgradeCheckerClient() {
               value={spec}
               onChange={(e) => setSpec(e.target.value as SpecKey)}
               className={`${input} mt-3`}
-              disabled={isLoading}
             >
               {SPECS.map((s) => (
                 <option key={s.key} value={s.key}>
@@ -934,14 +1005,9 @@ export default function UpgradeCheckerClient() {
         </div>
 
         <p className="mt-4 text-xs text-neutral-500">
-          {isLoading ? (
-            <>Loading data from public JSON…</>
-          ) : loadError ? (
+          {!isIndexLoaded ? (
             <>
-              <span className="text-rose-300 font-semibold">
-                Data load error:
-              </span>{" "}
-              <span className="text-rose-200">{loadError}</span>
+              Data loads on first interaction. Click a search box to load items.
             </>
           ) : (
             <>
@@ -952,10 +1018,10 @@ export default function UpgradeCheckerClient() {
           )}
         </p>
 
-        {!isLoading && !loadError && !itemsIndex.length ? (
-          <div className="mt-3 text-xs text-rose-300">
-            items_index.json loaded but contained 0 items (check file path / JSON
-            shape).
+        {byIdError ? (
+          <div className="mt-2 text-xs text-rose-300">
+            Item details error:{" "}
+            <span className="text-rose-200">{byIdError}</span>
           </div>
         ) : null}
       </div>
@@ -966,16 +1032,26 @@ export default function UpgradeCheckerClient() {
           itemsIndex={itemsIndex}
           itemsById={itemsById}
           picked={itemA}
-          onPick={setItemA}
-          isLoading={isLoading || !!loadError}
+          onPick={pickA}
+          onFirstInteract={ensureIndexLoaded}
+          isIndexLoaded={isIndexLoaded}
+          isIndexLoading={isIndexLoading}
+          indexError={indexError}
+          isByIdLoaded={isByIdLoaded}
+          isByIdLoading={isByIdLoading}
         />
         <ItemPicker
           title="New Item"
           itemsIndex={itemsIndex}
           itemsById={itemsById}
           picked={itemB}
-          onPick={setItemB}
-          isLoading={isLoading || !!loadError}
+          onPick={pickB}
+          onFirstInteract={ensureIndexLoaded}
+          isIndexLoaded={isIndexLoaded}
+          isIndexLoading={isIndexLoading}
+          indexError={indexError}
+          isByIdLoaded={isByIdLoaded}
+          isByIdLoading={isByIdLoading}
         />
       </div>
 
@@ -987,18 +1063,12 @@ export default function UpgradeCheckerClient() {
         spec={spec}
         focus={focus}
         profile={profile}
+        isByIdLoaded={isByIdLoaded}
+        isByIdLoading={isByIdLoading}
       />
 
       <div className="flex flex-wrap items-center justify-between gap-3 px-1">
-        <div className="text-xs text-neutral-600">
-          {isLoading
-            ? "Loading…"
-            : loadError
-            ? "0 items loaded"
-            : itemsIndex.length
-            ? `${itemsIndex.length.toLocaleString()} items loaded`
-            : "0 items loaded"}
-        </div>
+        <div className="text-xs text-neutral-600">{footerText}</div>
 
         <button
           type="button"
@@ -1007,7 +1077,6 @@ export default function UpgradeCheckerClient() {
             setItemB(null);
           }}
           className="text-xs text-neutral-400 hover:text-white transition"
-          disabled={isLoading}
         >
           Clear both
         </button>
