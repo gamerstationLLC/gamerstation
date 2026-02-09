@@ -500,12 +500,11 @@ function ComparisonPanel({
           {/* ✅ FIX: only show red "no weights" if weights were actually loaded */}
           {data.hasBoth && isIndexLoaded && data.weightsLoaded && !Object.keys(data.weights).length ? (
             <div className="mt-3 text-xs text-rose-300">
-              No weights found for this spec/profile in{" "}
-              <span className="text-rose-200">stats_weights.json</span>
+              
             </div>
           ) : data.hasBoth && !isIndexLoaded ? (
             <div className="mt-3 text-xs text-neutral-500">
-              Weights not loaded yet — click an item search box to load data.
+             
             </div>
           ) : null}
         </div>
