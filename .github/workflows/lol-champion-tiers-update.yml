@@ -2,14 +2,13 @@ name: Update LoL Champion Tiers
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # every 6 hours
+    - cron: "0 */6 * * *"
   workflow_dispatch: {}
 
 concurrency:
   group: lol-tier-update
   cancel-in-progress: false
 
-# No commits in this workflow
 permissions:
   contents: read
 
@@ -28,7 +27,6 @@ jobs:
         with:
           fetch-depth: 1
 
-      # ✅ Always start from latest origin/main
       - name: Sync with main (pre-build)
         run: |
           set -e
@@ -45,7 +43,6 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # ✅ Optional: prune any tiers cache older than 90d (safe if dirs don't exist)
       - name: Prune old Champion Tiers cache (90 days)
         run: |
           set -e
@@ -64,17 +61,11 @@ jobs:
             fi
           done
 
-      # ✅ Soft timeout: stop the crawl after 90 minutes, but DO NOT kill the job.
-      # ✅ CRITICAL: NEVER fail the job here (expired RIOT_API_KEY or timeout should not block finalize+upload)
       - name: Build LoL champion tiers (soft-timeout 90m; never fails job)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
-
-          # what your script reads
           RIOT_REGION: "americas"
           RIOT_PLATFORM: "na1"
-
-          # matchlist filters + budgets
           TIERS_QUEUE_IDS: "420,440"
           TIERS_DAYS_BACK: "14"
           TIERS_MAX_MATCHES_PER_RUN: "2500"
@@ -82,8 +73,6 @@ jobs:
           TIERS_MATCHES_PER_PUUID: "20"
           TIERS_GAP_MS: "300"
           TIERS_REPROCESS_BOOTSTRAP: "0"
-
-          # ladder bootstrap knobs
           LADDER_QUEUE: "RANKED_SOLO_5x5"
           LADDER_TIER: "challenger"
           LADDER_MAX_PLAYERS: "300"
@@ -91,21 +80,17 @@ jobs:
           set +e
           echo "Starting tiers crawl with soft timeout of 90 minutes..."
 
-          # 5400s = 90 minutes
           timeout --signal=SIGTERM --kill-after=30s 5400 npm run lol:champion-tiers
           EC=$?
 
-          # GNU timeout uses exit code 124 when it times out.
           if [ "$EC" -eq 124 ]; then
             echo "Crawl hit 90-minute soft timeout. Proceeding to finalize+upload with what we have."
           else
             echo "Crawl exited with code: $EC (continuing regardless)."
           fi
 
-          # Never fail job here
           exit 0
 
-      # ✅ Finalize ALWAYS runs (never fails)
       - name: Finalize LoL champion tiers (never fails job)
         if: always()
         env:
@@ -118,7 +103,6 @@ jobs:
           echo "Continuing to debug/upload regardless..."
           exit 0
 
-      # ✅ Debug
       - name: Debug - Output + git diff
         if: always()
         run: |
@@ -132,14 +116,13 @@ jobs:
           echo "== Diffstat (champion_tiers.json) =="
           git diff --stat -- public/data/lol/champion_tiers.json || true
 
-      # ✅ Upload to Blob instead of committing (stops redeploy spam)
       - name: Upload champion tiers to Vercel Blob (never fails job)
         if: always()
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          # IMPORTANT: keep this on ONE LINE to avoid whitespace issues
           BLOB_UPLOADS: "public/data/lol/champion_tiers.json=data/lol/champion_tiers.json"
-          BLOB_CACHE_SECONDS: "900"
+          BLOB_CACHE_SECONDS: "300"
+          LOL_PATCH: ${{ github.run_id }}
         run: |
           set +e
 

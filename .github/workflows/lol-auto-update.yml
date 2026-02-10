@@ -151,6 +151,7 @@ jobs:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
           BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
           BLOB_CACHE_SECONDS: "300"
+          LOL_PATCH: ${{ github.run_id }}
         run: |
           set +e
           if [ -n "$BLOB_READ_WRITE_TOKEN" ]; then

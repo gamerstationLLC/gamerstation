@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tools/lol/leaderboard" },
 };
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 type RegionKey = "na1" | "euw1" | "kr";
 type QueueKey = "RANKED_SOLO_5x5" | "RANKED_FLEX_SR";

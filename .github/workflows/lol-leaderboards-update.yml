@@ -91,7 +91,7 @@ jobs:
           echo "== Diffstat (leaderboards) =="
           git diff --stat -- public/data/lol/leaderboards || true
 
-      # ✅ CRITICAL: prove what disk has *right now* (this is where the truth is)
+      # ✅ CRITICAL: prove what disk has *right now*
       - name: Debug - Print generatedAt for key files (disk)
         if: always()
         run: |
@@ -129,7 +129,8 @@ jobs:
         if: always()
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          BLOB_CACHE_SECONDS: "300"
+          BLOB_CACHE_SECONDS: "60"
+          BLOB_UPLOAD_DIRS: "public/data/lol/leaderboards"
         run: |
           set +e
 
@@ -156,20 +157,6 @@ jobs:
             echo "Too many files ($JSON_COUNT). Cap is $MAX_FILES to avoid env-size issues. Skipping upload."
             exit 0
           fi
-
-          SPEC=""
-          while IFS= read -r file; do
-            rel="$file"
-            blob="data/lol/leaderboards/${rel#public/data/lol/leaderboards/}"
-
-            if [ -z "$SPEC" ]; then
-              SPEC="${rel}=${blob}"
-            else
-              SPEC="${SPEC};${rel}=${blob}"
-            fi
-          done < <(find public/data/lol/leaderboards -type f -name "*.json" | sort)
-
-          export BLOB_UPLOADS="$SPEC"
 
           node scripts/blob/upload-data.mjs
           EC=$?

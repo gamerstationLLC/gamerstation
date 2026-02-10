@@ -5,6 +5,9 @@ import { put } from "@vercel/blob";
 
 const ROOT = process.cwd();
 
+/* =========================
+   Env helpers
+========================= */
 function mustEnv(name) {
   const v = process.env[name];
   if (!v) throw new Error(`Missing env var: ${name}`);
@@ -16,6 +19,9 @@ function optionalEnv(name) {
   return v ? String(v).trim() : "";
 }
 
+/* =========================
+   Spec parsing
+========================= */
 /**
  * Provide uploads via env:
  * BLOB_UPLOADS="public/a.json=data/a.json;public/b.json=data/b.json"
@@ -52,21 +58,15 @@ function parseDirs(spec) {
 
 function getMaxFiles() {
   const raw = String(process.env.BLOB_MAX_FILES ?? "").trim();
-  if (!raw) return 5000; // sane default
+  if (!raw) return 5000;
   const n = Number(raw);
   if (!Number.isFinite(n) || n < 0) throw new Error(`Invalid BLOB_MAX_FILES: ${raw}`);
   return n; // 0 = unlimited
 }
 
-async function existsFile(p) {
-  try {
-    const st = await fs.stat(p);
-    return st.isFile();
-  } catch {
-    return false;
-  }
-}
-
+/* =========================
+   FS helpers
+========================= */
 async function walkFiles(dirAbs) {
   const out = [];
   const stack = [dirAbs];
@@ -95,13 +95,110 @@ function toPosix(p) {
 }
 
 function deriveBlobPathFromLocalRel(localRel) {
-  // Expect localRel like "public/data/lol/leaderboards/na1/..."
   const norm = localRel.replace(/\\/g, "/").replace(/^\/+/, "");
   if (norm.startsWith("public/")) return norm.slice("public/".length); // "data/..."
   return norm;
 }
 
-async function uploadOne({ localRel, blobPath, cacheSeconds }) {
+/* =========================
+   Overwrite vs append policy
+========================= */
+/**
+ * Your policy:
+ * - Leaderboards: overwrite the same keys every run
+ * - Meta builds + Champion tiers: "append" (keep history) using versioned keys
+ *
+ * Additionally:
+ * - Make updates visible quickly: set cacheControlMaxAge so clients/CDN refresh within ~60s.
+ */
+
+function shouldOverwrite(blobPath) {
+  if (blobPath.startsWith("data/lol/leaderboards/")) return true;
+  if (blobPath === "data/manifest.json") return true;
+  return false;
+}
+
+function isMetaBuilds(blobPath) {
+  return blobPath.includes("data/lol/meta_builds");
+}
+
+function isChampionTiers(blobPath) {
+  return blobPath.startsWith("data/lol/champion_tiers");
+}
+
+function ensureNoExt(name) {
+  return String(name || "").replace(/\.json$/i, "");
+}
+
+function utcStamp() {
+  // Example: 2026-02-09T21-37-00Z
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const y = d.getUTCFullYear();
+  const m = pad(d.getUTCMonth() + 1);
+  const day = pad(d.getUTCDate());
+  const hh = pad(d.getUTCHours());
+  const mm = pad(d.getUTCMinutes());
+  const ss = pad(d.getUTCSeconds());
+  return `${y}-${m}-${day}T${hh}-${mm}-${ss}Z`;
+}
+
+function sanitizeTag(s) {
+  return String(s || "").trim().replace(/[^\w.\-]/g, "_");
+}
+
+function getPatchTag() {
+  // Prefer LOL_PATCH, then BUILD_TAG, else fallback to UTC timestamp (so you DON'T have to change workflows)
+  const p = optionalEnv("LOL_PATCH") || optionalEnv("BUILD_TAG");
+  return p ? sanitizeTag(p) : utcStamp();
+}
+
+/**
+ * Versioning scheme (append history):
+ * - meta builds:
+ *     data/lol/meta_builds_ranked.json
+ *       -> data/lol/meta_builds/meta_builds_ranked/<TAG>.json
+ * - champion tiers:
+ *     data/lol/champion_tiers.json
+ *       -> data/lol/champion_tiers/champion_tiers/<TAG>.json
+ */
+function toAppendKey(blobPath) {
+  const tag = getPatchTag();
+
+  const file = blobPath.split("/").pop() || blobPath;
+  const stem = ensureNoExt(file);
+
+  if (isMetaBuilds(blobPath)) {
+    return `data/lol/meta_builds/${stem}/${tag}.json`;
+  }
+
+  if (isChampionTiers(blobPath)) {
+    return `data/lol/champion_tiers/${stem}/${tag}.json`;
+  }
+
+  return blobPath;
+}
+
+/**
+ * Cache policy:
+ * - Leaderboards should update quickly => 60 seconds
+ * - Meta builds + champion tiers can be longer (default 300), but still fine at 60 too
+ *
+ * You asked: "make it update in 60 seconds"
+ * We'll enforce:
+ *   - Leaderboards cache = 60
+ *   - Everything else uses BLOB_CACHE_SECONDS if provided, else 300
+ */
+function cacheSecondsFor(blobPath) {
+  const defaultOther = Number(optionalEnv("BLOB_CACHE_SECONDS") || "300");
+  if (blobPath.startsWith("data/lol/leaderboards/")) return 60;
+  return Number.isFinite(defaultOther) && defaultOther > 0 ? defaultOther : 300;
+}
+
+/* =========================
+   Upload
+========================= */
+async function uploadOne({ localRel, blobPath }) {
   const localAbs = path.join(ROOT, localRel);
 
   let buf;
@@ -112,21 +209,31 @@ async function uploadOne({ localRel, blobPath, cacheSeconds }) {
     return null;
   }
 
-  const res = await put(blobPath, buf, {
+  const overwrite = shouldOverwrite(blobPath);
+
+  // Append-mode: meta builds + champion tiers go to versioned keys
+  const targetPath =
+    overwrite ? blobPath : (isMetaBuilds(blobPath) || isChampionTiers(blobPath) ? toAppendKey(blobPath) : blobPath);
+
+  const cacheSeconds = cacheSecondsFor(blobPath);
+
+  const res = await put(targetPath, buf, {
     access: "public",
     addRandomSuffix: false,
-    allowOverwrite: true,
+    allowOverwrite: overwrite,
     contentType: "application/json",
     cacheControlMaxAge: cacheSeconds,
   });
 
-  console.log(`[ok] ${localRel} -> ${res.url}`);
-  return { localRel, blobPath, url: res.url };
+  console.log(
+    `[ok] ${localRel} -> ${res.url} (key=${targetPath} overwrite=${overwrite} cache=${cacheSeconds}s)`
+  );
+
+  return { localRel, blobPath: targetPath, url: res.url, overwrite, cacheSeconds };
 }
 
 async function main() {
-  mustEnv("BLOB_READ_WRITE_TOKEN"); // ensures token exists
-  const cacheSeconds = Number(optionalEnv("BLOB_CACHE_SECONDS") || "300");
+  mustEnv("BLOB_READ_WRITE_TOKEN");
 
   const filesSpec = optionalEnv("BLOB_UPLOADS");
   const dirsSpec = optionalEnv("BLOB_UPLOAD_DIRS");
@@ -150,10 +257,9 @@ async function main() {
       const absFiles = await walkFiles(dirAbs);
 
       for (const fAbs of absFiles) {
-        // localRel in repo-relative form
         const localRel = toPosix(path.relative(ROOT, fAbs));
 
-        // only upload json files (safe)
+        // Only upload JSON
         if (!localRel.toLowerCase().endsWith(".json")) continue;
 
         const blobPath = deriveBlobPathFromLocalRel(localRel);
@@ -177,14 +283,20 @@ async function main() {
   }
 
   console.log(`Uploading ${finalUploads.length} files...`);
+  console.log(
+    `[config] leaderboards cache forced to 60s; other cache uses BLOB_CACHE_SECONDS=${optionalEnv("BLOB_CACHE_SECONDS") || "300"}`
+  );
+  console.log(
+    `[config] append tag source LOL_PATCH="${optionalEnv("LOL_PATCH")}" BUILD_TAG="${optionalEnv("BUILD_TAG")}" (fallback=utc timestamp)`
+  );
 
   const uploaded = [];
   for (const u of finalUploads) {
-    const item = await uploadOne({ ...u, cacheSeconds });
+    const item = await uploadOne(u);
     if (item) uploaded.push(item);
   }
 
-  // manifest (useful)
+  // manifest
   const manifest = JSON.stringify({ updatedAt: new Date().toISOString(), uploaded }, null, 2);
 
   const manifestRes = await put("data/manifest.json", manifest, {
