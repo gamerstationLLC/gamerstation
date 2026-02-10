@@ -24414,6 +24414,45 @@
     ],
     "required_level": 27
   },
+  "27528": {
+    "id": 27528,
+    "name": "Gauntlets of Desolation",
+    "slot": "HAND",
+    "ilvl": 32,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 3,
+      "AGILITY": 3,
+      "STAMINA": 4,
+      "CRIT_RATING": 3,
+      "HASTE_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 3
+      },
+      {
+        "type": "AGILITY",
+        "value": 3
+      },
+      {
+        "type": "STAMINA",
+        "value": 4
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 27
+  },
   "27529": {
     "id": 27529,
     "name": "Figurine of the Colossus",
@@ -107536,6 +107575,45 @@
       {
         "type": "HASTE_RATING",
         "value": 10
+      }
+    ],
+    "required_level": 30
+  },
+  "133488": {
+    "id": 133488,
+    "name": "Polished Mirror Helm",
+    "slot": "HEAD",
+    "ilvl": 35,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 16,
+      "AGILITY": 16,
+      "STAMINA": 25,
+      "CRIT_RATING": 8,
+      "HASTE_RATING": 25
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 16
+      },
+      {
+        "type": "AGILITY",
+        "value": 16
+      },
+      {
+        "type": "STAMINA",
+        "value": 25
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 25
       }
     ],
     "required_level": 30
