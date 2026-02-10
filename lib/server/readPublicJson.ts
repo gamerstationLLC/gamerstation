@@ -1,5 +1,7 @@
 // lib/server/readPublicJson.ts
 import "server-only";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 type ReadPublicJsonOptions = {
   revalidateSeconds?: number;
@@ -14,47 +16,47 @@ function normalizeBase(b: string) {
 }
 
 function getBlobBase() {
-  const base =
-    process.env.BLOB_BASE_URL ||
-    process.env.NEXT_PUBLIC_BLOB_BASE_URL ||
-    "";
+  const base = process.env.BLOB_BASE_URL || process.env.NEXT_PUBLIC_BLOB_BASE_URL || "";
   return normalizeBase(base);
 }
 
 function normalizeBlobKey(input: string) {
   const s = normalizePath(input);
   if (!s) return s;
-
-  // Convert "public/data/..." -> "data/..."
   if (s.startsWith("public/data/")) return s.replace(/^public\/data\//, "data/");
-
-  // Keep "data/..." as-is
   if (s.startsWith("data/")) return s;
-
-  // Force everything else under "data/"
   return `data/${s}`;
 }
 
-export async function readPublicJson<T>(
-  pathnameInput: string,
-  opts: ReadPublicJsonOptions = {}
-): Promise<T> {
-  const keyRaw = normalizePath(pathnameInput);
-  if (!keyRaw) throw new Error("readPublicJson: missing pathname");
+/**
+ * Only these paths are allowed to come from Blob (per your policy):
+ * - meta builds
+ * - champion tiers
+ * - leaderboards
+ *
+ * Everything else must read from disk (/public/...) and should NOT hit Blob.
+ */
+function isBlobManaged(key: string) {
+  // key is normalized like "data/..."
+  if (key.startsWith("data/lol/leaderboards/")) return true;
+  if (key.startsWith("data/lol/champion_tiers")) return true; // adjust if your file name differs
+  if (key.includes("data/lol/meta_builds")) return true;       // ranked/casual variants
+  return false;
+}
 
-  const key = normalizeBlobKey(keyRaw);
+async function readDiskJson<T>(key: string): Promise<T> {
+  // key like "data/lol/champions_full.json" should exist at public/data/lol/...
+  const localPath = path.join(process.cwd(), "public", key);
+  const raw = await fs.readFile(localPath, "utf8");
+  return JSON.parse(raw) as T;
+}
+
+async function readBlobJson<T>(key: string, opts: ReadPublicJsonOptions): Promise<T> {
   const base = getBlobBase();
-
-  if (!base) {
-    throw new Error(
-      `readPublicJson: Missing BLOB_BASE_URL / NEXT_PUBLIC_BLOB_BASE_URL (requested key="${key}")`
-    );
-  }
+  if (!base) throw new Error(`readPublicJson: Missing BLOB_BASE_URL / NEXT_PUBLIC_BLOB_BASE_URL (key="${key}")`);
 
   const url = `${base}/${key}`;
-
-  const revalidateSeconds =
-    typeof opts.revalidateSeconds === "number" ? opts.revalidateSeconds : 900;
+  const revalidateSeconds = typeof opts.revalidateSeconds === "number" ? opts.revalidateSeconds : 900;
 
   const res = await fetch(url, {
     ...(opts.noStore ? { cache: "no-store" as const } : {}),
@@ -70,4 +72,20 @@ export async function readPublicJson<T>(
   }
 
   return (await res.json()) as T;
+}
+
+export async function readPublicJson<T>(pathnameInput: string, opts: ReadPublicJsonOptions = {}): Promise<T> {
+  const raw = normalizePath(pathnameInput);
+  if (!raw) throw new Error("readPublicJson: missing pathname");
+
+  const key = normalizeBlobKey(raw); // "data/..."
+
+  // ✅ Enforce your policy:
+  // - If it's blob-managed, use Blob (and fail loudly if missing)
+  // - Otherwise, read from disk only (and never touch Blob)
+  if (isBlobManaged(key)) {
+    return readBlobJson<T>(key, opts);
+  }
+
+  return readDiskJson<T>(key);
 }
