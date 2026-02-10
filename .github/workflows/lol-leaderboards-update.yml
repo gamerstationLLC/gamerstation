@@ -91,6 +91,40 @@ jobs:
           echo "== Diffstat (leaderboards) =="
           git diff --stat -- public/data/lol/leaderboards || true
 
+      # ✅ CRITICAL: prove what disk has *right now* (this is where the truth is)
+      - name: Debug - Print generatedAt for key files (disk)
+        if: always()
+        run: |
+          set +e
+          echo "== generatedAt check (disk) =="
+
+          node - <<'NODE'
+          const fs = require("fs");
+
+          const files = [
+            "public/data/lol/leaderboards/na1/RANKED_SOLO_5x5.challenger.json",
+            "public/data/lol/leaderboards/na1/RANKED_SOLO_5x5.grandmaster.json",
+            "public/data/lol/leaderboards/na1/RANKED_SOLO_5x5.master.json",
+          ];
+
+          for (const f of files) {
+            try {
+              const raw = fs.readFileSync(f, "utf8");
+              const j = JSON.parse(raw);
+              console.log(`${f}`);
+              console.log(`  generatedAt: ${j.generatedAt ?? "MISSING"}`);
+              console.log(`  region: ${j.region ?? "MISSING"} queue: ${j.queue ?? "MISSING"} tier: ${j.tier ?? "MISSING"} count: ${j.count ?? "MISSING"}`);
+              console.log("");
+            } catch (e) {
+              console.log(`${f}`);
+              console.log(`  ERROR: ${e?.message ?? e}`);
+              console.log("");
+            }
+          }
+          NODE
+
+          exit 0
+
       - name: Upload leaderboards to Vercel Blob (only if dataset is valid; never fails job)
         if: always()
         env:
@@ -117,8 +151,6 @@ jobs:
             exit 0
           fi
 
-          # Safety: avoid env var blowups if the folder gets huge
-          # (GitHub env size limits can bite you if this ever becomes thousands of files)
           MAX_FILES=800
           if [ "$JSON_COUNT" -gt "$MAX_FILES" ]; then
             echo "Too many files ($JSON_COUNT). Cap is $MAX_FILES to avoid env-size issues. Skipping upload."
@@ -127,7 +159,6 @@ jobs:
 
           SPEC=""
           while IFS= read -r file; do
-            # file is already relative (no leading ./ from find)
             rel="$file"
             blob="data/lol/leaderboards/${rel#public/data/lol/leaderboards/}"
 
@@ -144,4 +175,34 @@ jobs:
           EC=$?
           echo "Blob upload exit code: $EC"
           echo "Continuing regardless..."
+          exit 0
+
+      # ✅ AFTER upload: fetch the blob and print what it is serving *right now*
+      - name: Debug - Verify Blob serves expected generatedAt (na1 solo challenger)
+        if: always()
+        run: |
+          set +e
+          echo "== blob verify (na1 solo challenger) =="
+
+          node - <<'NODE'
+          const url = "https://or3vgdqybw6oou7j.public.blob.vercel-storage.com/data/lol/leaderboards/na1/RANKED_SOLO_5x5.challenger.json";
+          fetch(url, { cache: "no-store" })
+            .then(r => r.text().then(t => ({ ok: r.ok, status: r.status, text: t })))
+            .then(({ ok, status, text }) => {
+              console.log("url:", url);
+              console.log("status:", status, "ok:", ok);
+              try {
+                const j = JSON.parse(text);
+                console.log("generatedAt:", j.generatedAt ?? "MISSING");
+                console.log("region:", j.region, "queue:", j.queue, "tier:", j.tier, "count:", j.count);
+              } catch (e) {
+                console.log("FAILED to parse JSON:", e?.message ?? e);
+                console.log("body head:", text.slice(0, 200));
+              }
+            })
+            .catch(e => {
+              console.log("FETCH ERROR:", e?.message ?? e);
+            });
+          NODE
+
           exit 0

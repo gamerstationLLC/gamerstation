@@ -145,6 +145,27 @@ function normalizeIconUrl(url?: string | null): string | null {
   return null;
 }
 
+/** Client-safe Blob URL builder (dev + prod) */
+function normalizeBase(b: string) {
+  return String(b ?? "").trim().replace(/\/+$/, "");
+}
+function normalizePath(p: string) {
+  return String(p ?? "").trim().replace(/^\/+/, "");
+}
+function blobUrl(pathnameInput: string): string {
+  const pathname = normalizePath(pathnameInput);
+  const base = process.env.NEXT_PUBLIC_BLOB_BASE_URL || "";
+
+  if (!pathname) return "/";
+  if (!base) {
+    // In case you forgot the env var locally, you still get *something*.
+    console.warn("NEXT_PUBLIC_BLOB_BASE_URL not set — falling back to relative path:", pathname);
+    return `/${pathname}`;
+  }
+
+  return `${normalizeBase(base)}/${pathname}`;
+}
+
 /**
  * Fallback DDragon URL. Must use a CURRENT ddVersion or new icon ids 404 → ORB.
  */
@@ -257,8 +278,10 @@ export default function LeaderboardClient({
     };
   }, []);
 
+  // ✅ ALWAYS read from Blob (dev + prod) so you don’t have to commit/push to test.
   const dataUrl = useMemo(() => {
-    return `/data/lol/leaderboards/${region}/${queue}.${tier.toLowerCase()}.json`;
+    const pathname = `data/lol/leaderboards/${region}/${queue}.${tier.toLowerCase()}.json`;
+    return blobUrl(pathname);
   }, [region, queue, tier]);
 
   useEffect(() => {
@@ -269,7 +292,11 @@ export default function LeaderboardClient({
       setErr(null);
 
       try {
-        const res = await fetch(dataUrl, { cache: "no-store" });
+        // ✅ no-store + cache buster: avoid “stuck at 2/6” due to any caching layers
+        const bust = `cb=${Date.now()}`;
+        const url = dataUrl.includes("?") ? `${dataUrl}&${bust}` : `${dataUrl}?${bust}`;
+
+        const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error(`Failed to load leaderboard (${res.status})`);
         const json = (await res.json()) as LeaderboardJson;
 
@@ -458,8 +485,6 @@ export default function LeaderboardClient({
                         <div
                           key={rowKey}
                           className={`grid grid-cols-12 items-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 text-[11px] sm:text-sm transition ${surfaceHover}`}
-                          // ✅ This is the magic: icon target size scales with viewport
-                          // (6vw on tiny phones; clamp inside ChampSquareIcon keeps it sane)
                           style={{ ["--champ" as any]: "6vw" }}
                         >
                           <div className="col-span-1 text-neutral-400 tabular-nums">{r.rank}</div>
@@ -494,15 +519,13 @@ export default function LeaderboardClient({
                             {fmtInt(r.lp)}
                           </div>
 
-                          {/* ✅ W-L: never wraps; protected from overlap */}
+                          {/* W-L */}
                           <div className="col-span-2 sm:col-span-3 text-right tabular-nums text-neutral-300 whitespace-nowrap text-[11px] sm:text-sm">
-                            <span className="sm:hidden">
-                              ({r.wins}-{r.losses})
-                            </span>
+                            <span className="sm:hidden">({r.wins}-{r.losses})</span>
                             <span className="hidden sm:inline">{fmtWL(r.wins, r.losses)}</span>
                           </div>
 
-                          {/* ✅ Most Played: wraps + shrinks icons automatically so it never overlaps W-L */}
+                          {/* Most Played */}
                           <div className="col-span-2 sm:col-span-2 flex items-center justify-end">
                             <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
                               {champs.length ? (
@@ -513,7 +536,6 @@ export default function LeaderboardClient({
                                       href={champLink(c.name)}
                                       ariaLabel={c.name}
                                     />
-                                    {/* count badge desktop only */}
                                     <span className="hidden sm:inline-block absolute -right-1 -bottom-1 rounded-full bg-black/90 border border-neutral-700 px-1.5 py-[1px] text-[10px] text-white">
                                       {c.count}
                                     </span>
