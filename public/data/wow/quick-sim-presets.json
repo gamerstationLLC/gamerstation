@@ -1,0 +1,538 @@
+{
+  "version": "quick-sim-v1",
+  "specs": [
+    {
+      "id": "arms_warrior",
+      "className": "Warrior",
+      "name": "Arms",
+      "abilities": [
+        {
+          "id": "mortal_strike",
+          "name": "Mortal Strike",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.55,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.6,
+          "masteryMode": "mult",
+          "baseUpm": 8,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "overpower",
+          "name": "Overpower",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.35,
+          "spCoeff": 0,
+          "wdpsCoeff": 1,
+          "masteryMode": "mult",
+          "baseUpm": 10,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "execute",
+          "name": "Execute (burst window)",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.95,
+          "spCoeff": 0,
+          "wdpsCoeff": 2.1,
+          "masteryMode": "mult",
+          "baseUpm": 6,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fury_warrior",
+      "className": "Warrior",
+      "name": "Fury",
+      "abilities": [
+        {
+          "id": "raging_blow",
+          "name": "Raging Blow",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.45,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.2,
+          "masteryMode": "mult",
+          "baseUpm": 12,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "bloodthirst",
+          "name": "Bloodthirst",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.4,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.1,
+          "masteryMode": "mult",
+          "baseUpm": 10,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "rampage",
+          "name": "Rampage (burst window)",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.85,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.9,
+          "masteryMode": "mult",
+          "baseUpm": 6,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prot_warrior",
+      "className": "Warrior",
+      "name": "Protection",
+      "abilities": [
+        {
+          "id": "shield_slam",
+          "name": "Shield Slam",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.55,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.3,
+          "masteryMode": "mult",
+          "baseUpm": 9,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "thunder_clap",
+          "name": "Thunder Clap",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.35,
+          "spCoeff": 0,
+          "wdpsCoeff": 0.9,
+          "masteryMode": "mult",
+          "baseUpm": 8,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "revenge",
+          "name": "Revenge (burst window)",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.45,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.2,
+          "masteryMode": "mult",
+          "baseUpm": 6,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fire_mage",
+      "className": "Mage",
+      "name": "Fire",
+      "abilities": [
+        {
+          "id": "fireball",
+          "name": "Fireball",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.9,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 10,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "pyroblast",
+          "name": "Pyroblast (burst window)",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 1.45,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 5,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        },
+        {
+          "id": "ignite_tick",
+          "name": "Ignite (DoT tick)",
+          "school": "MAGIC",
+          "scales": "SP_DOT",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.15,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 60,
+          "hasteAffectsRate": false
+        }
+      ]
+    },
+    {
+      "id": "frost_mage",
+      "className": "Mage",
+      "name": "Frost",
+      "abilities": [
+        {
+          "id": "frostbolt",
+          "name": "Frostbolt",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.85,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 11,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "ice_lance",
+          "name": "Ice Lance (proc/burst window)",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.6,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 9,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        },
+        {
+          "id": "blizzard_tick",
+          "name": "Blizzard (AoE tick)",
+          "school": "MAGIC",
+          "scales": "SP_DOT",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.12,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 60,
+          "hasteAffectsRate": false
+        }
+      ]
+    },
+    {
+      "id": "arcane_mage",
+      "className": "Mage",
+      "name": "Arcane",
+      "abilities": [
+        {
+          "id": "arcane_blast",
+          "name": "Arcane Blast",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 1.05,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 10,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "arcane_missiles",
+          "name": "Arcane Missiles (channeled)",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.65,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 8,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "arcane_barrage",
+          "name": "Arcane Barrage (burst window)",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 1.25,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 5,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ret_paladin",
+      "className": "Paladin",
+      "name": "Retribution",
+      "abilities": [
+        {
+          "id": "templars_verdict",
+          "name": "Templar's Verdict",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.65,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.7,
+          "masteryMode": "mult",
+          "baseUpm": 7,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "blade_of_justice",
+          "name": "Blade of Justice",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.45,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.2,
+          "masteryMode": "mult",
+          "baseUpm": 9,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "judgment",
+          "name": "Judgment (burst window)",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.45,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 6,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prot_paladin",
+      "className": "Paladin",
+      "name": "Protection",
+      "abilities": [
+        {
+          "id": "avengers_shield",
+          "name": "Avenger's Shield",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.4,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.1,
+          "masteryMode": "mult",
+          "baseUpm": 8,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "shield_of_the_righteous",
+          "name": "Shield of the Righteous",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.55,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.4,
+          "masteryMode": "mult",
+          "baseUpm": 7,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "consecration_tick",
+          "name": "Consecration (tick)",
+          "school": "MAGIC",
+          "scales": "SP_DOT",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.1,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 60,
+          "hasteAffectsRate": false
+        }
+      ]
+    },
+    {
+      "id": "holy_paladin",
+      "className": "Paladin",
+      "name": "Holy",
+      "abilities": [
+        {
+          "id": "holy_shock",
+          "name": "Holy Shock (damage)",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.45,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 7,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "judgment_holy",
+          "name": "Judgment",
+          "school": "MAGIC",
+          "scales": "SP",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.4,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 7,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "consecration_tick_holy",
+          "name": "Consecration (tick)",
+          "school": "MAGIC",
+          "scales": "SP_DOT",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0.08,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 60,
+          "hasteAffectsRate": false
+        }
+      ]
+    },
+    {
+      "id": "havoc_dh",
+      "className": "Demon Hunter",
+      "name": "Havoc",
+      "abilities": [
+        {
+          "id": "chaos_strike",
+          "name": "Chaos Strike",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.55,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.6,
+          "masteryMode": "mult",
+          "baseUpm": 10,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "blade_dance",
+          "name": "Blade Dance",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.45,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.3,
+          "masteryMode": "mult",
+          "baseUpm": 7,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "eye_beam",
+          "name": "Eye Beam (burst window)",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 5,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vengeance_dh",
+      "className": "Demon Hunter",
+      "name": "Vengeance",
+      "abilities": [
+        {
+          "id": "shear",
+          "name": "Shear",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.3,
+          "spCoeff": 0,
+          "wdpsCoeff": 0.9,
+          "masteryMode": "mult",
+          "baseUpm": 12,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "soul_cleave",
+          "name": "Soul Cleave",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0.45,
+          "spCoeff": 0,
+          "wdpsCoeff": 1.3,
+          "masteryMode": "mult",
+          "baseUpm": 7,
+          "hasteAffectsRate": true
+        },
+        {
+          "id": "fel_devastation",
+          "name": "Fel Devastation (burst window)",
+          "school": "PHYSICAL",
+          "scales": "AP_WDPS",
+          "base": 0,
+          "apCoeff": 0,
+          "spCoeff": 0,
+          "wdpsCoeff": 0,
+          "masteryMode": "mult",
+          "baseUpm": 5,
+          "hasteAffectsRate": true,
+          "tags": [
+            "burst"
+          ]
+        }
+      ]
+    }
+  ]
+}

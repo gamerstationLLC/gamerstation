@@ -31,6 +31,8 @@ export type ChampionStatsRow = {
   role?: string; // top/jungle/mid/bot/support
   lane?: string;
 
+  // sometimes datasets have nested by-role buckets
+  // (we don't assume exact field names; we detect common shapes)
   [key: string]: any;
 };
 
@@ -112,11 +114,31 @@ function tierFromPercentile(p: number): Tier {
 
 function normalizeRole(raw: any): RoleKey {
   const s = (raw ?? "").toString().toLowerCase().trim();
-  if (s === "top") return "top";
-  if (s === "jungle" || s === "jg") return "jungle";
-  if (s === "mid" || s === "middle") return "mid";
-  if (s === "bot" || s === "adc" || s === "bottom") return "bot";
-  if (s === "support" || s === "sup") return "support";
+  if (!s) return "all";
+
+  // common synonyms
+  if (s === "top" || s === "toplane" || s === "top_lane") return "top";
+  if (s === "jungle" || s === "jg" || s === "jng") return "jungle";
+  if (s === "mid" || s === "middle" || s === "midlane" || s === "mid_lane") return "mid";
+  if (
+    s === "bot" ||
+    s === "bottom" ||
+    s === "adc" ||
+    s === "carry" ||
+    s === "marksman" ||
+    s === "botlane" ||
+    s === "bot_lane"
+  )
+    return "bot";
+  if (
+    s === "support" ||
+    s === "sup" ||
+    s === "utility" ||
+    s === "supp" ||
+    s === "bot_support"
+  )
+    return "support";
+
   return "all";
 }
 
@@ -195,6 +217,80 @@ function sortArrow(active: boolean, desc: boolean) {
   return desc ? "\u00A0↓" : "\u00A0↑";
 }
 
+/**
+ * If your tiers JSON is per-champ only: role filtering is not real.
+ * If your tiers JSON includes per-role buckets: we expand them into real rows.
+ *
+ * Supported shapes (auto-detected):
+ *  - row.role / row.lane: "top" | "jungle" | ...
+ *  - row.roles: { top: {...stats}, mid: {...stats}, ... }
+ *  - row.byRole / row.by_role: { ... }
+ *  - row.lanes / row.byLane / row.by_lane: { ... }
+ *  - row.top / row.jungle / row.mid / row.bot / row.support (object buckets)
+ */
+function pickRoleBuckets(r: ChampionStatsRow): Partial<Record<RoleKey, any>> | null {
+  const candidates = [
+    r.roles,
+    r.byRole,
+    r.by_role,
+    r.lanes,
+    r.byLane,
+    r.by_lane,
+    r.roleStats,
+    r.role_stats,
+  ];
+
+  for (const c of candidates) {
+    if (c && typeof c === "object" && !Array.isArray(c)) {
+      const out: Partial<Record<RoleKey, any>> = {};
+      for (const k of Object.keys(c)) {
+        const rk = normalizeRole(k);
+        if (rk !== "all" && c[k] && typeof c[k] === "object") out[rk] = c[k];
+      }
+      if (Object.keys(out).length) return out;
+    }
+  }
+
+  // also support flat keys like r.top / r.jungle etc if they look like stat buckets
+  const flatOut: Partial<Record<RoleKey, any>> = {};
+  const flatKeys: Array<[RoleKey, any]> = [
+    ["top", (r as any).top],
+    ["jungle", (r as any).jungle],
+    ["mid", (r as any).mid],
+    ["bot", (r as any).bot],
+    ["support", (r as any).support],
+  ];
+  for (const [rk, v] of flatKeys) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      // only treat as bucket if it contains at least one stat-ish field
+      if (
+        "games" in v ||
+        "picks" in v ||
+        "wins" in v ||
+        "winrate" in v ||
+        "bans" in v ||
+        "banrate" in v
+      ) {
+        flatOut[rk] = v;
+      }
+    }
+  }
+  return Object.keys(flatOut).length ? flatOut : null;
+}
+
+function computeCoreFromRow(r: any) {
+  const games = clampMin0(Number(r.games ?? r.picks ?? 0));
+  const wins =
+    clampMin0(Number(r.wins ?? 0)) ||
+    (Number.isFinite(r.winrate) ? Math.round(clampMin0(Number(r.winrate)) * games) : 0);
+  const bans = clampMin0(Number(r.bans ?? 0));
+
+  const winrate = Number.isFinite(r.winrate) ? clampMin0(Number(r.winrate)) : games ? wins / games : 0;
+  const banrate = Number.isFinite(r.banrate) ? clampMin0(Number(r.banrate)) : games ? bans / games : 0;
+
+  return { games, wins, bans, winrate, banrate };
+}
+
 export default function LolChampionTiersClient({
   initialRows,
   patch = "—",
@@ -254,64 +350,94 @@ export default function LolChampionTiersClient({
     else setDesc(true);
   }
 
-  const rows = useMemo((): Row[] => {
+  const { rows, hasRoleData } = useMemo((): { rows: Row[]; hasRoleData: boolean } => {
     const query = q.trim().toLowerCase();
 
-    const derivedBase = (initialRows || []).map(
-      (r, i): Omit<Row, "score" | "tier" | "tierRank"> => {
-        const displayName = (
-          r.name ||
-          r.championName ||
-          (typeof r.key === "string" ? r.key : "") ||
-          `Champion ${i + 1}`
-        ).toString();
+    // Expand into per-role rows if dataset provides role buckets,
+    // otherwise fall back to row.role/lane if present.
+    const expanded: Array<{
+      base: ChampionStatsRow;
+      role: RoleKey;
+      statsSource: any; // either base row or role bucket
+      keySuffix: string;
+    }> = [];
 
-        const slug = (r.slug || slugifyLoL(displayName)).toString();
-        const roleKey = normalizeRole(r.role ?? r.lane);
+    for (let i = 0; i < (initialRows || []).length; i++) {
+      const r = (initialRows || [])[i];
+      const buckets = pickRoleBuckets(r);
 
-        const games = clampMin0(Number(r.games ?? r.picks ?? 0));
-
-        const wins =
-          clampMin0(Number(r.wins ?? 0)) ||
-          (Number.isFinite(r.winrate) ? Math.round(clampMin0(Number(r.winrate)) * games) : 0);
-
-        const bans = clampMin0(Number(r.bans ?? 0));
-
-        const winrate = Number.isFinite(r.winrate)
-          ? clampMin0(Number(r.winrate))
-          : games
-          ? wins / games
-          : 0;
-
-        const banrate = Number.isFinite(r.banrate)
-          ? clampMin0(Number(r.banrate))
-          : games
-          ? bans / games
-          : 0;
-
-        const existing = (r.icon || r.image || "").toString().trim();
-        const imgUrl = existing ? existing : buildDdragonSquareUrl(patchLive, displayName);
-
-        const id = (r.id ?? r.key ?? slug).toString();
-
-        return {
-          id,
-          name: displayName,
-          slug,
-          role: roleKey,
-          imgUrl,
-          games,
-          wins,
-          bans,
-          winrate,
-          banrate,
-        };
+      if (buckets) {
+        for (const rk of ["top", "jungle", "mid", "bot", "support"] as const) {
+          const b = buckets[rk];
+          if (!b) continue;
+          expanded.push({
+            base: r,
+            role: rk,
+            statsSource: b,
+            keySuffix: `:${rk}`,
+          });
+        }
+        continue;
       }
-    );
+
+      const rk = normalizeRole(r.role ?? r.lane);
+      expanded.push({
+        base: r,
+        role: rk,
+        statsSource: r,
+        keySuffix: rk !== "all" ? `:${rk}` : "",
+      });
+    }
+
+    const derivedBase = expanded.map((x, i): Omit<Row, "score" | "tier" | "tierRank"> => {
+      const r = x.base;
+
+      const displayName = (
+        r.name ||
+        r.championName ||
+        (typeof r.key === "string" ? r.key : "") ||
+        `Champion ${i + 1}`
+      ).toString();
+
+      const slug = (r.slug || slugifyLoL(displayName)).toString();
+
+      const existing = (r.icon || r.image || "").toString().trim();
+      const imgUrl = existing ? existing : buildDdragonSquareUrl(patchLive, displayName);
+
+      const idBase = (r.id ?? r.key ?? slug).toString();
+      const id = `${idBase}${x.keySuffix}`;
+
+      const { games, wins, bans, winrate, banrate } = computeCoreFromRow(x.statsSource);
+
+      return {
+        id,
+        name: displayName,
+        slug,
+        role: x.role,
+        imgUrl,
+        games,
+        wins,
+        bans,
+        winrate,
+        banrate,
+      };
+    });
+
+    // Determine if role filtering is actually meaningful:
+    // - any row has a non-"all" role
+    // - AND we have at least 2 distinct roles represented
+    const roleSet = new Set<RoleKey>();
+    for (const r of derivedBase) {
+      if (r.role !== "all") roleSet.add(r.role);
+    }
+    const hasRoleData = roleSet.size >= 2;
 
     let filtered = derivedBase;
 
-    if (role !== "all") filtered = filtered.filter((r) => r.role === role);
+    // Only apply role filter if role data is real; otherwise keep "all"
+    const effectiveRole = hasRoleData ? role : "all";
+
+    if (effectiveRole !== "all") filtered = filtered.filter((r) => r.role === effectiveRole);
     if (query) filtered = filtered.filter((r) => r.name.toLowerCase().includes(query));
     filtered = filtered.filter((r) => r.games >= minGames);
 
@@ -378,13 +504,17 @@ export default function LolChampionTiersClient({
       return desc ? -diff : diff;
     });
 
-    return finalRows.slice(0, 200);
+    return { rows: finalRows.slice(0, 200), hasRoleData };
   }, [initialRows, patchLive, mode, role, q, minGames, sortBy, desc]);
+
+  // If role data isn't real, force UI back to "all"
+  useEffect(() => {
+    if (!hasRoleData && role !== "all") setRole("all");
+  }, [hasRoleData, role]);
 
   return (
     <section
       className={[
-        // ✅ WIDEN OUTER TAB ONLY ON MOBILE (like your Dota meta)
         "-mx-4 sm:mx-0",
         "rounded-2xl border border-neutral-800 bg-black/60",
         "p-3 sm:p-4",
@@ -407,19 +537,7 @@ export default function LolChampionTiersClient({
 
               <div className="mx-2 hidden h-8 w-px bg-neutral-800 lg:block" />
 
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value as RoleKey)}
-                className="h-9 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-200 outline-none focus:border-neutral-600"
-                title="Filter by role"
-              >
-                <option value="all">All roles</option>
-                <option value="top">Top</option>
-                <option value="jungle">Jungle</option>
-                <option value="mid">Mid</option>
-                <option value="bot">Bot</option>
-                <option value="support">Support</option>
-              </select>
+              
 
               <div className="ml-1 self-center text-xs text-neutral-500">
                 Sort:{" "}
@@ -466,12 +584,10 @@ export default function LolChampionTiersClient({
 
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
-        {/* ✅ NO horizontal scroll on mobile; keep desktop unchanged */}
         <div className="overflow-x-hidden sm:overflow-x-auto">
           <div className="w-full sm:min-w-[760px]">
             {/* Header */}
             <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-2 py-2 text-[10px] text-neutral-400 sm:px-3 sm:py-2 sm:text-xs">
-              {/* MOBILE: Champion=6, Games=2, Win=2, Ban=2 (fits everything) */}
               <div className="col-span-6 sm:col-span-5 flex items-center justify-between gap-2 min-w-0">
                 <span className="whitespace-nowrap">Champion</span>
                 <div className="w-[3.2rem] sm:w-auto">

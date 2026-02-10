@@ -1,465 +1,357 @@
 // scripts/wow/build-item-db.ts
+// Builds a searchable WoW item DB for the site from an existing local source JSON.
+// Output:
+//  - public/data/wow/items/index.json
+//  - public/data/wow/items/packs/items.pack.000.json (and more)
 //
-// Build a full searchable WoW Item DB (index + chunked packs) from Blizzard Game Data API.
-// ✅ Regionless UX: hardcode US host + static-us namespace
-// ✅ Dynamic smart filtering: keep items in a window of (maxIlvl - window)
-// ✅ Avoid garbage: requiredLevel >= minReqLevel, allowed qualities, equippable only
-//
-// Env (server-only):
-//   BNET_CLIENT_ID
-//   BNET_CLIENT_SECRET
-//
-// Output (default):
-//   public/data/wow/items/index.json
-//   public/data/wow/items/packs/items.pack.000.json
-//   ...
-//
-// Usage:
-//   npx tsx scripts/wow/build-item-db.ts
-//
-// Flags:
-//   --out public/data/wow/items
-//   --locale en_US
-//   --pageSize 100
-//   --maxPages 999999
-//   --packSize 500
-//   --sleepMs 35
-//   --resumeFromId 0
-//   --onlyEquippable true
-//   --logEvery 250
-//
-// Smart filters:
-//   --minReqLevel 70
-//   --allowedQualities rare,epic,legendary
-//   --ilvlWindow 40        (keeps ilvl >= maxIlvl - 40; set 0 to disable)
-//   --allowedSlots HEAD,NECK,... (optional; if omitted, keep any inventory_type)
+// "Current Content Mode A" defaults:
+//  - Only equippable
+//  - Only Armor + Weapon item classes
+//  - Only equip inventory types (no NON_EQUIP)
+//  - required_level >= 70 OR item_level >= 400 (configurable)
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import crypto from "node:crypto";
-import dotenv from "dotenv";
-
-dotenv.config({ path: ".env.local" });
-
-type Args = {
-  outDir: string;
-  locale: string;
-  pageSize: number;
-  maxPages: number;
-  packSize: number;
-  sleepMs: number;
-  resumeFromId: number;
-  onlyEquippable: boolean;
-  logEvery: number;
-
-  // filters
-  minReqLevel: number;
-  allowedQualities: Set<string> | null; // normalized lower
-  ilvlWindow: number; // 0 disables
-  allowedSlots: Set<string> | null; // inventory_type.type normalized upper
-};
-
-function getArg(flag: string) {
-  const i = process.argv.indexOf(flag);
-  if (i === -1) return null;
-  return process.argv[i + 1] ?? null;
-}
-function getBool(flag: string, def: boolean) {
-  const v = getArg(flag);
-  if (v == null) return def;
-  return v === "true" || v === "1" || v === "yes";
-}
-function getNum(flag: string, def: number) {
-  const v = getArg(flag);
-  if (v == null) return def;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : def;
-}
-function getCsvSet(flag: string, kind: "lower" | "upper"): Set<string> | null {
-  const v = getArg(flag);
-  if (!v) return null;
-  const parts = v
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((s) => (kind === "lower" ? s.toLowerCase() : s.toUpperCase()));
-  return parts.length ? new Set(parts) : null;
-}
-
-function requireEnv(key: string) {
-  const v = process.env[key];
-  if (!v) throw new Error(`Missing env var: ${key}`);
-  return v;
-}
-async function ensureDir(p: string) {
-  await fs.mkdir(p, { recursive: true });
-}
-async function writeJson(filePath: string, data: unknown) {
-  await ensureDir(path.dirname(filePath));
-  await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
-}
-async function sleep(ms: number) {
-  if (!ms) return;
-  await new Promise((r) => setTimeout(r, ms));
-}
-
-async function getAccessTokenUS(clientId: string, clientSecret: string) {
-  const tokenUrl = `https://us.battle.net/oauth/token`;
-  const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
-
-  const res = await fetch(tokenUrl, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${basic}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({ grant_type: "client_credentials" }).toString(),
-  });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`Token HTTP ${res.status}: ${text.slice(0, 800)}`);
-  }
-
-  const json = (await res.json()) as { access_token?: string };
-  if (!json.access_token) throw new Error("No access_token returned");
-  return json.access_token;
-}
-
-async function fetchJson<T>(url: string, token: string): Promise<T> {
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`HTTP ${res.status} for ${url}\n${text.slice(0, 800)}`);
-  }
-  return (await res.json()) as T;
-}
-
-function safeStr(x: any): string | undefined {
-  return typeof x === "string" ? x : undefined;
-}
-function safeNum(x: any): number | undefined {
-  return typeof x === "number" && Number.isFinite(x) ? x : undefined;
-}
-function normName(s: string) {
-  return s
-    .toLowerCase()
-    .replace(/'/g, "")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-function tokenize(s: string) {
-  const n = normName(s);
-  if (!n) return [];
-  return Array.from(new Set(n.split(" ").filter(Boolean)));
-}
-
-type SearchItemRow = { data: { id: number } };
-type SearchResponse = { pageCount?: number; results?: SearchItemRow[] };
 
 type ItemIndexRow = {
   id: number;
   name: string;
   nameNorm: string;
   tokens: string[];
-
   quality?: string;
   itemClass?: string;
   itemSubclass?: string;
-
-  inventoryType?: string; // human name
-  inventoryTypeKey?: string; // machine type (e.g., "HEAD", "TRINKET")
+  inventoryType?: string;
+  inventoryTypeKey?: string; // "HEAD", "TRINKET", etc
   isEquippable: boolean;
-
   itemLevel?: number;
   requiredLevel?: number;
-
   pack: number;
+};
+
+type IndexFile = {
+  builtAt: string;
+  mode: string;
+  minRequiredLevel: number;
+  minItemLevel: number;
+  packSize: number;
+  total: number;
+  packs: number;
+  maxIlvl: number;
+  minKeepIlvl: number;
+  items: ItemIndexRow[];
 };
 
 type PackedItem = { id: number; detail: any };
 
+const ROOT = process.cwd();
+
+function envNum(name: string, fallback: number) {
+  const raw = process.env[name];
+  if (!raw) return fallback;
+  const n = Number(String(raw).trim());
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function envStr(name: string, fallback = "") {
+  const raw = process.env[name];
+  return raw ? String(raw).trim() : fallback;
+}
+
+function toPosix(p: string) {
+  return p.split(path.sep).join("/");
+}
+
+async function readJson<T>(absPath: string): Promise<T | null> {
+  try {
+    const buf = await fs.readFile(absPath, "utf8");
+    return JSON.parse(buf) as T;
+  } catch {
+    return null;
+  }
+}
+
+async function ensureDir(absDir: string) {
+  await fs.mkdir(absDir, { recursive: true });
+}
+
+function normalizeName(name: string) {
+  return (name || "")
+    .toLowerCase()
+    .replace(/['’]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function tokenize(nameNorm: string) {
+  if (!nameNorm) return [];
+  return nameNorm.split(/\s+/g).map((t) => t.trim()).filter(Boolean);
+}
+
+// Map Blizzard inventory_type.type to your UI slot keys.
+function invKeyFromInventoryType(type: string | undefined | null): string | undefined {
+  const t = String(type || "").toUpperCase();
+
+  // direct keys you already use in client
+  const direct = new Set([
+    "HEAD",
+    "NECK",
+    "SHOULDER",
+    "CHEST",
+    "ROBE",
+    "WAIST",
+    "LEGS",
+    "FEET",
+    "WRIST",
+    "HANDS",
+    "FINGER",
+    "TRINKET",
+    "CLOAK",
+    "BACK",
+
+    "MAIN_HAND",
+    "OFF_HAND",
+    "ONE_HAND",
+    "TWO_HAND",
+
+    "WEAPONMAINHAND",
+    "WEAPONOFFHAND",
+
+    "HOLDABLE",
+    "SHIELD",
+    "RANGED",
+    "RANGEDRIGHT",
+    "RELIC",
+  ]);
+
+  if (direct.has(t)) return t;
+
+  // common aliases
+  if (t === "BODY") return "CHEST";
+  if (t === "TABARD") return undefined;
+  if (t === "NON_EQUIP") return undefined;
+
+  return t || undefined;
+}
+
+function isArmorOrWeapon(detail: any) {
+  // Blizzard item_class id: Weapon = 2, Armor = 4 (classic schema)
+  const id = Number(detail?.item_class?.id);
+  if (id === 2 || id === 4) return true;
+
+  // fallback by name
+  const name = String(detail?.item_class?.name || "").toLowerCase();
+  if (name.includes("weapon") || name.includes("armor")) return true;
+
+  return false;
+}
+
+function getItemLevel(detail: any): number {
+  // Prefer preview_item.level.value then top-level level
+  const v =
+    Number(detail?.preview_item?.level?.value) ||
+    Number(detail?.level) ||
+    Number(detail?.item_level) ||
+    0;
+  return Number.isFinite(v) ? v : 0;
+}
+
+function getRequiredLevel(detail: any): number {
+  const v =
+    Number(detail?.preview_item?.requirements?.level?.value) ||
+    Number(detail?.required_level) ||
+    0;
+  return Number.isFinite(v) ? v : 0;
+}
+
 function isEquippable(detail: any): boolean {
-  const invName = safeStr(detail?.inventory_type?.name);
-  const invType = safeStr(detail?.inventory_type?.type);
-  return !!((invName && invName.trim()) || (invType && invType.trim()));
+  const v = detail?.is_equippable;
+  if (typeof v === "boolean") return v;
+  // fallback: has a meaningful inventory_type and armor/weapon class
+  const inv = String(detail?.inventory_type?.type || "");
+  if (!inv || inv.toUpperCase() === "NON_EQUIP") return false;
+  return isArmorOrWeapon(detail);
 }
 
-function qualityKeyLower(detail: any): string | null {
-  const t = safeStr(detail?.quality?.type);
-  const n = safeStr(detail?.quality?.name);
-  const k = (t ?? n ?? "").toLowerCase();
-  return k || null;
+function shouldKeepItem(detail: any, minReqLevel: number, minIlvl: number) {
+  if (!detail) return false;
+  if (!isEquippable(detail)) return false;
+  if (!isArmorOrWeapon(detail)) return false;
+
+  const invType = String(detail?.inventory_type?.type || "").toUpperCase();
+  const invKey = invKeyFromInventoryType(invType);
+  if (!invKey) return false;
+
+  const req = getRequiredLevel(detail);
+  const ilvl = getItemLevel(detail);
+
+  // Current Content Mode A: keep if either threshold satisfied.
+  if (req >= minReqLevel) return true;
+  if (ilvl >= minIlvl) return true;
+
+  return false;
 }
 
-function inventoryTypeKeyUpper(detail: any): string | null {
-  const t = safeStr(detail?.inventory_type?.type);
-  // sometimes only "name" exists; keep null in that case
-  return t ? t.toUpperCase() : null;
+function qualityName(detail: any) {
+  return (
+    String(detail?.preview_item?.quality?.name || "") ||
+    String(detail?.quality?.name || "") ||
+    undefined
+  );
 }
 
-function sha1(s: string) {
-  return crypto.createHash("sha1").update(s).digest("hex");
+function itemClassName(detail: any) {
+  return String(detail?.item_class?.name || "") || undefined;
+}
+
+function itemSubclassName(detail: any) {
+  return String(detail?.item_subclass?.name || "") || undefined;
+}
+
+function inventoryTypeName(detail: any) {
+  return String(detail?.inventory_type?.name || "") || undefined;
 }
 
 async function main() {
-  const args: Args = {
-    outDir: getArg("--out") ?? "public/data/wow/items",
-    locale: getArg("--locale") ?? "en_US",
-    pageSize: getNum("--pageSize", 100),
-    maxPages: getNum("--maxPages", 999999),
-    packSize: getNum("--packSize", 500),
-    sleepMs: getNum("--sleepMs", 35),
-    resumeFromId: getNum("--resumeFromId", 0),
-    onlyEquippable: getBool("--onlyEquippable", true),
-    logEvery: getNum("--logEvery", 250),
+  const MODE = envStr("WOW_MODE", "current_a");
+  const MIN_REQUIRED_LEVEL = envNum("WOW_MIN_REQUIRED_LEVEL", 70);
+  const MIN_ILVL = envNum("WOW_MIN_ILVL", 400);
+  const PACK_SIZE = envNum("WOW_PACK_SIZE", 2000);
 
-    minReqLevel: getNum("--minReqLevel", 70),
-    allowedQualities: getCsvSet("--allowedQualities", "lower"),
-    ilvlWindow: getNum("--ilvlWindow", 40),
-    allowedSlots: getCsvSet("--allowedSlots", "upper"),
-  };
-
-  const clientId = requireEnv("BNET_CLIENT_ID");
-  const clientSecret = requireEnv("BNET_CLIENT_SECRET");
-
-  // Regionless UX: hardcode US Game Data host + static-us namespace.
-  const API_BASE = "https://us.api.blizzard.com";
-  const NAMESPACE = "static-us";
-
-  const token = await getAccessTokenUS(clientId, clientSecret);
-
-  const outDir = args.outDir;
+  const outDir = path.join(ROOT, "public", "data", "wow", "items");
   const packsDir = path.join(outDir, "packs");
+  await ensureDir(outDir);
   await ensureDir(packsDir);
 
-  // Temp stash for this run so we can apply dynamic ilvlWindow AFTER we know max ilvl.
-  // This prevents writing a bunch of packs then realizing they should be filtered out.
-  const tmpDir = path.join(outDir, ".tmp_run");
-  const tmpItemsPath = path.join(tmpDir, "items.ndjson");
-  await ensureDir(tmpDir);
+  // Input sources (already present in your repo from other scripts)
+  const srcByIdPath = path.join(ROOT, "public", "data", "wow", "items_by_id.json");
+  const srcIndexPath = path.join(ROOT, "public", "data", "wow", "items_index.json");
 
-  // wipe temp file
-  await fs.writeFile(tmpItemsPath, "", "utf8");
+  const byId = await readJson<Record<string, any>>(srcByIdPath);
+  const idxArr = await readJson<any[]>(srcIndexPath);
 
-  let fetched = 0;
-  let keptCandidates = 0;
+  let details: Array<{ id: number; detail: any }> = [];
+
+  if (byId && typeof byId === "object") {
+    for (const [k, v] of Object.entries(byId)) {
+      const id = Number(k);
+      if (!Number.isFinite(id)) continue;
+      details.push({ id, detail: v });
+    }
+  } else if (Array.isArray(idxArr)) {
+    // tolerate either {id, detail} or raw detail with id
+    for (const it of idxArr) {
+      const id = Number(it?.id ?? it?.detail?.id);
+      const detail = it?.detail ?? it;
+      if (!Number.isFinite(id) || !detail) continue;
+      details.push({ id, detail });
+    }
+  } else {
+    throw new Error(
+      `No source found. Expected either:\n` +
+        ` - public/data/wow/items_by_id.json\n` +
+        ` - public/data/wow/items_index.json\n` +
+        `Run your Blizzard crawl/build script first (the one that produces items_by_id.json).`
+    );
+  }
+
+  // Filter
+  const kept: Array<{ id: number; detail: any }> = [];
   let maxIlvl = 0;
+  let minKeepIlvl = Number.POSITIVE_INFINITY;
 
-  // Search pages
-  let page = 1;
+  for (const it of details) {
+    if (!shouldKeepItem(it.detail, MIN_REQUIRED_LEVEL, MIN_ILVL)) continue;
 
-  // Light “run key” for index meta
-  const runKey = sha1(`${API_BASE}|${NAMESPACE}|${args.locale}|${args.minReqLevel}|${[...((args.allowedQualities ?? new Set()).values())].join(",")}|${args.ilvlWindow}|${[...((args.allowedSlots ?? new Set()).values())].join(",")}`);
+    const ilvl = getItemLevel(it.detail);
+    if (ilvl > maxIlvl) maxIlvl = ilvl;
+    if (ilvl > 0 && ilvl < minKeepIlvl) minKeepIlvl = ilvl;
 
-  while (page <= args.maxPages) {
-    const searchUrl =
-      `${API_BASE}/data/wow/search/item` +
-      `?namespace=${encodeURIComponent(NAMESPACE)}` +
-      `&locale=${encodeURIComponent(args.locale)}` +
-      `&_page=${page}` +
-      `&_pageSize=${args.pageSize}`;
-
-    const sr = await fetchJson<SearchResponse>(searchUrl, token);
-    const results = Array.isArray(sr.results) ? sr.results : [];
-    if (results.length === 0) break;
-
-    for (const r of results) {
-      const id = safeNum(r?.data?.id);
-      if (!id) continue;
-      if (id <= args.resumeFromId) continue;
-
-      const detailUrl =
-        `${API_BASE}/data/wow/item/${id}` +
-        `?namespace=${encodeURIComponent(NAMESPACE)}` +
-        `&locale=${encodeURIComponent(args.locale)}`;
-
-      let detail: any;
-      try {
-        detail = await fetchJson<any>(detailUrl, token);
-      } catch (e: any) {
-        if (fetched % args.logEvery === 0) {
-          console.warn(`⚠️ item ${id} fetch failed: ${e?.message ?? e}`);
-        }
-        await sleep(args.sleepMs);
-        continue;
-      }
-
-      fetched += 1;
-
-      const equippable = isEquippable(detail);
-      if (args.onlyEquippable && !equippable) {
-        await sleep(args.sleepMs);
-        continue;
-      }
-
-      const invKey = inventoryTypeKeyUpper(detail);
-      if (args.allowedSlots && invKey && !args.allowedSlots.has(invKey)) {
-        await sleep(args.sleepMs);
-        continue;
-      }
-
-      const reqLevel = safeNum(detail?.required_level) ?? 0;
-      if (args.minReqLevel > 0 && reqLevel < args.minReqLevel) {
-        await sleep(args.sleepMs);
-        continue;
-      }
-
-      const qKey = qualityKeyLower(detail);
-      if (args.allowedQualities && qKey && !args.allowedQualities.has(qKey)) {
-        await sleep(args.sleepMs);
-        continue;
-      }
-      // If allowedQualities is set but qKey is missing, drop it (keeps DB cleaner)
-      if (args.allowedQualities && !qKey) {
-        await sleep(args.sleepMs);
-        continue;
-      }
-
-      const ilvl = safeNum(detail?.level) ?? safeNum(detail?.item_level) ?? 0;
-      if (ilvl > maxIlvl) maxIlvl = ilvl;
-
-      // store candidate (NDJSON) so phase 2 can filter by ilvlWindow without re-fetching
-      await fs.appendFile(tmpItemsPath, JSON.stringify({ id, ilvl, detail }) + "\n", "utf8");
-      keptCandidates += 1;
-
-      if (fetched % args.logEvery === 0) {
-        console.log(`✅ scanned ${fetched} items... candidates kept ${keptCandidates} (page ${page}) maxIlvl=${maxIlvl}`);
-      }
-
-      await sleep(args.sleepMs);
-    }
-
-    page += 1;
-
-    const pageCount = safeNum(sr.pageCount);
-    if (pageCount && page > pageCount) break;
+    kept.push(it);
   }
 
-  if (keptCandidates === 0) {
-    console.log("⚠️ No candidates matched filters. Nothing to write.");
-    return;
+  // Sort by ilvl desc then name
+  kept.sort((a, b) => {
+    const ia = getItemLevel(a.detail);
+    const ib = getItemLevel(b.detail);
+    if (ib !== ia) return ib - ia;
+    const na = String(a.detail?.name || "");
+    const nb = String(b.detail?.name || "");
+    return na.localeCompare(nb);
+  });
+
+  // Pack + index rows
+  const packs: PackedItem[][] = [];
+  const items: ItemIndexRow[] = [];
+
+  for (let i = 0; i < kept.length; i += PACK_SIZE) {
+    packs.push(kept.slice(i, i + PACK_SIZE).map((x) => ({ id: x.id, detail: x.detail })));
   }
 
-  const minKeepIlvl =
-    args.ilvlWindow > 0 ? Math.max(0, maxIlvl - args.ilvlWindow) : 0;
-
-  console.log(`🔎 Phase 2: writing final DB (ilvlWindow=${args.ilvlWindow}, keep ilvl >= ${minKeepIlvl})`);
-
-  // Phase 2: read NDJSON and write packs + index
-  const index: ItemIndexRow[] = [];
-  let currentPack: PackedItem[] = [];
-  let packNo = 0;
-  let written = 0;
-
-  async function flushPack() {
-    if (currentPack.length === 0) return;
-    const packPath = path.join(packsDir, `items.pack.${String(packNo).padStart(3, "0")}.json`);
-    await writeJson(packPath, currentPack);
-    currentPack = [];
-    packNo += 1;
+  // Write packs
+  for (let p = 0; p < packs.length; p++) {
+    const packNo = String(p).padStart(3, "0");
+    const packRel = `public/data/wow/items/packs/items.pack.${packNo}.json`;
+    const packAbs = path.join(ROOT, ...packRel.split("/"));
+    const content = JSON.stringify(packs[p], null, 2);
+    await fs.writeFile(packAbs, content, "utf8");
   }
 
-  const nd = await fs.readFile(tmpItemsPath, "utf8");
-  const lines = nd.split("\n").filter(Boolean);
+  // Build index rows with correct pack number
+  for (let p = 0; p < packs.length; p++) {
+    for (const row of packs[p]) {
+      const d = row.detail;
+      const name = String(d?.name || "").trim();
+      if (!name) continue;
 
-  for (const line of lines) {
-    let row: any;
-    try {
-      row = JSON.parse(line);
-    } catch {
-      continue;
-    }
+      const nameNorm = normalizeName(name);
+      const tokens = tokenize(nameNorm);
 
-    const id = safeNum(row?.id);
-    const ilvl = safeNum(row?.ilvl) ?? 0;
-    const detail = row?.detail;
-    if (!id || !detail) continue;
+      const invTypeKey = invKeyFromInventoryType(d?.inventory_type?.type);
+      const requiredLevel = getRequiredLevel(d);
+      const itemLevel = getItemLevel(d);
 
-    if (args.ilvlWindow > 0 && ilvl < minKeepIlvl) continue;
-
-    const name =
-      safeStr(detail?.name) ??
-      safeStr(detail?.name?.[args.locale]) ??
-      safeStr(detail?.name?.en_US) ??
-      `Item ${id}`;
-
-    const invName = safeStr(detail?.inventory_type?.name);
-    const invKey = inventoryTypeKeyUpper(detail) ?? undefined;
-
-    const quality = safeStr(detail?.quality?.name) ?? safeStr(detail?.quality?.type);
-    const itemClass = safeStr(detail?.item_class?.name) ?? safeStr(detail?.item_class?.type);
-    const itemSubclass = safeStr(detail?.item_subclass?.name) ?? safeStr(detail?.item_subclass?.type);
-    const reqLevel = safeNum(detail?.required_level);
-
-    const nameNorm = normName(name);
-    const tokens = tokenize(name);
-
-    index.push({
-      id,
-      name,
-      nameNorm,
-      tokens,
-      quality,
-      itemClass,
-      itemSubclass,
-      inventoryType: invName,
-      inventoryTypeKey: invKey,
-      isEquippable: true,
-      itemLevel: ilvl || undefined,
-      requiredLevel: reqLevel,
-      pack: packNo,
-    });
-
-    currentPack.push({ id, detail });
-    written += 1;
-
-    if (currentPack.length >= args.packSize) {
-      await flushPack();
+      items.push({
+        id: row.id,
+        name,
+        nameNorm,
+        tokens,
+        quality: qualityName(d),
+        itemClass: itemClassName(d),
+        itemSubclass: itemSubclassName(d),
+        inventoryType: inventoryTypeName(d),
+        inventoryTypeKey: invTypeKey,
+        isEquippable: true,
+        itemLevel: itemLevel || undefined,
+        requiredLevel: requiredLevel || undefined,
+        pack: p,
+      });
     }
   }
 
-  await flushPack();
-
-  const meta = {
-    version: "wow-items-db-v2",
+  const index: IndexFile = {
     builtAt: new Date().toISOString(),
-    runKey,
-    locale: args.locale,
-    namespace: NAMESPACE,
-    apiBase: API_BASE,
-
-    // filters
-    minReqLevel: args.minReqLevel,
-    allowedQualities: args.allowedQualities ? Array.from(args.allowedQualities) : null,
-    allowedSlots: args.allowedSlots ? Array.from(args.allowedSlots) : null,
-    ilvlWindow: args.ilvlWindow,
-    maxIlvlFound: maxIlvl,
-    minKeptIlvl: minKeepIlvl,
-
-    // output
-    pageSize: args.pageSize,
-    packSize: args.packSize,
-    candidatesScanned: keptCandidates,
-    totalItems: index.length,
-    packs: packNo,
+    mode: MODE,
+    minRequiredLevel: MIN_REQUIRED_LEVEL,
+    minItemLevel: MIN_ILVL,
+    packSize: PACK_SIZE,
+    total: items.length,
+    packs: packs.length,
+    maxIlvl: maxIlvl || 0,
+    minKeepIlvl: Number.isFinite(minKeepIlvl) ? minKeepIlvl : 0,
+    items,
   };
 
-  await writeJson(path.join(outDir, "index.json"), { meta, items: index });
+  const indexAbs = path.join(outDir, "index.json");
+  await fs.writeFile(indexAbs, JSON.stringify(index, null, 2), "utf8");
 
-  // cleanup temp
-  await fs.rm(tmpDir, { recursive: true, force: true });
-
-  console.log("✅ Done.");
-  console.log(`   Scanned candidates: ${keptCandidates}`);
-  console.log(`   Max ilvl found:     ${maxIlvl}`);
-  console.log(`   Kept ilvl >=        ${minKeepIlvl}`);
-  console.log(`   Items written:      ${written}`);
-  console.log(`   Packs:              ${packNo}`);
-  console.log(`   Out:                ${outDir}`);
+  console.log(`[wow] build-item-db done`);
+  console.log(` - kept items: ${items.length}`);
+  console.log(` - packs: ${packs.length}`);
+  console.log(` - wrote: ${toPosix(path.relative(ROOT, indexAbs))}`);
 }
 
-main().catch((err) => {
-  console.error("❌ build-item-db failed:", err?.message ?? err);
+main().catch((e) => {
+  console.error(e);
   process.exit(1);
 });

@@ -8,6 +8,11 @@ export const metadata = {
     "Browse every Dota 2 hero with live meta context, pick rate, win rate, and pro trends. Data via OpenDota, updated frequently.",
 };
 
+// ✅ Daily full-page regeneration
+export const revalidate = 60 * 60 * 24; // 24 hours
+export const runtime = "nodejs";
+export const dynamic = "force-static";
+
 type HeroStatsRow = {
   id: number;
   name?: string;
@@ -46,14 +51,17 @@ function iconUrl(r: HeroStatsRow) {
 
 async function getHeroStats(): Promise<HeroStatsRow[]> {
   const res = await fetch("https://api.opendota.com/api/heroStats", {
-    next: { revalidate: 600 }, // ~5 minutes
-    headers: { Accept: "application/json" },
+    next: { revalidate: 60 * 60 * 24 }, // ✅ daily
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "GamerStation (https://gamerstation.gg)",
+    },
   });
   if (!res.ok) return [];
   return res.json();
 }
 
-// ✅ Server-side patch: use YOUR route so it matches the client exactly
+// ✅ Patch check: more frequent than the hero list (so patch flips invalidate the page sooner)
 async function getPatchFromSelf(): Promise<string> {
   try {
     const base =
@@ -65,7 +73,7 @@ async function getPatchFromSelf(): Promise<string> {
         : "http://localhost:3000");
 
     const res = await fetch(`${base}/api/dota/patch`, {
-      next: { revalidate: 600 },
+      next: { revalidate: 60 * 60 * 6 }, // ✅ every 6 hours
       headers: { Accept: "application/json" },
     });
 
@@ -83,8 +91,10 @@ export default async function DotaHeroesIndexPage({
 }: {
   searchParams?: { q?: string };
 }) {
-  // ✅ fetch both in parallel
   const [rows, patch] = await Promise.all([getHeroStats(), getPatchFromSelf()]);
+
+  // 🔥 Cache bucket tied to patch — when patch changes, this page regenerates fresh
+  const cacheTag = `dota-heroes-${patch}`;
 
   const heroes: HeroCard[] = rows
     .map((r) => {
@@ -143,12 +153,22 @@ export default async function DotaHeroesIndexPage({
           <h1 className="text-4xl font-bold tracking-tight">Dota 2 Heroes</h1>
 
           <p className="mt-3 text-neutral-300">
-            Browse every Dota 2 hero with quick links to hero pages and meta context. Powered by OpenDota match
-            data and refreshed often.
+            Browse every Dota 2 hero with quick links to hero pages and meta context. Powered by OpenDota match data and
+            refreshed often.
+            <span className="text-neutral-500">
+              {" "}
+              (Daily refresh • Auto resets on patch change)
+            </span>
           </p>
 
-          {/* ✅ Pills are now rendered ONLY in the client */}
-          <DotaHeroesClient heroes={heroes} initialQuery={initialQuery} patch={patch} cacheLabel="~10 min" />
+          {/* ✅ Client remounts when patch changes */}
+          <DotaHeroesClient
+            key={cacheTag}
+            heroes={heroes}
+            initialQuery={initialQuery}
+            patch={patch}
+            cacheLabel="Daily"
+          />
         </div>
       </div>
     </main>

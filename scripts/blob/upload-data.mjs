@@ -1,4 +1,7 @@
 // scripts/blob/upload-data.mjs
+import dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import { put } from "@vercel/blob";
@@ -47,7 +50,7 @@ function parseUploads(spec) {
  *
  * Rule:
  * - localRel is the file path
- * - blobPath is derived by stripping "public/" prefix (so it becomes "data/...")
+ * - blobPath is derived by stripping "public/" prefix (so it becomes "data/..."
  */
 function parseDirs(spec) {
   return spec
@@ -100,6 +103,17 @@ function deriveBlobPathFromLocalRel(localRel) {
   return norm;
 }
 
+function guessContentType(blobPath) {
+  const lower = String(blobPath).toLowerCase();
+  if (lower.endsWith(".json")) return "application/json";
+  if (lower.endsWith(".png")) return "image/png";
+  if (lower.endsWith(".webp")) return "image/webp";
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+  if (lower.endsWith(".svg")) return "image/svg+xml";
+  if (lower.endsWith(".txt")) return "text/plain";
+  return "application/octet-stream";
+}
+
 /* =========================
    Overwrite vs append policy
 ========================= */
@@ -108,13 +122,23 @@ function deriveBlobPathFromLocalRel(localRel) {
  * - Leaderboards: overwrite the same keys every run
  * - Meta builds + Champion tiers: "append" (keep history) using versioned keys
  *
- * Additionally:
- * - Make updates visible quickly: set cacheControlMaxAge so clients/CDN refresh within ~60s.
+ * WoW policy:
+ * - WoW outputs should overwrite, because you want "latest" always
+ *   (covers: data/wow/items/index.json, packs, quick-sim presets, etc.)
  */
 
 function shouldOverwrite(blobPath) {
+  // LoL
   if (blobPath.startsWith("data/lol/leaderboards/")) return true;
   if (blobPath === "data/manifest.json") return true;
+
+  // ✅ Meta builds: overwrite stable "latest" keys (finalize already merges safely)
+  if (blobPath === "data/lol/meta_builds_ranked.json") return true;
+  if (blobPath === "data/lol/meta_builds_casual.json") return true;
+
+  // ✅ WoW: overwrite everything under data/wow/
+  if (blobPath.startsWith("data/wow/")) return true;
+
   return false;
 }
 
@@ -148,7 +172,7 @@ function sanitizeTag(s) {
 }
 
 function getPatchTag() {
-  // Prefer LOL_PATCH, then BUILD_TAG, else fallback to UTC timestamp (so you DON'T have to change workflows)
+  // Prefer LOL_PATCH, then BUILD_TAG, else fallback to UTC timestamp
   const p = optionalEnv("LOL_PATCH") || optionalEnv("BUILD_TAG");
   return p ? sanitizeTag(p) : utcStamp();
 }
@@ -181,17 +205,16 @@ function toAppendKey(blobPath) {
 
 /**
  * Cache policy:
- * - Leaderboards should update quickly => 60 seconds
- * - Meta builds + champion tiers can be longer (default 300), but still fine at 60 too
- *
- * You asked: "make it update in 60 seconds"
- * We'll enforce:
- *   - Leaderboards cache = 60
- *   - Everything else uses BLOB_CACHE_SECONDS if provided, else 300
+ * - LoL leaderboards: 60s
+ * - WoW: 60s (you asked for quick propagation)
+ * - Everything else: BLOB_CACHE_SECONDS (default 300)
  */
 function cacheSecondsFor(blobPath) {
   const defaultOther = Number(optionalEnv("BLOB_CACHE_SECONDS") || "300");
+
   if (blobPath.startsWith("data/lol/leaderboards/")) return 60;
+  if (blobPath.startsWith("data/wow/")) return 60;
+
   return Number.isFinite(defaultOther) && defaultOther > 0 ? defaultOther : 300;
 }
 
@@ -209,19 +232,24 @@ async function uploadOne({ localRel, blobPath }) {
     return null;
   }
 
-  const overwrite = shouldOverwrite(blobPath);
+  const FORCE_OVERWRITE = String(optionalEnv("BLOB_FORCE_OVERWRITE") || "0") === "1";
+const overwrite = FORCE_OVERWRITE || shouldOverwrite(blobPath);
+
 
   // Append-mode: meta builds + champion tiers go to versioned keys
   const targetPath =
-    overwrite ? blobPath : (isMetaBuilds(blobPath) || isChampionTiers(blobPath) ? toAppendKey(blobPath) : blobPath);
+    overwrite
+      ? blobPath
+      : (isMetaBuilds(blobPath) || isChampionTiers(blobPath) ? toAppendKey(blobPath) : blobPath);
 
   const cacheSeconds = cacheSecondsFor(blobPath);
+  const contentType = guessContentType(targetPath);
 
   const res = await put(targetPath, buf, {
     access: "public",
     addRandomSuffix: false,
     allowOverwrite: overwrite,
-    contentType: "application/json",
+    contentType,
     cacheControlMaxAge: cacheSeconds,
   });
 
@@ -259,7 +287,7 @@ async function main() {
       for (const fAbs of absFiles) {
         const localRel = toPosix(path.relative(ROOT, fAbs));
 
-        // Only upload JSON
+        // ✅ keep JSON-only uploads for now (your design)
         if (!localRel.toLowerCase().endsWith(".json")) continue;
 
         const blobPath = deriveBlobPathFromLocalRel(localRel);
@@ -284,7 +312,7 @@ async function main() {
 
   console.log(`Uploading ${finalUploads.length} files...`);
   console.log(
-    `[config] leaderboards cache forced to 60s; other cache uses BLOB_CACHE_SECONDS=${optionalEnv("BLOB_CACHE_SECONDS") || "300"}`
+    `[config] cache: leaderboards=60s, wow=60s, other=BLOB_CACHE_SECONDS=${optionalEnv("BLOB_CACHE_SECONDS") || "300"}`
   );
   console.log(
     `[config] append tag source LOL_PATCH="${optionalEnv("LOL_PATCH")}" BUILD_TAG="${optionalEnv("BUILD_TAG")}" (fallback=utc timestamp)`

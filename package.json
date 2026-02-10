@@ -29,7 +29,6 @@
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
     "@vercel/blob": "^2.2.0",
-    "dotenv": "^17.2.3",
     "fflate": "^0.8.2",
     "next": "16.1.1",
     "node-fetch": "^3.3.2",
@@ -42,6 +41,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "cheerio": "^1.2.0",
+    "dotenv": "^17.2.4",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",

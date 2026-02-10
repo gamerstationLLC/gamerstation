@@ -1,0 +1,231 @@
+name: WoW Data Auto-Update (Items + Quick Sim Presets)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Runs daily. Patch day? It updates automatically.
+    - cron: "17 11 * * *"
+
+concurrency:
+  group: wow-data-auto
+  cancel-in-progress: false
+
+jobs:
+  wow-data:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      NODE_ENV: production
+
+      # ✅ Blob base (store as GitHub Actions Variable or Secret)
+      # If you already have NEXT_PUBLIC_BLOB_BASE_URL in Vercel, you can also store it here as a repo Variable.
+      BLOB_BASE_URL: ${{ vars.NEXT_PUBLIC_BLOB_BASE_URL }}
+
+      # ✅ Blizzard creds (Secrets)
+      BNET_CLIENT_ID: ${{ secrets.BNET_CLIENT_ID }}
+      BNET_CLIENT_SECRET: ${{ secrets.BNET_CLIENT_SECRET }}
+
+      # ✅ Vercel Blob RW token (Secret)
+      BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      # ==========================
+      # Build Quick Sim Presets JSON
+      # ==========================
+      - name: Build quick sim presets
+        run: npx tsx scripts/wow/build-quick-sim-presets.ts
+
+      # ==========================
+      # Build "current patch relevant" item DB
+      # (max ilvl - window)
+      # ==========================
+      - name: Build items DB (current patch relevant)
+        continue-on-error: true
+        run: >
+          npx tsx scripts/wow/build-item-db.ts
+          --minReqLevel 70
+          --allowedQualities rare,epic,legendary
+          --ilvlWindow 40
+          --sleepMs 35
+
+      # ==========================
+      # Decide whether upload is needed
+      # Compares local index.json to Blob index.json (if exists)
+      # ==========================
+      - name: Check if upload needed
+        id: probe
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+
+          const base = process.env.BLOB_BASE_URL;
+          const localIndexPath = path.join("public","data","wow","items","index.json");
+
+          // If build failed or didn't create index, skip upload.
+          if (!fs.existsSync(localIndexPath)) {
+            console.log("upload_needed=false");
+            console.log("reason=local_index_missing");
+            process.exit(0);
+          }
+
+          const localIndex = JSON.parse(fs.readFileSync(localIndexPath, "utf8"));
+          const localMeta = localIndex?.meta || localIndex; // support either shape
+          const localSig = JSON.stringify({
+            maxIlvl: localMeta?.maxIlvlFound ?? localMeta?.maxIlvl,
+            minKeptIlvl: localMeta?.minKeptIlvl ?? localMeta?.minKeepIlvl,
+            total: localMeta?.totalItems ?? localMeta?.total ?? (localIndex?.items?.length ?? 0),
+            packs: localMeta?.packs ?? undefined,
+            ilvlWindow: localMeta?.ilvlWindow ?? undefined
+          });
+
+          async function main() {
+            // If no base URL, always upload (can't probe).
+            if (!base) {
+              console.log("upload_needed=true");
+              console.log("reason=no_blob_base_url");
+              return;
+            }
+
+            const remoteUrl = `${base.replace(/\/$/, "")}/data/wow/items/index.json`;
+
+            let remoteSig = null;
+            try {
+              const res = await fetch(remoteUrl, { cache: "no-store" });
+              if (res.ok) {
+                const remoteIndex = await res.json();
+                const remoteMeta = remoteIndex?.meta || remoteIndex;
+                remoteSig = JSON.stringify({
+                  maxIlvl: remoteMeta?.maxIlvlFound ?? remoteMeta?.maxIlvl,
+                  minKeptIlvl: remoteMeta?.minKeptIlvl ?? remoteMeta?.minKeepIlvl,
+                  total: remoteMeta?.totalItems ?? remoteMeta?.total ?? (remoteIndex?.items?.length ?? 0),
+                  packs: remoteMeta?.packs ?? undefined,
+                  ilvlWindow: remoteMeta?.ilvlWindow ?? undefined
+                });
+              }
+            } catch {}
+
+            const same = remoteSig && remoteSig === localSig;
+
+            console.log(`upload_needed=${same ? "false" : "true"}`);
+            console.log(`reason=${same ? "no_change" : "changed_or_missing"}`);
+          }
+
+          main();
+          NODE
+        shell: bash
+
+      # Expose probe outputs
+      - name: Set probe outputs
+        id: probe_out
+        run: |
+          # Read the last two console lines from previous step? Not available.
+          # We'll re-run a tiny deterministic check and set outputs.
+          node - <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+          const localIndexPath = path.join("public","data","wow","items","index.json");
+          const base = process.env.BLOB_BASE_URL;
+
+          function sig(obj) {
+            const meta = obj?.meta || obj;
+            return JSON.stringify({
+              maxIlvl: meta?.maxIlvlFound ?? meta?.maxIlvl,
+              minKeptIlvl: meta?.minKeptIlvl ?? meta?.minKeepIlvl,
+              total: meta?.totalItems ?? meta?.total ?? (obj?.items?.length ?? 0),
+              packs: meta?.packs ?? undefined,
+              ilvlWindow: meta?.ilvlWindow ?? undefined
+            });
+          }
+
+          (async () => {
+            if (!fs.existsSync(localIndexPath)) {
+              console.log("::set-output name=upload_needed::false");
+              console.log("::set-output name=reason::local_index_missing");
+              return;
+            }
+            const local = JSON.parse(fs.readFileSync(localIndexPath, "utf8"));
+            if (!base) {
+              console.log("::set-output name=upload_needed::true");
+              console.log("::set-output name=reason::no_blob_base_url");
+              return;
+            }
+            const remoteUrl = `${base.replace(/\/$/, "")}/data/wow/items/index.json`;
+            let remote = null;
+            try {
+              const res = await fetch(remoteUrl, { cache: "no-store" });
+              if (res.ok) remote = await res.json();
+            } catch {}
+            const same = remote && sig(remote) === sig(local);
+            console.log(`::set-output name=upload_needed::${same ? "false" : "true"}`);
+            console.log(`::set-output name=reason::${same ? "no_change" : "changed_or_missing"}`);
+          })();
+          NODE
+        shell: bash
+
+      # ==========================
+      # Upload to Blob (only if changed)
+      # Uploads presets + item index + all packs
+      # ==========================
+      - name: Upload WoW JSON to Blob
+        if: steps.probe_out.outputs.upload_needed == 'true'
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const path = require("path");
+
+          const uploads = [];
+
+          // Presets
+          const presetsLocal = "public/data/wow/quick-sim-presets.json";
+          if (fs.existsSync(presetsLocal)) {
+            uploads.push(`${presetsLocal}=data/wow/quick-sim-presets.json`);
+          }
+
+          // Items index
+          const indexLocal = "public/data/wow/items/index.json";
+          if (fs.existsSync(indexLocal)) {
+            uploads.push(`${indexLocal}=data/wow/items/index.json`);
+          }
+
+          // Packs
+          const packsDir = path.join("public","data","wow","items","packs");
+          if (fs.existsSync(packsDir)) {
+            const files = fs.readdirSync(packsDir).filter(f => f.endsWith(".json"));
+            for (const f of files) {
+              uploads.push(`public/data/wow/items/packs/${f}=data/wow/items/packs/${f}`);
+            }
+          }
+
+          if (!uploads.length) {
+            console.log("No files to upload.");
+            process.exit(0);
+          }
+
+          // Export for next step
+          fs.writeFileSync(".blob_uploads.txt", uploads.join(";"), "utf8");
+          console.log("Prepared uploads:", uploads.length);
+          NODE
+
+          export BLOB_UPLOADS="$(cat .blob_uploads.txt)"
+          node scripts/blob/upload-data.mjs
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+
+      - name: Summary
+        run: |
+          echo "Upload needed: ${{ steps.probe_out.outputs.upload_needed }}"
+          echo "Reason:        ${{ steps.probe_out.outputs.reason }}"

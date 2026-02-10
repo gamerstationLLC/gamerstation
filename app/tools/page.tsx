@@ -124,6 +124,17 @@ export default function ToolsPage() {
               </div>
             </Link>
 
+
+ <Link
+              href="/tools/pokemon/catch"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">Pokemon Catch Chance</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Pick a Pokémon game and Pokémon to view catch chance.
+              </div>
+            </Link>
+
             {/* Meta Loadouts */}
             <Link
               href="/games/cod/meta-loadouts"
