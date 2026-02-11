@@ -123,6 +123,7 @@ jobs:
           BLOB_UPLOADS: "public/data/lol/champion_tiers.json=data/lol/champion_tiers.json"
           BLOB_CACHE_SECONDS: "300"
           LOL_PATCH: ${{ github.run_id }}
+          BLOB_FORCE_OVERWRITE: "1" # ✅ required so manifest/latest pointers always update
         run: |
           set +e
 
