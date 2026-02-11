@@ -33,6 +33,7 @@ function normalizeBlobKey(input: string) {
  * - meta builds
  * - champion tiers
  * - leaderboards
+ * - pokemon datasets (catch calc)
  *
  * Everything else must read from disk (/public/...) and should NOT hit Blob.
  */
@@ -40,7 +41,11 @@ function isBlobManaged(key: string) {
   // key is normalized like "data/..."
   if (key.startsWith("data/lol/leaderboards/")) return true;
   if (key.startsWith("data/lol/champion_tiers")) return true; // adjust if your file name differs
-  if (key.includes("data/lol/meta_builds")) return true;       // ranked/casual variants
+  if (key.includes("data/lol/meta_builds")) return true; // ranked/casual variants
+
+  // ✅ Pokémon catch-calc datasets
+  if (key.startsWith("data/pokemon/")) return true;
+
   return false;
 }
 

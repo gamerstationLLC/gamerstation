@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* Ambient background */}
       {/* Subtle top glow */}
 <div aria-hidden className="pointer-events-none absolute inset-0">

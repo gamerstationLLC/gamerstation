@@ -1,41 +1,36 @@
-// app/calculators/wow/damage-calc/page.tsx
+﻿// app/calculators/wow/damage-calculator/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import WowDamageCalcClient from "./client";
 import { readPublicJson } from "@/lib/blob";
 
 export const metadata: Metadata = {
-  title: "WoW Damage Calculator – Ability + Simple DPS | GamerStation",
+  title: "WoW Damage Calculator (Quick Sim) | GamerStation",
   description:
-    "Estimate hit/crit/expected damage and a simple CPM-based DPS number. Add gear via searchable dropdowns using a full item database.",
+    "Estimate ability damage and simple DPS in World of Warcraft using spec presets, crit/haste/mastery/vers, target mitigation, and optional gear selection.",
 };
 
+export const dynamic = "force-static";
 export const revalidate = 600;
-
-type DamageSchool = "PHYSICAL" | "MAGIC";
-type Scaling = "AP_WDPS" | "SP" | "AP" | "SP_DOT";
-type MasteryMode = "none" | "mult";
-
-export type AbilityPreset = {
-  id: string;
-  name: string;
-  school: DamageSchool;
-  scales: Scaling;
-  base: number;
-  apCoeff: number;
-  spCoeff: number;
-  wdpsCoeff: number;
-  masteryMode: MasteryMode;
-  baseUpm: number;
-  hasteAffectsRate: boolean;
-  tags?: Array<"burst">;
-};
 
 export type SpecPreset = {
   id: string;
-  name: string;
   className: string;
-  abilities: AbilityPreset[];
+  name: string;
+  abilities: Array<{
+    id: string;
+    name: string;
+    school: "PHYSICAL" | "MAGIC";
+    scales: "AP_WDPS" | "SP" | "AP" | "SP_DOT";
+    base: number;
+    apCoeff: number;
+    spCoeff: number;
+    wdpsCoeff: number;
+    masteryMode: "none" | "mult";
+    baseUpm: number;
+    hasteAffectsRate: boolean;
+    tags?: string[];
+  }>;
 };
 
 export type PresetsFile = {
@@ -45,157 +40,83 @@ export type PresetsFile = {
 
 export type ItemIndexRow = {
   id: number;
-  name: string;
-  nameNorm: string;
-  tokens: string[];
-  quality?: string;
-  itemClass?: string;
-  itemSubclass?: string;
-  inventoryType?: string;
-  inventoryTypeKey?: string; // e.g. "HEAD", "TRINKET"
-  isEquippable: boolean;
+  name?: string;
+  nameNorm?: string;
+  tokens?: string[];
+  pack?: number;
   itemLevel?: number;
-  requiredLevel?: number;
-  pack: number; // pack number for packs/items.pack.XXX.json
+  ilvl?: number;
+
+  // slot-ish hints from your indexer (may be present)
+  inventoryTypeKey?: string;
+  slot?: string;
+  inventoryType?: string;
+
+  // sometimes present depending on your pipeline
+  quality?: string;
 };
 
-type ItemIndexFile = {
-  meta?: any;
-  items: ItemIndexRow[];
-};
-
-// ---------- helpers ----------
-function norm(s: string) {
-  return (s || "").toLowerCase().trim();
-}
-function tokenize(s: string) {
-  return norm(s)
-    .split(/[^a-z0-9]+/g)
-    .map((x) => x.trim())
-    .filter(Boolean);
-}
-function safeNum(n: any, fallback = 0) {
-  const v = Number(n);
-  return Number.isFinite(v) ? v : fallback;
-}
-
-/**
- * Accepts any of these shapes:
- * 1) { items: ItemIndexRow[] }   ✅ expected
- * 2) ItemIndexRow[]             ✅ acceptable
- * 3) PackedItem[] (array of {id, detail:{...}}) ✅ your pasted JSON
- *
- * If shape #3 is detected, we build a minimal index from detail so searching works.
- * NOTE: pack will be set to 0 if unknown, so "Apply gear → inputs" can’t reliably
- * fetch detail packs unless your real index.json includes correct pack numbers.
- */
-function coerceItemsIndex(raw: any): ItemIndexRow[] {
-  if (!raw) return [];
-
-  // shape #1
-  if (raw && typeof raw === "object" && Array.isArray(raw.items)) {
-    return raw.items.filter(Boolean);
+async function safeReadJson<T>(path: string): Promise<T | null> {
+  try {
+    return await readPublicJson<T>(path);
+  } catch {
+    return null;
   }
-
-  // shape #2
-  if (Array.isArray(raw) && raw.length && raw[0] && typeof raw[0] === "object") {
-    const first = raw[0] as any;
-
-    // already looks like ItemIndexRow[]
-    if (
-      typeof first.id === "number" &&
-      typeof first.name === "string" &&
-      typeof first.nameNorm === "string" &&
-      Array.isArray(first.tokens)
-    ) {
-      return raw as ItemIndexRow[];
-    }
-
-    // shape #3: packed items [{id, detail:{...}}]
-    if (typeof first.id === "number" && first.detail && typeof first.detail === "object") {
-      return (raw as Array<{ id: number; detail: any }>).map(({ id, detail }) => {
-        const name = String(detail?.name ?? `Item ${id}`);
-        const invTypeKey = String(detail?.inventory_type?.type ?? "").toUpperCase() || undefined;
-
-        // best-effort ilvl from common places
-        const ilvl =
-          safeNum(detail?.preview_item?.level?.value, NaN) ??
-          safeNum(detail?.level, NaN);
-
-        return {
-          id,
-          name,
-          nameNorm: norm(name),
-          tokens: tokenize(name),
-          quality: detail?.quality?.type ?? detail?.quality?.name,
-          itemClass: detail?.item_class?.name,
-          itemSubclass: detail?.item_subclass?.name,
-          inventoryType: detail?.inventory_type?.name,
-          inventoryTypeKey: invTypeKey,
-          isEquippable: !!detail?.is_equippable,
-          itemLevel: Number.isFinite(ilvl as any) ? (ilvl as number) : undefined,
-          requiredLevel: safeNum(detail?.required_level, undefined as any),
-          pack: safeNum((detail as any)?.pack, 0), // unknown here; real index.json should set this
-        };
-      });
-    }
-  }
-
-  return [];
 }
 
 export default async function WowDamageCalcPage() {
+  // These paths assume your readPublicJson maps:
+  // - disk: public + path
+  // - blob: BLOB_BASE_URL + path
+  const presets = await safeReadJson<PresetsFile>("/data/wow/quick-sim-presets.json");
+  const itemsIndex =
+    (await safeReadJson<ItemIndexRow[]>("/data/wow/items/items_index.json")) ??
+    (await safeReadJson<ItemIndexRow[]>("/data/wow/items/index.json")) ??
+    [];
+
   const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
-  // ✅ Disk-first, then Blob fallback
-  const presets =
-    (await readPublicJson<PresetsFile>("data/wow/quick-sim-presets.json").catch(
-      () => null
-    )) ?? null;
-
-  const itemsIndexRaw =
-    (await readPublicJson<any>("data/wow/items/index.json").catch(() => null)) ?? null;
-
-  const itemsIndex = coerceItemsIndex(itemsIndexRaw);
-
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
-      <div className="mx-auto max-w-5xl">
-        {/* ✅ Standard GS header */}
-        <header className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
+      <div className="mx-auto max-w-6xl">
+        {/* âœ… Standard GS header */}
+        <header className="flex items-center justify-between gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <img
               src="/gs-logo-v2.png"
               alt="GamerStation"
-              className="
-                h-10 w-10 rounded-xl bg-black p-1
-                shadow-[0_0_30px_rgba(0,255,255,0.35)]
-              "
+              className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_25px_rgba(0,255,255,0.20)]"
             />
-            <span className="text-lg font-black tracking-tight">
-              GamerStation<span className="align-super text-[0.6em]">™</span>
-            </span>
+            <div className="text-lg font-black">
+              GamerStation<span className="align-super text-[0.6em]">TM</span>
+            </div>
           </Link>
 
-          <div className="ml-auto">
+          <div className="flex items-center gap-2">
             <Link href="/calculators/wow" className={navBtn}>
               WoW Hub
+            </Link>
+            <Link href="/tools" className={navBtn}>
+              Tools
             </Link>
           </div>
         </header>
 
-        <h1 className="mt-8 text-4xl font-bold">WoW Damage Calculator</h1>
-        <p className="mt-3 text-neutral-300">
-          Estimate hit/crit/expected damage and a simple CPM-based DPS number.
-        </p>
+        <div className="mt-8">
+          <div className="mb-2 text-3xl font-black">WoW Damage Calculator</div>
+          <div className="text-sm text-neutral-400">
+            Quick Sim vibe: expected hit Ã— rate (UPM). Not a full rotation/resource sim.
+          </div>
+        </div>
 
-        <div className="mt-10">
+        <div className="mt-8">
           <WowDamageCalcClient presets={presets} itemsIndex={itemsIndex} />
         </div>
 
         <div className="mt-10 text-xs text-neutral-600">
-          Data sources: Blizzard Game Data API (items DB build). This calculator is an approximation (not a full sim).
+          Disclaimer: Approximation. Real WoW damage depends on talents, spec mechanics, buffs/debuffs, target scaling,
+          procs, and encounter effects.
         </div>
       </div>
     </main>

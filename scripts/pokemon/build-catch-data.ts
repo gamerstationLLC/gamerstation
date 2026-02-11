@@ -1,290 +1,469 @@
-/**
- * Build Pokémon per-game dropdown datasets for GamerStation Capture Calc.
- *
- * Output:
- *  - public/data/pokemon/games.json
- *  - public/data/pokemon/by_game/<gameKey>.json
- *
- * Run:
- *   npx tsx scripts/pokemon/build-capture-data.ts
- */
+// scripts/pokemon/build-catch-data.ts
+//
+// Builds:
+//  - public/data/pokemon/games.json
+//  - public/data/pokemon/by_game/*.json
+//
+// Data source: PokeAPI (species + pokemon endpoints)
+// Output is designed to match your Catch Calculator client.
+//
+// Run:
+//   npx tsx scripts/pokemon/build-catch-data.ts
+//
+// Optional env:
+//   POKEMON_OUT_DIR=public/data/pokemon
+//   POKEMON_CONCURRENCY=12
+//   POKEMON_ONLY=sv,bw2   (comma-separated byGameFile stems)
 
 import fs from "node:fs/promises";
 import path from "node:path";
 
+type RulesetKey = "gen1" | "gen2" | "gen34" | "gen5plus" | "letsgo" | "pla";
+
+type GameDef = {
+  gameKey: string;
+  label: string;
+  versionName: string;
+  versionGroup: string;
+  generation: string;
+  pokedex: string;
+  rulesetKey: RulesetKey;
+  // ✅ IMPORTANT: this MUST match your by_game filename stem (sv, bw2, hgss, etc.)
+  byGameFile: string;
+};
+
+type MonRow = {
+  id: number;
+  name: string; // "pikachu"
+  slug: string; // same as name for now
+  displayName: string; // "Pikachu"
+  sprite: string; // official artwork url
+  capture_rate: number; // 0..255
+  base_stats: {
+    hp: number;
+    atk: number;
+    def: number;
+    spa: number;
+    spd: number;
+    spe: number;
+  };
+};
+
+// -------------------------
+// Config
+// -------------------------
+
 const ROOT = process.cwd();
-const OUT_DIR = path.join(ROOT, "public", "data", "pokemon");
+const OUT_DIR = path.join(ROOT, process.env.POKEMON_OUT_DIR ?? "public/data/pokemon");
 const BY_GAME_DIR = path.join(OUT_DIR, "by_game");
 
-const POKEAPI = "https://pokeapi.co/api/v2";
+const CONCURRENCY = clampInt(process.env.POKEMON_CONCURRENCY, 12, 1, 64);
+const ONLY = parseOnly(process.env.POKEMON_ONLY);
 
-/**
- * Curated "major games" list.
- * (You can expand this list freely—this structure supports any count.)
- *
- * key: used as file name in by_game/<key>.json
- * versionGroup: must match PokéAPI version-group slug
- * ruleset: used by the calculator to pick formula details
- */
-type GameDef = {
-  key: string;
-  label: string;
-  versionGroup: string;
-  ruleset:
-    | "gen1"
-    | "gen2"
-    | "gen3"
-    | "gen4"
-    | "gen5"
-    | "gen6"
-    | "gen7"
-    | "gen8"
-    | "gen9";
-};
+// -------------------------
+// Game mapping (matches your by_game filenames)
+// -------------------------
 
-const MAJOR_GAMES: GameDef[] = [
-  // Gen 1
-  { key: "redblue", label: "Red / Blue", versionGroup: "red-blue", ruleset: "gen1" },
-  { key: "yellow", label: "Yellow", versionGroup: "yellow", ruleset: "gen1" },
-
-  // Gen 2
-  { key: "goldsilver", label: "Gold / Silver", versionGroup: "gold-silver", ruleset: "gen2" },
-  { key: "crystal", label: "Crystal", versionGroup: "crystal", ruleset: "gen2" },
-
-  // Gen 3
-  { key: "rubysapphire", label: "Ruby / Sapphire", versionGroup: "ruby-sapphire", ruleset: "gen3" },
-  { key: "emerald", label: "Emerald", versionGroup: "emerald", ruleset: "gen3" },
-  { key: "frlg", label: "FireRed / LeafGreen", versionGroup: "firered-leafgreen", ruleset: "gen3" },
-
-  // Gen 4
-  { key: "dp", label: "Diamond / Pearl", versionGroup: "diamond-pearl", ruleset: "gen4" },
-  { key: "platinum", label: "Platinum", versionGroup: "platinum", ruleset: "gen4" },
-  { key: "hgss", label: "HeartGold / SoulSilver", versionGroup: "heartgold-soulsilver", ruleset: "gen4" },
-
-  // Gen 5
-  { key: "bw", label: "Black / White", versionGroup: "black-white", ruleset: "gen5" },
-  { key: "bw2", label: "Black 2 / White 2", versionGroup: "black-2-white-2", ruleset: "gen5" },
-
-  // Gen 6
-  { key: "xy", label: "X / Y", versionGroup: "x-y", ruleset: "gen6" },
-  { key: "oras", label: "Omega Ruby / Alpha Sapphire", versionGroup: "omega-ruby-alpha-sapphire", ruleset: "gen6" },
-
-  // Gen 7
-  { key: "sm", label: "Sun / Moon", versionGroup: "sun-moon", ruleset: "gen7" },
-  { key: "usum", label: "Ultra Sun / Ultra Moon", versionGroup: "ultra-sun-ultra-moon", ruleset: "gen7" },
-
-  // Gen 8
-  { key: "swsh", label: "Sword / Shield", versionGroup: "sword-shield", ruleset: "gen8" },
-  { key: "bdsp", label: "Brilliant Diamond / Shining Pearl", versionGroup: "brilliant-diamond-and-shining-pearl", ruleset: "gen8" },
-
-  // Gen 9
-  { key: "sv", label: "Scarlet / Violet", versionGroup: "scarlet-violet", ruleset: "gen9" },
+const GAMES: GameDef[] = [
+  {
+    gameKey: "redblue",
+    byGameFile: "redblue",
+    label: "Red / Blue",
+    versionName: "red-blue",
+    versionGroup: "red-blue",
+    generation: "gen1",
+    pokedex: "national",
+    rulesetKey: "gen1",
+  },
+  {
+    gameKey: "yellow",
+    byGameFile: "yellow",
+    label: "Yellow",
+    versionName: "yellow",
+    versionGroup: "red-blue",
+    generation: "gen1",
+    pokedex: "national",
+    rulesetKey: "gen1",
+  },
+  {
+    gameKey: "goldsilver",
+    byGameFile: "goldsilver",
+    label: "Gold / Silver",
+    versionName: "gold-silver",
+    versionGroup: "gold-silver",
+    generation: "gen2",
+    pokedex: "national",
+    rulesetKey: "gen2",
+  },
+  {
+    gameKey: "crystal",
+    byGameFile: "crystal",
+    label: "Crystal",
+    versionName: "crystal",
+    versionGroup: "gold-silver",
+    generation: "gen2",
+    pokedex: "national",
+    rulesetKey: "gen2",
+  },
+  {
+    gameKey: "rubysapphire",
+    byGameFile: "rubysapphire",
+    label: "Ruby / Sapphire",
+    versionName: "ruby-sapphire",
+    versionGroup: "ruby-sapphire",
+    generation: "gen3",
+    pokedex: "national",
+    rulesetKey: "gen34",
+  },
+  {
+    gameKey: "emerald",
+    byGameFile: "emerald",
+    label: "Emerald",
+    versionName: "emerald",
+    versionGroup: "ruby-sapphire",
+    generation: "gen3",
+    pokedex: "national",
+    rulesetKey: "gen34",
+  },
+  {
+    gameKey: "frlg",
+    byGameFile: "frlg",
+    label: "FireRed / LeafGreen",
+    versionName: "firered-leafgreen",
+    versionGroup: "firered-leafgreen",
+    generation: "gen3",
+    pokedex: "national",
+    rulesetKey: "gen34",
+  },
+  {
+    gameKey: "dp",
+    byGameFile: "dp",
+    label: "Diamond / Pearl",
+    versionName: "diamond-pearl",
+    versionGroup: "diamond-pearl",
+    generation: "gen4",
+    pokedex: "national",
+    rulesetKey: "gen34",
+  },
+  {
+    gameKey: "platinum",
+    byGameFile: "platinum",
+    label: "Platinum",
+    versionName: "platinum",
+    versionGroup: "diamond-pearl",
+    generation: "gen4",
+    pokedex: "national",
+    rulesetKey: "gen34",
+  },
+  {
+    gameKey: "hgss",
+    byGameFile: "hgss",
+    label: "HeartGold / SoulSilver",
+    versionName: "heartgold-soulsilver",
+    versionGroup: "heartgold-soulsilver",
+    generation: "gen4",
+    pokedex: "national",
+    rulesetKey: "gen34",
+  },
+  {
+    gameKey: "bw",
+    byGameFile: "bw",
+    label: "Black / White",
+    versionName: "black-white",
+    versionGroup: "black-white",
+    generation: "gen5",
+    pokedex: "national",
+    rulesetKey: "gen5plus",
+  },
+  {
+    gameKey: "bw2",
+    byGameFile: "bw2",
+    label: "Black 2 / White 2",
+    versionName: "black-2-white-2",
+    versionGroup: "black-2-white-2",
+    generation: "gen5",
+    pokedex: "national",
+    rulesetKey: "gen5plus",
+  },
+  {
+    gameKey: "xy",
+    byGameFile: "xy",
+    label: "X / Y",
+    versionName: "x-y",
+    versionGroup: "x-y",
+    generation: "gen6",
+    pokedex: "national",
+    rulesetKey: "gen5plus",
+  },
+  {
+    gameKey: "oras",
+    byGameFile: "oras",
+    label: "Omega Ruby / Alpha Sapphire",
+    versionName: "omega-ruby-alpha-sapphire",
+    versionGroup: "omega-ruby-alpha-sapphire",
+    generation: "gen6",
+    pokedex: "national",
+    rulesetKey: "gen5plus",
+  },
+  {
+    gameKey: "sm",
+    byGameFile: "sm",
+    label: "Sun / Moon",
+    versionName: "sun-moon",
+    versionGroup: "sun-moon",
+    generation: "gen7",
+    pokedex: "national",
+    rulesetKey: "gen5plus",
+  },
+  {
+    gameKey: "usum",
+    byGameFile: "usum",
+    label: "Ultra Sun / Ultra Moon",
+    versionName: "ultra-sun-ultra-moon",
+    versionGroup: "ultra-sun-ultra-moon",
+    generation: "gen7",
+    pokedex: "national",
+    rulesetKey: "gen5plus",
+  },
+  {
+    gameKey: "swsh",
+    byGameFile: "swsh",
+    label: "Sword / Shield",
+    versionName: "sword-shield",
+    versionGroup: "sword-shield",
+    generation: "gen8",
+    pokedex: "national",
+    rulesetKey: "gen5plus",
+  },
+  {
+    gameKey: "sv",
+    byGameFile: "sv",
+    label: "Scarlet / Violet",
+    versionName: "scarlet-violet",
+    versionGroup: "scarlet-violet",
+    generation: "gen9",
+    pokedex: "national",
+    rulesetKey: "gen5plus",
+  },
 ];
 
-type BaseStats = {
-  hp: number;
-  atk: number;
-  def: number;
-  spa: number;
-  spd: number;
-  spe: number;
+// By-generation max national dex number
+// (Used to bound the build. Adjust any time.)
+const GEN_MAX: Record<string, number> = {
+  gen1: 151,
+  gen2: 251,
+  gen3: 386,
+  gen4: 493,
+  gen5: 649,
+  gen6: 721,
+  gen7: 809,
+  gen8: 905,
+  gen9: 1025,
 };
 
-type PokemonRow = {
+// -------------------------
+// PokeAPI types
+// -------------------------
+
+type NamedAPIResource = { name: string; url: string };
+
+type PokeApiName = { name: string; language: NamedAPIResource };
+
+type PokeApiSpecies = {
   id: number;
   name: string;
-  slug: string;
-  sprite: string | null;
-  capture_rate: number | null;
-  base_stats: BaseStats | null;
+  capture_rate: number;
+  names: PokeApiName[];
 };
 
-async function fetchJSON(url: string) {
-  const res = await fetch(url, { headers: { "User-Agent": "GamerStation/1.0" } });
-  if (!res.ok) throw new Error(`Fetch failed ${res.status} ${url}`);
-  return res.json();
+type PokeApiStat = { stat: NamedAPIResource; base_stat: number };
+
+type PokeApiPokemon = {
+  id: number;
+  name: string;
+  stats: PokeApiStat[];
+  sprites?: {
+    other?: {
+      ["official-artwork"]?: { front_default?: string | null };
+    };
+  };
+};
+
+function getEnglishName(names: PokeApiName[], fallback: string): string {
+  const hit = names.find((n) => n.language?.name === "en" && n.name);
+  return hit?.name?.trim() || titleCase(fallback);
 }
 
-function slugify(s: string) {
-  return String(s || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
-async function ensureDirs() {
-  await fs.mkdir(OUT_DIR, { recursive: true });
-  await fs.mkdir(BY_GAME_DIR, { recursive: true });
-}
-
-/**
- * Simple concurrency limiter (no deps).
- */
-async function mapLimit<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T, idx: number) => Promise<R>
-): Promise<R[]> {
-  const out: R[] = new Array(items.length);
-  let i = 0;
-
-  async function worker() {
-    while (true) {
-      const idx = i++;
-      if (idx >= items.length) break;
-      out[idx] = await fn(items[idx], idx);
-    }
+function statMap(stats: PokeApiStat[]) {
+  const out: Record<string, number> = {};
+  for (const s of stats) {
+    const key = (s.stat?.name || "").toLowerCase();
+    out[key] = Number(s.base_stat ?? 0);
   }
-
-  const workers = Array.from({ length: Math.max(1, limit) }, () => worker());
-  await Promise.all(workers);
   return out;
 }
 
-async function getSpeciesCaptureRate(speciesName: string): Promise<number | null> {
+// -------------------------
+// Fetch helpers
+// -------------------------
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+  return (await res.json()) as T;
+}
+
+function speciesUrl(id: number) {
+  return `https://pokeapi.co/api/v2/pokemon-species/${id}/`;
+}
+function pokemonUrl(id: number) {
+  return `https://pokeapi.co/api/v2/pokemon/${id}/`;
+}
+
+async function buildMonRow(id: number): Promise<MonRow | null> {
   try {
-    const sp = await fetchJSON(`${POKEAPI}/pokemon-species/${speciesName}`);
-    return typeof sp?.capture_rate === "number" ? sp.capture_rate : null;
+    const [species, mon] = await Promise.all([
+      fetchJson<PokeApiSpecies>(speciesUrl(id)),
+      fetchJson<PokeApiPokemon>(pokemonUrl(id)),
+    ]);
+
+    const s = statMap(mon.stats || []);
+    const sprite =
+      mon.sprites?.other?.["official-artwork"]?.front_default ||
+      `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+
+    return {
+      id,
+      name: mon.name,
+      slug: mon.name,
+      displayName: getEnglishName(species.names || [], mon.name),
+      capture_rate: Number(species.capture_rate ?? 0),
+      sprite,
+      base_stats: {
+        hp: Number(s.hp ?? 0),
+        atk: Number(s.attack ?? 0),
+        def: Number(s.defense ?? 0),
+        spa: Number(s["special-attack"] ?? 0),
+        spd: Number(s["special-defense"] ?? 0),
+        spe: Number(s.speed ?? 0),
+      },
+    };
   } catch {
+    // Some ids can be missing / special forms oddities; skip safely
     return null;
   }
 }
 
-async function getPokemonStatsAndSprite(pokemonName: string): Promise<{
-  id: number;
-  base_stats: BaseStats | null;
-  sprite: string | null;
-}> {
-  const p = await fetchJSON(`${POKEAPI}/pokemon/${pokemonName}`);
+// Simple concurrency pool
+async function mapPool<T, R>(
+  items: readonly T[],
+  limit: number,
+  fn: (item: T, idx: number) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = new Array(items.length) as R[];
+  let i = 0;
 
-  const id = typeof p?.id === "number" ? p.id : -1;
-
-  const statsArr: any[] = Array.isArray(p?.stats) ? p.stats : [];
-  const stat = (key: string) =>
-    statsArr.find((x) => x?.stat?.name === key)?.base_stat ?? null;
-
-  const base_stats: BaseStats | null =
-    stat("hp") != null
-      ? {
-          hp: Number(stat("hp")) || 0,
-          atk: Number(stat("attack")) || 0,
-          def: Number(stat("defense")) || 0,
-          spa: Number(stat("special-attack")) || 0,
-          spd: Number(stat("special-defense")) || 0,
-          spe: Number(stat("speed")) || 0,
-        }
-      : null;
-
-  const sprite =
-    p?.sprites?.other?.["official-artwork"]?.front_default ??
-    p?.sprites?.front_default ??
-    null;
-
-  return { id, base_stats, sprite };
-}
-
-/**
- * For a version-group, get the union of all Pokémon entries from its Pokédex(es).
- */
-async function getSpeciesListForVersionGroup(versionGroup: string): Promise<string[]> {
-  const vg = await fetchJSON(`${POKEAPI}/version-group/${versionGroup}`);
-  const pokedexRefs: any[] = Array.isArray(vg?.pokedexes) ? vg.pokedexes : [];
-  const pokedexNames = pokedexRefs.map((p) => p?.name).filter(Boolean);
-
-  const allSpecies = new Set<string>();
-
-  for (const dexName of pokedexNames) {
-    const dex = await fetchJSON(`${POKEAPI}/pokedex/${dexName}`);
-    const entries: any[] = Array.isArray(dex?.pokemon_entries) ? dex.pokemon_entries : [];
-    for (const e of entries) {
-      const speciesName = e?.pokemon_species?.name;
-      if (speciesName) allSpecies.add(String(speciesName));
+  const workers = new Array(Math.min(limit, items.length)).fill(0).map(async () => {
+    while (true) {
+      const idx = i++;
+      if (idx >= items.length) return;
+      results[idx] = await fn(items[idx], idx);
     }
-  }
-
-  return Array.from(allSpecies);
-}
-
-async function buildGame(game: GameDef) {
-  console.log(`\n=== Building ${game.label} (${game.versionGroup}) ===`);
-
-  const species = await getSpeciesListForVersionGroup(game.versionGroup);
-  console.log(`Species count: ${species.length}`);
-
-  // Pull capture_rate + stats/sprite with concurrency limits (be nice to PokeAPI).
-  const rows = await mapLimit(
-    species.sort((a, b) => a.localeCompare(b)),
-    10,
-    async (speciesName) => {
-      const capture_rate = await getSpeciesCaptureRate(speciesName);
-
-      // For stats/sprite: use the species name as pokemon name (works for most).
-      // Some species have different default forms; if a miss happens, we still keep capture_rate.
-      let id = -1;
-      let base_stats: BaseStats | null = null;
-      let sprite: string | null = null;
-
-      try {
-        const data = await getPokemonStatsAndSprite(speciesName);
-        id = data.id;
-        base_stats = data.base_stats;
-        sprite = data.sprite;
-      } catch {
-        // leave nulls
-      }
-
-      const row: PokemonRow = {
-        id,
-        name: speciesName,
-        slug: slugify(speciesName),
-        sprite,
-        capture_rate,
-        base_stats,
-      };
-
-      return row;
-    }
-  );
-
-  // Filter out truly broken entries where we got nothing useful
-  const filtered = rows.filter((r) => r.name && r.slug && r.capture_rate != null);
-
-  // Sort by Pokédex-ish id first (if present), else alphabetically
-  filtered.sort((a, b) => {
-    const ai = a.id > 0 ? a.id : Number.MAX_SAFE_INTEGER;
-    const bi = b.id > 0 ? b.id : Number.MAX_SAFE_INTEGER;
-    if (ai !== bi) return ai - bi;
-    return a.name.localeCompare(b.name);
   });
 
-  const outPath = path.join(BY_GAME_DIR, `${game.key}.json`);
-  await fs.writeFile(outPath, JSON.stringify(filtered, null, 2), "utf8");
-  console.log(`Wrote: ${path.relative(ROOT, outPath)} (${filtered.length} rows)`);
+  await Promise.all(workers);
+  return results;
 }
+
+// -------------------------
+// FS helpers
+// -------------------------
+
+async function ensureDir(p: string) {
+  await fs.mkdir(p, { recursive: true });
+}
+
+async function writeJson(fileAbs: string, data: unknown) {
+  const txt = JSON.stringify(data, null, 2);
+  await fs.writeFile(fileAbs, txt, "utf8");
+}
+
+// -------------------------
+// Utils
+// -------------------------
+
+function titleCase(s: string) {
+  return (s || "")
+    .replace(/[_-]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : w))
+    .join(" ");
+}
+
+function clampInt(vRaw: unknown, fallback: number, min: number, max: number) {
+  const n = Number(String(vRaw ?? "").trim());
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, Math.floor(n)));
+}
+
+function parseOnly(v: string | undefined): Set<string> | null {
+  const raw = (v ?? "").trim();
+  if (!raw) return null;
+  const parts = raw
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+  return new Set(parts);
+}
+
+// -------------------------
+// Main
+// -------------------------
 
 async function main() {
-  await ensureDirs();
+  await ensureDir(OUT_DIR);
+  await ensureDir(BY_GAME_DIR);
 
-  const gamesOut = MAJOR_GAMES.map((g) => ({
-    key: g.key,
+  // ✅ write games.json with byGameFile mapping
+  const gamesOut = GAMES.map((g) => ({
+    gameKey: g.gameKey,
     label: g.label,
+    versionName: g.versionName,
     versionGroup: g.versionGroup,
-    ruleset: g.ruleset,
+    generation: g.generation,
+    pokedex: g.pokedex,
+    rulesetKey: g.rulesetKey,
+    byGameFile: g.byGameFile,
   }));
 
-  await fs.writeFile(path.join(OUT_DIR, "games.json"), JSON.stringify(gamesOut, null, 2), "utf8");
-  console.log(`Wrote: ${path.relative(ROOT, path.join(OUT_DIR, "games.json"))}`);
+  await writeJson(path.join(OUT_DIR, "games.json"), gamesOut);
 
-  for (const g of MAJOR_GAMES) {
-    await buildGame(g);
+  // Build each by_game file
+  const selectedGames = ONLY ? GAMES.filter((g) => ONLY.has(g.byGameFile)) : GAMES;
+
+  for (const g of selectedGames) {
+    const maxId = GEN_MAX[g.generation] ?? 151;
+    const ids = Array.from({ length: maxId }, (_, i) => i + 1);
+
+    console.log(`[pokemon] building ${g.byGameFile}.json (${g.label}) ids=1..${maxId} concurrency=${CONCURRENCY}`);
+
+    const rows = await mapPool(ids, CONCURRENCY, async (id) => buildMonRow(id));
+    const cleaned = rows.filter((x): x is MonRow => !!x);
+
+    // stable sort
+    cleaned.sort((a, b) => a.id - b.id);
+
+    const outFile = path.join(BY_GAME_DIR, `${g.byGameFile}.json`);
+    await writeJson(outFile, cleaned);
+
+    console.log(`[pokemon] wrote ${path.relative(ROOT, outFile)} rows=${cleaned.length}`);
   }
 
-  console.log("\n✅ Done.");
+  console.log(`[pokemon] done. games.json + by_game/*.json updated.`);
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch((e: unknown) => {
+  console.error(e);
   process.exit(1);
 });

@@ -1,4 +1,4 @@
-// app/calculators/roblox/bloxfruits/xp/page.tsx
+﻿// app/calculators/roblox/bloxfruits/xp/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import XPBloxFruitsClient from "./XPBloxFruitsClient";
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function BloxFruitsXPPage() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Back link */}
         <header className="-ml-2 mb-6">
@@ -29,7 +29,7 @@ export default function BloxFruitsXPPage() {
             href="/calculators/roblox/bloxfruits"
             className="text-sm text-neutral-300 hover:text-white"
           >
-            ← Back to Blox Fruits Hub
+            â† Back to Blox Fruits Hub
           </Link>
         </header>
 
@@ -56,7 +56,7 @@ export default function BloxFruitsXPPage() {
           <ul className="list-disc pl-5 space-y-1">
             <li>Enter your current level and your target level (max 2550)</li>
             <li>Set your average XP per quest and quests per minute</li>
-            <li>Toggle 2× XP to reflect codes/events</li>
+            <li>Toggle 2Ã— XP to reflect codes/events</li>
             <li>
               Use Manual XP mode to paste an exact XP total for the most accurate
               estimate

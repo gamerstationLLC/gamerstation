@@ -1,116 +1,135 @@
 [
   {
-    "key": "redblue",
+    "gameKey": "redblue",
     "label": "Red / Blue",
-    "versionGroup": "red-blue",
-    "ruleset": "gen1"
+    "generation": "gen1",
+    "pokedex": "national",
+    "rulesetKey": "gen1"
   },
   {
-    "key": "yellow",
+    "gameKey": "yellow",
     "label": "Yellow",
-    "versionGroup": "yellow",
-    "ruleset": "gen1"
+    "generation": "gen1",
+    "pokedex": "national",
+    "rulesetKey": "gen1"
   },
   {
-    "key": "goldsilver",
+    "gameKey": "goldsilver",
     "label": "Gold / Silver",
-    "versionGroup": "gold-silver",
-    "ruleset": "gen2"
+    "generation": "gen2",
+    "pokedex": "national",
+    "rulesetKey": "gen2"
   },
   {
-    "key": "crystal",
+    "gameKey": "crystal",
     "label": "Crystal",
-    "versionGroup": "crystal",
-    "ruleset": "gen2"
+    "generation": "gen2",
+    "pokedex": "national",
+    "rulesetKey": "gen2"
   },
   {
-    "key": "rubysapphire",
+    "gameKey": "rubysapphire",
     "label": "Ruby / Sapphire",
-    "versionGroup": "ruby-sapphire",
-    "ruleset": "gen3"
+    "generation": "gen3",
+    "pokedex": "national",
+    "rulesetKey": "gen3"
   },
   {
-    "key": "emerald",
+    "gameKey": "emerald",
     "label": "Emerald",
-    "versionGroup": "emerald",
-    "ruleset": "gen3"
+    "generation": "gen3",
+    "pokedex": "national",
+    "rulesetKey": "gen3"
   },
   {
-    "key": "frlg",
+    "gameKey": "fireredleafgreen",
     "label": "FireRed / LeafGreen",
-    "versionGroup": "firered-leafgreen",
-    "ruleset": "gen3"
+    "generation": "gen3",
+    "pokedex": "national",
+    "rulesetKey": "gen3"
   },
   {
-    "key": "dp",
+    "gameKey": "diamondpearl",
     "label": "Diamond / Pearl",
-    "versionGroup": "diamond-pearl",
-    "ruleset": "gen4"
+    "generation": "gen4",
+    "pokedex": "national",
+    "rulesetKey": "gen4"
   },
   {
-    "key": "platinum",
+    "gameKey": "platinum",
     "label": "Platinum",
-    "versionGroup": "platinum",
-    "ruleset": "gen4"
+    "generation": "gen4",
+    "pokedex": "national",
+    "rulesetKey": "gen4"
   },
   {
-    "key": "hgss",
+    "gameKey": "heartgoldsoulsilver",
     "label": "HeartGold / SoulSilver",
-    "versionGroup": "heartgold-soulsilver",
-    "ruleset": "gen4"
+    "generation": "gen4",
+    "pokedex": "national",
+    "rulesetKey": "gen4"
   },
   {
-    "key": "bw",
+    "gameKey": "blackwhite",
     "label": "Black / White",
-    "versionGroup": "black-white",
-    "ruleset": "gen5"
+    "generation": "gen5",
+    "pokedex": "national",
+    "rulesetKey": "gen5"
   },
   {
-    "key": "bw2",
+    "gameKey": "blackwhite2",
     "label": "Black 2 / White 2",
-    "versionGroup": "black-2-white-2",
-    "ruleset": "gen5"
+    "generation": "gen5",
+    "pokedex": "national",
+    "rulesetKey": "gen5"
   },
   {
-    "key": "xy",
+    "gameKey": "xy",
     "label": "X / Y",
-    "versionGroup": "x-y",
-    "ruleset": "gen6"
+    "generation": "gen6",
+    "pokedex": "national",
+    "rulesetKey": "gen6"
   },
   {
-    "key": "oras",
+    "gameKey": "omegarubyalphasapphire",
     "label": "Omega Ruby / Alpha Sapphire",
-    "versionGroup": "omega-ruby-alpha-sapphire",
-    "ruleset": "gen6"
+    "generation": "gen6",
+    "pokedex": "national",
+    "rulesetKey": "gen6"
   },
   {
-    "key": "sm",
+    "gameKey": "sunmoon",
     "label": "Sun / Moon",
-    "versionGroup": "sun-moon",
-    "ruleset": "gen7"
+    "generation": "gen7",
+    "pokedex": "national",
+    "rulesetKey": "gen7"
   },
   {
-    "key": "usum",
+    "gameKey": "ultrasunultramoon",
     "label": "Ultra Sun / Ultra Moon",
-    "versionGroup": "ultra-sun-ultra-moon",
-    "ruleset": "gen7"
+    "generation": "gen7",
+    "pokedex": "national",
+    "rulesetKey": "gen7"
   },
   {
-    "key": "swsh",
+    "gameKey": "swordshield",
     "label": "Sword / Shield",
-    "versionGroup": "sword-shield",
-    "ruleset": "gen8"
+    "generation": "gen8",
+    "pokedex": "national",
+    "rulesetKey": "gen8"
   },
   {
-    "key": "bdsp",
+    "gameKey": "bdsp",
     "label": "Brilliant Diamond / Shining Pearl",
-    "versionGroup": "brilliant-diamond-and-shining-pearl",
-    "ruleset": "gen8"
+    "generation": "gen8",
+    "pokedex": "national",
+    "rulesetKey": "gen8"
   },
   {
-    "key": "sv",
+    "gameKey": "sv",
     "label": "Scarlet / Violet",
-    "versionGroup": "scarlet-violet",
-    "ruleset": "gen9"
+    "generation": "gen9",
+    "pokedex": "national",
+    "rulesetKey": "gen9"
   }
 ]

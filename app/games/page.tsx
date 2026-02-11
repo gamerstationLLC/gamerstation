@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 const GAMES = [
   { slug: "cod", name: "Call of Duty", desc: "TTK + buffs/nerfs" },
@@ -9,7 +9,7 @@ const GAMES = [
 
 export default function GamesPage() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-5xl">
         <header className="flex items-center gap-3">
   {/* GS brand */}
@@ -24,7 +24,7 @@ export default function GamesPage() {
       "
     />
     <span className="text-sm font-black tracking-tight">
-      GamerStation<span className="align-super text-[0.6em]">™</span>
+      GamerStation<span className="align-super text-[0.6em]">TM</span>
     </span>
   </Link>
 

@@ -1,4 +1,4 @@
-// app/tools/dota/heroes/[slug]/page.tsx
+﻿// app/tools/dota/heroes/[slug]/page.tsx
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import HeroImage from "./HeroImage";
@@ -6,7 +6,7 @@ import TrendsCard from "./TrendsCard";
 import CopyLinkButton from "./CopyLinkButton";
 
 export const dynamic = "force-static";
-export const revalidate = 600; // ✅ ISR: rebuild at most every 10 minutes
+export const revalidate = 600; // âœ… ISR: rebuild at most every 10 minutes
 
 type HeroStatsRow = {
   id: number;
@@ -88,7 +88,7 @@ function buildOpenDotaCdnUrl(rel: string) {
   return `https://cdn.opendota.com${rel}`;
 }
 
-// ✅ For the square header avatar, prefer icon first
+// âœ… For the square header avatar, prefer icon first
 function bestHeaderRelImage(r: HeroStatsRow) {
   return (r.icon || r.img || "").toString();
 }
@@ -127,7 +127,7 @@ function guessRetryAfterSec(status: number, retryAfterHeader: string | null) {
   return 20;
 }
 
-// ✅ Server-side patch (cache a bit more frequently than heroStats so patch flips are caught quickly)
+// âœ… Server-side patch (cache a bit more frequently than heroStats so patch flips are caught quickly)
 async function getPatchCached(): Promise<string> {
   try {
     const base =
@@ -139,20 +139,20 @@ async function getPatchCached(): Promise<string> {
         : "http://localhost:3000");
 
     const res = await fetch(`${base}/api/dota/patch`, {
-      next: { revalidate: 60 * 60 * 6 }, // ✅ every 6 hours
+      next: { revalidate: 60 * 60 * 6 }, // âœ… every 6 hours
       headers: { Accept: "application/json" },
     });
 
-    if (!res.ok) return "—";
+    if (!res.ok) return "â€”";
     const json = await res.json();
     const name = (json?.patch ?? "").toString().trim();
-    return name || "—";
+    return name || "â€”";
   } catch {
-    return "—";
+    return "â€”";
   }
 }
 
-// ✅ Patch-aware heroStats fetch
+// âœ… Patch-aware heroStats fetch
 //    OpenDota heroStats isn't truly "per patch", but this guarantees your cached HTML/data
 //    does NOT stick across patch flips.
 async function getHeroStatsByPatch(patch: string): Promise<HeroStatsResult> {
@@ -161,7 +161,7 @@ async function getHeroStatsByPatch(patch: string): Promise<HeroStatsResult> {
 
   try {
     const res = await fetch(`https://api.opendota.com/api/heroStats?gs_patch=${encodeURIComponent(patch)}`, {
-      // ✅ still 10 min refresh, but now keyed by patch
+      // âœ… still 10 min refresh, but now keyed by patch
       next: { revalidate: 600 },
       signal: controller.signal,
       headers: {
@@ -209,7 +209,7 @@ async function getHeroBySlug(slug: string, patch: string) {
   return { hero, result };
 }
 
-// ✅ FIX: params is async in this Next build
+// âœ… FIX: params is async in this Next build
 export async function generateMetadata({
   params,
 }: {
@@ -252,13 +252,13 @@ export default async function DotaHeroPage({
 
   const patch = await getPatchCached();
 
-  // ✅ Patch-aware stats fetch (cache bucket resets on patch)
+  // âœ… Patch-aware stats fetch (cache bucket resets on patch)
   const { hero, result } = await getHeroBySlug(normalizedSlug, patch);
 
   // Friendly queue state instead of 500
   if (!hero && result.state !== "ok") {
     return (
-      <main className="relative min-h-screen overflow-hidden bg-black text-white">
+      <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
         <div className="pointer-events-none absolute inset-0">
           <div
             className="absolute inset-0 opacity-[0.10]"
@@ -284,7 +284,7 @@ export default async function DotaHeroPage({
                   className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
                 />
                 <span className="text-lg font-black tracking-tight">
-                  GamerStation<span className="align-super text-[0.6em]">™</span>
+                  GamerStation<span className="align-super text-[0.6em]">TM</span>
                 </span>
               </Link>
 
@@ -303,7 +303,7 @@ export default async function DotaHeroPage({
 
               <p className="mt-2 text-sm text-neutral-300">
                 {result.state === "rate_limited"
-                  ? "OpenDota is rate-limiting requests. We’ll be back in a moment."
+                  ? "OpenDota is rate-limiting requests. Weâ€™ll be back in a moment."
                   : result.state === "timeout"
                   ? "OpenDota is responding slowly right now. Please try again shortly."
                   : "OpenDota is having issues right now. Please try again shortly."}
@@ -439,12 +439,12 @@ export default async function DotaHeroPage({
   const proNet = proWin - proLoss;
 
   const proSampleNote =
-    proPick >= 80 ? "Good sample — pro winrate is fairly meaningful." : proPick >= 30 ? "Medium sample — use some caution." : "Small sample — use caution.";
+    proPick >= 80 ? "Good sample â€” pro winrate is fairly meaningful." : proPick >= 30 ? "Medium sample â€” use some caution." : "Small sample â€” use caution.";
 
   const canonicalUrl = `/tools/dota/heroes/${normalizedSlug}`;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.10]"
@@ -470,7 +470,7 @@ export default async function DotaHeroPage({
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">™</span>
+                GamerStation<span className="align-super text-[0.6em]">TM</span>
               </span>
             </Link>
 
@@ -489,7 +489,7 @@ export default async function DotaHeroPage({
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{heroName}</h1>
               <p className="mt-2 text-sm text-neutral-300 sm:text-base">
                 Public rank brackets + pro trends. Data from OpenDota.{" "}
-                <span className="text-neutral-500">(Cached ~10 minutes • patch-aware)</span>
+                <span className="text-neutral-500">(Cached ~10 minutes â€¢ patch-aware)</span>
               </p>
 
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
@@ -548,8 +548,8 @@ export default async function DotaHeroPage({
               pub={{
                 publicPicks,
                 publicWinrateAll,
-                bestBracket: bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "—",
-                worstBracket: worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "—",
+                bestBracket: bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "â€”",
+                worstBracket: worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "â€”",
                 topPickBrackets,
               }}
             />
@@ -561,11 +561,11 @@ export default async function DotaHeroPage({
                 <div className="flex flex-wrap gap-2 text-xs">
                   <Pill
                     label="Best bracket"
-                    value={bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "—"}
+                    value={bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "â€”"}
                   />
                   <Pill
                     label="Worst bracket"
-                    value={worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "—"}
+                    value={worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "â€”"}
                   />
                 </div>
               </div>
@@ -579,7 +579,7 @@ export default async function DotaHeroPage({
                       <div className="text-right tabular-nums text-neutral-200">
                         {b.picks.toLocaleString()}{" "}
                         <span className="text-neutral-500">({(b.share * 100).toFixed(1)}%)</span>{" "}
-                        <span className="text-neutral-500">•</span>{" "}
+                        <span className="text-neutral-500">â€¢</span>{" "}
                         <span
                           className={
                             b.wr >= 0.52 ? "text-green-300" : b.wr <= 0.48 ? "text-red-300" : "text-neutral-200"
@@ -612,14 +612,14 @@ export default async function DotaHeroPage({
                         <div className="col-span-4 font-medium text-neutral-100">{b.label}</div>
                         <div className="col-span-4 text-right tabular-nums text-neutral-200">{b.picks.toLocaleString()}</div>
                         <div className="col-span-2 text-right tabular-nums text-neutral-200">
-                          {publicPicks ? `${(share * 100).toFixed(1)}%` : "—"}
+                          {publicPicks ? `${(share * 100).toFixed(1)}%` : "â€”"}
                         </div>
                         <div
                           className={`col-span-2 text-right tabular-nums ${
                             b.wr >= 0.52 ? "text-green-300" : b.wr <= 0.48 ? "text-red-300" : "text-neutral-200"
                           }`}
                         >
-                          {b.picks ? `${(b.wr * 100).toFixed(1)}%` : "—"}
+                          {b.picks ? `${(b.wr * 100).toFixed(1)}%` : "â€”"}
                         </div>
                       </div>
                     );
@@ -628,7 +628,7 @@ export default async function DotaHeroPage({
               </div>
 
               <div className="mt-3 text-xs text-neutral-500">
-                Public totals are aggregated across all brackets. High winrate with tiny picks is bait — sanity check samples.
+                Public totals are aggregated across all brackets. High winrate with tiny picks is bait â€” sanity check samples.
               </div>
             </div>
           </div>
@@ -648,7 +648,7 @@ function Stat({
   format: "int" | "pct";
 }) {
   const text =
-    value == null ? "—" : format === "int" ? value.toLocaleString() : `${(value * 100).toFixed(1)}%`;
+    value == null ? "â€”" : format === "int" ? value.toLocaleString() : `${(value * 100).toFixed(1)}%`;
 
   return (
     <div className="rounded-2xl border border-neutral-800 bg-black/60 p-4">

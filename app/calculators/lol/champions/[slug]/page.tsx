@@ -1,4 +1,4 @@
-// app/calculators/lol/champions/[slug]/page.tsx
+﻿// app/calculators/lol/champions/[slug]/page.tsx
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import fs from "node:fs/promises";
@@ -15,7 +15,7 @@ type ChampionRow = {
   title?: string;
   stats?: Record<string, number>;
 
-  // ✅ from your fetch script
+  // âœ… from your fetch script
   spells?: Array<{
     name?: string;
     tooltip?: string;
@@ -201,7 +201,7 @@ function shortSummaryFromText(s: string, maxLen = 190) {
   if (!clean) return "";
   const first = clean.split(/(?<=[.!?])\s+/)[0] ?? clean;
   if (first.length <= maxLen) return first;
-  return first.slice(0, maxLen - 1).trimEnd() + "…";
+  return first.slice(0, maxLen - 1).trimEnd() + "â€¦";
 }
 
 function asNumArray(x: any): number[] | undefined {
@@ -335,7 +335,7 @@ function buildAbilitiesFromChampion(
 }
 
 /**
- * ✅ Dynamic metadata per champion page (SEO)
+ * âœ… Dynamic metadata per champion page (SEO)
  */
 export async function generateMetadata({
   params,
@@ -356,7 +356,7 @@ export async function generateMetadata({
 
   const patch = file?.version ?? (await readPatchFallback()) ?? "latest";
   const safeName = champ?.name ?? slug;
-  const safeTitle = champ?.title ? ` — ${champ.title}` : "";
+  const safeTitle = champ?.title ? ` â€” ${champ.title}` : "";
 
   const title = `${safeName}${safeTitle} Stats by Level (Patch ${patch}) | GamerStation`;
   const description =
@@ -386,7 +386,7 @@ export async function generateMetadata({
 }
 
 /**
- * ✅ Prebuild all champion slug pages
+ * âœ… Prebuild all champion slug pages
  */
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   try {
@@ -426,7 +426,7 @@ export default async function LolChampionPage({
   const abilities = buildAbilitiesFromChampion(champ, overridesEntry);
 
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-12">
+    <main className="min-h-screen bg-transparent text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
         <StatsClient
           championId={championId}

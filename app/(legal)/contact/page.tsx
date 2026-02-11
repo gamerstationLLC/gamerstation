@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export const metadata = {
   title: "Contact | GamerStation",
@@ -9,7 +9,7 @@ export default function ContactPage() {
   const email = "support@gamerstation.gg";
 
   return (
-    <main className="min-h-screen bg-black px-6 py-16 text-white">
+    <main className="min-h-screen bg-transparent px-6 py-16 text-white">
       <div className="mx-auto w-full max-w-3xl">
         {/* Centered glow logo (clickable home) */}
         <div className="flex justify-center">
@@ -57,7 +57,7 @@ export default function ContactPage() {
           </p>
 
           <p className="mt-3 text-sm text-neutral-400">
-            We usually respond within 1–3 business days.
+            We usually respond within 1â€“3 business days.
           </p>
         </div>
       </div>

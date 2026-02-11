@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
@@ -42,9 +42,9 @@ export default function DpsPage() {
     "inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4";
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-transparent text-white">
       <div className="mx-auto max-w-5xl px-6 py-12">
-        {/* ✅ Standard header: brand left, top-right pills = Tools + Calculators */}
+        {/* âœ… Standard header: brand left, top-right pills = Tools + Calculators */}
         <header className="flex items-center gap-3">
   {/* Brand left */}
   <Link href="/" className="flex items-center gap-2 hover:opacity-90">
@@ -57,7 +57,7 @@ export default function DpsPage() {
               "
             />
             <span className="text-lg font-black tracking-tight">
-              GamerStation<span className="align-super text-[0.6em]">™</span>
+              GamerStation<span className="align-super text-[0.6em]">TM</span>
             </span>
           </Link>
 
@@ -116,13 +116,13 @@ export default function DpsPage() {
                 label="Accuracy (%)"
                 value={accuracyPct}
                 onChange={setAccuracyPct}
-                hint="0–100"
+                hint="0â€“100"
               />
               <Field
                 label="Crit chance (%)"
                 value={critChancePct}
                 onChange={setCritChancePct}
-                hint="0–100"
+                hint="0â€“100"
               />
               <Field
                 label="Crit multiplier"
@@ -166,7 +166,7 @@ export default function DpsPage() {
             </div>
 
             <div className="mt-5 rounded-lg border border-neutral-800 bg-black/40 p-4 text-xs text-neutral-300">
-              Formula: <b>DPS = (Damage × CritFactor × Accuracy) × (RPM ÷ 60)</b>
+              Formula: <b>DPS = (Damage Ã— CritFactor Ã— Accuracy) Ã— (RPM Ã· 60)</b>
             </div>
           </section>
 

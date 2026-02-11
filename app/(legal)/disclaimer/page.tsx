@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export const metadata = {
   title: "Disclaimer | GamerStation",
@@ -7,9 +7,9 @@ export const metadata = {
 
 export default function DisclaimerPage() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto w-full max-w-3xl">
-        {/* ✅ Center logo (replaces header) */}
+        {/* âœ… Center logo (replaces header) */}
         <div className="flex justify-center">
           <Link href="/" className="group inline-flex items-center">
             <span className="relative transition-all duration-300">
@@ -41,7 +41,7 @@ export default function DisclaimerPage() {
           </Link>
         </div>
 
-        {/* ✅ Disclaimer content */}
+        {/* âœ… Disclaimer content */}
         <p className="mt-8 leading-relaxed text-neutral-200">
           <strong>Game Disclaimer & Attribution:</strong> GamerStation is an independent, fan-created
           website and is{" "}

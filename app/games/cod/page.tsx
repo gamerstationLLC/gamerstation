@@ -1,8 +1,8 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export default function CodHubPage() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <header className="mb-10 flex items-center gap-3">
@@ -18,7 +18,7 @@ export default function CodHubPage() {
       "
     />
     <span className="text-sm font-black tracking-tight">
-      GamerStation<span className="align-super text-[0.6em]">™</span>
+      GamerStation<span className="align-super text-[0.6em]">TM</span>
     </span>
   </Link>
 

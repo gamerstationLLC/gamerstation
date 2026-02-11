@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export const metadata = {
   title: "Tools | GamerStation",
@@ -7,7 +7,7 @@ export const metadata = {
 
 export default function ToolsPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div
@@ -36,7 +36,7 @@ export default function ToolsPage() {
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">™</span>
+                GamerStation<span className="align-super text-[0.6em]">TM</span>
               </span>
             </Link>
 
@@ -62,6 +62,19 @@ export default function ToolsPage() {
           </p>
 
           <div className="mt-10 grid gap-6 sm:grid-cols-2">
+
+
+<Link
+              href="/tools/lol/summoner"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">LoL Summoner Stats</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Look up your Riot ID and get a clean, real-time breakdown of your ranked stats, match history, and performance.
+              </div>
+            </Link>
+ 
+
             <Link
               href="/tools/lol/leaderboard"
               className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
@@ -102,7 +115,7 @@ export default function ToolsPage() {
               </div>
             </Link>
 
-            {/* ✅ Dota 2 Player Stats */}
+            {/* âœ… Dota 2 Player Stats */}
             <Link
               href="/tools/dota/meta"
               className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
@@ -113,7 +126,7 @@ export default function ToolsPage() {
               </div>
             </Link>
 
-{/* ✅ Dota 2 champ index */}
+{/* âœ… Dota 2 champ index */}
             <Link
               href="/tools/dota/heroes"
               className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
@@ -125,15 +138,6 @@ export default function ToolsPage() {
             </Link>
 
 
- <Link
-              href="/tools/pokemon/catch"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">Pokemon Catch Chance</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Pick a Pokémon game and Pokémon to view catch chance.
-              </div>
-            </Link>
 
             {/* Meta Loadouts */}
             <Link

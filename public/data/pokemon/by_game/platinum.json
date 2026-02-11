@@ -2040,6 +2040,14 @@
     }
   },
   {
+    "id": 413,
+    "name": "wormadam",
+    "slug": "wormadam",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
+  },
+  {
     "id": 414,
     "name": "mothim",
     "slug": "mothim",
@@ -3105,6 +3113,14 @@
     }
   },
   {
+    "id": 487,
+    "name": "giratina",
+    "slug": "giratina",
+    "sprite": null,
+    "capture_rate": 3,
+    "base_stats": null
+  },
+  {
     "id": 490,
     "name": "manaphy",
     "slug": "manaphy",
@@ -3118,21 +3134,5 @@
       "spd": 100,
       "spe": 100
     }
-  },
-  {
-    "id": -1,
-    "name": "giratina",
-    "slug": "giratina",
-    "sprite": null,
-    "capture_rate": 3,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "wormadam",
-    "slug": "wormadam",
-    "sprite": null,
-    "capture_rate": 45,
-    "base_stats": null
   }
 ]

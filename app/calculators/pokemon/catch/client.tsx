@@ -7,22 +7,13 @@ import {
   type StatusKey as MathStatusKey,
   type BallKey as MathBallKey,
 } from "./catchMath";
-
-type GameDef = {
-  gameKey: string; // ✅ MUST match by_game filename stem (sv, bdsp, hgss, dp, frlg, etc)
-  label: string;
-  versionName: string;
-  versionGroup: string;
-  generation: string;
-  pokedex: string;
-  rulesetKey: string; // gen1 / gen2 / gen34 / gen5plus / letsgo / pla ...
-};
+import type { GameDef } from "./page";
 
 type MonRow = {
   id: number;
-  name?: any; // may come in as number/string/etc depending on how JSON was generated
-  slug?: any;
-  displayName?: any;
+  name?: string;
+  slug?: string;
+  displayName?: string;
   capture_rate: number;
   base_stats?: {
     hp: number;
@@ -91,6 +82,19 @@ function titleCase(s: string) {
     .join(" ");
 }
 
+function monDisplayName(m: MonRow) {
+  const dn = (m.displayName || "").trim();
+  if (dn) return dn;
+
+  const n = (m.name || "").trim();
+  if (n) return titleCase(n);
+
+  const sl = (m.slug || "").trim();
+  if (sl) return titleCase(sl);
+
+  return `#${m.id}`;
+}
+
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
@@ -123,110 +127,103 @@ function normalizeRulesetKey(k?: string | null): RulesetKey {
 }
 
 /**
- * Some builds accidentally put numeric IDs into name fields.
- * This normalizes "name"/"slug"/"displayName" into a usable string if possible.
+ * ✅ Preferred: `games.json` should include `byGameFile` and we use that.
+ * Fallback alias map kept for safety.
  */
-function coerceName(v: any): string {
-  if (typeof v === "string") return v.trim();
-  if (typeof v === "number") return ""; // treat pure numbers as "no name"
-  return "";
-}
+const BY_GAME_ALIAS: Record<string, string> = {
+  // gen 9
+  sv: "sv",
+  scarletviolet: "sv",
+  "scarlet-violet": "sv",
+  "scarlet / violet": "sv",
+  "scarlet & violet": "sv",
 
-function normalizeSlug(s: string) {
-  return s
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
+  // gen 8
+  swsh: "swsh",
+  swordshield: "swsh",
+  "sword-shield": "swsh",
+  "sword / shield": "swsh",
 
-function monDisplayName(m: MonRow, idToName?: Record<string, string>) {
-  // 1) Prefer explicit displayName
-  const dn = coerceName(m.displayName);
-  if (dn) return dn;
+  // let's go (if you use it)
+  lgpe: "lgpe",
+  letsgo: "lgpe",
+  letsgopikachueevee: "lgpe",
+  "let's go pikachu / eevee": "lgpe",
+};
 
-  // 2) If "name" looks like a real name (not a number), use it
-  const n = coerceName(m.name);
-  if (n) return titleCase(n);
+function candidateByGameKeys(gameKey: string, label?: string, explicit?: string) {
+  const out: string[] = [];
 
-  // 3) If we have an id->name map, use it
-  const mapped = idToName?.[String(m.id)];
-  if (mapped) return mapped;
+  const norm = (s: string) => String(s || "").trim().toLowerCase();
 
-  // 4) Fallback to slug if present
-  const sl = coerceName(m.slug);
-  if (sl) return titleCase(sl);
+  const alnum = (s: string) => norm(s).replace(/[^a-z0-9]+/g, "");
+  const hyphen = (s: string) =>
+    norm(s)
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
 
-  // 5) Final fallback
-  return `#${m.id}`;
+  const push = (x?: string) => {
+    const v = norm(x || "");
+    if (v && !out.includes(v)) out.push(v);
+  };
+
+  // 1) explicit from games.json (best)
+  if (explicit) push(explicit);
+
+  // 2) alias from explicit/gameKey/label
+  const tryAlias = (s?: string) => {
+    if (!s) return;
+    const n = norm(s);
+    const a1 = BY_GAME_ALIAS[n];
+    if (a1) push(a1);
+
+    const a2 = BY_GAME_ALIAS[alnum(s)];
+    if (a2) push(a2);
+
+    const a3 = BY_GAME_ALIAS[hyphen(s)];
+    if (a3) push(a3);
+  };
+
+  tryAlias(explicit);
+  tryAlias(gameKey);
+  tryAlias(label);
+
+  // 3) raw stems to try (alnum + hyphen)
+  const addStems = (s?: string) => {
+    if (!s) return;
+    push(alnum(s));
+    push(hyphen(s));
+  };
+
+  addStems(explicit);
+  addStems(gameKey);
+  addStems(label);
+
+  return Array.from(new Set(out)).filter(Boolean);
 }
 
 /**
- * Try to load a local name index first (from your blob/disk),
- * then fallback to PokeAPI *only for the currently selected mon* if needed.
+ * ✅ NEW:
+ * Your by_game JSON already contains `name` (lowercase) and `displayName`.
+ * But your dropdown currentlyN shows "#25 · Pikachu" only if `displayName` is present.
  *
- * If you later add a canonical file, either of these will work automatically:
- * - data/pokemon/pokemon_names.json  (preferred)
- * - data/pokemon/names.json
- *
- * Expected shape examples:
- * 1) { "1": "Bulbasaur", "2": "Ivysaur", ... }
- * 2) [ { "id": 1, "name": "Bulbasaur" }, ... ]
+ * If older blobs are missing displayName, we can synthesize it here so you never see bare numbers.
  */
-async function tryLoadNameIndex(): Promise<Record<string, string>> {
-  const candidates = [
-    "data/pokemon/pokemon_names.json",
-    "data/pokemon/names.json",
-  ];
-
-  for (const rel of candidates) {
-    const url = resolveDataUrl(rel);
-    try {
-      const data = await fetchJson<any>(url);
-
-      // object map form
-      if (data && typeof data === "object" && !Array.isArray(data)) {
-        const out: Record<string, string> = {};
-        for (const [k, v] of Object.entries(data)) {
-          const s = typeof v === "string" ? v.trim() : "";
-          if (s) out[String(k)] = s;
-        }
-        if (Object.keys(out).length) return out;
-      }
-
-      // array form
-      if (Array.isArray(data)) {
-        const out: Record<string, string> = {};
-        for (const row of data) {
-          const id = row?.id;
-          const name = row?.name;
-          if (Number.isFinite(id) && typeof name === "string" && name.trim()) {
-            out[String(id)] = name.trim();
-          }
-        }
-        if (Object.keys(out).length) return out;
-      }
-    } catch {
-      // try next
-    }
-  }
-
-  return {};
-}
-
-/**
- * Minimal PokeAPI fallback:
- * only used when a mon is selected and we still don't have a name.
- * (Avoids hammering the network for the entire dropdown.)
- */
-async function fetchPokeApiNameById(id: number): Promise<string> {
-  const url = `https://pokeapi.co/api/v2/pokemon-species/${id}/`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  const json = (await res.json()) as any;
-  const name = typeof json?.name === "string" ? json.name.trim() : "";
-  return name ? titleCase(name) : "";
+function normalizeMons(rows: MonRow[]): MonRow[] {
+  return (Array.isArray(rows) ? rows : [])
+    .filter((m) => m && typeof m.id === "number")
+    .map((m) => {
+      const name = (m.name || m.slug || "").trim();
+      const displayName = (m.displayName || "").trim() || (name ? titleCase(name) : "");
+      return {
+        ...m,
+        name: m.name || (name || undefined),
+        slug: m.slug || (name || undefined),
+        displayName: displayName || undefined,
+      };
+    })
+    .sort((a, b) => a.id - b.id);
 }
 
 export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
@@ -243,10 +240,6 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
   const [loadingMons, setLoadingMons] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // ✅ name helpers
-  const [idToName, setIdToName] = useState<Record<string, string>>({});
-  const [selectedNameOverride, setSelectedNameOverride] = useState<string>("");
-
   const didInit = useRef(false);
 
   const selectedGame = useMemo(
@@ -262,52 +255,36 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
   const card =
     "rounded-2xl border border-neutral-800 bg-black p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]";
 
-  /**
-   * Turn removed:
-   * - Quick Ball: assume Turn 1 (best-case)
-   * - Timer Ball: assume Turn 10 (mid-fight)
-   */
   const effectiveTurn = useMemo(() => {
     if (ball === "quick") return 1;
     if (ball === "timer") return 10;
     return 1;
   }, [ball]);
 
-  /**
-   * ✅ Load mons for a game.
-   *
-   * IMPORTANT CHANGE:
-   * We always attempt the EXACT key you uploaded: data/pokemon/by_game/${gameKey}.json
-   * This matches your blobs: bw.json, bw2.json, hgss.json, dp.json, frlg.json, sv.json, bdsp.json, etc.
-   *
-   * We keep a small fallback: if someone’s games.json has older keys, we try a normalized slug too.
-   */
   async function loadMons(forGameKey: string) {
     setLoadingMons(true);
     setError("");
 
     const g = games.find((x) => x.gameKey === forGameKey) || null;
 
-    const exactStem = String(forGameKey || "").trim();
-    const fallbackStem = g?.label ? normalizeSlug(g.label).replace(/-/g, "") : "";
-
-    const candidates = Array.from(
-      new Set([exactStem, fallbackStem].filter(Boolean))
+    const candidates = candidateByGameKeys(
+      forGameKey,
+      g?.label,
+      (g as any)?.byGameFile // optional field; best if present
     );
 
-    let lastErr: any = null;
+    let lastErr: unknown = null;
 
     try {
-      for (const stem of candidates) {
-        const rel = `data/pokemon/by_game/${stem}.json`;
+      for (const key of candidates) {
+        const rel = `data/pokemon/by_game/${key}.json`;
         const url = resolveDataUrl(rel);
 
         try {
           const data = await fetchJson<MonRow[]>(url);
-          const arr = Array.isArray(data) ? data : [];
+          const arr = normalizeMons(data);
           setMons(arr);
           setMonId("");
-          setSelectedNameOverride("");
           return arr;
         } catch (e) {
           lastErr = e;
@@ -320,7 +297,6 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
 
       setMons([]);
       setMonId("");
-      setSelectedNameOverride("");
       setError(
         `${msg}\nTried: ${candidates
           .map((s) => `data/pokemon/by_game/${s}.json`)
@@ -332,11 +308,6 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
     }
   }
 
-  /**
-   * ✅ First mount:
-   * 1) Load name index if you have it (optional)
-   * 2) Load mons for initial game (and probe if needed)
-   */
   useEffect(() => {
     if (didInit.current) return;
     didInit.current = true;
@@ -344,33 +315,19 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
     (async () => {
       if (!games.length) return;
 
-      // 1) Try to load an id->name index (if you add one later, it just works)
-      try {
-        const map = await tryLoadNameIndex();
-        if (map && Object.keys(map).length) setIdToName(map);
-      } catch {
-        // ignore
-      }
-
-      // 2) Try current gameKey first
       if (gameKey) {
         try {
           await loadMons(gameKey);
           return;
-        } catch {
-          // continue probing
-        }
+        } catch {}
       }
 
-      // 3) Probe games until one loads
       for (const gg of games) {
         try {
           await loadMons(gg.gameKey);
           setGameKey(gg.gameKey);
           return;
-        } catch {
-          // keep going
-        }
+        } catch {}
       }
 
       setError("No by_game JSON found for any configured game.");
@@ -378,48 +335,12 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [games]);
 
-  /**
-   * Game changes:
-   */
   useEffect(() => {
     if (!didInit.current) return;
     if (!gameKey) return;
     loadMons(gameKey).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameKey]);
-
-  /**
-   * Selected mon name fallback:
-   * If the dropdown items look like numbers (no name fields), we fetch ONLY the selected mon’s name.
-   */
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      setSelectedNameOverride("");
-
-      if (!selectedMon || !Number.isFinite(selectedMon.id)) return;
-
-      // If we already have a usable name, no need to fetch
-      const dn = coerceName(selectedMon.displayName);
-      const n = coerceName(selectedMon.name);
-      const sl = coerceName(selectedMon.slug);
-      const mapped = idToName[String(selectedMon.id)];
-
-      if (dn || n || sl || mapped) return;
-
-      try {
-        const apiName = await fetchPokeApiNameById(selectedMon.id);
-        if (!cancelled && apiName) setSelectedNameOverride(apiName);
-      } catch {
-        // ignore; we’ll just show #id
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedMon, idToName]);
 
   const chance = useMemo(() => {
     if (!selectedMon) return NaN;
@@ -441,19 +362,11 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
     return 1 / chance;
   }, [chance]);
 
-  const selectedMonName = useMemo(() => {
-    if (!selectedMon) return "";
-    if (selectedNameOverride) return selectedNameOverride;
-    return monDisplayName(selectedMon, idToName);
-  }, [selectedMon, idToName, selectedNameOverride]);
-
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      {/* Inputs */}
       <section className={card}>
         <div className="mb-4 text-sm font-semibold text-neutral-200">Inputs</div>
 
-        {/* Game */}
         <label className="block text-xs text-neutral-400">Game</label>
         <select
           className="mt-1 w-full rounded-xl border border-neutral-800 bg-black px-3 py-2 text-sm text-white outline-none focus:border-neutral-600"
@@ -473,7 +386,6 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
           Dex: <span className="text-neutral-300">{selectedGame?.pokedex || "—"}</span>
         </div>
 
-        {/* Pokémon */}
         <div className="mt-5">
           <label className="block text-xs text-neutral-400">Pokémon</label>
           <select
@@ -488,22 +400,16 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
             <option value="">
               {loadingMons ? "Loading…" : mons.length ? "Select a Pokémon…" : "No Pokémon loaded"}
             </option>
-            {mons.map((m) => {
-              const name = monDisplayName(m, idToName);
-              return (
-                <option key={m.id} value={m.id}>
-                  {name.startsWith("#") ? `#${m.id}` : `#${m.id} · ${name}`}
-                </option>
-              );
-            })}
+            {mons.map((m) => (
+              <option key={m.id} value={m.id}>
+                #{m.id} · {monDisplayName(m)}
+              </option>
+            ))}
           </select>
 
-          {error ? (
-            <div className="mt-2 whitespace-pre-wrap text-xs text-red-400">{error}</div>
-          ) : null}
+          {error ? <div className="mt-2 whitespace-pre-wrap text-xs text-red-400">{error}</div> : null}
         </div>
 
-        {/* Battle state */}
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="md:col-span-2">
             <label className="block text-xs text-neutral-400">
@@ -549,14 +455,10 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
             </select>
 
             {ball === "quick" ? (
-              <div className="mt-2 text-[11px] text-neutral-500">
-                Quick Ball assumes Turn 1 (best-case).
-              </div>
+              <div className="mt-2 text-[11px] text-neutral-500">Quick Ball assumes Turn 1 (best-case).</div>
             ) : null}
             {ball === "timer" ? (
-              <div className="mt-2 text-[11px] text-neutral-500">
-                Timer Ball assumes ~Turn 10 (mid-fight).
-              </div>
+              <div className="mt-2 text-[11px] text-neutral-500">Timer Ball assumes ~Turn 10 (mid-fight).</div>
             ) : null}
           </div>
         </div>
@@ -566,7 +468,6 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
         </div>
       </section>
 
-      {/* Results */}
       <section className={card}>
         <div className="mb-4 text-sm font-semibold text-neutral-200">Results</div>
 
@@ -579,7 +480,7 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={selectedMon.sprite}
-                  alt={selectedMonName}
+                  alt={monDisplayName(selectedMon)}
                   className="h-20 w-20 rounded-xl border border-neutral-800 bg-neutral-950 object-contain"
                   loading="lazy"
                 />
@@ -589,11 +490,10 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
 
               <div>
                 <div className="text-lg font-black tracking-tight">
-                  #{selectedMon.id} · {selectedMonName}
+                  #{selectedMon.id} · {monDisplayName(selectedMon)}
                 </div>
                 <div className="mt-1 text-xs text-neutral-400">
-                  Base catch rate:{" "}
-                  <span className="text-neutral-200">{selectedMon.capture_rate}</span>
+                  Base catch rate: <span className="text-neutral-200">{selectedMon.capture_rate}</span>
                 </div>
                 <div className="mt-1 text-xs text-neutral-500">
                   Catch chance: <span className="text-neutral-200">{fmtPct(chance)}</span>
@@ -631,8 +531,7 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
             ) : null}
 
             <div className="text-xs text-neutral-600">
-              Powered by <span className="text-neutral-300">catchMath.ts</span> (Gen 3+ shake-check probability; rulesets
-              can be refined later via <span className="text-neutral-300">rulesetKey</span>).
+              Powered by <span className="text-neutral-300">catchMath.ts</span>.
             </div>
           </div>
         )}

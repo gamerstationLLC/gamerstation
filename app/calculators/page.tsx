@@ -1,8 +1,8 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export default function CalculatorsPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* Ambient background (matches Tools/Home vibe) */}
       <div className="pointer-events-none absolute inset-0">
         <div
@@ -31,7 +31,7 @@ export default function CalculatorsPage() {
       className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
     />
     <span className="text-lg font-black tracking-tight">
-      GamerStation<span className="align-super text-[0.6em]">™</span>
+      GamerStation<span className="align-super text-[0.6em]">TM</span>
     </span>
   </Link>
 
@@ -79,6 +79,16 @@ export default function CalculatorsPage() {
               </div>
             </Link>
 
+<Link
+              href="/calculators/pokemon/catch"
+              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
+            >
+              <div className="text-sm font-semibold">Pokemon Catch Chance</div>
+              <div className="mt-2 text-sm text-neutral-400">
+                Pick a Pokemon game and Pokemon to calculate catch chance.
+              </div>
+            </Link>
+
             {/* Fortnite TTK */}
             <Link
               href="/calculators/ttk/fortnite"
@@ -86,7 +96,7 @@ export default function CalculatorsPage() {
             >
               <div className="text-sm font-semibold">Fortnite TTK Calculator</div>
               <div className="mt-2 text-sm text-neutral-400">
-                Per-rarity weapon damage • live fire rates
+                Per-rarity weapon damage â€¢ live fire rates
               </div>
             </Link>
 

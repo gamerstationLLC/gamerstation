@@ -448,7 +448,7 @@ export default function OsrsDpsPage() {
   // UI
   // ========
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-10">
+    <main className="min-h-screen bg-transparent text-white px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 hover:opacity-90">

@@ -1,4 +1,4 @@
-// app/calculators/lol/page.tsx
+﻿// app/calculators/lol/page.tsx
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     "Calculate burst damage, DPS, and time-to-kill in League of Legends using official Riot Data Dragon values. Simple and Advanced modes supported.",
 };
 
-// ✅ Segment config (VALID)
+// âœ… Segment config (VALID)
 export const revalidate = 21600; // 6 hours
 
 type LolChampionFile = {
@@ -39,7 +39,7 @@ export type ChampionIndexRow = {
     spellblock: number;
     spellblockperlevel: number;
 
-    // ✅ AA / DPS fields
+    // âœ… AA / DPS fields
     attackdamage: number;
     attackdamageperlevel: number;
     attackspeed: number;
@@ -58,7 +58,7 @@ export type ItemRow = {
 };
 
 /**
- * ✅ Cached "latest patch" getter with safe fallback.
+ * âœ… Cached "latest patch" getter with safe fallback.
  * - Uses Data Dragon versions endpoint (cached by Next)
  * - Falls back to your local public version.json if Riot fetch fails
  */
@@ -93,7 +93,7 @@ async function loadLolIndex(version: string): Promise<{
   patch: string;
   champions: ChampionIndexRow[];
 }> {
-  // ✅ Read from disk: /public/data/lol/champions_full.json
+  // âœ… Read from disk: /public/data/lol/champions_full.json
   const json = await readPublicJson<LolChampionFile>(
     "data/lol/champions_full.json"
   );
@@ -115,7 +115,7 @@ async function loadLolIndex(version: string): Promise<{
         spellblock: Number(c.stats?.spellblock ?? 0),
         spellblockperlevel: Number(c.stats?.spellblockperlevel ?? 0),
 
-        // ✅ Make AA usable
+        // âœ… Make AA usable
         attackdamage: Number(c.stats?.attackdamage ?? 0),
         attackdamageperlevel: Number(c.stats?.attackdamageperlevel ?? 0),
         attackspeed: Number(c.stats?.attackspeed ?? 0),
@@ -130,7 +130,7 @@ async function loadLolIndex(version: string): Promise<{
 async function loadLolItems(
   version: string
 ): Promise<{ patch: string; items: ItemRow[] }> {
-  // ✅ Read from disk: /public/data/lol/items.json
+  // âœ… Read from disk: /public/data/lol/items.json
   const json = await readPublicJson<LolItemsFile>("data/lol/items.json");
 
   const patch = version;
@@ -178,7 +178,7 @@ async function loadLolItems(
 
 function LoadingShell() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-12">
+    <main className="min-h-screen bg-transparent text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
         <div className="h-4 w-40 rounded bg-white/10" />
         <div className="mt-8 h-10 w-[min(560px,100%)] rounded bg-white/10" />
@@ -201,7 +201,8 @@ export default async function LolCalculatorPage() {
   ]);
 
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-12">
+  <main className="min-h-screen bg-transparent text-white px-6 py-12">
+
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center gap-3">
           {/* GS brand */}
@@ -215,7 +216,7 @@ export default async function LolCalculatorPage() {
               "
             />
             <span className="text-lg font-black tracking-tight">
-              GamerStation<span className="align-super text-[0.6em]">™</span>
+              GamerStation<span className="align-super text-[0.6em]">TM</span>
             </span>
           </Link>
 
@@ -240,7 +241,7 @@ export default async function LolCalculatorPage() {
           over a short time window. [Summoner&apos;s Rift Only]
         </p>
 
-        {/* ✅ 3 buttons right above the inputs card (i.e., above LolClient) */}
+        {/* âœ… 3 buttons right above the inputs card (i.e., above LolClient) */}
         <div className="mt-1 flex flex-wrap items-center gap-2 py-2">
           <Link href="/tools/lol/meta" className={topButtonClass}>
            Meta
@@ -253,7 +254,7 @@ export default async function LolCalculatorPage() {
           </Link>
         </div>
 
-        {/* ✅ Required by Next when LolClient uses useSearchParams() */}
+        {/* âœ… Required by Next when LolClient uses useSearchParams() */}
         <Suspense fallback={<LoadingShell />}>
           <LolClient champions={champions} patch={patch} items={items} />
         </Suspense>

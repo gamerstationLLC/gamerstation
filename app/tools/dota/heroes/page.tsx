@@ -1,4 +1,4 @@
-// app/tools/dota/heroes/page.tsx
+﻿// app/tools/dota/heroes/page.tsx
 import Link from "next/link";
 import DotaHeroesClient from "./client";
 
@@ -8,7 +8,7 @@ export const metadata = {
     "Browse every Dota 2 hero with live meta context, pick rate, win rate, and pro trends. Data via OpenDota, updated frequently.",
 };
 
-// ✅ Daily full-page regeneration
+// âœ… Daily full-page regeneration
 export const revalidate = 60 * 60 * 24; // 24 hours
 export const runtime = "nodejs";
 export const dynamic = "force-static";
@@ -51,7 +51,7 @@ function iconUrl(r: HeroStatsRow) {
 
 async function getHeroStats(): Promise<HeroStatsRow[]> {
   const res = await fetch("https://api.opendota.com/api/heroStats", {
-    next: { revalidate: 60 * 60 * 24 }, // ✅ daily
+    next: { revalidate: 60 * 60 * 24 }, // âœ… daily
     headers: {
       Accept: "application/json",
       "User-Agent": "GamerStation (https://gamerstation.gg)",
@@ -61,7 +61,7 @@ async function getHeroStats(): Promise<HeroStatsRow[]> {
   return res.json();
 }
 
-// ✅ Patch check: more frequent than the hero list (so patch flips invalidate the page sooner)
+// âœ… Patch check: more frequent than the hero list (so patch flips invalidate the page sooner)
 async function getPatchFromSelf(): Promise<string> {
   try {
     const base =
@@ -73,16 +73,16 @@ async function getPatchFromSelf(): Promise<string> {
         : "http://localhost:3000");
 
     const res = await fetch(`${base}/api/dota/patch`, {
-      next: { revalidate: 60 * 60 * 6 }, // ✅ every 6 hours
+      next: { revalidate: 60 * 60 * 6 }, // âœ… every 6 hours
       headers: { Accept: "application/json" },
     });
 
-    if (!res.ok) return "—";
+    if (!res.ok) return "â€”";
     const json = await res.json().catch(() => null);
     const patch = (json?.patch ?? "").toString().trim();
-    return patch || "—";
+    return patch || "â€”";
   } catch {
-    return "—";
+    return "â€”";
   }
 }
 
@@ -93,7 +93,7 @@ export default async function DotaHeroesIndexPage({
 }) {
   const [rows, patch] = await Promise.all([getHeroStats(), getPatchFromSelf()]);
 
-  // 🔥 Cache bucket tied to patch — when patch changes, this page regenerates fresh
+  // ðŸ”¥ Cache bucket tied to patch â€” when patch changes, this page regenerates fresh
   const cacheTag = `dota-heroes-${patch}`;
 
   const heroes: HeroCard[] = rows
@@ -111,7 +111,7 @@ export default async function DotaHeroesIndexPage({
   const initialQuery = (searchParams?.q ?? "").toString();
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div
@@ -138,7 +138,7 @@ export default async function DotaHeroesIndexPage({
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">™</span>
+                GamerStation<span className="align-super text-[0.6em]">TM</span>
               </span>
             </Link>
 
@@ -157,11 +157,11 @@ export default async function DotaHeroesIndexPage({
             refreshed often.
             <span className="text-neutral-500">
               {" "}
-              (Daily refresh • Auto resets on patch change)
+              (Daily refresh â€¢ Auto resets on patch change)
             </span>
           </p>
 
-          {/* ✅ Client remounts when patch changes */}
+          {/* âœ… Client remounts when patch changes */}
           <DotaHeroesClient
             key={cacheTag}
             heroes={heroes}

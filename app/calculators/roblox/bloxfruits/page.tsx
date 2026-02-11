@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function BloxFruitsHubPage() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Back link */}
         <header className="-ml-2">
@@ -27,7 +27,7 @@ export default function BloxFruitsHubPage() {
             href="/calculators/roblox"
             className="text-sm text-neutral-300 hover:text-white"
           >
-            ← Back to Roblox
+            â† Back to Roblox
           </Link>
         </header>
 

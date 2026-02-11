@@ -4845,6 +4845,14 @@
     }
   },
   {
+    "id": 550,
+    "name": "basculin",
+    "slug": "basculin",
+    "sprite": null,
+    "capture_rate": 25,
+    "base_stats": null
+  },
+  {
     "id": 551,
     "name": "sandile",
     "slug": "sandile",
@@ -4903,6 +4911,14 @@
       "spd": 45,
       "spe": 50
     }
+  },
+  {
+    "id": 555,
+    "name": "darmanitan",
+    "slug": "darmanitan",
+    "sprite": null,
+    "capture_rate": 60,
+    "base_stats": null
   },
   {
     "id": 556,
@@ -6180,6 +6196,14 @@
     }
   },
   {
+    "id": 678,
+    "name": "meowstic",
+    "slug": "meowstic",
+    "sprite": null,
+    "capture_rate": 75,
+    "base_stats": null
+  },
+  {
     "id": 679,
     "name": "honedge",
     "slug": "honedge",
@@ -6208,6 +6232,14 @@
       "spd": 49,
       "spe": 35
     }
+  },
+  {
+    "id": 681,
+    "name": "aegislash",
+    "slug": "aegislash",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
   },
   {
     "id": 682,
@@ -6630,6 +6662,22 @@
     }
   },
   {
+    "id": 710,
+    "name": "pumpkaboo",
+    "slug": "pumpkaboo",
+    "sprite": null,
+    "capture_rate": 120,
+    "base_stats": null
+  },
+  {
+    "id": 711,
+    "name": "gourgeist",
+    "slug": "gourgeist",
+    "sprite": null,
+    "capture_rate": 60,
+    "base_stats": null
+  },
+  {
     "id": 712,
     "name": "bergmite",
     "slug": "bergmite",
@@ -6778,6 +6826,22 @@
       "spd": 40,
       "spe": 60
     }
+  },
+  {
+    "id": 745,
+    "name": "lycanroc",
+    "slug": "lycanroc",
+    "sprite": null,
+    "capture_rate": 90,
+    "base_stats": null
+  },
+  {
+    "id": 746,
+    "name": "wishiwashi",
+    "slug": "wishiwashi",
+    "sprite": null,
+    "capture_rate": 60,
+    "base_stats": null
   },
   {
     "id": 747,
@@ -7213,6 +7277,14 @@
       "spd": 73,
       "spe": 96
     }
+  },
+  {
+    "id": 778,
+    "name": "mimikyu",
+    "slug": "mimikyu",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
   },
   {
     "id": 780,
@@ -7875,6 +7947,14 @@
     }
   },
   {
+    "id": 849,
+    "name": "toxtricity",
+    "slug": "toxtricity",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
+  },
+  {
     "id": 850,
     "name": "sizzlipede",
     "slug": "sizzlipede",
@@ -8250,6 +8330,30 @@
     }
   },
   {
+    "id": 875,
+    "name": "eiscue",
+    "slug": "eiscue",
+    "sprite": null,
+    "capture_rate": 60,
+    "base_stats": null
+  },
+  {
+    "id": 876,
+    "name": "indeedee",
+    "slug": "indeedee",
+    "sprite": null,
+    "capture_rate": 30,
+    "base_stats": null
+  },
+  {
+    "id": 877,
+    "name": "morpeko",
+    "slug": "morpeko",
+    "sprite": null,
+    "capture_rate": 180,
+    "base_stats": null
+  },
+  {
     "id": 878,
     "name": "cufant",
     "slug": "cufant",
@@ -8460,6 +8564,14 @@
     }
   },
   {
+    "id": 892,
+    "name": "urshifu",
+    "slug": "urshifu",
+    "sprite": null,
+    "capture_rate": 3,
+    "base_stats": null
+  },
+  {
     "id": 893,
     "name": "zarude",
     "slug": "zarude",
@@ -8548,117 +8660,5 @@
       "spd": 80,
       "spe": 80
     }
-  },
-  {
-    "id": -1,
-    "name": "aegislash",
-    "slug": "aegislash",
-    "sprite": null,
-    "capture_rate": 45,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "basculin",
-    "slug": "basculin",
-    "sprite": null,
-    "capture_rate": 25,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "darmanitan",
-    "slug": "darmanitan",
-    "sprite": null,
-    "capture_rate": 60,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "eiscue",
-    "slug": "eiscue",
-    "sprite": null,
-    "capture_rate": 60,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "gourgeist",
-    "slug": "gourgeist",
-    "sprite": null,
-    "capture_rate": 60,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "indeedee",
-    "slug": "indeedee",
-    "sprite": null,
-    "capture_rate": 30,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "lycanroc",
-    "slug": "lycanroc",
-    "sprite": null,
-    "capture_rate": 90,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "meowstic",
-    "slug": "meowstic",
-    "sprite": null,
-    "capture_rate": 75,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "mimikyu",
-    "slug": "mimikyu",
-    "sprite": null,
-    "capture_rate": 45,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "morpeko",
-    "slug": "morpeko",
-    "sprite": null,
-    "capture_rate": 180,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "pumpkaboo",
-    "slug": "pumpkaboo",
-    "sprite": null,
-    "capture_rate": 120,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "toxtricity",
-    "slug": "toxtricity",
-    "sprite": null,
-    "capture_rate": 45,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "urshifu",
-    "slug": "urshifu",
-    "sprite": null,
-    "capture_rate": 3,
-    "base_stats": null
-  },
-  {
-    "id": -1,
-    "name": "wishiwashi",
-    "slug": "wishiwashi",
-    "sprite": null,
-    "capture_rate": 60,
-    "base_stats": null
   }
 ]

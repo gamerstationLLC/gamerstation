@@ -1,0 +1,5911 @@
+[
+  {
+    "id": 25,
+    "name": "pikachu",
+    "slug": "pikachu",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 35,
+      "atk": 55,
+      "def": 40,
+      "spa": 50,
+      "spd": 50,
+      "spe": 90
+    }
+  },
+  {
+    "id": 26,
+    "name": "raichu",
+    "slug": "raichu",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/26.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 60,
+      "atk": 90,
+      "def": 55,
+      "spa": 90,
+      "spd": 80,
+      "spe": 110
+    }
+  },
+  {
+    "id": 39,
+    "name": "jigglypuff",
+    "slug": "jigglypuff",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/39.png",
+    "capture_rate": 170,
+    "base_stats": {
+      "hp": 115,
+      "atk": 45,
+      "def": 20,
+      "spa": 45,
+      "spd": 25,
+      "spe": 20
+    }
+  },
+  {
+    "id": 40,
+    "name": "wigglytuff",
+    "slug": "wigglytuff",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/40.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 140,
+      "atk": 70,
+      "def": 45,
+      "spa": 85,
+      "spd": 50,
+      "spe": 45
+    }
+  },
+  {
+    "id": 48,
+    "name": "venonat",
+    "slug": "venonat",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/48.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 60,
+      "atk": 55,
+      "def": 50,
+      "spa": 40,
+      "spd": 55,
+      "spe": 45
+    }
+  },
+  {
+    "id": 49,
+    "name": "venomoth",
+    "slug": "venomoth",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/49.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 70,
+      "atk": 65,
+      "def": 60,
+      "spa": 90,
+      "spd": 75,
+      "spe": 90
+    }
+  },
+  {
+    "id": 50,
+    "name": "diglett",
+    "slug": "diglett",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/50.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 10,
+      "atk": 55,
+      "def": 25,
+      "spa": 35,
+      "spd": 45,
+      "spe": 95
+    }
+  },
+  {
+    "id": 51,
+    "name": "dugtrio",
+    "slug": "dugtrio",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/51.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 35,
+      "atk": 100,
+      "def": 50,
+      "spa": 50,
+      "spd": 70,
+      "spe": 120
+    }
+  },
+  {
+    "id": 52,
+    "name": "meowth",
+    "slug": "meowth",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/52.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 40,
+      "atk": 45,
+      "def": 35,
+      "spa": 40,
+      "spd": 40,
+      "spe": 90
+    }
+  },
+  {
+    "id": 53,
+    "name": "persian",
+    "slug": "persian",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/53.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 65,
+      "atk": 70,
+      "def": 60,
+      "spa": 65,
+      "spd": 65,
+      "spe": 115
+    }
+  },
+  {
+    "id": 54,
+    "name": "psyduck",
+    "slug": "psyduck",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/54.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 50,
+      "atk": 52,
+      "def": 48,
+      "spa": 65,
+      "spd": 50,
+      "spe": 55
+    }
+  },
+  {
+    "id": 55,
+    "name": "golduck",
+    "slug": "golduck",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/55.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 80,
+      "atk": 82,
+      "def": 78,
+      "spa": 95,
+      "spd": 80,
+      "spe": 85
+    }
+  },
+  {
+    "id": 56,
+    "name": "mankey",
+    "slug": "mankey",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/56.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 40,
+      "atk": 80,
+      "def": 35,
+      "spa": 35,
+      "spd": 45,
+      "spe": 70
+    }
+  },
+  {
+    "id": 57,
+    "name": "primeape",
+    "slug": "primeape",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/57.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 65,
+      "atk": 105,
+      "def": 60,
+      "spa": 60,
+      "spd": 70,
+      "spe": 95
+    }
+  },
+  {
+    "id": 58,
+    "name": "growlithe",
+    "slug": "growlithe",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/58.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 55,
+      "atk": 70,
+      "def": 45,
+      "spa": 70,
+      "spd": 50,
+      "spe": 60
+    }
+  },
+  {
+    "id": 59,
+    "name": "arcanine",
+    "slug": "arcanine",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/59.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 90,
+      "atk": 110,
+      "def": 80,
+      "spa": 100,
+      "spd": 80,
+      "spe": 95
+    }
+  },
+  {
+    "id": 79,
+    "name": "slowpoke",
+    "slug": "slowpoke",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/79.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 90,
+      "atk": 65,
+      "def": 65,
+      "spa": 40,
+      "spd": 40,
+      "spe": 15
+    }
+  },
+  {
+    "id": 80,
+    "name": "slowbro",
+    "slug": "slowbro",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/80.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 95,
+      "atk": 75,
+      "def": 110,
+      "spa": 100,
+      "spd": 80,
+      "spe": 30
+    }
+  },
+  {
+    "id": 81,
+    "name": "magnemite",
+    "slug": "magnemite",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/81.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 25,
+      "atk": 35,
+      "def": 70,
+      "spa": 95,
+      "spd": 55,
+      "spe": 45
+    }
+  },
+  {
+    "id": 82,
+    "name": "magneton",
+    "slug": "magneton",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/82.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 50,
+      "atk": 60,
+      "def": 95,
+      "spa": 120,
+      "spd": 70,
+      "spe": 70
+    }
+  },
+  {
+    "id": 88,
+    "name": "grimer",
+    "slug": "grimer",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/88.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 80,
+      "atk": 80,
+      "def": 50,
+      "spa": 40,
+      "spd": 50,
+      "spe": 25
+    }
+  },
+  {
+    "id": 89,
+    "name": "muk",
+    "slug": "muk",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/89.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 105,
+      "atk": 105,
+      "def": 75,
+      "spa": 65,
+      "spd": 100,
+      "spe": 50
+    }
+  },
+  {
+    "id": 90,
+    "name": "shellder",
+    "slug": "shellder",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/90.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 30,
+      "atk": 65,
+      "def": 100,
+      "spa": 45,
+      "spd": 25,
+      "spe": 40
+    }
+  },
+  {
+    "id": 91,
+    "name": "cloyster",
+    "slug": "cloyster",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/91.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 50,
+      "atk": 95,
+      "def": 180,
+      "spa": 85,
+      "spd": 45,
+      "spe": 70
+    }
+  },
+  {
+    "id": 92,
+    "name": "gastly",
+    "slug": "gastly",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/92.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 30,
+      "atk": 35,
+      "def": 30,
+      "spa": 100,
+      "spd": 35,
+      "spe": 80
+    }
+  },
+  {
+    "id": 93,
+    "name": "haunter",
+    "slug": "haunter",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/93.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 45,
+      "atk": 50,
+      "def": 45,
+      "spa": 115,
+      "spd": 55,
+      "spe": 95
+    }
+  },
+  {
+    "id": 94,
+    "name": "gengar",
+    "slug": "gengar",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 60,
+      "atk": 65,
+      "def": 60,
+      "spa": 130,
+      "spd": 75,
+      "spe": 110
+    }
+  },
+  {
+    "id": 96,
+    "name": "drowzee",
+    "slug": "drowzee",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/96.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 60,
+      "atk": 48,
+      "def": 45,
+      "spa": 43,
+      "spd": 90,
+      "spe": 42
+    }
+  },
+  {
+    "id": 97,
+    "name": "hypno",
+    "slug": "hypno",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/97.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 85,
+      "atk": 73,
+      "def": 70,
+      "spa": 73,
+      "spd": 115,
+      "spe": 67
+    }
+  },
+  {
+    "id": 100,
+    "name": "voltorb",
+    "slug": "voltorb",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/100.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 50,
+      "spa": 55,
+      "spd": 55,
+      "spe": 100
+    }
+  },
+  {
+    "id": 101,
+    "name": "electrode",
+    "slug": "electrode",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/101.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 60,
+      "atk": 50,
+      "def": 70,
+      "spa": 80,
+      "spd": 80,
+      "spe": 150
+    }
+  },
+  {
+    "id": 113,
+    "name": "chansey",
+    "slug": "chansey",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/113.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 250,
+      "atk": 5,
+      "def": 5,
+      "spa": 35,
+      "spd": 105,
+      "spe": 50
+    }
+  },
+  {
+    "id": 123,
+    "name": "scyther",
+    "slug": "scyther",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/123.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 70,
+      "atk": 110,
+      "def": 80,
+      "spa": 55,
+      "spd": 80,
+      "spe": 105
+    }
+  },
+  {
+    "id": 128,
+    "name": "tauros",
+    "slug": "tauros",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/128.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 75,
+      "atk": 100,
+      "def": 95,
+      "spa": 40,
+      "spd": 70,
+      "spe": 110
+    }
+  },
+  {
+    "id": 129,
+    "name": "magikarp",
+    "slug": "magikarp",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/129.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 20,
+      "atk": 10,
+      "def": 55,
+      "spa": 15,
+      "spd": 20,
+      "spe": 80
+    }
+  },
+  {
+    "id": 130,
+    "name": "gyarados",
+    "slug": "gyarados",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/130.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 95,
+      "atk": 125,
+      "def": 79,
+      "spa": 60,
+      "spd": 100,
+      "spe": 81
+    }
+  },
+  {
+    "id": 132,
+    "name": "ditto",
+    "slug": "ditto",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/132.png",
+    "capture_rate": 35,
+    "base_stats": {
+      "hp": 48,
+      "atk": 48,
+      "def": 48,
+      "spa": 48,
+      "spd": 48,
+      "spe": 48
+    }
+  },
+  {
+    "id": 133,
+    "name": "eevee",
+    "slug": "eevee",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 55,
+      "atk": 55,
+      "def": 50,
+      "spa": 45,
+      "spd": 65,
+      "spe": 55
+    }
+  },
+  {
+    "id": 134,
+    "name": "vaporeon",
+    "slug": "vaporeon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/134.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 130,
+      "atk": 65,
+      "def": 60,
+      "spa": 110,
+      "spd": 95,
+      "spe": 65
+    }
+  },
+  {
+    "id": 135,
+    "name": "jolteon",
+    "slug": "jolteon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/135.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 65,
+      "def": 60,
+      "spa": 110,
+      "spd": 95,
+      "spe": 130
+    }
+  },
+  {
+    "id": 136,
+    "name": "flareon",
+    "slug": "flareon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/136.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 130,
+      "def": 60,
+      "spa": 95,
+      "spd": 110,
+      "spe": 65
+    }
+  },
+  {
+    "id": 147,
+    "name": "dratini",
+    "slug": "dratini",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/147.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 41,
+      "atk": 64,
+      "def": 45,
+      "spa": 50,
+      "spd": 50,
+      "spe": 50
+    }
+  },
+  {
+    "id": 148,
+    "name": "dragonair",
+    "slug": "dragonair",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/148.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 61,
+      "atk": 84,
+      "def": 65,
+      "spa": 70,
+      "spd": 70,
+      "spe": 70
+    }
+  },
+  {
+    "id": 149,
+    "name": "dragonite",
+    "slug": "dragonite",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 91,
+      "atk": 134,
+      "def": 95,
+      "spa": 100,
+      "spd": 100,
+      "spe": 80
+    }
+  },
+  {
+    "id": 172,
+    "name": "pichu",
+    "slug": "pichu",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/172.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 20,
+      "atk": 40,
+      "def": 15,
+      "spa": 35,
+      "spd": 35,
+      "spe": 60
+    }
+  },
+  {
+    "id": 174,
+    "name": "igglybuff",
+    "slug": "igglybuff",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/174.png",
+    "capture_rate": 170,
+    "base_stats": {
+      "hp": 90,
+      "atk": 30,
+      "def": 15,
+      "spa": 40,
+      "spd": 20,
+      "spe": 15
+    }
+  },
+  {
+    "id": 179,
+    "name": "mareep",
+    "slug": "mareep",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/179.png",
+    "capture_rate": 235,
+    "base_stats": {
+      "hp": 55,
+      "atk": 40,
+      "def": 40,
+      "spa": 65,
+      "spd": 45,
+      "spe": 35
+    }
+  },
+  {
+    "id": 180,
+    "name": "flaaffy",
+    "slug": "flaaffy",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/180.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 70,
+      "atk": 55,
+      "def": 55,
+      "spa": 80,
+      "spd": 60,
+      "spe": 45
+    }
+  },
+  {
+    "id": 181,
+    "name": "ampharos",
+    "slug": "ampharos",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/181.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 90,
+      "atk": 75,
+      "def": 85,
+      "spa": 115,
+      "spd": 90,
+      "spe": 55
+    }
+  },
+  {
+    "id": 183,
+    "name": "marill",
+    "slug": "marill",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/183.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 70,
+      "atk": 20,
+      "def": 50,
+      "spa": 20,
+      "spd": 50,
+      "spe": 40
+    }
+  },
+  {
+    "id": 184,
+    "name": "azumarill",
+    "slug": "azumarill",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/184.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 100,
+      "atk": 50,
+      "def": 80,
+      "spa": 60,
+      "spd": 80,
+      "spe": 50
+    }
+  },
+  {
+    "id": 185,
+    "name": "sudowoodo",
+    "slug": "sudowoodo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/185.png",
+    "capture_rate": 65,
+    "base_stats": {
+      "hp": 70,
+      "atk": 100,
+      "def": 115,
+      "spa": 30,
+      "spd": 65,
+      "spe": 30
+    }
+  },
+  {
+    "id": 187,
+    "name": "hoppip",
+    "slug": "hoppip",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/187.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 35,
+      "atk": 35,
+      "def": 40,
+      "spa": 35,
+      "spd": 55,
+      "spe": 50
+    }
+  },
+  {
+    "id": 188,
+    "name": "skiploom",
+    "slug": "skiploom",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/188.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 55,
+      "atk": 45,
+      "def": 50,
+      "spa": 45,
+      "spd": 65,
+      "spe": 80
+    }
+  },
+  {
+    "id": 189,
+    "name": "jumpluff",
+    "slug": "jumpluff",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/189.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 75,
+      "atk": 55,
+      "def": 70,
+      "spa": 55,
+      "spd": 95,
+      "spe": 110
+    }
+  },
+  {
+    "id": 191,
+    "name": "sunkern",
+    "slug": "sunkern",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/191.png",
+    "capture_rate": 235,
+    "base_stats": {
+      "hp": 30,
+      "atk": 30,
+      "def": 30,
+      "spa": 30,
+      "spd": 30,
+      "spe": 30
+    }
+  },
+  {
+    "id": 192,
+    "name": "sunflora",
+    "slug": "sunflora",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/192.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 75,
+      "atk": 75,
+      "def": 55,
+      "spa": 105,
+      "spd": 85,
+      "spe": 30
+    }
+  },
+  {
+    "id": 194,
+    "name": "wooper",
+    "slug": "wooper",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/194.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 55,
+      "atk": 45,
+      "def": 45,
+      "spa": 25,
+      "spd": 25,
+      "spe": 15
+    }
+  },
+  {
+    "id": 196,
+    "name": "espeon",
+    "slug": "espeon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/196.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 65,
+      "def": 60,
+      "spa": 130,
+      "spd": 95,
+      "spe": 110
+    }
+  },
+  {
+    "id": 197,
+    "name": "umbreon",
+    "slug": "umbreon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 95,
+      "atk": 65,
+      "def": 110,
+      "spa": 60,
+      "spd": 130,
+      "spe": 65
+    }
+  },
+  {
+    "id": 198,
+    "name": "murkrow",
+    "slug": "murkrow",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/198.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 60,
+      "atk": 85,
+      "def": 42,
+      "spa": 85,
+      "spd": 42,
+      "spe": 91
+    }
+  },
+  {
+    "id": 199,
+    "name": "slowking",
+    "slug": "slowking",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/199.png",
+    "capture_rate": 70,
+    "base_stats": {
+      "hp": 95,
+      "atk": 75,
+      "def": 80,
+      "spa": 100,
+      "spd": 110,
+      "spe": 30
+    }
+  },
+  {
+    "id": 200,
+    "name": "misdreavus",
+    "slug": "misdreavus",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/200.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 60,
+      "spa": 85,
+      "spd": 85,
+      "spe": 85
+    }
+  },
+  {
+    "id": 203,
+    "name": "girafarig",
+    "slug": "girafarig",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/203.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 70,
+      "atk": 80,
+      "def": 65,
+      "spa": 90,
+      "spd": 65,
+      "spe": 85
+    }
+  },
+  {
+    "id": 204,
+    "name": "pineco",
+    "slug": "pineco",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/204.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 50,
+      "atk": 65,
+      "def": 90,
+      "spa": 35,
+      "spd": 35,
+      "spe": 15
+    }
+  },
+  {
+    "id": 205,
+    "name": "forretress",
+    "slug": "forretress",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/205.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 75,
+      "atk": 90,
+      "def": 140,
+      "spa": 60,
+      "spd": 60,
+      "spe": 40
+    }
+  },
+  {
+    "id": 206,
+    "name": "dunsparce",
+    "slug": "dunsparce",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/206.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 100,
+      "atk": 70,
+      "def": 70,
+      "spa": 65,
+      "spd": 65,
+      "spe": 45
+    }
+  },
+  {
+    "id": 211,
+    "name": "qwilfish",
+    "slug": "qwilfish",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/211.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 95,
+      "def": 85,
+      "spa": 55,
+      "spd": 55,
+      "spe": 85
+    }
+  },
+  {
+    "id": 212,
+    "name": "scizor",
+    "slug": "scizor",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/212.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 70,
+      "atk": 130,
+      "def": 100,
+      "spa": 55,
+      "spd": 80,
+      "spe": 65
+    }
+  },
+  {
+    "id": 214,
+    "name": "heracross",
+    "slug": "heracross",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/214.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 80,
+      "atk": 125,
+      "def": 75,
+      "spa": 40,
+      "spd": 95,
+      "spe": 85
+    }
+  },
+  {
+    "id": 215,
+    "name": "sneasel",
+    "slug": "sneasel",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/215.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 55,
+      "atk": 95,
+      "def": 55,
+      "spa": 35,
+      "spd": 75,
+      "spe": 115
+    }
+  },
+  {
+    "id": 216,
+    "name": "teddiursa",
+    "slug": "teddiursa",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/216.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 60,
+      "atk": 80,
+      "def": 50,
+      "spa": 50,
+      "spd": 50,
+      "spe": 40
+    }
+  },
+  {
+    "id": 217,
+    "name": "ursaring",
+    "slug": "ursaring",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/217.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 90,
+      "atk": 130,
+      "def": 75,
+      "spa": 75,
+      "spd": 75,
+      "spe": 55
+    }
+  },
+  {
+    "id": 225,
+    "name": "delibird",
+    "slug": "delibird",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/225.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 45,
+      "atk": 55,
+      "def": 45,
+      "spa": 65,
+      "spd": 45,
+      "spe": 75
+    }
+  },
+  {
+    "id": 228,
+    "name": "houndour",
+    "slug": "houndour",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/228.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 45,
+      "atk": 60,
+      "def": 30,
+      "spa": 80,
+      "spd": 50,
+      "spe": 65
+    }
+  },
+  {
+    "id": 229,
+    "name": "houndoom",
+    "slug": "houndoom",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/229.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 75,
+      "atk": 90,
+      "def": 50,
+      "spa": 110,
+      "spd": 80,
+      "spe": 95
+    }
+  },
+  {
+    "id": 231,
+    "name": "phanpy",
+    "slug": "phanpy",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/231.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 90,
+      "atk": 60,
+      "def": 60,
+      "spa": 40,
+      "spd": 40,
+      "spe": 40
+    }
+  },
+  {
+    "id": 232,
+    "name": "donphan",
+    "slug": "donphan",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/232.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 90,
+      "atk": 120,
+      "def": 120,
+      "spa": 60,
+      "spd": 60,
+      "spe": 50
+    }
+  },
+  {
+    "id": 234,
+    "name": "stantler",
+    "slug": "stantler",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/234.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 73,
+      "atk": 95,
+      "def": 62,
+      "spa": 85,
+      "spd": 65,
+      "spe": 85
+    }
+  },
+  {
+    "id": 242,
+    "name": "blissey",
+    "slug": "blissey",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/242.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 255,
+      "atk": 10,
+      "def": 10,
+      "spa": 75,
+      "spd": 135,
+      "spe": 55
+    }
+  },
+  {
+    "id": 246,
+    "name": "larvitar",
+    "slug": "larvitar",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/246.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 50,
+      "atk": 64,
+      "def": 50,
+      "spa": 45,
+      "spd": 50,
+      "spe": 41
+    }
+  },
+  {
+    "id": 247,
+    "name": "pupitar",
+    "slug": "pupitar",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/247.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 70,
+      "atk": 84,
+      "def": 70,
+      "spa": 65,
+      "spd": 70,
+      "spe": 51
+    }
+  },
+  {
+    "id": 248,
+    "name": "tyranitar",
+    "slug": "tyranitar",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/248.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 100,
+      "atk": 134,
+      "def": 110,
+      "spa": 95,
+      "spd": 100,
+      "spe": 61
+    }
+  },
+  {
+    "id": 278,
+    "name": "wingull",
+    "slug": "wingull",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/278.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 30,
+      "spa": 55,
+      "spd": 30,
+      "spe": 85
+    }
+  },
+  {
+    "id": 279,
+    "name": "pelipper",
+    "slug": "pelipper",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/279.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 60,
+      "atk": 50,
+      "def": 100,
+      "spa": 95,
+      "spd": 70,
+      "spe": 65
+    }
+  },
+  {
+    "id": 280,
+    "name": "ralts",
+    "slug": "ralts",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/280.png",
+    "capture_rate": 235,
+    "base_stats": {
+      "hp": 28,
+      "atk": 25,
+      "def": 25,
+      "spa": 45,
+      "spd": 35,
+      "spe": 40
+    }
+  },
+  {
+    "id": 281,
+    "name": "kirlia",
+    "slug": "kirlia",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/281.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 38,
+      "atk": 35,
+      "def": 35,
+      "spa": 65,
+      "spd": 55,
+      "spe": 50
+    }
+  },
+  {
+    "id": 282,
+    "name": "gardevoir",
+    "slug": "gardevoir",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/282.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 68,
+      "atk": 65,
+      "def": 65,
+      "spa": 125,
+      "spd": 115,
+      "spe": 80
+    }
+  },
+  {
+    "id": 283,
+    "name": "surskit",
+    "slug": "surskit",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/283.png",
+    "capture_rate": 200,
+    "base_stats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 32,
+      "spa": 50,
+      "spd": 52,
+      "spe": 65
+    }
+  },
+  {
+    "id": 284,
+    "name": "masquerain",
+    "slug": "masquerain",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/284.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 70,
+      "atk": 60,
+      "def": 62,
+      "spa": 100,
+      "spd": 82,
+      "spe": 80
+    }
+  },
+  {
+    "id": 285,
+    "name": "shroomish",
+    "slug": "shroomish",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/285.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 60,
+      "atk": 40,
+      "def": 60,
+      "spa": 40,
+      "spd": 60,
+      "spe": 35
+    }
+  },
+  {
+    "id": 286,
+    "name": "breloom",
+    "slug": "breloom",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/286.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 60,
+      "atk": 130,
+      "def": 80,
+      "spa": 60,
+      "spd": 60,
+      "spe": 70
+    }
+  },
+  {
+    "id": 287,
+    "name": "slakoth",
+    "slug": "slakoth",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/287.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 60,
+      "spa": 35,
+      "spd": 35,
+      "spe": 30
+    }
+  },
+  {
+    "id": 288,
+    "name": "vigoroth",
+    "slug": "vigoroth",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/288.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 80,
+      "atk": 80,
+      "def": 80,
+      "spa": 55,
+      "spd": 55,
+      "spe": 90
+    }
+  },
+  {
+    "id": 289,
+    "name": "slaking",
+    "slug": "slaking",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/289.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 150,
+      "atk": 160,
+      "def": 100,
+      "spa": 95,
+      "spd": 65,
+      "spe": 100
+    }
+  },
+  {
+    "id": 296,
+    "name": "makuhita",
+    "slug": "makuhita",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/296.png",
+    "capture_rate": 180,
+    "base_stats": {
+      "hp": 72,
+      "atk": 60,
+      "def": 30,
+      "spa": 20,
+      "spd": 30,
+      "spe": 25
+    }
+  },
+  {
+    "id": 297,
+    "name": "hariyama",
+    "slug": "hariyama",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/297.png",
+    "capture_rate": 200,
+    "base_stats": {
+      "hp": 144,
+      "atk": 120,
+      "def": 60,
+      "spa": 40,
+      "spd": 60,
+      "spe": 50
+    }
+  },
+  {
+    "id": 298,
+    "name": "azurill",
+    "slug": "azurill",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/298.png",
+    "capture_rate": 150,
+    "base_stats": {
+      "hp": 50,
+      "atk": 20,
+      "def": 40,
+      "spa": 20,
+      "spd": 40,
+      "spe": 20
+    }
+  },
+  {
+    "id": 302,
+    "name": "sableye",
+    "slug": "sableye",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/302.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 50,
+      "atk": 75,
+      "def": 75,
+      "spa": 65,
+      "spd": 65,
+      "spe": 50
+    }
+  },
+  {
+    "id": 307,
+    "name": "meditite",
+    "slug": "meditite",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/307.png",
+    "capture_rate": 180,
+    "base_stats": {
+      "hp": 30,
+      "atk": 40,
+      "def": 55,
+      "spa": 40,
+      "spd": 55,
+      "spe": 60
+    }
+  },
+  {
+    "id": 308,
+    "name": "medicham",
+    "slug": "medicham",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/308.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 75,
+      "spa": 60,
+      "spd": 75,
+      "spe": 80
+    }
+  },
+  {
+    "id": 316,
+    "name": "gulpin",
+    "slug": "gulpin",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/316.png",
+    "capture_rate": 225,
+    "base_stats": {
+      "hp": 70,
+      "atk": 43,
+      "def": 53,
+      "spa": 43,
+      "spd": 53,
+      "spe": 40
+    }
+  },
+  {
+    "id": 317,
+    "name": "swalot",
+    "slug": "swalot",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/317.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 100,
+      "atk": 73,
+      "def": 83,
+      "spa": 73,
+      "spd": 83,
+      "spe": 55
+    }
+  },
+  {
+    "id": 322,
+    "name": "numel",
+    "slug": "numel",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/322.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 40,
+      "spa": 65,
+      "spd": 45,
+      "spe": 35
+    }
+  },
+  {
+    "id": 323,
+    "name": "camerupt",
+    "slug": "camerupt",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/323.png",
+    "capture_rate": 150,
+    "base_stats": {
+      "hp": 70,
+      "atk": 100,
+      "def": 70,
+      "spa": 105,
+      "spd": 75,
+      "spe": 40
+    }
+  },
+  {
+    "id": 324,
+    "name": "torkoal",
+    "slug": "torkoal",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/324.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 70,
+      "atk": 85,
+      "def": 140,
+      "spa": 85,
+      "spd": 70,
+      "spe": 20
+    }
+  },
+  {
+    "id": 325,
+    "name": "spoink",
+    "slug": "spoink",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/325.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 60,
+      "atk": 25,
+      "def": 35,
+      "spa": 70,
+      "spd": 80,
+      "spe": 60
+    }
+  },
+  {
+    "id": 326,
+    "name": "grumpig",
+    "slug": "grumpig",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/326.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 80,
+      "atk": 45,
+      "def": 65,
+      "spa": 90,
+      "spd": 110,
+      "spe": 80
+    }
+  },
+  {
+    "id": 331,
+    "name": "cacnea",
+    "slug": "cacnea",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/331.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 50,
+      "atk": 85,
+      "def": 40,
+      "spa": 85,
+      "spd": 40,
+      "spe": 35
+    }
+  },
+  {
+    "id": 332,
+    "name": "cacturne",
+    "slug": "cacturne",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/332.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 70,
+      "atk": 115,
+      "def": 60,
+      "spa": 115,
+      "spd": 60,
+      "spe": 55
+    }
+  },
+  {
+    "id": 333,
+    "name": "swablu",
+    "slug": "swablu",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/333.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 45,
+      "atk": 40,
+      "def": 60,
+      "spa": 40,
+      "spd": 75,
+      "spe": 50
+    }
+  },
+  {
+    "id": 334,
+    "name": "altaria",
+    "slug": "altaria",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/334.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 75,
+      "atk": 70,
+      "def": 90,
+      "spa": 70,
+      "spd": 105,
+      "spe": 80
+    }
+  },
+  {
+    "id": 335,
+    "name": "zangoose",
+    "slug": "zangoose",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/335.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 73,
+      "atk": 115,
+      "def": 60,
+      "spa": 60,
+      "spd": 60,
+      "spe": 90
+    }
+  },
+  {
+    "id": 336,
+    "name": "seviper",
+    "slug": "seviper",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/336.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 73,
+      "atk": 100,
+      "def": 60,
+      "spa": 100,
+      "spd": 60,
+      "spe": 65
+    }
+  },
+  {
+    "id": 339,
+    "name": "barboach",
+    "slug": "barboach",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/339.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 50,
+      "atk": 48,
+      "def": 43,
+      "spa": 46,
+      "spd": 41,
+      "spe": 60
+    }
+  },
+  {
+    "id": 340,
+    "name": "whiscash",
+    "slug": "whiscash",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/340.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 110,
+      "atk": 78,
+      "def": 73,
+      "spa": 76,
+      "spd": 71,
+      "spe": 60
+    }
+  },
+  {
+    "id": 353,
+    "name": "shuppet",
+    "slug": "shuppet",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/353.png",
+    "capture_rate": 225,
+    "base_stats": {
+      "hp": 44,
+      "atk": 75,
+      "def": 35,
+      "spa": 63,
+      "spd": 33,
+      "spe": 45
+    }
+  },
+  {
+    "id": 354,
+    "name": "banette",
+    "slug": "banette",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/354.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 64,
+      "atk": 115,
+      "def": 65,
+      "spa": 83,
+      "spd": 63,
+      "spe": 65
+    }
+  },
+  {
+    "id": 357,
+    "name": "tropius",
+    "slug": "tropius",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/357.png",
+    "capture_rate": 200,
+    "base_stats": {
+      "hp": 99,
+      "atk": 68,
+      "def": 83,
+      "spa": 72,
+      "spd": 87,
+      "spe": 51
+    }
+  },
+  {
+    "id": 361,
+    "name": "snorunt",
+    "slug": "snorunt",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/361.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 50,
+      "atk": 50,
+      "def": 50,
+      "spa": 50,
+      "spd": 50,
+      "spe": 50
+    }
+  },
+  {
+    "id": 362,
+    "name": "glalie",
+    "slug": "glalie",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/362.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 80,
+      "atk": 80,
+      "def": 80,
+      "spa": 80,
+      "spd": 80,
+      "spe": 80
+    }
+  },
+  {
+    "id": 370,
+    "name": "luvdisc",
+    "slug": "luvdisc",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/370.png",
+    "capture_rate": 225,
+    "base_stats": {
+      "hp": 43,
+      "atk": 30,
+      "def": 55,
+      "spa": 40,
+      "spd": 65,
+      "spe": 97
+    }
+  },
+  {
+    "id": 371,
+    "name": "bagon",
+    "slug": "bagon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/371.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 45,
+      "atk": 75,
+      "def": 60,
+      "spa": 40,
+      "spd": 30,
+      "spe": 50
+    }
+  },
+  {
+    "id": 372,
+    "name": "shelgon",
+    "slug": "shelgon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/372.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 95,
+      "def": 100,
+      "spa": 60,
+      "spd": 50,
+      "spe": 50
+    }
+  },
+  {
+    "id": 373,
+    "name": "salamence",
+    "slug": "salamence",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/373.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 95,
+      "atk": 135,
+      "def": 80,
+      "spa": 110,
+      "spd": 80,
+      "spe": 100
+    }
+  },
+  {
+    "id": 396,
+    "name": "starly",
+    "slug": "starly",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/396.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 40,
+      "atk": 55,
+      "def": 30,
+      "spa": 30,
+      "spd": 30,
+      "spe": 60
+    }
+  },
+  {
+    "id": 397,
+    "name": "staravia",
+    "slug": "staravia",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/397.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 55,
+      "atk": 75,
+      "def": 50,
+      "spa": 40,
+      "spd": 40,
+      "spe": 80
+    }
+  },
+  {
+    "id": 398,
+    "name": "staraptor",
+    "slug": "staraptor",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/398.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 85,
+      "atk": 120,
+      "def": 70,
+      "spa": 50,
+      "spd": 60,
+      "spe": 100
+    }
+  },
+  {
+    "id": 401,
+    "name": "kricketot",
+    "slug": "kricketot",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/401.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 37,
+      "atk": 25,
+      "def": 41,
+      "spa": 25,
+      "spd": 41,
+      "spe": 25
+    }
+  },
+  {
+    "id": 402,
+    "name": "kricketune",
+    "slug": "kricketune",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/402.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 77,
+      "atk": 85,
+      "def": 51,
+      "spa": 55,
+      "spd": 51,
+      "spe": 65
+    }
+  },
+  {
+    "id": 403,
+    "name": "shinx",
+    "slug": "shinx",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/403.png",
+    "capture_rate": 235,
+    "base_stats": {
+      "hp": 45,
+      "atk": 65,
+      "def": 34,
+      "spa": 40,
+      "spd": 34,
+      "spe": 45
+    }
+  },
+  {
+    "id": 404,
+    "name": "luxio",
+    "slug": "luxio",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/404.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 60,
+      "atk": 85,
+      "def": 49,
+      "spa": 60,
+      "spd": 49,
+      "spe": 60
+    }
+  },
+  {
+    "id": 405,
+    "name": "luxray",
+    "slug": "luxray",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/405.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 79,
+      "spa": 95,
+      "spd": 79,
+      "spe": 70
+    }
+  },
+  {
+    "id": 415,
+    "name": "combee",
+    "slug": "combee",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/415.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 30,
+      "atk": 30,
+      "def": 42,
+      "spa": 30,
+      "spd": 42,
+      "spe": 70
+    }
+  },
+  {
+    "id": 416,
+    "name": "vespiquen",
+    "slug": "vespiquen",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/416.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 70,
+      "atk": 80,
+      "def": 102,
+      "spa": 80,
+      "spd": 102,
+      "spe": 40
+    }
+  },
+  {
+    "id": 417,
+    "name": "pachirisu",
+    "slug": "pachirisu",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/417.png",
+    "capture_rate": 200,
+    "base_stats": {
+      "hp": 60,
+      "atk": 45,
+      "def": 70,
+      "spa": 45,
+      "spd": 90,
+      "spe": 95
+    }
+  },
+  {
+    "id": 418,
+    "name": "buizel",
+    "slug": "buizel",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/418.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 55,
+      "atk": 65,
+      "def": 35,
+      "spa": 60,
+      "spd": 30,
+      "spe": 85
+    }
+  },
+  {
+    "id": 419,
+    "name": "floatzel",
+    "slug": "floatzel",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/419.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 85,
+      "atk": 105,
+      "def": 55,
+      "spa": 85,
+      "spd": 50,
+      "spe": 115
+    }
+  },
+  {
+    "id": 422,
+    "name": "shellos",
+    "slug": "shellos",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/422.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 76,
+      "atk": 48,
+      "def": 48,
+      "spa": 57,
+      "spd": 62,
+      "spe": 34
+    }
+  },
+  {
+    "id": 423,
+    "name": "gastrodon",
+    "slug": "gastrodon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/423.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 111,
+      "atk": 83,
+      "def": 68,
+      "spa": 92,
+      "spd": 82,
+      "spe": 39
+    }
+  },
+  {
+    "id": 425,
+    "name": "drifloon",
+    "slug": "drifloon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/425.png",
+    "capture_rate": 125,
+    "base_stats": {
+      "hp": 90,
+      "atk": 50,
+      "def": 34,
+      "spa": 60,
+      "spd": 44,
+      "spe": 70
+    }
+  },
+  {
+    "id": 426,
+    "name": "drifblim",
+    "slug": "drifblim",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/426.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 150,
+      "atk": 80,
+      "def": 44,
+      "spa": 90,
+      "spd": 54,
+      "spe": 80
+    }
+  },
+  {
+    "id": 429,
+    "name": "mismagius",
+    "slug": "mismagius",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/429.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 60,
+      "spa": 105,
+      "spd": 105,
+      "spe": 105
+    }
+  },
+  {
+    "id": 430,
+    "name": "honchkrow",
+    "slug": "honchkrow",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/430.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 100,
+      "atk": 125,
+      "def": 52,
+      "spa": 105,
+      "spd": 52,
+      "spe": 71
+    }
+  },
+  {
+    "id": 434,
+    "name": "stunky",
+    "slug": "stunky",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/434.png",
+    "capture_rate": 225,
+    "base_stats": {
+      "hp": 63,
+      "atk": 63,
+      "def": 47,
+      "spa": 41,
+      "spd": 41,
+      "spe": 74
+    }
+  },
+  {
+    "id": 435,
+    "name": "skuntank",
+    "slug": "skuntank",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/435.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 103,
+      "atk": 93,
+      "def": 67,
+      "spa": 71,
+      "spd": 61,
+      "spe": 84
+    }
+  },
+  {
+    "id": 436,
+    "name": "bronzor",
+    "slug": "bronzor",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/436.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 57,
+      "atk": 24,
+      "def": 86,
+      "spa": 24,
+      "spd": 86,
+      "spe": 23
+    }
+  },
+  {
+    "id": 437,
+    "name": "bronzong",
+    "slug": "bronzong",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/437.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 67,
+      "atk": 89,
+      "def": 116,
+      "spa": 79,
+      "spd": 116,
+      "spe": 33
+    }
+  },
+  {
+    "id": 438,
+    "name": "bonsly",
+    "slug": "bonsly",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/438.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 50,
+      "atk": 80,
+      "def": 95,
+      "spa": 10,
+      "spd": 45,
+      "spe": 10
+    }
+  },
+  {
+    "id": 440,
+    "name": "happiny",
+    "slug": "happiny",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/440.png",
+    "capture_rate": 130,
+    "base_stats": {
+      "hp": 100,
+      "atk": 5,
+      "def": 5,
+      "spa": 15,
+      "spd": 65,
+      "spe": 30
+    }
+  },
+  {
+    "id": 442,
+    "name": "spiritomb",
+    "slug": "spiritomb",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/442.png",
+    "capture_rate": 100,
+    "base_stats": {
+      "hp": 50,
+      "atk": 92,
+      "def": 108,
+      "spa": 92,
+      "spd": 108,
+      "spe": 35
+    }
+  },
+  {
+    "id": 443,
+    "name": "gible",
+    "slug": "gible",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/443.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 58,
+      "atk": 70,
+      "def": 45,
+      "spa": 40,
+      "spd": 45,
+      "spe": 42
+    }
+  },
+  {
+    "id": 444,
+    "name": "gabite",
+    "slug": "gabite",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/444.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 68,
+      "atk": 90,
+      "def": 65,
+      "spa": 50,
+      "spd": 55,
+      "spe": 82
+    }
+  },
+  {
+    "id": 445,
+    "name": "garchomp",
+    "slug": "garchomp",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/445.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 108,
+      "atk": 130,
+      "def": 95,
+      "spa": 80,
+      "spd": 85,
+      "spe": 102
+    }
+  },
+  {
+    "id": 447,
+    "name": "riolu",
+    "slug": "riolu",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/447.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 40,
+      "atk": 70,
+      "def": 40,
+      "spa": 35,
+      "spd": 40,
+      "spe": 60
+    }
+  },
+  {
+    "id": 448,
+    "name": "lucario",
+    "slug": "lucario",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 70,
+      "atk": 110,
+      "def": 70,
+      "spa": 115,
+      "spd": 70,
+      "spe": 90
+    }
+  },
+  {
+    "id": 449,
+    "name": "hippopotas",
+    "slug": "hippopotas",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/449.png",
+    "capture_rate": 140,
+    "base_stats": {
+      "hp": 68,
+      "atk": 72,
+      "def": 78,
+      "spa": 38,
+      "spd": 42,
+      "spe": 32
+    }
+  },
+  {
+    "id": 450,
+    "name": "hippowdon",
+    "slug": "hippowdon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/450.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 108,
+      "atk": 112,
+      "def": 118,
+      "spa": 68,
+      "spd": 72,
+      "spe": 47
+    }
+  },
+  {
+    "id": 453,
+    "name": "croagunk",
+    "slug": "croagunk",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/453.png",
+    "capture_rate": 140,
+    "base_stats": {
+      "hp": 48,
+      "atk": 61,
+      "def": 40,
+      "spa": 61,
+      "spd": 40,
+      "spe": 50
+    }
+  },
+  {
+    "id": 454,
+    "name": "toxicroak",
+    "slug": "toxicroak",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/454.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 83,
+      "atk": 106,
+      "def": 65,
+      "spa": 86,
+      "spd": 65,
+      "spe": 85
+    }
+  },
+  {
+    "id": 456,
+    "name": "finneon",
+    "slug": "finneon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/456.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 49,
+      "atk": 49,
+      "def": 56,
+      "spa": 49,
+      "spd": 61,
+      "spe": 66
+    }
+  },
+  {
+    "id": 457,
+    "name": "lumineon",
+    "slug": "lumineon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/457.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 69,
+      "atk": 69,
+      "def": 76,
+      "spa": 69,
+      "spd": 86,
+      "spe": 91
+    }
+  },
+  {
+    "id": 459,
+    "name": "snover",
+    "slug": "snover",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/459.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 60,
+      "atk": 62,
+      "def": 50,
+      "spa": 62,
+      "spd": 60,
+      "spe": 40
+    }
+  },
+  {
+    "id": 460,
+    "name": "abomasnow",
+    "slug": "abomasnow",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/460.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 90,
+      "atk": 92,
+      "def": 75,
+      "spa": 92,
+      "spd": 85,
+      "spe": 60
+    }
+  },
+  {
+    "id": 461,
+    "name": "weavile",
+    "slug": "weavile",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/461.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 70,
+      "atk": 120,
+      "def": 65,
+      "spa": 45,
+      "spd": 85,
+      "spe": 125
+    }
+  },
+  {
+    "id": 462,
+    "name": "magnezone",
+    "slug": "magnezone",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/462.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 70,
+      "atk": 70,
+      "def": 115,
+      "spa": 130,
+      "spd": 90,
+      "spe": 60
+    }
+  },
+  {
+    "id": 470,
+    "name": "leafeon",
+    "slug": "leafeon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/470.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 110,
+      "def": 130,
+      "spa": 60,
+      "spd": 65,
+      "spe": 95
+    }
+  },
+  {
+    "id": 471,
+    "name": "glaceon",
+    "slug": "glaceon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/471.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 60,
+      "def": 110,
+      "spa": 130,
+      "spd": 95,
+      "spe": 65
+    }
+  },
+  {
+    "id": 475,
+    "name": "gallade",
+    "slug": "gallade",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/475.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 68,
+      "atk": 125,
+      "def": 65,
+      "spa": 65,
+      "spd": 115,
+      "spe": 80
+    }
+  },
+  {
+    "id": 478,
+    "name": "froslass",
+    "slug": "froslass",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/478.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 70,
+      "atk": 80,
+      "def": 70,
+      "spa": 80,
+      "spd": 70,
+      "spe": 110
+    }
+  },
+  {
+    "id": 479,
+    "name": "rotom",
+    "slug": "rotom",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/479.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 50,
+      "atk": 50,
+      "def": 77,
+      "spa": 95,
+      "spd": 77,
+      "spe": 91
+    }
+  },
+  {
+    "id": 548,
+    "name": "petilil",
+    "slug": "petilil",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/548.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 45,
+      "atk": 35,
+      "def": 50,
+      "spa": 70,
+      "spd": 50,
+      "spe": 30
+    }
+  },
+  {
+    "id": 549,
+    "name": "lilligant",
+    "slug": "lilligant",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/549.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 70,
+      "atk": 60,
+      "def": 75,
+      "spa": 110,
+      "spd": 75,
+      "spe": 90
+    }
+  },
+  {
+    "id": 550,
+    "name": "basculin",
+    "slug": "basculin",
+    "sprite": null,
+    "capture_rate": 25,
+    "base_stats": null
+  },
+  {
+    "id": 551,
+    "name": "sandile",
+    "slug": "sandile",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/551.png",
+    "capture_rate": 180,
+    "base_stats": {
+      "hp": 50,
+      "atk": 72,
+      "def": 35,
+      "spa": 35,
+      "spd": 35,
+      "spe": 65
+    }
+  },
+  {
+    "id": 552,
+    "name": "krokorok",
+    "slug": "krokorok",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/552.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 60,
+      "atk": 82,
+      "def": 45,
+      "spa": 45,
+      "spd": 45,
+      "spe": 74
+    }
+  },
+  {
+    "id": 553,
+    "name": "krookodile",
+    "slug": "krookodile",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/553.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 95,
+      "atk": 117,
+      "def": 80,
+      "spa": 65,
+      "spd": 70,
+      "spe": 92
+    }
+  },
+  {
+    "id": 570,
+    "name": "zorua",
+    "slug": "zorua",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/570.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 40,
+      "atk": 65,
+      "def": 40,
+      "spa": 80,
+      "spd": 40,
+      "spe": 65
+    }
+  },
+  {
+    "id": 571,
+    "name": "zoroark",
+    "slug": "zoroark",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/571.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 60,
+      "atk": 105,
+      "def": 60,
+      "spa": 120,
+      "spd": 60,
+      "spe": 105
+    }
+  },
+  {
+    "id": 574,
+    "name": "gothita",
+    "slug": "gothita",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/574.png",
+    "capture_rate": 200,
+    "base_stats": {
+      "hp": 45,
+      "atk": 30,
+      "def": 50,
+      "spa": 55,
+      "spd": 65,
+      "spe": 45
+    }
+  },
+  {
+    "id": 575,
+    "name": "gothorita",
+    "slug": "gothorita",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/575.png",
+    "capture_rate": 100,
+    "base_stats": {
+      "hp": 60,
+      "atk": 45,
+      "def": 70,
+      "spa": 75,
+      "spd": 85,
+      "spe": 55
+    }
+  },
+  {
+    "id": 576,
+    "name": "gothitelle",
+    "slug": "gothitelle",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/576.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 70,
+      "atk": 55,
+      "def": 95,
+      "spa": 95,
+      "spd": 110,
+      "spe": 65
+    }
+  },
+  {
+    "id": 585,
+    "name": "deerling",
+    "slug": "deerling",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/585.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 50,
+      "spa": 40,
+      "spd": 50,
+      "spe": 75
+    }
+  },
+  {
+    "id": 586,
+    "name": "sawsbuck",
+    "slug": "sawsbuck",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/586.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 80,
+      "atk": 100,
+      "def": 70,
+      "spa": 60,
+      "spd": 70,
+      "spe": 95
+    }
+  },
+  {
+    "id": 590,
+    "name": "foongus",
+    "slug": "foongus",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/590.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 69,
+      "atk": 55,
+      "def": 45,
+      "spa": 55,
+      "spd": 55,
+      "spe": 15
+    }
+  },
+  {
+    "id": 591,
+    "name": "amoonguss",
+    "slug": "amoonguss",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/591.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 114,
+      "atk": 85,
+      "def": 70,
+      "spa": 85,
+      "spd": 80,
+      "spe": 30
+    }
+  },
+  {
+    "id": 594,
+    "name": "alomomola",
+    "slug": "alomomola",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/594.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 165,
+      "atk": 75,
+      "def": 80,
+      "spa": 40,
+      "spd": 45,
+      "spe": 65
+    }
+  },
+  {
+    "id": 602,
+    "name": "tynamo",
+    "slug": "tynamo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/602.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 35,
+      "atk": 55,
+      "def": 40,
+      "spa": 45,
+      "spd": 40,
+      "spe": 60
+    }
+  },
+  {
+    "id": 603,
+    "name": "eelektrik",
+    "slug": "eelektrik",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/603.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 65,
+      "atk": 85,
+      "def": 70,
+      "spa": 75,
+      "spd": 70,
+      "spe": 40
+    }
+  },
+  {
+    "id": 604,
+    "name": "eelektross",
+    "slug": "eelektross",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/604.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 85,
+      "atk": 115,
+      "def": 80,
+      "spa": 105,
+      "spd": 80,
+      "spe": 50
+    }
+  },
+  {
+    "id": 610,
+    "name": "axew",
+    "slug": "axew",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/610.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 46,
+      "atk": 87,
+      "def": 60,
+      "spa": 30,
+      "spd": 40,
+      "spe": 57
+    }
+  },
+  {
+    "id": 611,
+    "name": "fraxure",
+    "slug": "fraxure",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/611.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 66,
+      "atk": 117,
+      "def": 70,
+      "spa": 40,
+      "spd": 50,
+      "spe": 67
+    }
+  },
+  {
+    "id": 612,
+    "name": "haxorus",
+    "slug": "haxorus",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/612.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 76,
+      "atk": 147,
+      "def": 90,
+      "spa": 60,
+      "spd": 70,
+      "spe": 97
+    }
+  },
+  {
+    "id": 613,
+    "name": "cubchoo",
+    "slug": "cubchoo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/613.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 55,
+      "atk": 70,
+      "def": 40,
+      "spa": 60,
+      "spd": 40,
+      "spe": 40
+    }
+  },
+  {
+    "id": 614,
+    "name": "beartic",
+    "slug": "beartic",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/614.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 95,
+      "atk": 130,
+      "def": 80,
+      "spa": 70,
+      "spd": 80,
+      "spe": 50
+    }
+  },
+  {
+    "id": 615,
+    "name": "cryogonal",
+    "slug": "cryogonal",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/615.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 80,
+      "atk": 50,
+      "def": 50,
+      "spa": 95,
+      "spd": 135,
+      "spe": 105
+    }
+  },
+  {
+    "id": 624,
+    "name": "pawniard",
+    "slug": "pawniard",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/624.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 45,
+      "atk": 85,
+      "def": 70,
+      "spa": 40,
+      "spd": 40,
+      "spe": 60
+    }
+  },
+  {
+    "id": 625,
+    "name": "bisharp",
+    "slug": "bisharp",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/625.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 125,
+      "def": 100,
+      "spa": 60,
+      "spd": 70,
+      "spe": 70
+    }
+  },
+  {
+    "id": 627,
+    "name": "rufflet",
+    "slug": "rufflet",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/627.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 70,
+      "atk": 83,
+      "def": 50,
+      "spa": 37,
+      "spd": 50,
+      "spe": 60
+    }
+  },
+  {
+    "id": 628,
+    "name": "braviary",
+    "slug": "braviary",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/628.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 100,
+      "atk": 123,
+      "def": 75,
+      "spa": 57,
+      "spd": 75,
+      "spe": 80
+    }
+  },
+  {
+    "id": 633,
+    "name": "deino",
+    "slug": "deino",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/633.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 52,
+      "atk": 65,
+      "def": 50,
+      "spa": 45,
+      "spd": 50,
+      "spe": 38
+    }
+  },
+  {
+    "id": 634,
+    "name": "zweilous",
+    "slug": "zweilous",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/634.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 72,
+      "atk": 85,
+      "def": 70,
+      "spa": 65,
+      "spd": 70,
+      "spe": 58
+    }
+  },
+  {
+    "id": 635,
+    "name": "hydreigon",
+    "slug": "hydreigon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/635.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 92,
+      "atk": 105,
+      "def": 90,
+      "spa": 125,
+      "spd": 90,
+      "spe": 98
+    }
+  },
+  {
+    "id": 636,
+    "name": "larvesta",
+    "slug": "larvesta",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/636.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 55,
+      "atk": 85,
+      "def": 55,
+      "spa": 50,
+      "spd": 55,
+      "spe": 60
+    }
+  },
+  {
+    "id": 637,
+    "name": "volcarona",
+    "slug": "volcarona",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/637.png",
+    "capture_rate": 15,
+    "base_stats": {
+      "hp": 85,
+      "atk": 60,
+      "def": 65,
+      "spa": 135,
+      "spd": 105,
+      "spe": 100
+    }
+  },
+  {
+    "id": 661,
+    "name": "fletchling",
+    "slug": "fletchling",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/661.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 45,
+      "atk": 50,
+      "def": 43,
+      "spa": 40,
+      "spd": 38,
+      "spe": 62
+    }
+  },
+  {
+    "id": 662,
+    "name": "fletchinder",
+    "slug": "fletchinder",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/662.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 62,
+      "atk": 73,
+      "def": 55,
+      "spa": 56,
+      "spd": 52,
+      "spe": 84
+    }
+  },
+  {
+    "id": 663,
+    "name": "talonflame",
+    "slug": "talonflame",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/663.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 78,
+      "atk": 81,
+      "def": 71,
+      "spa": 74,
+      "spd": 69,
+      "spe": 126
+    }
+  },
+  {
+    "id": 664,
+    "name": "scatterbug",
+    "slug": "scatterbug",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/664.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 38,
+      "atk": 35,
+      "def": 40,
+      "spa": 27,
+      "spd": 25,
+      "spe": 35
+    }
+  },
+  {
+    "id": 665,
+    "name": "spewpa",
+    "slug": "spewpa",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/665.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 45,
+      "atk": 22,
+      "def": 60,
+      "spa": 27,
+      "spd": 30,
+      "spe": 29
+    }
+  },
+  {
+    "id": 666,
+    "name": "vivillon",
+    "slug": "vivillon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/666.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 80,
+      "atk": 52,
+      "def": 50,
+      "spa": 90,
+      "spd": 50,
+      "spe": 89
+    }
+  },
+  {
+    "id": 667,
+    "name": "litleo",
+    "slug": "litleo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/667.png",
+    "capture_rate": 220,
+    "base_stats": {
+      "hp": 62,
+      "atk": 50,
+      "def": 58,
+      "spa": 73,
+      "spd": 54,
+      "spe": 72
+    }
+  },
+  {
+    "id": 668,
+    "name": "pyroar",
+    "slug": "pyroar",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/668.png",
+    "capture_rate": 65,
+    "base_stats": {
+      "hp": 86,
+      "atk": 68,
+      "def": 72,
+      "spa": 109,
+      "spd": 66,
+      "spe": 106
+    }
+  },
+  {
+    "id": 669,
+    "name": "flabebe",
+    "slug": "flabebe",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/669.png",
+    "capture_rate": 225,
+    "base_stats": {
+      "hp": 44,
+      "atk": 38,
+      "def": 39,
+      "spa": 61,
+      "spd": 79,
+      "spe": 42
+    }
+  },
+  {
+    "id": 670,
+    "name": "floette",
+    "slug": "floette",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/670.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 54,
+      "atk": 45,
+      "def": 47,
+      "spa": 75,
+      "spd": 98,
+      "spe": 52
+    }
+  },
+  {
+    "id": 671,
+    "name": "florges",
+    "slug": "florges",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/671.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 78,
+      "atk": 65,
+      "def": 68,
+      "spa": 112,
+      "spd": 154,
+      "spe": 75
+    }
+  },
+  {
+    "id": 672,
+    "name": "skiddo",
+    "slug": "skiddo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/672.png",
+    "capture_rate": 200,
+    "base_stats": {
+      "hp": 66,
+      "atk": 65,
+      "def": 48,
+      "spa": 62,
+      "spd": 57,
+      "spe": 52
+    }
+  },
+  {
+    "id": 673,
+    "name": "gogoat",
+    "slug": "gogoat",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/673.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 123,
+      "atk": 100,
+      "def": 62,
+      "spa": 97,
+      "spd": 81,
+      "spe": 68
+    }
+  },
+  {
+    "id": 690,
+    "name": "skrelp",
+    "slug": "skrelp",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/690.png",
+    "capture_rate": 225,
+    "base_stats": {
+      "hp": 50,
+      "atk": 60,
+      "def": 60,
+      "spa": 60,
+      "spd": 60,
+      "spe": 30
+    }
+  },
+  {
+    "id": 691,
+    "name": "dragalge",
+    "slug": "dragalge",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/691.png",
+    "capture_rate": 55,
+    "base_stats": {
+      "hp": 65,
+      "atk": 75,
+      "def": 90,
+      "spa": 97,
+      "spd": 123,
+      "spe": 44
+    }
+  },
+  {
+    "id": 692,
+    "name": "clauncher",
+    "slug": "clauncher",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/692.png",
+    "capture_rate": 225,
+    "base_stats": {
+      "hp": 50,
+      "atk": 53,
+      "def": 62,
+      "spa": 58,
+      "spd": 63,
+      "spe": 44
+    }
+  },
+  {
+    "id": 693,
+    "name": "clawitzer",
+    "slug": "clawitzer",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/693.png",
+    "capture_rate": 55,
+    "base_stats": {
+      "hp": 71,
+      "atk": 73,
+      "def": 88,
+      "spa": 120,
+      "spd": 89,
+      "spe": 59
+    }
+  },
+  {
+    "id": 700,
+    "name": "sylveon",
+    "slug": "sylveon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/700.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 95,
+      "atk": 65,
+      "def": 65,
+      "spa": 110,
+      "spd": 130,
+      "spe": 60
+    }
+  },
+  {
+    "id": 701,
+    "name": "hawlucha",
+    "slug": "hawlucha",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/701.png",
+    "capture_rate": 100,
+    "base_stats": {
+      "hp": 78,
+      "atk": 92,
+      "def": 75,
+      "spa": 74,
+      "spd": 63,
+      "spe": 118
+    }
+  },
+  {
+    "id": 702,
+    "name": "dedenne",
+    "slug": "dedenne",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/702.png",
+    "capture_rate": 180,
+    "base_stats": {
+      "hp": 67,
+      "atk": 58,
+      "def": 57,
+      "spa": 81,
+      "spd": 67,
+      "spe": 101
+    }
+  },
+  {
+    "id": 704,
+    "name": "goomy",
+    "slug": "goomy",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/704.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 45,
+      "atk": 50,
+      "def": 35,
+      "spa": 55,
+      "spd": 75,
+      "spe": 40
+    }
+  },
+  {
+    "id": 705,
+    "name": "sliggoo",
+    "slug": "sliggoo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/705.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 68,
+      "atk": 75,
+      "def": 53,
+      "spa": 83,
+      "spd": 113,
+      "spe": 60
+    }
+  },
+  {
+    "id": 706,
+    "name": "goodra",
+    "slug": "goodra",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/706.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 90,
+      "atk": 100,
+      "def": 70,
+      "spa": 110,
+      "spd": 150,
+      "spe": 80
+    }
+  },
+  {
+    "id": 707,
+    "name": "klefki",
+    "slug": "klefki",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/707.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 57,
+      "atk": 80,
+      "def": 91,
+      "spa": 80,
+      "spd": 87,
+      "spe": 75
+    }
+  },
+  {
+    "id": 712,
+    "name": "bergmite",
+    "slug": "bergmite",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/712.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 55,
+      "atk": 69,
+      "def": 85,
+      "spa": 32,
+      "spd": 35,
+      "spe": 28
+    }
+  },
+  {
+    "id": 713,
+    "name": "avalugg",
+    "slug": "avalugg",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/713.png",
+    "capture_rate": 55,
+    "base_stats": {
+      "hp": 95,
+      "atk": 117,
+      "def": 184,
+      "spa": 44,
+      "spd": 46,
+      "spe": 28
+    }
+  },
+  {
+    "id": 714,
+    "name": "noibat",
+    "slug": "noibat",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/714.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 40,
+      "atk": 30,
+      "def": 35,
+      "spa": 45,
+      "spd": 40,
+      "spe": 55
+    }
+  },
+  {
+    "id": 715,
+    "name": "noivern",
+    "slug": "noivern",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/715.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 85,
+      "atk": 70,
+      "def": 80,
+      "spa": 97,
+      "spd": 80,
+      "spe": 123
+    }
+  },
+  {
+    "id": 734,
+    "name": "yungoos",
+    "slug": "yungoos",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/734.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 48,
+      "atk": 70,
+      "def": 30,
+      "spa": 30,
+      "spd": 30,
+      "spe": 45
+    }
+  },
+  {
+    "id": 735,
+    "name": "gumshoos",
+    "slug": "gumshoos",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/735.png",
+    "capture_rate": 127,
+    "base_stats": {
+      "hp": 88,
+      "atk": 110,
+      "def": 60,
+      "spa": 55,
+      "spd": 60,
+      "spe": 45
+    }
+  },
+  {
+    "id": 739,
+    "name": "crabrawler",
+    "slug": "crabrawler",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/739.png",
+    "capture_rate": 225,
+    "base_stats": {
+      "hp": 47,
+      "atk": 82,
+      "def": 57,
+      "spa": 42,
+      "spd": 47,
+      "spe": 63
+    }
+  },
+  {
+    "id": 740,
+    "name": "crabominable",
+    "slug": "crabominable",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/740.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 97,
+      "atk": 132,
+      "def": 77,
+      "spa": 62,
+      "spd": 67,
+      "spe": 43
+    }
+  },
+  {
+    "id": 741,
+    "name": "oricorio",
+    "slug": "oricorio",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
+  },
+  {
+    "id": 744,
+    "name": "rockruff",
+    "slug": "rockruff",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/744.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 45,
+      "atk": 65,
+      "def": 40,
+      "spa": 30,
+      "spd": 40,
+      "spe": 60
+    }
+  },
+  {
+    "id": 745,
+    "name": "lycanroc",
+    "slug": "lycanroc",
+    "sprite": null,
+    "capture_rate": 90,
+    "base_stats": null
+  },
+  {
+    "id": 747,
+    "name": "mareanie",
+    "slug": "mareanie",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/747.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 50,
+      "atk": 53,
+      "def": 62,
+      "spa": 43,
+      "spd": 52,
+      "spe": 45
+    }
+  },
+  {
+    "id": 748,
+    "name": "toxapex",
+    "slug": "toxapex",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/748.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 50,
+      "atk": 63,
+      "def": 152,
+      "spa": 53,
+      "spd": 142,
+      "spe": 35
+    }
+  },
+  {
+    "id": 749,
+    "name": "mudbray",
+    "slug": "mudbray",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/749.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 70,
+      "atk": 100,
+      "def": 70,
+      "spa": 45,
+      "spd": 55,
+      "spe": 45
+    }
+  },
+  {
+    "id": 750,
+    "name": "mudsdale",
+    "slug": "mudsdale",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/750.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 100,
+      "atk": 125,
+      "def": 100,
+      "spa": 55,
+      "spd": 85,
+      "spe": 35
+    }
+  },
+  {
+    "id": 753,
+    "name": "fomantis",
+    "slug": "fomantis",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/753.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 40,
+      "atk": 55,
+      "def": 35,
+      "spa": 50,
+      "spd": 35,
+      "spe": 35
+    }
+  },
+  {
+    "id": 754,
+    "name": "lurantis",
+    "slug": "lurantis",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/754.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 70,
+      "atk": 105,
+      "def": 90,
+      "spa": 80,
+      "spd": 90,
+      "spe": 45
+    }
+  },
+  {
+    "id": 757,
+    "name": "salandit",
+    "slug": "salandit",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/757.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 48,
+      "atk": 44,
+      "def": 40,
+      "spa": 71,
+      "spd": 40,
+      "spe": 77
+    }
+  },
+  {
+    "id": 758,
+    "name": "salazzle",
+    "slug": "salazzle",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/758.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 68,
+      "atk": 64,
+      "def": 60,
+      "spa": 111,
+      "spd": 60,
+      "spe": 117
+    }
+  },
+  {
+    "id": 761,
+    "name": "bounsweet",
+    "slug": "bounsweet",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/761.png",
+    "capture_rate": 235,
+    "base_stats": {
+      "hp": 42,
+      "atk": 30,
+      "def": 38,
+      "spa": 30,
+      "spd": 38,
+      "spe": 32
+    }
+  },
+  {
+    "id": 762,
+    "name": "steenee",
+    "slug": "steenee",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/762.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 52,
+      "atk": 40,
+      "def": 48,
+      "spa": 40,
+      "spd": 48,
+      "spe": 62
+    }
+  },
+  {
+    "id": 763,
+    "name": "tsareena",
+    "slug": "tsareena",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/763.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 72,
+      "atk": 120,
+      "def": 98,
+      "spa": 50,
+      "spd": 98,
+      "spe": 72
+    }
+  },
+  {
+    "id": 765,
+    "name": "oranguru",
+    "slug": "oranguru",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/765.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 90,
+      "atk": 60,
+      "def": 80,
+      "spa": 90,
+      "spd": 110,
+      "spe": 60
+    }
+  },
+  {
+    "id": 766,
+    "name": "passimian",
+    "slug": "passimian",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/766.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 100,
+      "atk": 120,
+      "def": 90,
+      "spa": 40,
+      "spd": 60,
+      "spe": 80
+    }
+  },
+  {
+    "id": 769,
+    "name": "sandygast",
+    "slug": "sandygast",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/769.png",
+    "capture_rate": 140,
+    "base_stats": {
+      "hp": 55,
+      "atk": 55,
+      "def": 80,
+      "spa": 70,
+      "spd": 45,
+      "spe": 15
+    }
+  },
+  {
+    "id": 770,
+    "name": "palossand",
+    "slug": "palossand",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/770.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 85,
+      "atk": 75,
+      "def": 110,
+      "spa": 100,
+      "spd": 75,
+      "spe": 35
+    }
+  },
+  {
+    "id": 775,
+    "name": "komala",
+    "slug": "komala",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/775.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 115,
+      "def": 65,
+      "spa": 75,
+      "spd": 95,
+      "spe": 65
+    }
+  },
+  {
+    "id": 778,
+    "name": "mimikyu",
+    "slug": "mimikyu",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
+  },
+  {
+    "id": 779,
+    "name": "bruxish",
+    "slug": "bruxish",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/779.png",
+    "capture_rate": 80,
+    "base_stats": {
+      "hp": 68,
+      "atk": 105,
+      "def": 70,
+      "spa": 70,
+      "spd": 70,
+      "spe": 92
+    }
+  },
+  {
+    "id": 819,
+    "name": "skwovet",
+    "slug": "skwovet",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/819.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 70,
+      "atk": 55,
+      "def": 55,
+      "spa": 35,
+      "spd": 35,
+      "spe": 25
+    }
+  },
+  {
+    "id": 820,
+    "name": "greedent",
+    "slug": "greedent",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/820.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 120,
+      "atk": 95,
+      "def": 95,
+      "spa": 55,
+      "spd": 75,
+      "spe": 20
+    }
+  },
+  {
+    "id": 821,
+    "name": "rookidee",
+    "slug": "rookidee",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/821.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 38,
+      "atk": 47,
+      "def": 35,
+      "spa": 33,
+      "spd": 35,
+      "spe": 57
+    }
+  },
+  {
+    "id": 822,
+    "name": "corvisquire",
+    "slug": "corvisquire",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/822.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 68,
+      "atk": 67,
+      "def": 55,
+      "spa": 43,
+      "spd": 55,
+      "spe": 77
+    }
+  },
+  {
+    "id": 823,
+    "name": "corviknight",
+    "slug": "corviknight",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/823.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 98,
+      "atk": 87,
+      "def": 105,
+      "spa": 53,
+      "spd": 85,
+      "spe": 67
+    }
+  },
+  {
+    "id": 833,
+    "name": "chewtle",
+    "slug": "chewtle",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/833.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 50,
+      "atk": 64,
+      "def": 50,
+      "spa": 38,
+      "spd": 38,
+      "spe": 44
+    }
+  },
+  {
+    "id": 834,
+    "name": "drednaw",
+    "slug": "drednaw",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/834.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 90,
+      "atk": 115,
+      "def": 90,
+      "spa": 48,
+      "spd": 68,
+      "spe": 74
+    }
+  },
+  {
+    "id": 837,
+    "name": "rolycoly",
+    "slug": "rolycoly",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/837.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 30,
+      "atk": 40,
+      "def": 50,
+      "spa": 40,
+      "spd": 50,
+      "spe": 30
+    }
+  },
+  {
+    "id": 838,
+    "name": "carkol",
+    "slug": "carkol",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/838.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 80,
+      "atk": 60,
+      "def": 90,
+      "spa": 60,
+      "spd": 70,
+      "spe": 50
+    }
+  },
+  {
+    "id": 839,
+    "name": "coalossal",
+    "slug": "coalossal",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/839.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 110,
+      "atk": 80,
+      "def": 120,
+      "spa": 80,
+      "spd": 90,
+      "spe": 30
+    }
+  },
+  {
+    "id": 840,
+    "name": "applin",
+    "slug": "applin",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/840.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 40,
+      "atk": 40,
+      "def": 80,
+      "spa": 40,
+      "spd": 40,
+      "spe": 20
+    }
+  },
+  {
+    "id": 841,
+    "name": "flapple",
+    "slug": "flapple",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/841.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 70,
+      "atk": 110,
+      "def": 80,
+      "spa": 95,
+      "spd": 60,
+      "spe": 70
+    }
+  },
+  {
+    "id": 842,
+    "name": "appletun",
+    "slug": "appletun",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/842.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 110,
+      "atk": 85,
+      "def": 80,
+      "spa": 100,
+      "spd": 80,
+      "spe": 30
+    }
+  },
+  {
+    "id": 843,
+    "name": "silicobra",
+    "slug": "silicobra",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/843.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 52,
+      "atk": 57,
+      "def": 75,
+      "spa": 35,
+      "spd": 50,
+      "spe": 46
+    }
+  },
+  {
+    "id": 844,
+    "name": "sandaconda",
+    "slug": "sandaconda",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/844.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 72,
+      "atk": 107,
+      "def": 125,
+      "spa": 65,
+      "spd": 70,
+      "spe": 71
+    }
+  },
+  {
+    "id": 846,
+    "name": "arrokuda",
+    "slug": "arrokuda",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/846.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 41,
+      "atk": 63,
+      "def": 40,
+      "spa": 40,
+      "spd": 30,
+      "spe": 66
+    }
+  },
+  {
+    "id": 847,
+    "name": "barraskewda",
+    "slug": "barraskewda",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/847.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 61,
+      "atk": 123,
+      "def": 60,
+      "spa": 60,
+      "spd": 50,
+      "spe": 136
+    }
+  },
+  {
+    "id": 848,
+    "name": "toxel",
+    "slug": "toxel",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/848.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 40,
+      "atk": 38,
+      "def": 35,
+      "spa": 54,
+      "spd": 35,
+      "spe": 40
+    }
+  },
+  {
+    "id": 849,
+    "name": "toxtricity",
+    "slug": "toxtricity",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
+  },
+  {
+    "id": 854,
+    "name": "sinistea",
+    "slug": "sinistea",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/854.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 40,
+      "atk": 45,
+      "def": 45,
+      "spa": 74,
+      "spd": 54,
+      "spe": 50
+    }
+  },
+  {
+    "id": 855,
+    "name": "polteageist",
+    "slug": "polteageist",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/855.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 60,
+      "atk": 65,
+      "def": 65,
+      "spa": 134,
+      "spd": 114,
+      "spe": 70
+    }
+  },
+  {
+    "id": 856,
+    "name": "hatenna",
+    "slug": "hatenna",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/856.png",
+    "capture_rate": 235,
+    "base_stats": {
+      "hp": 42,
+      "atk": 30,
+      "def": 45,
+      "spa": 56,
+      "spd": 53,
+      "spe": 39
+    }
+  },
+  {
+    "id": 857,
+    "name": "hattrem",
+    "slug": "hattrem",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/857.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 57,
+      "atk": 40,
+      "def": 65,
+      "spa": 86,
+      "spd": 73,
+      "spe": 49
+    }
+  },
+  {
+    "id": 858,
+    "name": "hatterene",
+    "slug": "hatterene",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/858.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 57,
+      "atk": 90,
+      "def": 95,
+      "spa": 136,
+      "spd": 103,
+      "spe": 29
+    }
+  },
+  {
+    "id": 859,
+    "name": "impidimp",
+    "slug": "impidimp",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/859.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 45,
+      "atk": 45,
+      "def": 30,
+      "spa": 55,
+      "spd": 40,
+      "spe": 50
+    }
+  },
+  {
+    "id": 860,
+    "name": "morgrem",
+    "slug": "morgrem",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/860.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 65,
+      "atk": 60,
+      "def": 45,
+      "spa": 75,
+      "spd": 55,
+      "spe": 70
+    }
+  },
+  {
+    "id": 861,
+    "name": "grimmsnarl",
+    "slug": "grimmsnarl",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/861.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 95,
+      "atk": 120,
+      "def": 65,
+      "spa": 95,
+      "spd": 75,
+      "spe": 60
+    }
+  },
+  {
+    "id": 870,
+    "name": "falinks",
+    "slug": "falinks",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/870.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 100,
+      "def": 100,
+      "spa": 70,
+      "spd": 60,
+      "spe": 75
+    }
+  },
+  {
+    "id": 871,
+    "name": "pincurchin",
+    "slug": "pincurchin",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/871.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 48,
+      "atk": 101,
+      "def": 95,
+      "spa": 91,
+      "spd": 85,
+      "spe": 15
+    }
+  },
+  {
+    "id": 872,
+    "name": "snom",
+    "slug": "snom",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/872.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 30,
+      "atk": 25,
+      "def": 35,
+      "spa": 45,
+      "spd": 30,
+      "spe": 20
+    }
+  },
+  {
+    "id": 873,
+    "name": "frosmoth",
+    "slug": "frosmoth",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/873.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 70,
+      "atk": 65,
+      "def": 60,
+      "spa": 125,
+      "spd": 90,
+      "spe": 65
+    }
+  },
+  {
+    "id": 874,
+    "name": "stonjourner",
+    "slug": "stonjourner",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/874.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 100,
+      "atk": 125,
+      "def": 135,
+      "spa": 20,
+      "spd": 20,
+      "spe": 70
+    }
+  },
+  {
+    "id": 875,
+    "name": "eiscue",
+    "slug": "eiscue",
+    "sprite": null,
+    "capture_rate": 60,
+    "base_stats": null
+  },
+  {
+    "id": 876,
+    "name": "indeedee",
+    "slug": "indeedee",
+    "sprite": null,
+    "capture_rate": 30,
+    "base_stats": null
+  },
+  {
+    "id": 878,
+    "name": "cufant",
+    "slug": "cufant",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/878.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 72,
+      "atk": 80,
+      "def": 49,
+      "spa": 40,
+      "spd": 49,
+      "spe": 40
+    }
+  },
+  {
+    "id": 879,
+    "name": "copperajah",
+    "slug": "copperajah",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/879.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 122,
+      "atk": 130,
+      "def": 69,
+      "spa": 80,
+      "spd": 69,
+      "spe": 30
+    }
+  },
+  {
+    "id": 885,
+    "name": "dreepy",
+    "slug": "dreepy",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/885.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 28,
+      "atk": 60,
+      "def": 30,
+      "spa": 40,
+      "spd": 30,
+      "spe": 82
+    }
+  },
+  {
+    "id": 886,
+    "name": "drakloak",
+    "slug": "drakloak",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/886.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 68,
+      "atk": 80,
+      "def": 50,
+      "spa": 60,
+      "spd": 50,
+      "spe": 102
+    }
+  },
+  {
+    "id": 887,
+    "name": "dragapult",
+    "slug": "dragapult",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/887.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 88,
+      "atk": 120,
+      "def": 75,
+      "spa": 100,
+      "spd": 75,
+      "spe": 142
+    }
+  },
+  {
+    "id": 906,
+    "name": "sprigatito",
+    "slug": "sprigatito",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/906.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 40,
+      "atk": 61,
+      "def": 54,
+      "spa": 45,
+      "spd": 45,
+      "spe": 65
+    }
+  },
+  {
+    "id": 907,
+    "name": "floragato",
+    "slug": "floragato",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/907.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 61,
+      "atk": 80,
+      "def": 63,
+      "spa": 60,
+      "spd": 63,
+      "spe": 83
+    }
+  },
+  {
+    "id": 908,
+    "name": "meowscarada",
+    "slug": "meowscarada",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/908.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 76,
+      "atk": 110,
+      "def": 70,
+      "spa": 81,
+      "spd": 70,
+      "spe": 123
+    }
+  },
+  {
+    "id": 909,
+    "name": "fuecoco",
+    "slug": "fuecoco",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/909.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 67,
+      "atk": 45,
+      "def": 59,
+      "spa": 63,
+      "spd": 40,
+      "spe": 36
+    }
+  },
+  {
+    "id": 910,
+    "name": "crocalor",
+    "slug": "crocalor",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/910.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 81,
+      "atk": 55,
+      "def": 78,
+      "spa": 90,
+      "spd": 58,
+      "spe": 49
+    }
+  },
+  {
+    "id": 911,
+    "name": "skeledirge",
+    "slug": "skeledirge",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/911.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 104,
+      "atk": 75,
+      "def": 100,
+      "spa": 110,
+      "spd": 75,
+      "spe": 66
+    }
+  },
+  {
+    "id": 912,
+    "name": "quaxly",
+    "slug": "quaxly",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/912.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 55,
+      "atk": 65,
+      "def": 45,
+      "spa": 50,
+      "spd": 45,
+      "spe": 50
+    }
+  },
+  {
+    "id": 913,
+    "name": "quaxwell",
+    "slug": "quaxwell",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/913.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 70,
+      "atk": 85,
+      "def": 65,
+      "spa": 65,
+      "spd": 60,
+      "spe": 65
+    }
+  },
+  {
+    "id": 914,
+    "name": "quaquaval",
+    "slug": "quaquaval",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/914.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 85,
+      "atk": 120,
+      "def": 80,
+      "spa": 85,
+      "spd": 75,
+      "spe": 85
+    }
+  },
+  {
+    "id": 915,
+    "name": "lechonk",
+    "slug": "lechonk",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/915.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 54,
+      "atk": 45,
+      "def": 40,
+      "spa": 35,
+      "spd": 45,
+      "spe": 35
+    }
+  },
+  {
+    "id": 916,
+    "name": "oinkologne",
+    "slug": "oinkologne",
+    "sprite": null,
+    "capture_rate": 100,
+    "base_stats": null
+  },
+  {
+    "id": 917,
+    "name": "tarountula",
+    "slug": "tarountula",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/917.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 35,
+      "atk": 41,
+      "def": 45,
+      "spa": 29,
+      "spd": 40,
+      "spe": 20
+    }
+  },
+  {
+    "id": 918,
+    "name": "spidops",
+    "slug": "spidops",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/918.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 60,
+      "atk": 79,
+      "def": 92,
+      "spa": 52,
+      "spd": 86,
+      "spe": 35
+    }
+  },
+  {
+    "id": 919,
+    "name": "nymble",
+    "slug": "nymble",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/919.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 33,
+      "atk": 46,
+      "def": 40,
+      "spa": 21,
+      "spd": 25,
+      "spe": 45
+    }
+  },
+  {
+    "id": 920,
+    "name": "lokix",
+    "slug": "lokix",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/920.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 71,
+      "atk": 102,
+      "def": 78,
+      "spa": 52,
+      "spd": 55,
+      "spe": 92
+    }
+  },
+  {
+    "id": 921,
+    "name": "pawmi",
+    "slug": "pawmi",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/921.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 45,
+      "atk": 50,
+      "def": 20,
+      "spa": 40,
+      "spd": 25,
+      "spe": 60
+    }
+  },
+  {
+    "id": 922,
+    "name": "pawmo",
+    "slug": "pawmo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/922.png",
+    "capture_rate": 80,
+    "base_stats": {
+      "hp": 60,
+      "atk": 75,
+      "def": 40,
+      "spa": 50,
+      "spd": 40,
+      "spe": 85
+    }
+  },
+  {
+    "id": 923,
+    "name": "pawmot",
+    "slug": "pawmot",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/923.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 70,
+      "atk": 115,
+      "def": 70,
+      "spa": 70,
+      "spd": 60,
+      "spe": 105
+    }
+  },
+  {
+    "id": 924,
+    "name": "tandemaus",
+    "slug": "tandemaus",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/924.png",
+    "capture_rate": 150,
+    "base_stats": {
+      "hp": 50,
+      "atk": 50,
+      "def": 45,
+      "spa": 40,
+      "spd": 45,
+      "spe": 75
+    }
+  },
+  {
+    "id": 925,
+    "name": "maushold",
+    "slug": "maushold",
+    "sprite": null,
+    "capture_rate": 75,
+    "base_stats": null
+  },
+  {
+    "id": 926,
+    "name": "fidough",
+    "slug": "fidough",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/926.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 37,
+      "atk": 55,
+      "def": 70,
+      "spa": 30,
+      "spd": 55,
+      "spe": 65
+    }
+  },
+  {
+    "id": 927,
+    "name": "dachsbun",
+    "slug": "dachsbun",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/927.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 57,
+      "atk": 80,
+      "def": 115,
+      "spa": 50,
+      "spd": 80,
+      "spe": 95
+    }
+  },
+  {
+    "id": 928,
+    "name": "smoliv",
+    "slug": "smoliv",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/928.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 41,
+      "atk": 35,
+      "def": 45,
+      "spa": 58,
+      "spd": 51,
+      "spe": 30
+    }
+  },
+  {
+    "id": 929,
+    "name": "dolliv",
+    "slug": "dolliv",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/929.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 52,
+      "atk": 53,
+      "def": 60,
+      "spa": 78,
+      "spd": 78,
+      "spe": 33
+    }
+  },
+  {
+    "id": 930,
+    "name": "arboliva",
+    "slug": "arboliva",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/930.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 78,
+      "atk": 69,
+      "def": 90,
+      "spa": 125,
+      "spd": 109,
+      "spe": 39
+    }
+  },
+  {
+    "id": 931,
+    "name": "squawkabilly",
+    "slug": "squawkabilly",
+    "sprite": null,
+    "capture_rate": 190,
+    "base_stats": null
+  },
+  {
+    "id": 932,
+    "name": "nacli",
+    "slug": "nacli",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/932.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 55,
+      "atk": 55,
+      "def": 75,
+      "spa": 35,
+      "spd": 35,
+      "spe": 25
+    }
+  },
+  {
+    "id": 933,
+    "name": "naclstack",
+    "slug": "naclstack",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/933.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 100,
+      "spa": 35,
+      "spd": 65,
+      "spe": 35
+    }
+  },
+  {
+    "id": 934,
+    "name": "garganacl",
+    "slug": "garganacl",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/934.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 100,
+      "atk": 100,
+      "def": 130,
+      "spa": 45,
+      "spd": 90,
+      "spe": 35
+    }
+  },
+  {
+    "id": 935,
+    "name": "charcadet",
+    "slug": "charcadet",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/935.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 40,
+      "atk": 50,
+      "def": 40,
+      "spa": 50,
+      "spd": 40,
+      "spe": 35
+    }
+  },
+  {
+    "id": 936,
+    "name": "armarouge",
+    "slug": "armarouge",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/936.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 85,
+      "atk": 60,
+      "def": 100,
+      "spa": 125,
+      "spd": 80,
+      "spe": 75
+    }
+  },
+  {
+    "id": 937,
+    "name": "ceruledge",
+    "slug": "ceruledge",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/937.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 75,
+      "atk": 125,
+      "def": 80,
+      "spa": 60,
+      "spd": 100,
+      "spe": 85
+    }
+  },
+  {
+    "id": 938,
+    "name": "tadbulb",
+    "slug": "tadbulb",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/938.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 61,
+      "atk": 31,
+      "def": 41,
+      "spa": 59,
+      "spd": 35,
+      "spe": 45
+    }
+  },
+  {
+    "id": 939,
+    "name": "bellibolt",
+    "slug": "bellibolt",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/939.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 109,
+      "atk": 64,
+      "def": 91,
+      "spa": 103,
+      "spd": 83,
+      "spe": 45
+    }
+  },
+  {
+    "id": 940,
+    "name": "wattrel",
+    "slug": "wattrel",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/940.png",
+    "capture_rate": 180,
+    "base_stats": {
+      "hp": 40,
+      "atk": 40,
+      "def": 35,
+      "spa": 55,
+      "spd": 40,
+      "spe": 70
+    }
+  },
+  {
+    "id": 941,
+    "name": "kilowattrel",
+    "slug": "kilowattrel",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/941.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 70,
+      "atk": 70,
+      "def": 60,
+      "spa": 105,
+      "spd": 60,
+      "spe": 125
+    }
+  },
+  {
+    "id": 942,
+    "name": "maschiff",
+    "slug": "maschiff",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/942.png",
+    "capture_rate": 150,
+    "base_stats": {
+      "hp": 60,
+      "atk": 78,
+      "def": 60,
+      "spa": 40,
+      "spd": 51,
+      "spe": 51
+    }
+  },
+  {
+    "id": 943,
+    "name": "mabosstiff",
+    "slug": "mabosstiff",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/943.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 90,
+      "spa": 60,
+      "spd": 70,
+      "spe": 85
+    }
+  },
+  {
+    "id": 944,
+    "name": "shroodle",
+    "slug": "shroodle",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/944.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 40,
+      "atk": 65,
+      "def": 35,
+      "spa": 40,
+      "spd": 35,
+      "spe": 75
+    }
+  },
+  {
+    "id": 945,
+    "name": "grafaiai",
+    "slug": "grafaiai",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/945.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 63,
+      "atk": 95,
+      "def": 65,
+      "spa": 80,
+      "spd": 72,
+      "spe": 110
+    }
+  },
+  {
+    "id": 946,
+    "name": "bramblin",
+    "slug": "bramblin",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/946.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 40,
+      "atk": 65,
+      "def": 30,
+      "spa": 45,
+      "spd": 35,
+      "spe": 60
+    }
+  },
+  {
+    "id": 947,
+    "name": "brambleghast",
+    "slug": "brambleghast",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/947.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 55,
+      "atk": 115,
+      "def": 70,
+      "spa": 80,
+      "spd": 70,
+      "spe": 90
+    }
+  },
+  {
+    "id": 948,
+    "name": "toedscool",
+    "slug": "toedscool",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/948.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 40,
+      "atk": 40,
+      "def": 35,
+      "spa": 50,
+      "spd": 100,
+      "spe": 70
+    }
+  },
+  {
+    "id": 949,
+    "name": "toedscruel",
+    "slug": "toedscruel",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/949.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 80,
+      "atk": 70,
+      "def": 65,
+      "spa": 80,
+      "spd": 120,
+      "spe": 100
+    }
+  },
+  {
+    "id": 950,
+    "name": "klawf",
+    "slug": "klawf",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/950.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 70,
+      "atk": 100,
+      "def": 115,
+      "spa": 35,
+      "spd": 55,
+      "spe": 75
+    }
+  },
+  {
+    "id": 951,
+    "name": "capsakid",
+    "slug": "capsakid",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/951.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 50,
+      "atk": 62,
+      "def": 40,
+      "spa": 62,
+      "spd": 40,
+      "spe": 50
+    }
+  },
+  {
+    "id": 952,
+    "name": "scovillain",
+    "slug": "scovillain",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/952.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 65,
+      "atk": 108,
+      "def": 65,
+      "spa": 108,
+      "spd": 65,
+      "spe": 75
+    }
+  },
+  {
+    "id": 953,
+    "name": "rellor",
+    "slug": "rellor",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/953.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 41,
+      "atk": 50,
+      "def": 60,
+      "spa": 31,
+      "spd": 58,
+      "spe": 30
+    }
+  },
+  {
+    "id": 954,
+    "name": "rabsca",
+    "slug": "rabsca",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/954.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 75,
+      "atk": 50,
+      "def": 85,
+      "spa": 115,
+      "spd": 100,
+      "spe": 45
+    }
+  },
+  {
+    "id": 955,
+    "name": "flittle",
+    "slug": "flittle",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/955.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 30,
+      "atk": 35,
+      "def": 30,
+      "spa": 55,
+      "spd": 30,
+      "spe": 75
+    }
+  },
+  {
+    "id": 956,
+    "name": "espathra",
+    "slug": "espathra",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/956.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 95,
+      "atk": 60,
+      "def": 60,
+      "spa": 101,
+      "spd": 60,
+      "spe": 105
+    }
+  },
+  {
+    "id": 957,
+    "name": "tinkatink",
+    "slug": "tinkatink",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/957.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 50,
+      "atk": 45,
+      "def": 45,
+      "spa": 35,
+      "spd": 64,
+      "spe": 58
+    }
+  },
+  {
+    "id": 958,
+    "name": "tinkatuff",
+    "slug": "tinkatuff",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/958.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 65,
+      "atk": 55,
+      "def": 55,
+      "spa": 45,
+      "spd": 82,
+      "spe": 78
+    }
+  },
+  {
+    "id": 959,
+    "name": "tinkaton",
+    "slug": "tinkaton",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/959.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 85,
+      "atk": 75,
+      "def": 77,
+      "spa": 70,
+      "spd": 105,
+      "spe": 94
+    }
+  },
+  {
+    "id": 960,
+    "name": "wiglett",
+    "slug": "wiglett",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/960.png",
+    "capture_rate": 255,
+    "base_stats": {
+      "hp": 10,
+      "atk": 55,
+      "def": 25,
+      "spa": 35,
+      "spd": 25,
+      "spe": 95
+    }
+  },
+  {
+    "id": 961,
+    "name": "wugtrio",
+    "slug": "wugtrio",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/961.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 35,
+      "atk": 100,
+      "def": 50,
+      "spa": 50,
+      "spd": 70,
+      "spe": 120
+    }
+  },
+  {
+    "id": 962,
+    "name": "bombirdier",
+    "slug": "bombirdier",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/962.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 70,
+      "atk": 103,
+      "def": 85,
+      "spa": 60,
+      "spd": 85,
+      "spe": 82
+    }
+  },
+  {
+    "id": 963,
+    "name": "finizen",
+    "slug": "finizen",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/963.png",
+    "capture_rate": 200,
+    "base_stats": {
+      "hp": 70,
+      "atk": 45,
+      "def": 40,
+      "spa": 45,
+      "spd": 40,
+      "spe": 75
+    }
+  },
+  {
+    "id": 964,
+    "name": "palafin",
+    "slug": "palafin",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
+  },
+  {
+    "id": 965,
+    "name": "varoom",
+    "slug": "varoom",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/965.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 45,
+      "atk": 70,
+      "def": 63,
+      "spa": 30,
+      "spd": 45,
+      "spe": 47
+    }
+  },
+  {
+    "id": 966,
+    "name": "revavroom",
+    "slug": "revavroom",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/966.png",
+    "capture_rate": 75,
+    "base_stats": {
+      "hp": 80,
+      "atk": 119,
+      "def": 90,
+      "spa": 54,
+      "spd": 67,
+      "spe": 90
+    }
+  },
+  {
+    "id": 967,
+    "name": "cyclizar",
+    "slug": "cyclizar",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/967.png",
+    "capture_rate": 190,
+    "base_stats": {
+      "hp": 70,
+      "atk": 95,
+      "def": 65,
+      "spa": 85,
+      "spd": 65,
+      "spe": 121
+    }
+  },
+  {
+    "id": 968,
+    "name": "orthworm",
+    "slug": "orthworm",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/968.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 70,
+      "atk": 85,
+      "def": 145,
+      "spa": 60,
+      "spd": 55,
+      "spe": 65
+    }
+  },
+  {
+    "id": 969,
+    "name": "glimmet",
+    "slug": "glimmet",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/969.png",
+    "capture_rate": 70,
+    "base_stats": {
+      "hp": 48,
+      "atk": 35,
+      "def": 42,
+      "spa": 105,
+      "spd": 60,
+      "spe": 60
+    }
+  },
+  {
+    "id": 970,
+    "name": "glimmora",
+    "slug": "glimmora",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/970.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 83,
+      "atk": 55,
+      "def": 90,
+      "spa": 130,
+      "spd": 81,
+      "spe": 86
+    }
+  },
+  {
+    "id": 971,
+    "name": "greavard",
+    "slug": "greavard",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/971.png",
+    "capture_rate": 120,
+    "base_stats": {
+      "hp": 50,
+      "atk": 61,
+      "def": 60,
+      "spa": 30,
+      "spd": 55,
+      "spe": 34
+    }
+  },
+  {
+    "id": 972,
+    "name": "houndstone",
+    "slug": "houndstone",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/972.png",
+    "capture_rate": 60,
+    "base_stats": {
+      "hp": 72,
+      "atk": 101,
+      "def": 100,
+      "spa": 50,
+      "spd": 97,
+      "spe": 68
+    }
+  },
+  {
+    "id": 973,
+    "name": "flamigo",
+    "slug": "flamigo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/973.png",
+    "capture_rate": 100,
+    "base_stats": {
+      "hp": 82,
+      "atk": 115,
+      "def": 74,
+      "spa": 75,
+      "spd": 64,
+      "spe": 90
+    }
+  },
+  {
+    "id": 974,
+    "name": "cetoddle",
+    "slug": "cetoddle",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/974.png",
+    "capture_rate": 150,
+    "base_stats": {
+      "hp": 108,
+      "atk": 68,
+      "def": 45,
+      "spa": 30,
+      "spd": 40,
+      "spe": 43
+    }
+  },
+  {
+    "id": 975,
+    "name": "cetitan",
+    "slug": "cetitan",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/975.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 170,
+      "atk": 113,
+      "def": 65,
+      "spa": 45,
+      "spd": 55,
+      "spe": 73
+    }
+  },
+  {
+    "id": 976,
+    "name": "veluza",
+    "slug": "veluza",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/976.png",
+    "capture_rate": 100,
+    "base_stats": {
+      "hp": 90,
+      "atk": 102,
+      "def": 73,
+      "spa": 78,
+      "spd": 65,
+      "spe": 70
+    }
+  },
+  {
+    "id": 977,
+    "name": "dondozo",
+    "slug": "dondozo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/977.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 150,
+      "atk": 100,
+      "def": 115,
+      "spa": 65,
+      "spd": 65,
+      "spe": 35
+    }
+  },
+  {
+    "id": 978,
+    "name": "tatsugiri",
+    "slug": "tatsugiri",
+    "sprite": null,
+    "capture_rate": 100,
+    "base_stats": null
+  },
+  {
+    "id": 979,
+    "name": "annihilape",
+    "slug": "annihilape",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/979.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 110,
+      "atk": 115,
+      "def": 80,
+      "spa": 50,
+      "spd": 90,
+      "spe": 90
+    }
+  },
+  {
+    "id": 980,
+    "name": "clodsire",
+    "slug": "clodsire",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/980.png",
+    "capture_rate": 90,
+    "base_stats": {
+      "hp": 130,
+      "atk": 75,
+      "def": 60,
+      "spa": 45,
+      "spd": 100,
+      "spe": 20
+    }
+  },
+  {
+    "id": 981,
+    "name": "farigiraf",
+    "slug": "farigiraf",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/981.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 120,
+      "atk": 90,
+      "def": 70,
+      "spa": 110,
+      "spd": 70,
+      "spe": 60
+    }
+  },
+  {
+    "id": 982,
+    "name": "dudunsparce",
+    "slug": "dudunsparce",
+    "sprite": null,
+    "capture_rate": 45,
+    "base_stats": null
+  },
+  {
+    "id": 983,
+    "name": "kingambit",
+    "slug": "kingambit",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/983.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 100,
+      "atk": 135,
+      "def": 120,
+      "spa": 60,
+      "spd": 85,
+      "spe": 50
+    }
+  },
+  {
+    "id": 984,
+    "name": "great-tusk",
+    "slug": "great-tusk",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/984.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 115,
+      "atk": 131,
+      "def": 131,
+      "spa": 53,
+      "spd": 53,
+      "spe": 87
+    }
+  },
+  {
+    "id": 985,
+    "name": "scream-tail",
+    "slug": "scream-tail",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/985.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 115,
+      "atk": 65,
+      "def": 99,
+      "spa": 65,
+      "spd": 115,
+      "spe": 111
+    }
+  },
+  {
+    "id": 986,
+    "name": "brute-bonnet",
+    "slug": "brute-bonnet",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/986.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 111,
+      "atk": 127,
+      "def": 99,
+      "spa": 79,
+      "spd": 99,
+      "spe": 55
+    }
+  },
+  {
+    "id": 987,
+    "name": "flutter-mane",
+    "slug": "flutter-mane",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/987.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 55,
+      "atk": 55,
+      "def": 55,
+      "spa": 135,
+      "spd": 135,
+      "spe": 135
+    }
+  },
+  {
+    "id": 988,
+    "name": "slither-wing",
+    "slug": "slither-wing",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/988.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 85,
+      "atk": 135,
+      "def": 79,
+      "spa": 85,
+      "spd": 105,
+      "spe": 81
+    }
+  },
+  {
+    "id": 989,
+    "name": "sandy-shocks",
+    "slug": "sandy-shocks",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/989.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 85,
+      "atk": 81,
+      "def": 97,
+      "spa": 121,
+      "spd": 85,
+      "spe": 101
+    }
+  },
+  {
+    "id": 990,
+    "name": "iron-treads",
+    "slug": "iron-treads",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/990.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 90,
+      "atk": 112,
+      "def": 120,
+      "spa": 72,
+      "spd": 70,
+      "spe": 106
+    }
+  },
+  {
+    "id": 991,
+    "name": "iron-bundle",
+    "slug": "iron-bundle",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/991.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 56,
+      "atk": 80,
+      "def": 114,
+      "spa": 124,
+      "spd": 60,
+      "spe": 136
+    }
+  },
+  {
+    "id": 992,
+    "name": "iron-hands",
+    "slug": "iron-hands",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/992.png",
+    "capture_rate": 50,
+    "base_stats": {
+      "hp": 154,
+      "atk": 140,
+      "def": 108,
+      "spa": 50,
+      "spd": 68,
+      "spe": 50
+    }
+  },
+  {
+    "id": 993,
+    "name": "iron-jugulis",
+    "slug": "iron-jugulis",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/993.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 94,
+      "atk": 80,
+      "def": 86,
+      "spa": 122,
+      "spd": 80,
+      "spe": 108
+    }
+  },
+  {
+    "id": 994,
+    "name": "iron-moth",
+    "slug": "iron-moth",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/994.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 80,
+      "atk": 70,
+      "def": 60,
+      "spa": 140,
+      "spd": 110,
+      "spe": 110
+    }
+  },
+  {
+    "id": 995,
+    "name": "iron-thorns",
+    "slug": "iron-thorns",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/995.png",
+    "capture_rate": 30,
+    "base_stats": {
+      "hp": 100,
+      "atk": 134,
+      "def": 110,
+      "spa": 70,
+      "spd": 84,
+      "spe": 72
+    }
+  },
+  {
+    "id": 996,
+    "name": "frigibax",
+    "slug": "frigibax",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/996.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 65,
+      "atk": 75,
+      "def": 45,
+      "spa": 35,
+      "spd": 45,
+      "spe": 55
+    }
+  },
+  {
+    "id": 997,
+    "name": "arctibax",
+    "slug": "arctibax",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/997.png",
+    "capture_rate": 25,
+    "base_stats": {
+      "hp": 90,
+      "atk": 95,
+      "def": 66,
+      "spa": 45,
+      "spd": 65,
+      "spe": 62
+    }
+  },
+  {
+    "id": 998,
+    "name": "baxcalibur",
+    "slug": "baxcalibur",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/998.png",
+    "capture_rate": 10,
+    "base_stats": {
+      "hp": 115,
+      "atk": 145,
+      "def": 92,
+      "spa": 75,
+      "spd": 86,
+      "spe": 87
+    }
+  },
+  {
+    "id": 999,
+    "name": "gimmighoul",
+    "slug": "gimmighoul",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/999.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 45,
+      "atk": 30,
+      "def": 70,
+      "spa": 75,
+      "spd": 70,
+      "spe": 10
+    }
+  },
+  {
+    "id": 1000,
+    "name": "gholdengo",
+    "slug": "gholdengo",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1000.png",
+    "capture_rate": 45,
+    "base_stats": {
+      "hp": 87,
+      "atk": 60,
+      "def": 95,
+      "spa": 133,
+      "spd": 91,
+      "spe": 84
+    }
+  },
+  {
+    "id": 1001,
+    "name": "wo-chien",
+    "slug": "wo-chien",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1001.png",
+    "capture_rate": 6,
+    "base_stats": {
+      "hp": 85,
+      "atk": 85,
+      "def": 100,
+      "spa": 95,
+      "spd": 135,
+      "spe": 70
+    }
+  },
+  {
+    "id": 1002,
+    "name": "chien-pao",
+    "slug": "chien-pao",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1002.png",
+    "capture_rate": 6,
+    "base_stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 80,
+      "spa": 90,
+      "spd": 65,
+      "spe": 135
+    }
+  },
+  {
+    "id": 1003,
+    "name": "ting-lu",
+    "slug": "ting-lu",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1003.png",
+    "capture_rate": 6,
+    "base_stats": {
+      "hp": 155,
+      "atk": 110,
+      "def": 125,
+      "spa": 55,
+      "spd": 80,
+      "spe": 45
+    }
+  },
+  {
+    "id": 1004,
+    "name": "chi-yu",
+    "slug": "chi-yu",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1004.png",
+    "capture_rate": 6,
+    "base_stats": {
+      "hp": 55,
+      "atk": 80,
+      "def": 80,
+      "spa": 135,
+      "spd": 120,
+      "spe": 100
+    }
+  },
+  {
+    "id": 1005,
+    "name": "roaring-moon",
+    "slug": "roaring-moon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1005.png",
+    "capture_rate": 10,
+    "base_stats": {
+      "hp": 105,
+      "atk": 139,
+      "def": 71,
+      "spa": 55,
+      "spd": 101,
+      "spe": 119
+    }
+  },
+  {
+    "id": 1006,
+    "name": "iron-valiant",
+    "slug": "iron-valiant",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1006.png",
+    "capture_rate": 10,
+    "base_stats": {
+      "hp": 74,
+      "atk": 130,
+      "def": 90,
+      "spa": 120,
+      "spd": 60,
+      "spe": 116
+    }
+  },
+  {
+    "id": 1007,
+    "name": "koraidon",
+    "slug": "koraidon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1007.png",
+    "capture_rate": 3,
+    "base_stats": {
+      "hp": 100,
+      "atk": 135,
+      "def": 115,
+      "spa": 85,
+      "spd": 100,
+      "spe": 135
+    }
+  },
+  {
+    "id": 1008,
+    "name": "miraidon",
+    "slug": "miraidon",
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1008.png",
+    "capture_rate": 3,
+    "base_stats": {
+      "hp": 100,
+      "atk": 85,
+      "def": 100,
+      "spa": 135,
+      "spd": 115,
+      "spe": 135
+    }
+  }
+]

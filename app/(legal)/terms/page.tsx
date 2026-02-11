@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export const metadata = {
   title: "Terms of Service | GamerStation",
@@ -10,7 +10,7 @@ export default function TermsPage() {
   const lastUpdated = "January 2, 2026";
 
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-3xl">
         {/* Centered glowing logo (matches Disclaimer + Contact) */}
         <div className="flex justify-center mb-10">
@@ -65,7 +65,7 @@ export default function TermsPage() {
 
           <h2 className="mt-8 text-xl font-semibold text-white">2) No warranties</h2>
           <p>
-            The site is provided “as is” and “as available.” We make no warranties of any kind, express or implied,
+            The site is provided â€œas isâ€ and â€œas available.â€ We make no warranties of any kind, express or implied,
             including accuracy, reliability, or fitness for a particular purpose.
           </p>
 

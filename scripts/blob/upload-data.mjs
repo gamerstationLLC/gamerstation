@@ -22,6 +22,11 @@ function optionalEnv(name) {
   return v ? String(v).trim() : "";
 }
 
+function envBool(name) {
+  const v = optionalEnv(name).toLowerCase();
+  return v === "1" || v === "true" || v === "yes" || v === "y" || v === "on";
+}
+
 /* =========================
    Spec parsing
 ========================= */
@@ -50,7 +55,7 @@ function parseUploads(spec) {
  *
  * Rule:
  * - localRel is the file path
- * - blobPath is derived by stripping "public/" prefix (so it becomes "data/..."
+ * - blobPath is derived by stripping "public/" prefix (so it becomes "data/...")
  */
 function parseDirs(spec) {
   return spec
@@ -118,13 +123,13 @@ function guessContentType(blobPath) {
    Overwrite vs append policy
 ========================= */
 /**
- * Your policy:
- * - Leaderboards: overwrite the same keys every run
- * - Meta builds + Champion tiers: "append" (keep history) using versioned keys
+ * - Leaderboards: overwrite
+ * - Meta builds + Champion tiers: append versioned
+ * - WoW: overwrite
+ * - ✅ Pokémon: overwrite (you iterate + rename often)
  *
- * WoW policy:
- * - WoW outputs should overwrite, because you want "latest" always
- *   (covers: data/wow/items/index.json, packs, quick-sim presets, etc.)
+ * Global override:
+ * - BLOB_OVERWRITE=1 will overwrite EVERYTHING
  */
 
 function shouldOverwrite(blobPath) {
@@ -132,12 +137,11 @@ function shouldOverwrite(blobPath) {
   if (blobPath.startsWith("data/lol/leaderboards/")) return true;
   if (blobPath === "data/manifest.json") return true;
 
-  // ✅ Meta builds: overwrite stable "latest" keys (finalize already merges safely)
-  if (blobPath === "data/lol/meta_builds_ranked.json") return true;
-  if (blobPath === "data/lol/meta_builds_casual.json") return true;
-
-  // ✅ WoW: overwrite everything under data/wow/
+  // WoW
   if (blobPath.startsWith("data/wow/")) return true;
+
+  // ✅ Pokémon
+  if (blobPath.startsWith("data/pokemon/")) return true;
 
   return false;
 }
@@ -155,7 +159,6 @@ function ensureNoExt(name) {
 }
 
 function utcStamp() {
-  // Example: 2026-02-09T21-37-00Z
   const d = new Date();
   const pad = (n) => String(n).padStart(2, "0");
   const y = d.getUTCFullYear();
@@ -172,23 +175,12 @@ function sanitizeTag(s) {
 }
 
 function getPatchTag() {
-  // Prefer LOL_PATCH, then BUILD_TAG, else fallback to UTC timestamp
   const p = optionalEnv("LOL_PATCH") || optionalEnv("BUILD_TAG");
   return p ? sanitizeTag(p) : utcStamp();
 }
 
-/**
- * Versioning scheme (append history):
- * - meta builds:
- *     data/lol/meta_builds_ranked.json
- *       -> data/lol/meta_builds/meta_builds_ranked/<TAG>.json
- * - champion tiers:
- *     data/lol/champion_tiers.json
- *       -> data/lol/champion_tiers/champion_tiers/<TAG>.json
- */
 function toAppendKey(blobPath) {
   const tag = getPatchTag();
-
   const file = blobPath.split("/").pop() || blobPath;
   const stem = ensureNoExt(file);
 
@@ -203,12 +195,6 @@ function toAppendKey(blobPath) {
   return blobPath;
 }
 
-/**
- * Cache policy:
- * - LoL leaderboards: 60s
- * - WoW: 60s (you asked for quick propagation)
- * - Everything else: BLOB_CACHE_SECONDS (default 300)
- */
 function cacheSecondsFor(blobPath) {
   const defaultOther = Number(optionalEnv("BLOB_CACHE_SECONDS") || "300");
 
@@ -232,11 +218,9 @@ async function uploadOne({ localRel, blobPath }) {
     return null;
   }
 
-  const FORCE_OVERWRITE = String(optionalEnv("BLOB_FORCE_OVERWRITE") || "0") === "1";
-const overwrite = FORCE_OVERWRITE || shouldOverwrite(blobPath);
+  const forceOverwrite = envBool("BLOB_OVERWRITE") || envBool("BLOB_FORCE_OVERWRITE");
+  const overwrite = forceOverwrite ? true : shouldOverwrite(blobPath);
 
-
-  // Append-mode: meta builds + champion tiers go to versioned keys
   const targetPath =
     overwrite
       ? blobPath
@@ -272,12 +256,8 @@ async function main() {
 
   const uploads = [];
 
-  // 1) explicit file uploads
-  if (filesSpec) {
-    uploads.push(...parseUploads(filesSpec));
-  }
+  if (filesSpec) uploads.push(...parseUploads(filesSpec));
 
-  // 2) directory uploads
   if (dirsSpec) {
     const dirs = parseDirs(dirsSpec);
     for (const dirRel of dirs) {
@@ -286,8 +266,6 @@ async function main() {
 
       for (const fAbs of absFiles) {
         const localRel = toPosix(path.relative(ROOT, fAbs));
-
-        // ✅ keep JSON-only uploads for now (your design)
         if (!localRel.toLowerCase().endsWith(".json")) continue;
 
         const blobPath = deriveBlobPathFromLocalRel(localRel);
@@ -296,12 +274,11 @@ async function main() {
     }
   }
 
-  // de-dupe by blobPath (last one wins)
+  // de-dupe by blobPath (last wins)
   const byPath = new Map();
   for (const u of uploads) byPath.set(u.blobPath, u);
   const finalUploads = [...byPath.values()];
 
-  // safety guard
   const maxFiles = getMaxFiles();
   if (maxFiles > 0 && finalUploads.length > maxFiles) {
     throw new Error(
@@ -317,6 +294,9 @@ async function main() {
   console.log(
     `[config] append tag source LOL_PATCH="${optionalEnv("LOL_PATCH")}" BUILD_TAG="${optionalEnv("BUILD_TAG")}" (fallback=utc timestamp)`
   );
+  console.log(
+    `[config] overwrite override: BLOB_OVERWRITE=${optionalEnv("BLOB_OVERWRITE") || "0"} BLOB_FORCE_OVERWRITE=${optionalEnv("BLOB_FORCE_OVERWRITE") || "0"}`
+  );
 
   const uploaded = [];
   for (const u of finalUploads) {
@@ -324,7 +304,6 @@ async function main() {
     if (item) uploaded.push(item);
   }
 
-  // manifest
   const manifest = JSON.stringify({ updatedAt: new Date().toISOString(), uploaded }, null, 2);
 
   const manifestRes = await put("data/manifest.json", manifest, {

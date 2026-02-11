@@ -1,4 +1,4 @@
-// app/calculators/lol/meta/page.tsx
+﻿// app/calculators/lol/meta/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import MetaClient from "./client";
@@ -29,7 +29,7 @@ export default function Page() {
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* background */}
       <div className="pointer-events-none absolute inset-0">
         <div
@@ -56,7 +56,7 @@ export default function Page() {
               className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
             />
             <span className="text-lg font-black tracking-tight">
-              GamerStation<span className="align-super text-[0.6em]">™</span>
+              GamerStation<span className="align-super text-[0.6em]">TM</span>
             </span>
           </Link>
 
@@ -69,7 +69,7 @@ export default function Page() {
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">Current LoL Meta</h1>
         <p className="mt-2 text-sm text-white/65">
-          Best League of Legends builds, items, and meta champions for the current patch — ranked by real match data.
+          Best League of Legends builds, items, and meta champions for the current patch â€” ranked by real match data.
         </p>
 
         <div className="mt-6">

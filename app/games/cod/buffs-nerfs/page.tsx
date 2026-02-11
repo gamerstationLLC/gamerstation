@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 type PatchChange = "Buff" | "Nerf" | "New";
 
@@ -20,49 +20,49 @@ const PATCH_NOTES: { weapon: string; change: PatchChange; details: string }[] = 
     weapon: 'AK-27 (17" Bystro Speed Barrel)',
     change: "Buff",
     details:
-      "Mid-Range Barrel update: now grants ~7% ADS movement speed; Medium Damage Range 1 benefit improved (25% → 35%).",
+      "Mid-Range Barrel update: now grants ~7% ADS movement speed; Medium Damage Range 1 benefit improved (25% â†’ 35%).",
   },
   {
     weapon: "AK-27 Battle-Scar Conversion",
     change: "Nerf",
     details:
-      "Damage reduced across ranges (70→56 max, 56→47 mid, 47→42 min) to slow TTK (generally +1 bullet to kill per range).",
+      "Damage reduced across ranges (70â†’56 max, 56â†’47 mid, 47â†’42 min) to slow TTK (generally +1 bullet to kill per range).",
   },
 
   {
     weapon: 'DS20 Mirage (18.9" Westerlies Barrel)',
     change: "Buff",
     details:
-      "Mid-Range Barrel update: now grants ~7% ADS movement speed; Medium Damage Range 1 benefit improved (25% → 35%).",
+      "Mid-Range Barrel update: now grants ~7% ADS movement speed; Medium Damage Range 1 benefit improved (25% â†’ 35%).",
   },
 
   {
     weapon: "M15 MOD 0",
     change: "Buff",
     details:
-      "Max damage 32→33 and max range extended (0–38m → 0–45m). Min damage 22→24; breakpoints pushed out. Bullet velocity 880→900.",
+      "Max damage 32â†’33 and max range extended (0â€“38m â†’ 0â€“45m). Min damage 22â†’24; breakpoints pushed out. Bullet velocity 880â†’900.",
   },
   {
     weapon: "Maddox RFB",
     change: "Buff",
     details:
-      "Mid damage 28→29 and mid range extends (37–48m → 37–60m). Bullet velocity 650→870; vertical recoil reduced ~5%.",
+      "Mid damage 28â†’29 and mid range extends (37â€“48m â†’ 37â€“60m). Bullet velocity 650â†’870; vertical recoil reduced ~5%.",
   },
   {
     weapon: "MXR-17",
     change: "Nerf",
-    details: "Long-range (minimum) damage reduced 36→34 (slightly weaker at long range).",
+    details: "Long-range (minimum) damage reduced 36â†’34 (slightly weaker at long range).",
   },
   {
     weapon: "Peacekeeper Mk1",
     change: "Buff",
-    details: "Long-range (minimum) damage increased 20→21 (slightly better at long range).",
+    details: "Long-range (minimum) damage increased 20â†’21 (slightly better at long range).",
   },
   {
     weapon: "X9 Maverick",
     change: "Buff",
     details:
-      "Max damage 48→50 and max range extended (0–45m → 0–50m). Min damage 36→37; range breakpoints adjusted.",
+      "Max damage 48â†’50 and max range extended (0â€“45m â†’ 0â€“50m). Min damage 36â†’37; range breakpoints adjusted.",
   },
 
   {
@@ -75,19 +75,19 @@ const PATCH_NOTES: { weapon: string; change: PatchChange; details: string }[] = 
     weapon: "Dravec 45",
     change: "Buff",
     details:
-      "Min damage 30→34. Lower torso/leg multipliers 0.85x→0.9x. ADS 210ms→195ms; sprint-to-fire 170ms→140ms.",
+      "Min damage 30â†’34. Lower torso/leg multipliers 0.85xâ†’0.9x. ADS 210msâ†’195ms; sprint-to-fire 170msâ†’140ms.",
   },
   {
     weapon: "RK-9",
     change: "Buff",
     details:
-      "Burst cooldown 0.09s → 0.082s. Bullet velocity 570→620. ADS 195ms→185ms.",
+      "Burst cooldown 0.09s â†’ 0.082s. Bullet velocity 570â†’620. ADS 195msâ†’185ms.",
   },
 
   {
     weapon: "MK.78 (LMG)",
     change: "Buff",
-    details: "Max range extended (0–42m → 0–52m). Min damage 28→30.",
+    details: "Max range extended (0â€“42m â†’ 0â€“52m). Min damage 28â†’30.",
   },
 ];
 
@@ -105,8 +105,8 @@ export default function CodBuffsNerfsPage() {
     "inline-flex w-fit items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 hover:underline underline-offset-4";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
-      {/* ✅ GS background system */}
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
+      {/* âœ… GS background system */}
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.10]"
@@ -124,7 +124,7 @@ export default function CodBuffsNerfsPage() {
 
       <div className="relative px-6 py-16">
         <div className="mx-auto max-w-5xl">
-          {/* ✅ Standard header: brand left, Tools top-right */}
+          {/* âœ… Standard header: brand left, Tools top-right */}
           <header className="mb-8 flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 hover:opacity-90">
               <img
@@ -133,7 +133,7 @@ export default function CodBuffsNerfsPage() {
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">™</span>
+                GamerStation<span className="align-super text-[0.6em]">TM</span>
               </span>
             </Link>
 
@@ -147,7 +147,7 @@ export default function CodBuffsNerfsPage() {
           {/* Title */}
           <h1 className="mt-2 text-4xl font-bold">Weapon Buffs &amp; Nerfs</h1>
           <p className="mt-3 max-w-2xl text-neutral-300">
-            Patch watch for Call of Duty — expected buffs, nerfs, balance changes, and meta shifts.
+            Patch watch for Call of Duty â€” expected buffs, nerfs, balance changes, and meta shifts.
           </p>
 
           {/* Notes */}

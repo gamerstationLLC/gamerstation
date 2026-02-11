@@ -1,11 +1,11 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import DotaMetaClient, { HeroStatsRow } from "./client";
 import { readPublicJson } from "@/lib/blob";
 
 export const runtime = "nodejs";
 export const dynamic = "force-static";
 
-// ✅ Daily full-page regeneration
+// âœ… Daily full-page regeneration
 export const revalidate = 60 * 60 * 24; // 24 hours
 
 type PatchEntry = {
@@ -66,16 +66,16 @@ async function getLatestPatch(): Promise<string> {
       },
     });
 
-    if (!res.ok) return "—";
+    if (!res.ok) return "â€”";
 
     const data = await res.json();
-    return extractLatestPatchName(data) ?? "—";
+    return extractLatestPatchName(data) ?? "â€”";
   } catch {
-    return "—";
+    return "â€”";
   }
 }
 
-// ✅ Blob immortal stats
+// âœ… Blob immortal stats
 async function readImmortalJson(): Promise<ImmortalJson | null> {
   try {
     return await readPublicJson<ImmortalJson>(
@@ -89,7 +89,7 @@ async function readImmortalJson(): Promise<ImmortalJson | null> {
 export default async function DotaMetaPage() {
   const patch = await getLatestPatch();
 
-  // 🔥 CRITICAL:
+  // ðŸ”¥ CRITICAL:
   // This makes cache version depend on patch
   const cacheTag = `dota-meta-${patch}`;
 
@@ -127,7 +127,7 @@ export default async function DotaMetaPage() {
   });
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       <div className="relative px-6 py-16">
         <div className="mx-auto max-w-5xl">
 
@@ -140,7 +140,7 @@ export default async function DotaMetaPage() {
               />
               <span className="text-lg font-black tracking-tight">
                 GamerStation
-                <span className="align-super text-[0.6em]">™</span>
+                <span className="align-super text-[0.6em]">TM</span>
               </span>
             </Link>
 
@@ -161,13 +161,13 @@ export default async function DotaMetaPage() {
             Data from OpenDota.
             <span className="text-neutral-500">
               {" "}
-              (Daily refresh • Auto resets on patch change)
+              (Daily refresh â€¢ Auto resets on patch change)
             </span>
           </p>
 
           <div className="mt-6">
             <DotaMetaClient
-              key={cacheTag} // 🔥 forces reset when patch changes
+              key={cacheTag} // ðŸ”¥ forces reset when patch changes
               initialRows={mergedRows}
               patch={patch}
             />

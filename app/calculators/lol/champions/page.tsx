@@ -1,10 +1,10 @@
-// app/calculators/lol/champions/page.tsx
+﻿// app/calculators/lol/champions/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import ChampionPickerClient, { type ChampionRow } from "./client";
 
 export const metadata: Metadata = {
-  title: "LoL Champions – Search Champion Stats | GamerStation",
+  title: "LoL Champions â€“ Search Champion Stats | GamerStation",
   description:
     "Search League of Legends champions and open a champion stats page instantly. Data from Riot Data Dragon.",
   alternates: { canonical: "/calculators/lol/champions" },
@@ -65,7 +65,7 @@ export default async function ChampionsPickerPage() {
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div
@@ -93,7 +93,7 @@ export default async function ChampionsPickerPage() {
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">™</span>
+                GamerStation<span className="align-super text-[0.6em]">TM</span>
               </span>
             </Link>
 

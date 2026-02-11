@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import BloxFruitsCombatClient from "./client";
 
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function BloxFruitsCombatPage() {
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Back link */}
         <header className="-ml-2 mb-6">
@@ -28,7 +28,7 @@ export default function BloxFruitsCombatPage() {
             href="/calculators/roblox/bloxfruits"
             className="text-sm text-neutral-300 hover:text-white"
           >
-            ← Back to Blox Fruits Hub
+            â† Back to Blox Fruits Hub
           </Link>
         </header>
 
@@ -38,7 +38,7 @@ export default function BloxFruitsCombatPage() {
         </h1>
         <p className="mt-3 max-w-2xl text-neutral-300">
           Build comparison tools for fruits, swords, guns, and accessories.
-          This is the foundation — we’ll expand it into a real combat calculator
+          This is the foundation â€” weâ€™ll expand it into a real combat calculator
           once the stat model is finalized.
         </p>
 
@@ -61,7 +61,7 @@ export default function BloxFruitsCombatPage() {
 
           <p className="text-neutral-400">
             Early versions will prioritize clarity over simulation. No clutter,
-            no confusing “black box” math.
+            no confusing â€œblack boxâ€ math.
           </p>
         </section>
 

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export const metadata = {
   title: "Privacy Policy | GamerStation",
@@ -10,7 +10,7 @@ export default function PrivacyPage() {
   const lastUpdated = "January 2, 2026";
 
   return (
-    <main className="min-h-screen bg-black text-white px-6 py-16">
+    <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-3xl">
         {/* Centered glowing logo (matches all legal pages) */}
         <div className="flex justify-center mb-10">
@@ -109,7 +109,7 @@ export default function PrivacyPage() {
           <ul className="list-disc pl-6 space-y-2">
             <li>You can block cookies in your browser settings</li>
             <li>
-              You can use browser “Do Not Track” (note: it may not be honored by
+              You can use browser â€œDo Not Trackâ€ (note: it may not be honored by
               all services)
             </li>
           </ul>

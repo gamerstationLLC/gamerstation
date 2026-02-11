@@ -373,7 +373,7 @@ export default function CodTtkClient({
   return (
     <main
       className="
-        min-h-screen bg-black text-white px-6
+        min-h-screen bg-transparent text-white px-6
         pt-10 pb-[calc(92px+env(safe-area-inset-bottom))]
         lg:py-10
       "
