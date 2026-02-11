@@ -55,26 +55,10 @@ jobs:
             scripts/riot/cache/matches
             scripts/riot/cache/timelines
             scripts/riot/cache/state
-          key: lol-riot-cache-v1-${{ runner.os }}
+          key: lol-riot-cache-v2-${{ runner.os }}
           restore-keys: |
-            lol-riot-cache-v1-${{ runner.os }}
-            lol-riot-cache-v1
-
-      - name: Prune old Riot cache (90 days)
-        run: |
-          set -e
-          CUTOFF=$(date -d "90 days ago" +%s)
-
-          for DIR in scripts/riot/cache/matches scripts/riot/cache/timelines; do
-            if [ -d "$DIR" ]; then
-              find "$DIR" -type f -name "*.json" | while read -r file; do
-                mtime=$(stat -c %Y "$file" 2>/dev/null || echo 0)
-                if [ "$mtime" -lt "$CUTOFF" ]; then
-                  rm -f "$file"
-                fi
-              done
-            fi
-          done
+            lol-riot-cache-v2-${{ runner.os }}
+            lol-riot-cache-v2
 
       - name: Update LoL static data
         run: npm run lol:update
@@ -82,7 +66,7 @@ jobs:
       - name: Update LoL overrides
         run: npm run lol:update:overrides
 
-      - name: Set crawl mode
+      - name: Set crawl mode (STABLE PROFILE)
         id: mode
         run: |
           set -e
@@ -93,9 +77,10 @@ jobs:
 
           echo "rebuild=$REBUILD" >> "$GITHUB_OUTPUT"
 
-          # NOTE:
-          # Match-V5 /matches/by-puuid/.../ids endpoint only allows count <= 100.
-          # Keep MATCHES_PER_PUUID <= 100 unless your script implements paging.
+          # IMPORTANT:
+          # Riot Match-V5 is fragile when hammered.
+          # We lower pressure and rely on frequent cron runs instead.
+
           if [ "$REBUILD" = "true" ]; then
             echo "REPROCESS_BOOTSTRAP=1" >> "$GITHUB_ENV"
             echo "REPROCESS_SEEDS=1" >> "$GITHUB_ENV"
@@ -103,11 +88,11 @@ jobs:
             echo "RESET_SEEN_PUUIDS=1" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=1" >> "$GITHUB_ENV"
 
-            # Rebuild: heavy, but stable
-            echo "MAX_MATCHES_PER_RUN=80000" >> "$GITHUB_ENV"
-            echo "MAX_NEW_PUUIDS_PER_RUN=8000" >> "$GITHUB_ENV"
-            echo "MATCHES_PER_PUUID=80" >> "$GITHUB_ENV"
-            echo "CHECKPOINT_EVERY=250" >> "$GITHUB_ENV"
+            # Controlled rebuild
+            echo "MAX_MATCHES_PER_RUN=50000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=5000" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=60" >> "$GITHUB_ENV"
+            echo "CHECKPOINT_EVERY=200" >> "$GITHUB_ENV"
           else
             echo "REPROCESS_BOOTSTRAP=0" >> "$GITHUB_ENV"
             echo "REPROCESS_SEEDS=0" >> "$GITHUB_ENV"
@@ -115,11 +100,16 @@ jobs:
             echo "RESET_SEEN_PUUIDS=0" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=0" >> "$GITHUB_ENV"
 
-            # Incremental: beefy, but must respect Riot's max count=100 per ids call
-            echo "MAX_MATCHES_PER_RUN=120000" >> "$GITHUB_ENV"
-            echo "MAX_NEW_PUUIDS_PER_RUN=20000" >> "$GITHUB_ENV"
-            echo "MATCHES_PER_PUUID=100" >> "$GITHUB_ENV"
-            echo "CHECKPOINT_EVERY=250" >> "$GITHUB_ENV"
+            # Stable incremental profile
+            echo "MAX_MATCHES_PER_RUN=70000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=10000" >> "$GITHUB_ENV"
+
+            # CRITICAL FIX:
+            # DO NOT exceed 100 (Riot hard cap)
+            # Keep this conservative to reduce 500 storms.
+            echo "MATCHES_PER_PUUID=80" >> "$GITHUB_ENV"
+
+            echo "CHECKPOINT_EVERY=200" >> "$GITHUB_ENV"
           fi
 
       - name: Crawl Riot matches (never fail job)
@@ -129,7 +119,7 @@ jobs:
           RIOT_PLATFORM: na1
           LADDER_QUEUE: RANKED_SOLO_5x5
           LADDER_TIER: challenger
-          LADDER_MAX_PLAYERS: "1000"
+          LADDER_MAX_PLAYERS: "300"
           MAX_MATCHES_PER_RUN: ${{ env.MAX_MATCHES_PER_RUN }}
           MAX_NEW_PUUIDS_PER_RUN: ${{ env.MAX_NEW_PUUIDS_PER_RUN }}
           MATCHES_PER_PUUID: ${{ env.MATCHES_PER_PUUID }}
@@ -144,7 +134,7 @@ jobs:
           CACHE_MAX_AGE_DAYS: "90"
         run: |
           set +e
-          timeout 17940 npm run lol:update:meta
+          timeout 16000 npm run lol:update:meta
           exit 0
 
       - name: Finalize meta builds
@@ -160,7 +150,6 @@ jobs:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
           BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
           BLOB_CACHE_SECONDS: "300"
-          LOL_PATCH: ${{ github.run_id }}
         run: |
           set +e
           if [ -n "$BLOB_READ_WRITE_TOKEN" ]; then
