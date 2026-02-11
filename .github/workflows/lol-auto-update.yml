@@ -37,6 +37,7 @@ jobs:
           git fetch origin main
           git checkout main
           git reset --hard origin/main
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -58,6 +59,7 @@ jobs:
           restore-keys: |
             lol-riot-cache-v1-${{ runner.os }}
             lol-riot-cache-v1
+
       - name: Prune old Riot cache (90 days)
         run: |
           set -e
@@ -72,6 +74,7 @@ jobs:
               done
             fi
           done
+
       - name: Update LoL static data
         run: npm run lol:update
 
@@ -106,6 +109,7 @@ jobs:
             echo "MAX_NEW_PUUIDS_PER_RUN=4000" >> "$GITHUB_ENV"
             echo "MATCHES_PER_PUUID=100" >> "$GITHUB_ENV"
           fi
+
       - name: Crawl Riot matches (never fail job)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
@@ -130,12 +134,14 @@ jobs:
           set +e
           timeout 17940 npm run lol:update:meta
           exit 0
+
       - name: Finalize meta builds
         if: always()
         run: |
           set +e
           npm run lol:finalize:meta
           exit 0
+
       - name: Upload meta builds to Blob
         if: always()
         env:
@@ -143,12 +149,14 @@ jobs:
           BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
           BLOB_CACHE_SECONDS: "300"
           LOL_PATCH: ${{ github.run_id }}
+          BLOB_FORCE_OVERWRITE: "1"   # ✅ force overwrites (manifest + any stable keys)
         run: |
           set +e
           if [ -n "$BLOB_READ_WRITE_TOKEN" ]; then
             node scripts/blob/upload-data.mjs || true
           fi
           exit 0
+
       - name: Commit & push static data only
         if: always()
         run: |
