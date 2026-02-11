@@ -18,8 +18,20 @@ const SEEN_PUUIDS_PATH = path.join(CACHE_STATE_DIR, "seen_puuids.json");
 const AGG_STATE_PATH = path.join(CACHE_STATE_DIR, "agg_state.json");
 const PUUID_CURSORS_PATH = path.join(CACHE_STATE_DIR, "puuid_cursors.json");
 
-const OUT_RANKED_PATH = path.join(ROOT, "public", "data", "lol", "meta_builds_ranked.json");
-const OUT_CASUAL_PATH = path.join(ROOT, "public", "data", "lol", "meta_builds_casual.json");
+const OUT_RANKED_PATH = path.join(
+  ROOT,
+  "public",
+  "data",
+  "lol",
+  "meta_builds_ranked.json"
+);
+const OUT_CASUAL_PATH = path.join(
+  ROOT,
+  "public",
+  "data",
+  "lol",
+  "meta_builds_casual.json"
+);
 
 // env
 const RIOT_API_KEY = process.env.RIOT_API_KEY || "";
@@ -41,13 +53,15 @@ const MIN_DISPLAY_SAMPLE = Number(process.env.MIN_DISPLAY_SAMPLE || 25);
 const BAYES_K = Number(process.env.BAYES_K || 100);
 const PRIOR_WINRATE = Number(process.env.PRIOR_WINRATE || 0.5);
 
-const PATCH_MAJOR_MINOR_ONLY = String(process.env.PATCH_MAJOR_MINOR_ONLY || "1") !== "0";
+const PATCH_MAJOR_MINOR_ONLY =
+  String(process.env.PATCH_MAJOR_MINOR_ONLY || "1") !== "0";
 
 // cache scan / fallback knobs
 const CACHE_SCAN_LIMIT = Number(process.env.CACHE_SCAN_LIMIT || 0);
-const ALLOW_LOW_SAMPLE_FALLBACK = String(process.env.ALLOW_LOW_SAMPLE_FALLBACK || "0") === "1";
+const ALLOW_LOW_SAMPLE_FALLBACK =
+  String(process.env.ALLOW_LOW_SAMPLE_FALLBACK || "0") === "1";
 
-// ✅ CHECKPOINTS (new)
+// ✅ CHECKPOINTS
 const CHECKPOINT_EVERY = Number(process.env.CHECKPOINT_EVERY || 100);
 
 // ✅ Ladder bootstrap knobs
@@ -55,7 +69,9 @@ type LadderQueue = "RANKED_SOLO_5x5" | "RANKED_FLEX_SR";
 const LADDER_QUEUE = (process.env.LADDER_QUEUE || "RANKED_SOLO_5x5").trim() as LadderQueue;
 
 type LadderTier = "challenger" | "grandmaster" | "master";
-const LADDER_TIER = (process.env.LADDER_TIER || "challenger").trim().toLowerCase() as LadderTier;
+const LADDER_TIER = (process.env.LADDER_TIER || "challenger")
+  .trim()
+  .toLowerCase() as LadderTier;
 
 const LADDER_MAX_PLAYERS = Number(process.env.LADDER_MAX_PLAYERS || 250);
 const REPROCESS_BOOTSTRAP = String(process.env.REPROCESS_BOOTSTRAP || "0") === "1";
@@ -84,15 +100,39 @@ const RESET_SEEN_MATCHES = String(process.env.RESET_SEEN_MATCHES || "0") === "1"
 const RESET_SEEN_PUUIDS = String(process.env.RESET_SEEN_PUUIDS || "0") === "1";
 const RESET_CURSORS = String(process.env.RESET_CURSORS || "0") === "1";
 
+// ✅ QUIET SKIPS:
+//  - default ON (so bad match/puuid/match-v5 500 windows don't spam logs)
+//  - set QUIET_SKIPS=0 to see warnings
+const QUIET_SKIPS = String(process.env.QUIET_SKIPS || "1") !== "0";
+
+function logInfo(...args: any[]) {
+  if (!QUIET_SKIPS) console.log(...args);
+}
+function logWarn(...args: any[]) {
+  if (!QUIET_SKIPS) console.warn(...args);
+}
+
 console.log(
   "[env] RIOT_API_KEY:",
-  process.env.RIOT_API_KEY ? `present len=${process.env.RIOT_API_KEY.length}` : "MISSING"
+  process.env.RIOT_API_KEY
+    ? `present len=${process.env.RIOT_API_KEY.length}`
+    : "MISSING"
 );
 console.log("[env] RIOT_REGION (match-v5):", RIOT_REGION);
 console.log("[env] RIOT_PLATFORM (league/summoner):", RIOT_PLATFORM);
 console.log("[env] LADDER_TIER/QUEUE/MAX:", LADDER_TIER, LADDER_QUEUE, LADDER_MAX_PLAYERS);
-console.log("[env] Seed extras: SEED_MATCH_IDS:", SEED_MATCH_IDS.length, "SEED_MATCH_URLS:", SEED_MATCH_URLS.length);
-console.log(`[env] STRICT WINDOW: CACHE_MAX_AGE_DAYS=${CACHE_MAX_AGE_DAYS} startTime=${START_TIME_SEC} cutoff=${new Date(CUTOFF_MS).toISOString()}`);
+console.log(
+  "[env] Seed extras: SEED_MATCH_IDS:",
+  SEED_MATCH_IDS.length,
+  "SEED_MATCH_URLS:",
+  SEED_MATCH_URLS.length
+);
+console.log(
+  `[env] STRICT WINDOW: CACHE_MAX_AGE_DAYS=${CACHE_MAX_AGE_DAYS} startTime=${START_TIME_SEC} cutoff=${new Date(
+    CUTOFF_MS
+  ).toISOString()}`
+);
+console.log("[env] QUIET_SKIPS:", QUIET_SKIPS ? "1 (quiet)" : "0 (verbose)");
 
 const QUEUE_RANKED = 420;
 const QUEUES_CASUAL = new Set<number>([400, 430]);
@@ -123,7 +163,7 @@ type AggState = {
 
 type Role = "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY";
 
-// ✅ CHECKPOINTS: globals + helpers (new)
+// ✅ CHECKPOINTS: globals + helpers
 let shutdownRequested = false;
 let gSeenMatches: Set<string> | null = null;
 let gSeenPuuids: Set<string> | null = null;
@@ -135,11 +175,19 @@ async function persistState(reason: string) {
   if (!gSeenMatches || !gSeenPuuids || !gPuuidCursors || !gAgg) return;
 
   try {
-    await writeJson(SEEN_MATCH_IDS_PATH, { ids: Array.from(gSeenMatches) } satisfies SeenMatchIdsState);
-    await writeJson(SEEN_PUUIDS_PATH, { puuids: Array.from(gSeenPuuids) } satisfies SeenPuuidsState);
+    await writeJson(SEEN_MATCH_IDS_PATH, {
+      ids: Array.from(gSeenMatches),
+    } satisfies SeenMatchIdsState);
+    await writeJson(SEEN_PUUIDS_PATH, {
+      puuids: Array.from(gSeenPuuids),
+    } satisfies SeenPuuidsState);
     await writeJson(PUUID_CURSORS_PATH, gPuuidCursors);
     await writeJson(AGG_STATE_PATH, gAgg);
-    console.log(`[checkpoint] persisted (${reason}) matches=${gSeenMatches.size} puuids=${gSeenPuuids.size}`);
+
+    // checkpoints are useful signal even in quiet mode
+    console.log(
+      `[checkpoint] persisted (${reason}) matches=${gSeenMatches.size} puuids=${gSeenPuuids.size}`
+    );
   } catch (e: any) {
     console.warn(`[checkpoint] persist failed (${reason}): ${e?.message || e}`);
   }
@@ -153,13 +201,14 @@ async function handleSignal(sig: string) {
   process.exit(0);
 }
 
-// Register signal handlers once
 process.on("SIGTERM", () => void handleSignal("SIGTERM"));
 process.on("SIGINT", () => void handleSignal("SIGINT"));
 
 function assertEnv() {
   if (!RIOT_API_KEY || !RIOT_API_KEY.startsWith("RGAPI-")) {
-    throw new Error("Missing/invalid RIOT_API_KEY. Put it in .env.local as RIOT_API_KEY=RGAPI-...");
+    throw new Error(
+      "Missing/invalid RIOT_API_KEY. Put it in .env.local as RIOT_API_KEY=RGAPI-..."
+    );
   }
 }
 
@@ -236,14 +285,30 @@ function riotPlatformBase() {
   return `https://${RIOT_PLATFORM}.api.riotgames.com`;
 }
 
+/**
+ * Skippable errors are ones you explicitly don't want noise for:
+ * - 400/403/404: bad request / forbidden / not found
+ * - 5xx: Riot hiccup windows
+ *
+ * 429 is NOT skippable (we should respect retry-after and keep going).
+ */
+function isSkippableStatus(status: number) {
+  return status === 400 || status === 403 || status === 404 || status >= 500;
+}
+
 async function fetchJsonWithRetry(
   url: string,
-  opts?: { retries?: number; kind?: "regional" | "platform" }
+  opts?: {
+    kind?: "regional" | "platform";
+    retries429?: number;
+    onSkippable?: "throw" | "return_null";
+  }
 ): Promise<any> {
-  const retries = opts?.retries ?? 5;
   const kind = opts?.kind ?? "regional";
+  const retries429 = opts?.retries429 ?? 10;
+  const onSkippable = opts?.onSkippable ?? "return_null";
 
-  for (let attempt = 0; attempt <= retries; attempt++) {
+  for (let attempt = 0; attempt <= retries429; attempt++) {
     const res = await fetch(url, {
       headers: {
         "X-Riot-Token": RIOT_API_KEY,
@@ -251,19 +316,26 @@ async function fetchJsonWithRetry(
       },
     });
 
+    // ✅ 429: retry (recoverable)
     if (res.status === 429) {
       const ra = res.headers.get("Retry-After");
       const waitMs = ra ? Number(ra) * 1000 : 1200 + attempt * 800;
-      console.log(`429 rate limited (${kind}). Waiting ${waitMs}ms then retrying...`);
+      logInfo(`429 rate limited (${kind}). Waiting ${waitMs}ms then retrying...`);
       await sleep(waitMs);
       continue;
     }
 
-    if (res.status >= 500 && attempt < retries) {
-      const waitMs = 800 + attempt * 600;
-      console.log(`${res.status} server error (${kind}). Waiting ${waitMs}ms then retrying...`);
-      await sleep(waitMs);
-      continue;
+    // ✅ skippable: return null (quiet) OR throw (verbose mode if you want)
+    if (isSkippableStatus(res.status)) {
+      if (!QUIET_SKIPS) {
+        const txt = await res.text().catch(() => "");
+        console.warn(`[skip] ${kind} ${res.status}: ${url}\n${txt}`.slice(0, 1000));
+      }
+      if (onSkippable === "throw") {
+        const txt = await res.text().catch(() => "");
+        throw new Error(`${kind} fetch failed: ${res.status} ${url}\n${txt}`);
+      }
+      return null;
     }
 
     if (!res.ok) {
@@ -274,32 +346,49 @@ async function fetchJsonWithRetry(
     return res.json();
   }
 
-  throw new Error(`${opts?.kind || "fetch"} failed after retries: ${url}`);
+  // if we exhausted 429 retries, treat as skip (quiet) unless verbose
+  if (!QUIET_SKIPS) {
+    console.warn(`[skip] ${kind} exhausted 429 retries: ${url}`);
+  }
+  return null;
 }
 
-async function fetchRegionalJson(url: string, opts?: { retries?: number }) {
-  return fetchJsonWithRetry(url, { retries: opts?.retries, kind: "regional" });
+async function fetchRegionalJson(url: string, opts?: { retries429?: number }) {
+  return fetchJsonWithRetry(url, {
+    kind: "regional",
+    retries429: opts?.retries429,
+    onSkippable: "return_null",
+  });
 }
 
-async function fetchPlatformJson(url: string, opts?: { retries?: number }) {
-  return fetchJsonWithRetry(url, { retries: opts?.retries, kind: "platform" });
+async function fetchPlatformJson(url: string, opts?: { retries429?: number }) {
+  return fetchJsonWithRetry(url, {
+    kind: "platform",
+    retries429: opts?.retries429,
+    onSkippable: "return_null",
+  });
 }
 
-// Match-v5 ids (regional, paged)
-async function getMatchIdsByPuuidPaged(puuid: string, start: number, count: number): Promise<string[]> {
-  const base =
-    `${riotRegionalBase()}/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids` +
+// Match-v5 ids (regional, paged) — return [] on skippable errors
+async function getMatchIdsByPuuidPaged(
+  puuid: string,
+  start: number,
+  count: number
+): Promise<string[]> {
+  const url =
+    `${riotRegionalBase()}/lol/match/v5/matches/by-puuid/${encodeURIComponent(
+      puuid
+    )}/ids` +
     `?start=${start}&count=${count}` +
     `&startTime=${START_TIME_SEC}`;
 
-  const url = base;
-
   const ids = (await fetchRegionalJson(url)) as any;
+  if (!ids) return []; // ✅ skip silently
   return Array.isArray(ids) ? ids.map(String) : [];
 }
 
 // ✅ read cache if present; if fetching, only write cache if opts.cacheWrite === true
-async function getMatch(matchId: string, opts?: { cacheWrite?: boolean }): Promise<any> {
+async function getMatch(matchId: string, opts?: { cacheWrite?: boolean }): Promise<any | null> {
   const cachePath = path.join(CACHE_MATCHES_DIR, `${matchId}.json`);
   try {
     const raw = await fs.readFile(cachePath, "utf-8");
@@ -307,6 +396,8 @@ async function getMatch(matchId: string, opts?: { cacheWrite?: boolean }): Promi
   } catch {
     const url = `${riotRegionalBase()}/lol/match/v5/matches/${encodeURIComponent(matchId)}`;
     const data = await fetchRegionalJson(url);
+    if (!data) return null; // ✅ skip silently
+
     if (opts?.cacheWrite) {
       await fs.writeFile(cachePath, JSON.stringify(data), "utf-8");
     }
@@ -314,14 +405,17 @@ async function getMatch(matchId: string, opts?: { cacheWrite?: boolean }): Promi
   }
 }
 
-async function getTimeline(matchId: string): Promise<any> {
+async function getTimeline(matchId: string): Promise<any | null> {
   const cachePath = path.join(CACHE_TIMELINES_DIR, `${matchId}.json`);
   try {
     const raw = await fs.readFile(cachePath, "utf-8");
     return JSON.parse(raw);
   } catch {
-    const url = `${riotRegionalBase()}/lol/match/v5/matches/${encodeURIComponent(matchId)}/timeline`;
+    const url = `${riotRegionalBase()}/lol/match/v5/matches/${encodeURIComponent(
+      matchId
+    )}/timeline`;
     const data = await fetchRegionalJson(url);
+    if (!data) return null; // ✅ skip silently
     await fs.writeFile(cachePath, JSON.stringify(data), "utf-8");
     return data;
   }
@@ -515,11 +609,7 @@ async function scanCacheAndIngest(agg: AggState) {
     let timeline: any = null;
     if (USE_TIMELINE) {
       const matchId = String(match?.metadata?.matchId || f.replace(".json", ""));
-      try {
-        timeline = await getTimeline(matchId);
-      } catch {
-        timeline = null;
-      }
+      timeline = await getTimeline(matchId);
     }
 
     for (const pt of participants) {
@@ -554,7 +644,9 @@ async function scanCacheAndIngest(agg: AggState) {
   }
 
   if (skippedOldOrNoCreation) {
-    console.log(`[cache] Skipped ${skippedOldOrNoCreation} cached matches due to strict age/no gameCreation.`);
+    console.log(
+      `[cache] Skipped ${skippedOldOrNoCreation} cached matches due to strict age/no gameCreation.`
+    );
   }
 
   return ingested;
@@ -577,16 +669,15 @@ async function seedPuuidsFromMatchIds(matchIds: string[]): Promise<string[]> {
   const puuids: string[] = [];
 
   for (const mid of matchIds) {
-    try {
-      // ✅ do not cache these unless they pass strict filter (handled below in main loop)
-      const match = await getMatch(mid, { cacheWrite: false });
-      const parts: any[] = Array.isArray(match?.info?.participants) ? match.info.participants : [];
-      for (const p of parts) {
-        const pu = String(p?.puuid || "").trim();
-        if (pu) puuids.push(pu);
-      }
-    } catch (e: any) {
-      console.warn(`Seed match fetch failed ${mid}: ${e?.message || e}`);
+    const match = await getMatch(mid, { cacheWrite: false });
+    if (!match) continue; // ✅ silent skip
+
+    const parts: any[] = Array.isArray(match?.info?.participants)
+      ? match.info.participants
+      : [];
+    for (const p of parts) {
+      const pu = String(p?.puuid || "").trim();
+      if (pu) puuids.push(pu);
     }
   }
 
@@ -611,27 +702,32 @@ type SummonerDTO = {
   name?: string;
 };
 
-async function fetchLadderLeague(): Promise<LeagueList> {
+async function fetchLadderLeague(): Promise<LeagueList | null> {
   const base = riotPlatformBase();
-
   const queuePath = LADDER_QUEUE;
 
   let url: string;
-  if (LADDER_TIER === "grandmaster") url = `${base}/lol/league/v4/grandmasterleagues/by-queue/${queuePath}`;
-  else if (LADDER_TIER === "master") url = `${base}/lol/league/v4/masterleagues/by-queue/${queuePath}`;
+  if (LADDER_TIER === "grandmaster")
+    url = `${base}/lol/league/v4/grandmasterleagues/by-queue/${queuePath}`;
+  else if (LADDER_TIER === "master")
+    url = `${base}/lol/league/v4/masterleagues/by-queue/${queuePath}`;
   else url = `${base}/lol/league/v4/challengerleagues/by-queue/${queuePath}`;
 
-  return (await fetchPlatformJson(url)) as LeagueList;
+  return (await fetchPlatformJson(url)) as LeagueList | null;
 }
 
-async function fetchSummonerById(encSummonerId: string): Promise<SummonerDTO> {
-  const url = `${riotPlatformBase()}/lol/summoner/v4/summoners/${encodeURIComponent(encSummonerId)}`;
-  return (await fetchPlatformJson(url)) as SummonerDTO;
+async function fetchSummonerById(encSummonerId: string): Promise<SummonerDTO | null> {
+  const url = `${riotPlatformBase()}/lol/summoner/v4/summoners/${encodeURIComponent(
+    encSummonerId
+  )}`;
+  return (await fetchPlatformJson(url)) as SummonerDTO | null;
 }
 
-async function fetchSummonerByName(summonerName: string): Promise<SummonerDTO> {
-  const url = `${riotPlatformBase()}/lol/summoner/v4/summoners/by-name/${encodeURIComponent(summonerName)}`;
-  return (await fetchPlatformJson(url)) as SummonerDTO;
+async function fetchSummonerByName(summonerName: string): Promise<SummonerDTO | null> {
+  const url = `${riotPlatformBase()}/lol/summoner/v4/summoners/by-name/${encodeURIComponent(
+    summonerName
+  )}`;
+  return (await fetchPlatformJson(url)) as SummonerDTO | null;
 }
 
 function pickFirstString(obj: any, keys: string[]): string {
@@ -644,12 +740,12 @@ function pickFirstString(obj: any, keys: string[]): string {
 
 async function ladderBootstrapPuuids(): Promise<string[]> {
   const league = await fetchLadderLeague();
+  if (!league) return []; // ✅ silent skip
+
   const entries = Array.isArray(league.entries) ? league.entries : [];
 
-  console.log("[ladder] league keys:", league ? Object.keys(league as any) : "NONE");
+  // keep some ladder debug (helpful even when quiet)
   console.log("[ladder] entries length:", entries.length);
-  console.log("[ladder] sample entry keys:", entries[0] ? Object.keys(entries[0] as any) : "NONE");
-  console.log("[ladder] sample entry:", entries[0] ?? null);
 
   entries.sort((a, b) => Number(b?.leaguePoints || 0) - Number(a?.leaguePoints || 0));
   const top = entries.slice(0, Math.max(0, LADDER_MAX_PLAYERS));
@@ -660,12 +756,6 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
 
   const puuids: string[] = [];
   let ok = 0;
-  let fail = 0;
-  let missingId = 0;
-  let missingName = 0;
-  let usedByName = 0;
-
-  let loggedSample = false;
 
   for (const anyE of top) {
     const directPuuid = pickFirstString(anyE, ["puuid", "playerPuuid", "player_puuid"]);
@@ -696,58 +786,27 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
       "name",
     ]);
 
-    if (!sid && !sname) {
-      missingId++;
-      missingName++;
-      if (!loggedSample) {
-        loggedSample = true;
-        console.warn("[ladder] entry missing BOTH puuid + (id/name). Full sample:", anyE);
-        console.warn("[ladder] entry keys:", Object.keys(anyE || {}));
-      }
-      continue;
-    }
+    if (!sid && !sname) continue;
 
-    try {
-      let dto: SummonerDTO | null = null;
+    let dto: SummonerDTO | null = null;
+    if (sid) dto = await fetchSummonerById(sid);
+    else dto = await fetchSummonerByName(sname);
 
-      if (sid) dto = await fetchSummonerById(sid);
-      else {
-        usedByName++;
-        dto = await fetchSummonerByName(sname);
-      }
-
-      const pu = String(dto?.puuid || "").trim();
-      if (pu) {
-        puuids.push(pu);
-        ok++;
-      } else {
-        fail++;
-      }
-    } catch (err: any) {
-      fail++;
-      console.warn(`[ladder] summoner resolve failed: ${sname || sid}: ${err?.message || err}`);
+    const pu = String(dto?.puuid || "").trim();
+    if (pu) {
+      puuids.push(pu);
+      ok++;
     }
   }
 
   const unique = Array.from(new Set(puuids));
-
-  console.log(
-    `[ladder] puuids resolved: ok=${ok} fail=${fail} missingId=${missingId} missingName=${missingName} byName=${usedByName} unique=${unique.length}`
-  );
-
-  if (unique.length === 0) {
-    throw new Error(
-      `[ladder] bootstrap produced 0 PUUIDs. Your ladder entries contain neither "puuid" nor any resolvable summoner id/name.`
-    );
-  }
-
+  console.log(`[ladder] puuids resolved: ok=${ok} unique=${unique.length}`);
   return unique;
 }
 
 // ===============================
 // Main
 // ===============================
-
 async function main() {
   assertEnv();
   await ensureDirs();
@@ -769,7 +828,7 @@ async function main() {
   const seenMatches = new Set<string>(seenMatchIds.ids || []);
   const seenPuuids = new Set<string>(seenPuuidsState.puuids || []);
 
-  // ✅ CHECKPOINTS: wire globals (new)
+  // ✅ CHECKPOINTS: wire globals
   gSeenMatches = seenMatches;
   gSeenPuuids = seenPuuids;
   gPuuidCursors = puuidCursors;
@@ -778,24 +837,16 @@ async function main() {
   const cacheIngested = await scanCacheAndIngest(agg);
   console.log(`Ingested cached matches this run: ${cacheIngested}`);
 
-  // ✅ Bootstrap PUUID queue from ladder instead of seeds.json
+  // ✅ Bootstrap PUUID queue from ladder + optional seed matches
   const puuidQueue: string[] = [];
   const bootstrapPuuids = new Set<string>();
 
-  try {
-    const ladderPuuids = await ladderBootstrapPuuids();
-    for (const pu of ladderPuuids) {
-      bootstrapPuuids.add(pu);
-      puuidQueue.push(pu);
-    }
-  } catch (e: any) {
-    console.warn(
-      `[ladder] bootstrap failed: ${e?.message || e}\n` +
-        "You can still seed via SEED_MATCH_IDS / SEED_MATCH_URLS if ladder endpoints are blocked."
-    );
+  const ladderPuuids = await ladderBootstrapPuuids();
+  for (const pu of ladderPuuids) {
+    bootstrapPuuids.add(pu);
+    puuidQueue.push(pu);
   }
 
-  // Optional backup seeding from match ids/urls
   const fromUrls = parseMatchIdsFromUrls(SEED_MATCH_URLS);
   const matchSeedIds = Array.from(new Set([...SEED_MATCH_IDS, ...fromUrls]));
   if (matchSeedIds.length) {
@@ -831,10 +882,11 @@ async function main() {
     skippedNoParticipants: 0,
     skippedSeen: 0,
     cachedWritten: 0,
+    skippedFetchNull: 0,
   };
 
   while (puuidQueue.length > 0) {
-    if (shutdownRequested) break; // ✅ CHECKPOINTS (new)
+    if (shutdownRequested) break;
     if (matchesProcessed >= MAX_MATCHES_PER_RUN) break;
 
     const puuid = puuidQueue.shift()!;
@@ -845,21 +897,16 @@ async function main() {
 
     const start = Number(puuidCursors[puuid] || 0);
 
-    let matchIds: string[] = [];
-    try {
-      matchIds = await getMatchIdsByPuuidPaged(puuid, start, MATCHES_PER_PUUID);
-    } catch (e: any) {
-      console.warn(`Failed match ids for PUUID ${puuid.slice(0, 8)}…: ${e?.message || e}`);
-      continue;
-    } finally {
-      seenPuuids.add(puuid);
-    }
+    const matchIds = await getMatchIdsByPuuidPaged(puuid, start, MATCHES_PER_PUUID);
 
+    // Always mark seen for this cursor step so we don't spin
+    seenPuuids.add(puuid);
     puuidCursors[puuid] = start + MATCHES_PER_PUUID;
+
     if (!matchIds.length) continue;
 
     for (const matchId of matchIds) {
-      if (shutdownRequested) break; // ✅ CHECKPOINTS (new)
+      if (shutdownRequested) break;
       if (matchesProcessed >= MAX_MATCHES_PER_RUN) break;
 
       if (seenMatches.has(matchId)) {
@@ -867,13 +914,10 @@ async function main() {
         continue;
       }
 
-      // ✅ IMPORTANT: do NOT mark seen yet — fetch + validate first
-      let match: any;
-      try {
-        match = await getMatch(matchId, { cacheWrite: false }); // write only after strict filter passes
-      } catch (e: any) {
-        console.warn(`Failed match ${matchId}: ${e?.message || e}`);
-        continue;
+      const match = await getMatch(matchId, { cacheWrite: false });
+      if (!match) {
+        strictDebug.skippedFetchNull += 1;
+        continue; // ✅ silent skip
       }
 
       const info = match?.info;
@@ -883,8 +927,6 @@ async function main() {
         continue;
       }
 
-      // ✅ STRICT RECENCY FILTER (the one you asked for):
-      // Drop if missing gameCreation OR older than cutoff.
       const created = Number(info?.gameCreation || 0);
       if (!created) {
         strictDebug.skippedNoGameCreation += 1;
@@ -907,13 +949,13 @@ async function main() {
         continue;
       }
 
-      // ✅ NOW that it’s valid, cache it + mark seen
+      // ✅ valid: cache + mark seen
       try {
         const cachePath = path.join(CACHE_MATCHES_DIR, `${matchId}.json`);
         await fs.writeFile(cachePath, JSON.stringify(match), "utf-8");
         strictDebug.cachedWritten += 1;
       } catch {
-        // ignore cache write failures
+        // ignore
       }
 
       seenMatches.add(matchId);
@@ -922,11 +964,7 @@ async function main() {
 
       let timeline: any = null;
       if (USE_TIMELINE) {
-        try {
-          timeline = await getTimeline(matchId);
-        } catch {
-          timeline = null;
-        }
+        timeline = await getTimeline(matchId);
       }
 
       for (const pt of participants) {
@@ -959,7 +997,6 @@ async function main() {
 
       matchesProcessed += 1;
 
-      // ✅ CHECKPOINTS: flush every N matches (new)
       if (CHECKPOINT_EVERY > 0 && matchesProcessed - gLastCheckpointMatches >= CHECKPOINT_EVERY) {
         gLastCheckpointMatches = matchesProcessed;
         await persistState(`every:${CHECKPOINT_EVERY}`);
@@ -980,11 +1017,14 @@ async function main() {
 
   console.log("[strict] DEBUG:", strictDebug);
 
-  // ✅ CHECKPOINTS: final flush (new)
   await persistState("end");
 
-  await writeJson(SEEN_MATCH_IDS_PATH, { ids: Array.from(seenMatches) } satisfies SeenMatchIdsState);
-  await writeJson(SEEN_PUUIDS_PATH, { puuids: Array.from(seenPuuids) } satisfies SeenPuuidsState);
+  await writeJson(SEEN_MATCH_IDS_PATH, {
+    ids: Array.from(seenMatches),
+  } satisfies SeenMatchIdsState);
+  await writeJson(SEEN_PUUIDS_PATH, {
+    puuids: Array.from(seenPuuids),
+  } satisfies SeenPuuidsState);
   await writeJson(PUUID_CURSORS_PATH, puuidCursors);
   await writeJson(AGG_STATE_PATH, agg);
 
@@ -992,6 +1032,7 @@ async function main() {
   console.log(`Processed matches this run: ${matchesProcessed} (budget=${MAX_MATCHES_PER_RUN})`);
   console.log(`Added new PUUIDs this run: ${newPuuidsAdded} (cap=${MAX_NEW_PUUIDS_PER_RUN})`);
   console.log(`Wrote: ${OUT_RANKED_PATH}`);
+  console.log(`Wrote: ${OUT_CASUAL_PATH}`);
   console.log(`Wrote: ${OUT_CASUAL_PATH}`);
   console.log(`Cache dir: ${CACHE_DIR}`);
 }
