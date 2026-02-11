@@ -93,7 +93,9 @@ jobs:
 
           echo "rebuild=$REBUILD" >> "$GITHUB_OUTPUT"
 
-          # Beefier runs (production key): higher caps + less checkpoint overhead.
+          # NOTE:
+          # Match-V5 /matches/by-puuid/.../ids endpoint only allows count <= 100.
+          # Keep MATCHES_PER_PUUID <= 100 unless your script implements paging.
           if [ "$REBUILD" = "true" ]; then
             echo "REPROCESS_BOOTSTRAP=1" >> "$GITHUB_ENV"
             echo "REPROCESS_SEEDS=1" >> "$GITHUB_ENV"
@@ -101,7 +103,7 @@ jobs:
             echo "RESET_SEEN_PUUIDS=1" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=1" >> "$GITHUB_ENV"
 
-            # Rebuild: still heavy, but slightly more conservative for stability
+            # Rebuild: heavy, but stable
             echo "MAX_MATCHES_PER_RUN=80000" >> "$GITHUB_ENV"
             echo "MAX_NEW_PUUIDS_PER_RUN=8000" >> "$GITHUB_ENV"
             echo "MATCHES_PER_PUUID=80" >> "$GITHUB_ENV"
@@ -113,10 +115,10 @@ jobs:
             echo "RESET_SEEN_PUUIDS=0" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=0" >> "$GITHUB_ENV"
 
-            # Incremental: very beefy (long run + high throughput)
+            # Incremental: beefy, but must respect Riot's max count=100 per ids call
             echo "MAX_MATCHES_PER_RUN=120000" >> "$GITHUB_ENV"
             echo "MAX_NEW_PUUIDS_PER_RUN=20000" >> "$GITHUB_ENV"
-            echo "MATCHES_PER_PUUID=250" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=100" >> "$GITHUB_ENV"
             echo "CHECKPOINT_EVERY=250" >> "$GITHUB_ENV"
           fi
 
