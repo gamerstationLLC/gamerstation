@@ -37,7 +37,6 @@ jobs:
           git fetch origin main
           git checkout main
           git reset --hard origin/main
-
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -55,18 +54,31 @@ jobs:
             scripts/riot/cache/matches
             scripts/riot/cache/timelines
             scripts/riot/cache/state
-          key: lol-riot-cache-v2-${{ runner.os }}
+          key: lol-riot-cache-v1-${{ runner.os }}
           restore-keys: |
-            lol-riot-cache-v2-${{ runner.os }}
-            lol-riot-cache-v2
-
+            lol-riot-cache-v1-${{ runner.os }}
+            lol-riot-cache-v1
+      - name: Prune old Riot cache (90 days)
+        run: |
+          set -e
+          CUTOFF=$(date -d "90 days ago" +%s)
+          for DIR in scripts/riot/cache/matches scripts/riot/cache/timelines; do
+            if [ -d "$DIR" ]; then
+              find "$DIR" -type f -name "*.json" | while read -r file; do
+                mtime=$(stat -c %Y "$file" 2>/dev/null || echo 0)
+                if [ "$mtime" -lt "$CUTOFF" ]; then
+                  rm -f "$file"
+                fi
+              done
+            fi
+          done
       - name: Update LoL static data
         run: npm run lol:update
 
       - name: Update LoL overrides
         run: npm run lol:update:overrides
 
-      - name: Set crawl mode (STABLE PROFILE)
+      - name: Set crawl mode
         id: mode
         run: |
           set -e
@@ -74,38 +86,26 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             REBUILD="${{ inputs.rebuild }}"
           fi
-
           echo "rebuild=$REBUILD" >> "$GITHUB_OUTPUT"
-
-          # Riot Match-V5 is fragile when hammered.
-          # Strategy: keep each run "calm" and rely on the 6-hour cadence.
-
           if [ "$REBUILD" = "true" ]; then
             echo "REPROCESS_BOOTSTRAP=1" >> "$GITHUB_ENV"
             echo "REPROCESS_SEEDS=1" >> "$GITHUB_ENV"
             echo "RESET_SEEN_MATCHES=1" >> "$GITHUB_ENV"
             echo "RESET_SEEN_PUUIDS=1" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=1" >> "$GITHUB_ENV"
-
-            # Controlled rebuild (still big, but not a 500-storm generator)
-            echo "MAX_MATCHES_PER_RUN=30000" >> "$GITHUB_ENV"
-            echo "MAX_NEW_PUUIDS_PER_RUN=3000" >> "$GITHUB_ENV"
-            echo "MATCHES_PER_PUUID=50" >> "$GITHUB_ENV"
-            echo "CHECKPOINT_EVERY=200" >> "$GITHUB_ENV"
+            echo "MAX_MATCHES_PER_RUN=5000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=500" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=20" >> "$GITHUB_ENV"
           else
             echo "REPROCESS_BOOTSTRAP=0" >> "$GITHUB_ENV"
             echo "REPROCESS_SEEDS=0" >> "$GITHUB_ENV"
             echo "RESET_SEEN_MATCHES=0" >> "$GITHUB_ENV"
             echo "RESET_SEEN_PUUIDS=0" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=0" >> "$GITHUB_ENV"
-
-            # Stable incremental profile (fast, but not abusive)
-            echo "MAX_MATCHES_PER_RUN=12000" >> "$GITHUB_ENV"
-            echo "MAX_NEW_PUUIDS_PER_RUN=2000" >> "$GITHUB_ENV"
-            echo "MATCHES_PER_PUUID=30" >> "$GITHUB_ENV"
-            echo "CHECKPOINT_EVERY=200" >> "$GITHUB_ENV"
+            echo "MAX_MATCHES_PER_RUN=20000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=4000" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=100" >> "$GITHUB_ENV"
           fi
-
       - name: Crawl Riot matches (never fail job)
         env:
           RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
@@ -113,11 +113,11 @@ jobs:
           RIOT_PLATFORM: na1
           LADDER_QUEUE: RANKED_SOLO_5x5
           LADDER_TIER: challenger
-          LADDER_MAX_PLAYERS: "300"
+          LADDER_MAX_PLAYERS: "250"
           MAX_MATCHES_PER_RUN: ${{ env.MAX_MATCHES_PER_RUN }}
           MAX_NEW_PUUIDS_PER_RUN: ${{ env.MAX_NEW_PUUIDS_PER_RUN }}
           MATCHES_PER_PUUID: ${{ env.MATCHES_PER_PUUID }}
-          CHECKPOINT_EVERY: ${{ env.CHECKPOINT_EVERY }}
+          CHECKPOINT_EVERY: "100"
           USE_TIMELINE: "0"
           REPROCESS_BOOTSTRAP: ${{ env.REPROCESS_BOOTSTRAP }}
           REPROCESS_SEEDS: ${{ env.REPROCESS_SEEDS }}
@@ -128,37 +128,33 @@ jobs:
           CACHE_MAX_AGE_DAYS: "90"
         run: |
           set +e
-          timeout 16000 npm run lol:update:meta
+          timeout 17940 npm run lol:update:meta
           exit 0
-
       - name: Finalize meta builds
         if: always()
         run: |
           set +e
           npm run lol:finalize:meta
           exit 0
-
       - name: Upload meta builds to Blob
         if: always()
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
           BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
           BLOB_CACHE_SECONDS: "300"
+          LOL_PATCH: ${{ github.run_id }}
         run: |
           set +e
           if [ -n "$BLOB_READ_WRITE_TOKEN" ]; then
             node scripts/blob/upload-data.mjs || true
           fi
           exit 0
-
       - name: Commit & push static data only
         if: always()
         run: |
           set -euo pipefail
-
           git config user.name "gamerstation-bot"
           git config user.email "actions@users.noreply.github.com"
-
           CANDIDATES=(
             "public/data/lol/champions_index.json"
             "public/data/lol/champions_full.json"
@@ -166,20 +162,16 @@ jobs:
             "public/data/lol/spells_overrides.json"
             "public/data/lol/version.json"
           )
-
           for p in "${CANDIDATES[@]}"; do
             if [ -e "$p" ]; then
               git add -A "$p"
             fi
           done
-
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-
           git commit -m "chore(lol): refresh LoL static"
-
           for i in 1 2 3 4 5; do
             git fetch origin main
             git pull --no-rebase origin main || true
@@ -189,6 +181,5 @@ jobs:
             fi
             sleep 5
           done
-
           echo "Push failed after retries."
           exit 1
