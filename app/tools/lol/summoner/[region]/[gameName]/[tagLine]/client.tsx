@@ -52,6 +52,11 @@ type SummonerProfileData = {
     ddVersion?: string;
     usedFallbackByName?: boolean;
     attemptedRiotId?: string;
+    partial?: {
+      requested: number;
+      loaded: number;
+      failedMatches: number;
+    };
   };
 };
 
@@ -163,6 +168,11 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
       ? `Matched by Summoner Name (fallback from ${data.meta.attemptedRiotId})`
       : "Match history + quick aggregated stats";
 
+  const partialNote =
+    data.meta?.partial?.failedMatches && data.meta.partial.failedMatches > 0
+      ? `Some matches could not be loaded right now (Riot API hiccup). Showing ${data.meta.partial.loaded}/${data.meta.partial.requested}.`
+      : "";
+
   return (
     <div className="space-y-8">
       {/* Top profile card */}
@@ -269,6 +279,9 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
             <div className="mt-1 text-sm text-neutral-400">
               Click a champion icon to open their page.
             </div>
+            {partialNote ? (
+              <div className="mt-2 text-xs text-amber-200/90">{partialNote}</div>
+            ) : null}
           </div>
 
           <input

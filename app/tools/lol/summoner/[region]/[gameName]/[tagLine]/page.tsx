@@ -102,6 +102,11 @@ function isValidPlatformRegion(v: string): v is PlatformRegion {
     "ru",
     "kr",
     "jp1",
+    "ph2",
+    "sg2",
+    "th2",
+    "tw2",
+    "vn2",
   ].includes(v);
 }
 
@@ -142,19 +147,14 @@ function deriveDdVersionFromGameVersion(gameVersion: string | undefined) {
   return `${parts[0]}.${parts[1]}.1`;
 }
 
-export default async function SummonerProfilePage({
-  params,
-}: {
-  params: Promise<Params>;
-}) {
-  const p = await params;
-
-  const regionRaw = safeDecode(p.region as unknown as string);
-  const gameName = safeDecode(p.gameName);
-  const tagLine = safeDecode(p.tagLine);
+export default async function SummonerProfilePage({ params }: { params: Params }) {
+  const regionRaw = safeDecode(params.region as unknown as string);
+  const gameName = safeDecode(params.gameName);
+  const tagLine = safeDecode(params.tagLine);
 
   if (!isValidPlatformRegion(regionRaw)) notFound();
-  const region = regionRaw;
+
+  const region = regionRaw as PlatformRegion;
   const cluster = platformToCluster(region);
 
   // Resolve PUUID:
@@ -164,36 +164,37 @@ export default async function SummonerProfilePage({
   let displayName = `${gameName}#${tagLine}`;
   let usedFallbackByName = false;
 
-  try {
-    const accountUrl = `${riotHostForCluster(
-      cluster
-    )}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
-      gameName
-    )}/${encodeURIComponent(tagLine)}`;
+  const accountUrl = `${riotHostForCluster(
+    cluster
+  )}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
+    gameName
+  )}/${encodeURIComponent(tagLine)}`;
 
-    const account = await riotFetchJson<AccountByRiotId>(accountUrl, {
-      revalidateSeconds: 300,
-      maxRetries: 2,
-    });
+  const account = await riotFetchJson<AccountByRiotId>(accountUrl, {
+    revalidate: 300,
+    attempts: 3,
+    softFail: true,
+  });
 
+  if (account?.puuid) {
     puuid = account.puuid;
     displayName = `${account.gameName}#${account.tagLine}`;
-  } catch {
+  } else {
     usedFallbackByName = true;
-    try {
-      const byNameUrl = `${riotHostForPlatform(
-        region
-      )}/lol/summoner/v4/summoners/by-name/${encodeURIComponent(gameName)}`;
 
-      const s = await riotFetchJson<SummonerByName>(byNameUrl, {
-        revalidateSeconds: 300,
-        maxRetries: 2,
-      });
+    const byNameUrl = `${riotHostForPlatform(
+      region
+    )}/lol/summoner/v4/summoners/by-name/${encodeURIComponent(gameName)}`;
 
+    const s = await riotFetchJson<SummonerByName>(byNameUrl, {
+      revalidate: 300,
+      attempts: 3,
+      softFail: true,
+    });
+
+    if (s?.puuid) {
       puuid = s.puuid;
       displayName = s.name;
-    } catch {
-      notFound();
     }
   }
 
@@ -204,32 +205,48 @@ export default async function SummonerProfilePage({
   )}/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(puuid)}`;
 
   const summoner = await riotFetchJson<SummonerByPuuid>(summonerUrl, {
-    revalidateSeconds: 300,
-    maxRetries: 2,
+    revalidate: 300,
+    attempts: 3,
+    softFail: true,
   });
+
+  // If we can't load summoner basics, we can't render safely
+  if (!summoner) notFound();
 
   const matchIdsUrl = `${riotHostForCluster(
     cluster
-  )}/lol/match/v5/matches/by-puuid/${encodeURIComponent(
-    puuid
-  )}/ids?start=0&count=20`;
+  )}/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids?start=0&count=20`;
 
   const matchIds = await riotFetchJson<string[]>(matchIdsUrl, {
-    revalidateSeconds: 300,
-    maxRetries: 2,
+    revalidate: 300,
+    attempts: 3,
+    softFail: true,
   });
 
-  const matchDetails = await mapLimit(matchIds.slice(0, 12), 4, async (matchId) => {
+  const ids = Array.isArray(matchIds) ? matchIds.slice(0, 12) : [];
+  const requested = ids.length;
+
+  const matchDetailsRaw = await mapLimit(ids, 4, async (matchId) => {
     const matchUrl = `${riotHostForCluster(
       cluster
     )}/lol/match/v5/matches/${encodeURIComponent(matchId)}`;
+
+    // ✅ Soft-fail: Riot 500s won't crash SSR; we'll just skip the match
     return riotFetchJson<MatchV5>(matchUrl, {
-      revalidateSeconds: 300,
-      maxRetries: 2,
+      revalidate: 300,
+      attempts: 4,
+      softFail: true,
     });
   });
 
-  // âœ… derive ddragon version once from the first match
+  const matchDetails = matchDetailsRaw.filter(
+    (m): m is MatchV5 => Boolean(m && m.info && m.metadata)
+  );
+
+  const loaded = matchDetails.length;
+  const failedMatches = Math.max(0, requested - loaded);
+
+  // ✅ derive ddragon version once from the first loaded match
   const ddVersion = deriveDdVersionFromGameVersion(matchDetails?.[0]?.info?.gameVersion);
 
   const rows = matchDetails
@@ -245,7 +262,7 @@ export default async function SummonerProfilePage({
         durationSec: m.info.gameDuration,
         mode: m.info.gameMode,
         queueId: m.info.queueId,
-        gameVersion: m.info.gameVersion, // âœ… pass through for icon version fallback
+        gameVersion: m.info.gameVersion,
         win: me.win,
         champ: me.championName,
         role: me.teamPosition || me.lane || me.role,
@@ -315,7 +332,12 @@ export default async function SummonerProfilePage({
     meta: {
       usedFallbackByName,
       attemptedRiotId: `${gameName}#${tagLine}`,
-      ddVersion, // âœ… so client always knows what to use for Data Dragon URLs
+      ddVersion,
+      partial: {
+        requested,
+        loaded,
+        failedMatches,
+      },
     },
   };
 
@@ -327,13 +349,14 @@ export default async function SummonerProfilePage({
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/gs-logo-v2.png"
               alt="GamerStation"
               className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.25)]"
             />
             <span className="text-lg font-black">
-              GamerStation<span className="align-super text-[0.6em]">TM</span>
+              GamerStation<span className="align-super text-[0.6em]">™</span>
             </span>
           </Link>
 
