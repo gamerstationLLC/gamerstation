@@ -9,9 +9,11 @@ export const metadata = {
 };
 
 // âœ… Daily full-page regeneration
-export const revalidate = 60 * 60 * 24; // 24 hours
-
+export const revalidate = 86400; // 24 hours
 export const dynamic = "force-static";
+
+
+
 
 type HeroStatsRow = {
   id: number;
