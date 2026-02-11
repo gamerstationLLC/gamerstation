@@ -77,9 +77,8 @@ jobs:
 
           echo "rebuild=$REBUILD" >> "$GITHUB_OUTPUT"
 
-          # IMPORTANT:
           # Riot Match-V5 is fragile when hammered.
-          # We lower pressure and rely on frequent cron runs instead.
+          # Strategy: keep each run "calm" and rely on the 6-hour cadence.
 
           if [ "$REBUILD" = "true" ]; then
             echo "REPROCESS_BOOTSTRAP=1" >> "$GITHUB_ENV"
@@ -88,10 +87,10 @@ jobs:
             echo "RESET_SEEN_PUUIDS=1" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=1" >> "$GITHUB_ENV"
 
-            # Controlled rebuild
-            echo "MAX_MATCHES_PER_RUN=50000" >> "$GITHUB_ENV"
-            echo "MAX_NEW_PUUIDS_PER_RUN=5000" >> "$GITHUB_ENV"
-            echo "MATCHES_PER_PUUID=60" >> "$GITHUB_ENV"
+            # Controlled rebuild (still big, but not a 500-storm generator)
+            echo "MAX_MATCHES_PER_RUN=30000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=3000" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=50" >> "$GITHUB_ENV"
             echo "CHECKPOINT_EVERY=200" >> "$GITHUB_ENV"
           else
             echo "REPROCESS_BOOTSTRAP=0" >> "$GITHUB_ENV"
@@ -100,15 +99,10 @@ jobs:
             echo "RESET_SEEN_PUUIDS=0" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=0" >> "$GITHUB_ENV"
 
-            # Stable incremental profile
-            echo "MAX_MATCHES_PER_RUN=70000" >> "$GITHUB_ENV"
-            echo "MAX_NEW_PUUIDS_PER_RUN=10000" >> "$GITHUB_ENV"
-
-            # CRITICAL FIX:
-            # DO NOT exceed 100 (Riot hard cap)
-            # Keep this conservative to reduce 500 storms.
-            echo "MATCHES_PER_PUUID=80" >> "$GITHUB_ENV"
-
+            # Stable incremental profile (fast, but not abusive)
+            echo "MAX_MATCHES_PER_RUN=12000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=2000" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=30" >> "$GITHUB_ENV"
             echo "CHECKPOINT_EVERY=200" >> "$GITHUB_ENV"
           fi
 
