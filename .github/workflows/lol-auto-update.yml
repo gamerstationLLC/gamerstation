@@ -2,7 +2,7 @@ name: Auto Update LoL Data
 
 on:
   schedule:
-    - cron: "30 */6 * * *"
+    - cron: "30 */2 * * *"
   workflow_dispatch:
     inputs:
       rebuild:
