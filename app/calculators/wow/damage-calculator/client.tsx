@@ -82,7 +82,7 @@ const GEAR_SLOTS: Array<{
 ];
 
 /* =========================
-   Math helpers
+   Helpers
 ========================= */
 
 function clamp(n: number, min: number, max: number) {
@@ -104,6 +104,20 @@ function expectedDamageMultiplierFromCrit(critChancePct: number, critMult: numbe
 }
 function safeNum(n: number, fallback = 0) {
   return Number.isFinite(n) ? n : fallback;
+}
+
+function norm(s: string) {
+  return (s || "").toLowerCase().trim();
+}
+function tokenizeQuery(q: string) {
+  return norm(q)
+    .split(/[^a-z0-9]+/g)
+    .map((x) => x.trim())
+    .filter(Boolean);
+}
+
+function isValidItemRow(r: ItemIndexRow): r is ItemIndexRow & { id: number } {
+  return typeof (r as any)?.id === "number" && Number.isFinite((r as any).id);
 }
 
 /* =========================
@@ -180,74 +194,8 @@ function computeSpecDps(spec: SpecPreset, inp: CalcInputs) {
 }
 
 /* =========================
-   UI atoms
+   Dropdown
 ========================= */
-
-function SmallNumberInput(props: {
-  label?: string;
-  value: number;
-  onChange: (v: number) => void;
-  min?: number;
-  max?: number;
-  step?: number;
-  suffix?: string;
-}) {
-  const { label, value, onChange, min, max, step, suffix } = props;
-
-  return (
-    <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-3">
-      {label ? <div className="text-[11px] font-semibold text-neutral-400">{label}</div> : null}
-      <div className="mt-2 flex items-center gap-2">
-        <input
-          className="h-10 w-full rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-100 outline-none transition focus:border-neutral-600"
-          type="number"
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          min={min}
-          max={max}
-          step={step}
-          inputMode="decimal"
-        />
-        {suffix ? <div className="shrink-0 text-xs text-neutral-500">{suffix}</div> : null}
-      </div>
-    </div>
-  );
-}
-
-function ChipButton(props: { active?: boolean; children: ReactNode; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={props.onClick}
-      className={[
-        "h-10 rounded-xl border px-4 text-sm transition",
-        props.active
-          ? "border-neutral-600 bg-black text-white"
-          : "border-neutral-800 bg-neutral-950 text-neutral-300 hover:border-neutral-600 hover:text-white",
-      ].join(" ")}
-    >
-      {props.children}
-    </button>
-  );
-}
-
-/* =========================
-   Search helpers
-========================= */
-
-function norm(s: string) {
-  return (s || "").toLowerCase().trim();
-}
-function tokenizeQuery(q: string) {
-  return norm(q)
-    .split(/[^a-z0-9]+/g)
-    .map((x) => x.trim())
-    .filter(Boolean);
-}
-
-function isValidItemRow(r: ItemIndexRow): r is ItemIndexRow & { id: number } {
-  return typeof (r as any)?.id === "number" && Number.isFinite((r as any).id);
-}
 
 function SearchDropdown(props: {
   placeholder: string;
@@ -305,6 +253,12 @@ function SearchDropdown(props: {
         ) : null}
       </div>
 
+      {selectedLabel ? (
+        <div className="mt-2 text-[11px] text-neutral-400 truncate">
+          Selected: <span className="text-neutral-200 font-semibold">{selectedLabel}</span>
+        </div>
+      ) : null}
+
       {open ? (
         <div className="absolute z-40 mt-2 w-full overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow-[0_0_30px_rgba(0,0,0,0.55)]">
           <div className="max-h-[320px] overflow-auto p-2">
@@ -343,12 +297,11 @@ function SearchDropdown(props: {
 }
 
 /* =========================
-   Item parsing
+   Detail parsing
 ========================= */
 
 function sumStatsFromDetail(detail: any) {
   const out: Partial<Record<StatKey, number>> = {};
-
   const stats = detail?.stats ?? detail?.preview_item?.stats ?? detail?.previewItem?.stats ?? [];
 
   if (Array.isArray(stats)) {
@@ -356,7 +309,6 @@ function sumStatsFromDetail(detail: any) {
       const type = s?.type?.type ?? s?.type ?? s?.stat ?? s?.name ?? "";
       const val = Number(s?.value ?? s?.amount ?? 0);
       if (!type || !Number.isFinite(val)) continue;
-
       const k = String(type).toUpperCase() as StatKey;
       out[k] = (out[k] ?? 0) + val;
     }
@@ -384,28 +336,18 @@ function guessWeaponDps(detail: any): number {
 }
 
 /* =========================
-   Slot normalization (FIXED)
+   Slot normalization (covers INVTYPE_*)
 ========================= */
 
 function normalizeSlotKey(raw: any): string {
   let k = String(raw ?? "").toUpperCase().trim();
   if (!k) return "";
 
-  // ✅ common Blizzard index formats
-  // INVTYPE_HEAD, invtype_neck, etc
   if (k.startsWith("INVTYPE_")) k = k.slice("INVTYPE_".length);
-
-  // some pipelines store "SLOT_HEAD" etc
   if (k.startsWith("SLOT_")) k = k.slice("SLOT_".length);
 
-  // normalize oddities
   if (k === "HAND") k = "HANDS";
-  if (k === "CLOAK") k = "CLOAK"; // explicit
-  if (k === "2HWEAPON") k = "2HWEAPON"; // keep
   if (k === "TWOHWEAPON") k = "2HWEAPON";
-  if (k === "WEAPONMAINHAND") k = "WEAPONMAINHAND";
-  if (k === "WEAPONOFFHAND") k = "WEAPONOFFHAND";
-
   return k;
 }
 
@@ -422,13 +364,89 @@ function getRowSlotKey(r: any): string {
   return normalizeSlotKey(type);
 }
 
-function normalizeIndexToArray(raw: any): ItemIndexRow[] {
+/* =========================
+   Normalize/merge ALL item sources
+========================= */
+
+function normalizeToRows(raw: any): ItemIndexRow[] {
   if (!raw) return [];
-  if (Array.isArray(raw)) return raw;
-  if (Array.isArray(raw?.rows)) return raw.rows;
-  if (Array.isArray(raw?.items)) return raw.items;
-  if (typeof raw === "object") return Object.values(raw);
+  if (Array.isArray(raw)) return raw as any;
+  if (Array.isArray(raw?.rows)) return raw.rows as any;
+  if (Array.isArray(raw?.items)) return raw.items as any;
+
+  // object map => values
+  if (typeof raw === "object") {
+    return Object.values(raw) as any;
+  }
   return [];
+}
+
+function normalizeItemsByIdToRows(raw: any): ItemIndexRow[] {
+  if (!raw) return [];
+
+  // items_by_id.json often is { "19019": { ...detail... } } or { "19019": { detail: ... } }
+  if (typeof raw === "object" && !Array.isArray(raw)) {
+    const out: ItemIndexRow[] = [];
+    for (const [k, v] of Object.entries(raw)) {
+      const id = Number(k);
+      if (!Number.isFinite(id)) continue;
+      const obj: any = v || {};
+      const name =
+        obj?.name ??
+        obj?.detail?.name ??
+        obj?.detail?.preview_item?.name ??
+        obj?.preview_item?.name ??
+        obj?.previewItem?.name;
+
+      const invType =
+        obj?.inventory_type?.type ??
+        obj?.detail?.inventory_type?.type ??
+        obj?.detail?.preview_item?.inventory_type?.type;
+
+      const pack = obj?.pack ?? obj?.detail?.pack;
+
+      out.push({
+        id,
+        name: name ? String(name) : undefined,
+        nameNorm: name ? String(name).toLowerCase() : undefined,
+        pack: typeof pack === "number" ? pack : undefined,
+        inventoryTypeKey: invType ? String(invType) : undefined,
+      });
+    }
+    return out;
+  }
+
+  return [];
+}
+
+function mergeDedupeRows(a: ItemIndexRow[], b: ItemIndexRow[]): ItemIndexRow[] {
+  const byId = new Map<number, any>();
+
+  function absorb(rows: ItemIndexRow[]) {
+    for (const r of rows) {
+      const id = Number((r as any)?.id);
+      if (!Number.isFinite(id)) continue;
+
+      const prev = byId.get(id) || {};
+      // merge: keep existing, fill missing from next
+      const next = { ...r } as any;
+      const merged: any = { ...next, ...prev };
+
+      // Prefer name from next if prev missing
+      if (!merged.name && next.name) merged.name = next.name;
+      if (!merged.nameNorm && (next.nameNorm || next.name)) merged.nameNorm = String(next.nameNorm ?? next.name).toLowerCase();
+
+      // Tokens fallback
+      if (!Array.isArray(merged.tokens) && Array.isArray((next as any).tokens)) merged.tokens = (next as any).tokens;
+
+      byId.set(id, merged);
+    }
+  }
+
+  absorb(a);
+  absorb(b);
+
+  return Array.from(byId.values());
 }
 
 /* =========================
@@ -437,14 +455,26 @@ function normalizeIndexToArray(raw: any): ItemIndexRow[] {
 
 export default function WowDamageCalcClient(props: {
   presets: PresetsFile | null;
-  itemsIndex: any;
+  itemsIndexA: any; // items_index.json (any shape)
+  itemsIndexB: any; // index.json (any shape)
+  itemsById: any; // items_by_id.json (map)
+  probe: any; // probe.json (optional)
 }) {
   const presets: PresetsFile = useMemo(() => {
     if (props.presets?.specs?.length) return props.presets;
     return { version: "missing", specs: [] };
   }, [props.presets]);
 
-  const itemsIndex: ItemIndexRow[] = useMemo(() => normalizeIndexToArray(props.itemsIndex), [props.itemsIndex]);
+  const itemsIndex: ItemIndexRow[] = useMemo(() => {
+    const a = normalizeToRows(props.itemsIndexA);
+    const b = normalizeToRows(props.itemsIndexB);
+    const c = normalizeItemsByIdToRows(props.itemsById);
+    return mergeDedupeRows(mergeDedupeRows(a, b), c);
+  }, [props.itemsIndexA, props.itemsIndexB, props.itemsById]);
+
+  const itemsByIdMap = useMemo(() => {
+    return props.itemsById && typeof props.itemsById === "object" ? props.itemsById : null;
+  }, [props.itemsById]);
 
   const [specId, setSpecId] = useState<string>(() => presets.specs[0]?.id ?? "");
   useEffect(() => {
@@ -454,6 +484,10 @@ export default function WowDamageCalcClient(props: {
   }, [presets.version, presets.specs.length]);
 
   const spec = useMemo(() => presets.specs.find((s) => s.id === specId) ?? presets.specs[0] ?? null, [presets, specId]);
+
+  /* =========================
+     Inputs
+  ========================= */
 
   const [mobileTab, setMobileTab] = useState<MobileTab>("stats");
 
@@ -514,32 +548,109 @@ export default function WowDamageCalcClient(props: {
   }, [spec, baseInputs]);
 
   /* =========================
+     Small UI atoms
+  ========================= */
+
+  function SmallNumberInput(props: {
+    label?: string;
+    value: number;
+    onChange: (v: number) => void;
+    min?: number;
+    max?: number;
+    step?: number;
+    suffix?: string;
+  }) {
+    const { label, value, onChange, min, max, step, suffix } = props;
+
+    return (
+      <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-3">
+        {label ? <div className="text-[11px] font-semibold text-neutral-400">{label}</div> : null}
+        <div className="mt-2 flex items-center gap-2">
+          <input
+            className="h-10 w-full rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-100 outline-none transition focus:border-neutral-600"
+            type="number"
+            value={value}
+            onChange={(e) => onChange(Number(e.target.value))}
+            min={min}
+            max={max}
+            step={step}
+            inputMode="decimal"
+          />
+          {suffix ? <div className="shrink-0 text-xs text-neutral-500">{suffix}</div> : null}
+        </div>
+      </div>
+    );
+  }
+
+  function ChipButton(props: { active?: boolean; children: ReactNode; onClick: () => void }) {
+    return (
+      <button
+        type="button"
+        onClick={props.onClick}
+        className={[
+          "h-10 rounded-xl border px-4 text-sm transition",
+          props.active
+            ? "border-neutral-600 bg-black text-white"
+            : "border-neutral-800 bg-neutral-950 text-neutral-300 hover:border-neutral-600 hover:text-white",
+        ].join(" ")}
+      >
+        {props.children}
+      </button>
+    );
+  }
+
+  /* =========================
      Gear dropdown state
   ========================= */
 
   const [primaryStat, setPrimaryStat] = useState<PrimaryStat>("STRENGTH");
+
   const [gear, setGear] = useState<Record<string, number[]>>(() => ({}));
   const [gearQuery, setGearQuery] = useState<Record<string, string>>(() => ({}));
   const [packCache, setPackCache] = useState<Record<number, PackedItem[]>>({});
-  const [autoApplyGear, setAutoApplyGear] = useState<boolean>(true);
-  const applySeqRef = useRef(0);
 
+  // ✅ pack loading tries BOTH locations:
+  // - /data/wow/items/packs/items.pack.000.json
+  // - /data/wow/items/items.pack.000.json
   async function getPack(packNo: number) {
     if (packCache[packNo]) return packCache[packNo];
-    const url = `/data/wow/items/packs/items.pack.${String(packNo).padStart(3, "0")}.json`;
-    const res = await fetch(url, { cache: "force-cache" });
-    if (!res.ok) throw new Error(`Failed pack ${packNo}`);
-    const json = (await res.json()) as PackedItem[];
-    setPackCache((prev) => ({ ...prev, [packNo]: json }));
-    return json;
+
+    const file = `items.pack.${String(packNo).padStart(3, "0")}.json`;
+    const urls = [`/data/wow/items/packs/${file}`, `/data/wow/items/${file}`];
+
+    let lastErr: any = null;
+    for (const url of urls) {
+      try {
+        const res = await fetch(url, { cache: "force-cache" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = (await res.json()) as PackedItem[];
+        setPackCache((prev) => ({ ...prev, [packNo]: json }));
+        return json;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+
+    throw lastErr ?? new Error(`Failed pack ${packNo}`);
   }
 
+  // ✅ resolve detail from items_by_id first (no fetch), then pack
   async function resolveItemDetail(row: ItemIndexRow): Promise<any | null> {
+    const id = Number((row as any)?.id);
+    if (itemsByIdMap && Number.isFinite(id)) {
+      const v = (itemsByIdMap as any)[String(id)] ?? (itemsByIdMap as any)[id];
+      if (v) {
+        if (v?.detail) return v.detail;
+        // sometimes the map IS the detail
+        return v;
+      }
+    }
+
     try {
       const packNo = Number((row as any).pack);
       if (!Number.isFinite(packNo)) return null;
       const pack = await getPack(packNo);
-      const found = pack.find((p) => p?.id === (row as any).id);
+      const found = pack.find((p) => p?.id === id);
       return found?.detail ?? null;
     } catch {
       return null;
@@ -547,7 +658,9 @@ export default function WowDamageCalcClient(props: {
   }
 
   const gearDerived = useMemo(() => {
-    return { selectedCount: Object.values(gear).reduce((s, arr) => s + (arr?.length ?? 0), 0) };
+    return {
+      selectedCount: Object.values(gear).reduce((s, arr) => s + (arr?.length ?? 0), 0),
+    };
   }, [gear]);
 
   const [gearTotals, setGearTotals] = useState({
@@ -561,8 +674,6 @@ export default function WowDamageCalcClient(props: {
   });
 
   async function recomputeGearTotalsAndApply() {
-    const mySeq = ++applySeqRef.current;
-
     let primary = 0;
     let crit = 0;
     let haste = 0;
@@ -571,17 +682,17 @@ export default function WowDamageCalcClient(props: {
     let wDps = 0;
     let loaded = 0;
 
-    const allSelectedIds = Object.entries(gear).flatMap(([slotKey, ids]) => (ids ?? []).map((id) => ({ slotKey, id })));
+    const allSelectedIds = Object.entries(gear).flatMap(([slotKey, ids]) =>
+      (ids ?? []).map((id) => ({ slotKey, id }))
+    );
 
     const rowById = new Map<number, ItemIndexRow>();
     for (const r of itemsIndex) {
-      const id = (r as any)?.id;
-      if (typeof id === "number" && Number.isFinite(id)) rowById.set(id, r);
+      const rid = Number((r as any)?.id);
+      if (Number.isFinite(rid)) rowById.set(rid, r);
     }
 
     for (const pick of allSelectedIds) {
-      if (applySeqRef.current !== mySeq) return;
-
       const row = rowById.get(pick.id);
       if (!row) continue;
 
@@ -606,38 +717,26 @@ export default function WowDamageCalcClient(props: {
       if (dps > wDps) wDps = dps;
     }
 
-    if (applySeqRef.current !== mySeq) return;
-
     setGearTotals({ primary, crit, haste, mastery, vers, weaponDps: wDps, loadedItems: loaded });
 
     if (primary > 0) setMainStat(primary);
     if (wDps > 0) setWeaponDps(wDps);
   }
 
-  useEffect(() => {
-    if (!autoApplyGear) return;
-    const t = window.setTimeout(() => {
-      recomputeGearTotalsAndApply().catch(() => {});
-    }, 250);
-    return () => window.clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoApplyGear, gear, primaryStat, itemsIndex]);
-
   function slotResults(slot: (typeof GEAR_SLOTS)[number], q: string) {
     const tq = tokenizeQuery(q);
 
-    // ✅ Normalize slot keys on BOTH sides
     const allowed = new Set(slot.inventoryTypeKeys.map((x) => normalizeSlotKey(x)));
 
-    // Primary pool: slot-matched
+    // slot-matched pool
     let pool = itemsIndex.filter((r: any) => {
       const k = getRowSlotKey(r);
       if (!k) return false;
       return allowed.has(k);
     });
 
-    // ✅ Fallback: if your index doesn't have slot keys (or mismatch),
-    // don't dead-end the dropdown. Search globally by name.
+    // ✅ Fallback if your index doesn't carry slot keys consistently:
+    // allow global name search so dropdown isn't dead
     if (!pool.length) pool = itemsIndex;
 
     if (tq.length) {
@@ -661,8 +760,8 @@ export default function WowDamageCalcClient(props: {
   function selectedLabelFor(slotKey: string, idx: number) {
     const id = gear[slotKey]?.[idx];
     if (!id) return "";
-    const row = itemsIndex.find((r: any) => r?.id === id);
-    return row ? String((row as any).name) : `Item ${id}`;
+    const row = itemsIndex.find((r: any) => Number((r as any)?.id) === Number(id));
+    return row ? String((row as any).name ?? `Item ${id}`) : `Item ${id}`;
   }
 
   function setSlotPick(slotKey: string, which: number, id: number | null) {
@@ -709,6 +808,7 @@ export default function WowDamageCalcClient(props: {
           className="h-10 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-100 outline-none focus:border-neutral-600"
           value={primaryStat}
           onChange={(e) => setPrimaryStat(e.target.value as PrimaryStat)}
+          title="Primary stat to sum from gear"
         >
           <option value="STRENGTH">Strength</option>
           <option value="AGILITY">Agility</option>
@@ -720,9 +820,16 @@ export default function WowDamageCalcClient(props: {
           <span>•</span>
           <span>{gearTotals.loadedItems} loaded</span>
           <span>•</span>
-          <span>{itemsIndex.length} index</span>
+          <span>{itemsIndex.length} index rows</span>
         </div>
       </div>
+
+      {!spec ? (
+        <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/40 p-4 text-sm text-neutral-300">
+          No presets loaded. Ensure <span className="font-semibold text-white">/data/wow/quick-sim-presets.json</span>{" "}
+          exists (disk or Blob) and has at least one spec.
+        </div>
+      ) : null}
     </div>
   );
 
@@ -772,7 +879,7 @@ export default function WowDamageCalcClient(props: {
 
   const GearPanel = (
     <details className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-5">
-      <summary className="cursor-pointer text-sm font-semibold text-neutral-200">Gear (Dropdowns)</summary>
+      <summary className="cursor-pointer text-sm font-semibold text-neutral-200">Gear (Optional)</summary>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <button
@@ -782,19 +889,9 @@ export default function WowDamageCalcClient(props: {
         >
           Apply gear → inputs
         </button>
-
-        <button
-          type="button"
-          onClick={() => setAutoApplyGear((v) => !v)}
-          className={[
-            "h-10 rounded-xl border px-4 text-sm transition",
-            autoApplyGear ? "border-neutral-600 bg-black text-white" : "border-neutral-800 bg-neutral-950 text-neutral-300 hover:border-neutral-600 hover:text-white",
-          ].join(" ")}
-        >
-          Auto-apply: {autoApplyGear ? "On" : "Off"}
-        </button>
-
-        <div className="text-[11px] text-neutral-500">If your index uses INVTYPE_*, this build now normalizes it.</div>
+        <div className="text-[11px] text-neutral-500">
+          Uses items_by_id.json first, then packs. Slot keys normalized (INVTYPE_* supported).
+        </div>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -807,7 +904,7 @@ export default function WowDamageCalcClient(props: {
             <div key={slotKey} className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm font-semibold text-neutral-200">{slot.label}</div>
-                <div className="text-[11px] text-neutral-500">{slot.inventoryTypeKeys.slice(0, 2).join("/")}</div>
+                <div className="text-[11px] text-neutral-500">{slot.inventoryTypeKeys.join("/")}</div>
               </div>
 
               <div className="mt-3 space-y-3">
@@ -826,8 +923,8 @@ export default function WowDamageCalcClient(props: {
                         results={results}
                         selectedLabel={selected}
                         onPick={(row) => {
-                          const id = typeof (row as any).id === "number" ? (row as any).id : 0;
-                          if (id > 0) setSlotPick(slotKey, which, id);
+                          const id = typeof (row as any).id === "number" ? (row as any).id : Number((row as any).id);
+                          if (Number.isFinite(id) && id > 0) setSlotPick(slotKey, which, id);
                           setGearQuery((prev) => ({ ...prev, [qKey]: "" }));
                         }}
                         onClear={() => setSlotPick(slotKey, which, null)}
@@ -911,6 +1008,8 @@ export default function WowDamageCalcClient(props: {
             <div className="mt-1 font-bold">{fmt(computed.SP, 0)}</div>
           </div>
         </div>
+
+        <div className="mt-4 text-[11px] text-neutral-500">Expected hit × rate (UPM).</div>
       </div>
     </div>
   );
@@ -938,7 +1037,8 @@ export default function WowDamageCalcClient(props: {
       <div className="space-y-4">
         {TopBar}
         <div className="rounded-2xl border border-neutral-800 bg-black/40 p-4 text-sm text-neutral-300">
-          Missing presets. Create <span className="font-semibold text-white">/public/data/wow/quick-sim-presets.json</span> with at least one spec preset.
+          Missing presets. Create <span className="font-semibold text-white">/public/data/wow/quick-sim-presets.json</span>{" "}
+          (or upload to Blob) with at least one spec preset.
         </div>
       </div>
     );
@@ -956,6 +1056,7 @@ export default function WowDamageCalcClient(props: {
           {TargetPanel}
           {RotationPanel}
         </div>
+
         <div className="sticky top-6">{ResultsPanel}</div>
       </div>
 
@@ -968,6 +1069,7 @@ export default function WowDamageCalcClient(props: {
             {RotationPanel}
           </>
         ) : null}
+
         {mobileTab === "gear" ? <>{GearPanel}</> : null}
         {mobileTab === "results" ? <>{ResultsPanel}</> : null}
       </div>

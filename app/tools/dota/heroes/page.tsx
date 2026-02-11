@@ -10,7 +10,7 @@ export const metadata = {
 
 // âœ… Daily full-page regeneration
 export const revalidate = 60 * 60 * 24; // 24 hours
-export const runtime = "nodejs";
+
 export const dynamic = "force-static";
 
 type HeroStatsRow = {

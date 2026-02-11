@@ -47,12 +47,10 @@ export type ItemIndexRow = {
   itemLevel?: number;
   ilvl?: number;
 
-  // slot-ish hints from your indexer (may be present)
   inventoryTypeKey?: string;
   slot?: string;
   inventoryType?: string;
 
-  // sometimes present depending on your pipeline
   quality?: string;
 };
 
@@ -65,14 +63,15 @@ async function safeReadJson<T>(path: string): Promise<T | null> {
 }
 
 export default async function WowDamageCalcPage() {
-  // These paths assume your readPublicJson maps:
-  // - disk: public + path
-  // - blob: BLOB_BASE_URL + path
+  // Presets
   const presets = await safeReadJson<PresetsFile>("/data/wow/quick-sim-presets.json");
-  const itemsIndex =
-    (await safeReadJson<ItemIndexRow[]>("/data/wow/items/items_index.json")) ??
-    (await safeReadJson<ItemIndexRow[]>("/data/wow/items/index.json")) ??
-    [];
+
+  // ✅ Load ALL WoW item datasets you currently have
+  // (client will normalize/merge/dedupe)
+  const itemsIndexA = await safeReadJson<any>("/data/wow/items/items_index.json");
+  const itemsIndexB = await safeReadJson<any>("/data/wow/items/index.json");
+  const itemsById = await safeReadJson<any>("/data/wow/items/items_by_id.json");
+  const probe = await safeReadJson<any>("/data/wow/items/probe.json");
 
   const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
@@ -80,7 +79,7 @@ export default async function WowDamageCalcPage() {
   return (
     <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-6xl">
-        {/* âœ… Standard GS header */}
+        {/* ✅ Standard GS header */}
         <header className="flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-3">
             <img
@@ -89,27 +88,36 @@ export default async function WowDamageCalcPage() {
               className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_25px_rgba(0,255,255,0.20)]"
             />
             <div className="text-lg font-black">
-              GamerStation<span className="align-super text-[0.6em]">TM</span>
+              GamerStation<span className="align-super text-[0.6em]">™</span>
             </div>
           </Link>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <Link href="/calculators/wow" className={navBtn}>
-              WoW
+              WoW Hub
             </Link>
-            
+            <Link href="/tools" className={navBtn}>
+              Tools
+            </Link>
           </div>
         </header>
 
         <div className="mt-8">
           <div className="mb-2 text-3xl font-black">WoW Damage Calculator</div>
           <div className="text-sm text-neutral-400">
-            Quick Sim vibe: expected hit Ã— rate (UPM). Not a full rotation/resource sim.
+            Quick Sim vibe: expected hit × rate (UPM). Not a full rotation/resource sim.
           </div>
         </div>
 
         <div className="mt-8">
-          <WowDamageCalcClient presets={presets} itemsIndex={itemsIndex} />
+          <WowDamageCalcClient
+            presets={presets}
+            // ✅ pass everything; client merges it
+            itemsIndexA={itemsIndexA}
+            itemsIndexB={itemsIndexB}
+            itemsById={itemsById}
+            probe={probe}
+          />
         </div>
 
         <div className="mt-10 text-xs text-neutral-600">

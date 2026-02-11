@@ -2,7 +2,7 @@
 import DotaMetaClient, { HeroStatsRow } from "./client";
 import { readPublicJson } from "@/lib/blob";
 
-export const runtime = "nodejs";
+
 export const dynamic = "force-static";
 
 // âœ… Daily full-page regeneration
