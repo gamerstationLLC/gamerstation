@@ -53,9 +53,10 @@ type SummonerProfileData = {
     usedFallbackByName?: boolean;
     attemptedRiotId?: string;
     partial?: {
-      requested: number;
-      loaded: number;
-      failedMatches: number;
+      idsReturned?: number;
+      matchDetailsAttempted?: number;
+      matchDetailsLoaded?: number;
+      failedMatches?: number;
     };
   };
 };
@@ -94,9 +95,7 @@ function champKeyToSlug(champKey: string) {
   let s = (champKey || "").trim();
 
   const romanMatch = s.match(/^(.*?)(VIII|VII|VI|IV|V|III|II|IX|X)$/);
-  if (romanMatch) {
-    s = `${romanMatch[1]}-${romanMatch[2]}`;
-  }
+  if (romanMatch) s = `${romanMatch[1]}-${romanMatch[2]}`;
 
   s = s.replace(/([a-z])([A-Z])/g, "$1-$2");
 
@@ -168,17 +167,16 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
       ? `Matched by Summoner Name (fallback from ${data.meta.attemptedRiotId})`
       : "Match history + quick aggregated stats";
 
-  const partialNote =
-    data.meta?.partial?.failedMatches && data.meta.partial.failedMatches > 0
-      ? `Some matches could not be loaded right now (Riot API hiccup). Showing ${data.meta.partial.loaded}/${data.meta.partial.requested}.`
-      : "";
+  const partial = data.meta?.partial;
+  const matchDown =
+    (partial?.idsReturned ?? 0) > 0 &&
+    (partial?.matchDetailsAttempted ?? 0) > 0 &&
+    (partial?.matchDetailsLoaded ?? 0) === 0;
 
   return (
     <div className="space-y-8">
-      {/* Top profile card */}
       <section className="rounded-3xl border border-neutral-800 bg-black/45 p-6 shadow-[0_0_70px_rgba(0,255,255,0.08)]">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          {/* Left: icon + name */}
           <div className="flex items-start gap-5">
             <div className="flex flex-col items-center gap-3">
               <div className="h-20 w-20 overflow-hidden rounded-2xl border border-neutral-800 bg-black shadow-[0_0_35px_rgba(0,255,255,0.18)]">
@@ -220,13 +218,19 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
             </div>
           </div>
 
-          {/* Right: headline stats */}
           <div className="grid w-full gap-3 sm:grid-cols-3 lg:w-[420px]">
             <TinyStat label="Win Rate" value={`${data.summary.winRate}%`} />
             <TinyStat label="W / L" value={`${data.summary.wins}/${data.summary.losses}`} />
             <TinyStat label="KDA" value={data.summary.kda} />
           </div>
         </div>
+
+        {matchDown ? (
+          <div className="mt-6 rounded-2xl border border-amber-900/50 bg-amber-950/25 p-4 text-sm text-amber-200">
+            Riot match history is temporarily returning errors (Match-V5 500). Your profile loaded,
+            but match details couldn’t be fetched. Try again in a few minutes.
+          </div>
+        ) : null}
 
         <div className="mt-6 grid gap-3 md:grid-cols-4">
           <StatPill label="Avg CS" value={data.summary.avgCs} />
@@ -235,7 +239,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
           <StatPill label="Avg Vision" value={data.summary.avgVision} />
         </div>
 
-        {/* Most played */}
         <div className="mt-6">
           <div className="text-sm font-bold text-neutral-200">Most played (loaded)</div>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -271,7 +274,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
         </div>
       </section>
 
-      {/* Recent matches */}
       <section className="rounded-3xl border border-neutral-800 bg-black/45 p-6 shadow-[0_0_70px_rgba(0,255,255,0.06)]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -279,9 +281,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
             <div className="mt-1 text-sm text-neutral-400">
               Click a champion icon to open their page.
             </div>
-            {partialNote ? (
-              <div className="mt-2 text-xs text-amber-200/90">{partialNote}</div>
-            ) : null}
           </div>
 
           <input
@@ -305,7 +304,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                 } bg-black/40 p-5 transition hover:border-neutral-600`}
               >
                 <div className="flex items-center gap-4">
-                  {/* Champion icon (clickable) */}
                   <Link
                     href={champHref(slug)}
                     className="group relative h-12 w-12 overflow-hidden rounded-2xl border border-neutral-800 bg-black shadow-[0_0_25px_rgba(0,255,255,0.08)]"
@@ -362,7 +360,9 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
 
           {filtered.length === 0 ? (
             <div className="rounded-2xl border border-neutral-800 bg-black/40 p-6 text-sm text-neutral-300">
-              No matches found for that filter.
+              {matchDown
+                ? "Match details are temporarily unavailable from Riot right now."
+                : "No matches found for that filter."}
             </div>
           ) : null}
         </div>

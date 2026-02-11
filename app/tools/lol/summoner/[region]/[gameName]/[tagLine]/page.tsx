@@ -131,16 +131,11 @@ async function mapLimit<T, R>(
     }
   }
 
-  await Promise.all(
-    Array.from({ length: Math.min(limit, items.length) }, () => worker())
-  );
-
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, () => worker()));
   return out;
 }
 
 function deriveDdVersionFromGameVersion(gameVersion: string | undefined) {
-  // Riot gameVersion is like "15.3.123.456"
-  // DDragon wants "15.3.1" (best-effort, stable enough for icons)
   if (!gameVersion) return undefined;
   const parts = gameVersion.split(".");
   if (parts.length < 2) return undefined;
@@ -148,18 +143,24 @@ function deriveDdVersionFromGameVersion(gameVersion: string | undefined) {
 }
 
 export default async function SummonerProfilePage({ params }: { params: Params }) {
-  const regionRaw = safeDecode(params.region as unknown as string);
-  const gameName = safeDecode(params.gameName);
-  const tagLine = safeDecode(params.tagLine);
+  // ✅ Next.js 16 expects params as an object, NOT a Promise
+  const regionRaw = safeDecode(String(params.region));
+  const gameNameRaw = safeDecode(params.gameName);
+  const tagLineRaw = safeDecode(params.tagLine);
+
+  // Support some “weird but valid” inputs:
+  // - plus signs coming from URLs
+  // - extra spaces
+  const gameName = gameNameRaw.replace(/\+/g, " ").trim();
+  const tagLine = tagLineRaw.replace(/\+/g, " ").trim();
 
   if (!isValidPlatformRegion(regionRaw)) notFound();
+  const region = regionRaw;
 
-  const region = regionRaw as PlatformRegion;
   const cluster = platformToCluster(region);
 
-  // Resolve PUUID:
-  // 1) Try Riot ID (Account-V1)
-  // 2) Fallback: Summoner name (Summoner-V4 by-name) using gameName
+  // 1) Resolve PUUID by Riot ID (Account-V1).
+  // 2) Fallback: treat `gameName` as Summoner Name (Summoner-V4 by-name).
   let puuid: string | null = null;
   let displayName = `${gameName}#${tagLine}`;
   let usedFallbackByName = false;
@@ -172,8 +173,9 @@ export default async function SummonerProfilePage({ params }: { params: Params }
 
   const account = await riotFetchJson<AccountByRiotId>(accountUrl, {
     revalidate: 300,
-    attempts: 3,
+    attempts: 2,
     softFail: true,
+    log: false,
   });
 
   if (account?.puuid) {
@@ -188,65 +190,64 @@ export default async function SummonerProfilePage({ params }: { params: Params }
 
     const s = await riotFetchJson<SummonerByName>(byNameUrl, {
       revalidate: 300,
-      attempts: 3,
+      attempts: 2,
       softFail: true,
+      log: false,
     });
 
-    if (s?.puuid) {
-      puuid = s.puuid;
-      displayName = s.name;
-    }
+    if (!s?.puuid) notFound();
+    puuid = s.puuid;
+    displayName = s.name;
   }
 
   if (!puuid) notFound();
 
+  // Summoner profile (should be stable)
   const summonerUrl = `${riotHostForPlatform(
     region
   )}/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(puuid)}`;
 
   const summoner = await riotFetchJson<SummonerByPuuid>(summonerUrl, {
     revalidate: 300,
-    attempts: 3,
+    attempts: 2,
     softFail: true,
+    log: false,
   });
 
-  // If we can't load summoner basics, we can't render safely
   if (!summoner) notFound();
 
+  // Match IDs list
   const matchIdsUrl = `${riotHostForCluster(
     cluster
   )}/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids?start=0&count=20`;
 
-  const matchIds = await riotFetchJson<string[]>(matchIdsUrl, {
+  const matchIds = (await riotFetchJson<string[]>(matchIdsUrl, {
     revalidate: 300,
-    attempts: 3,
+    attempts: 2,
     softFail: true,
-  });
+    log: false,
+  })) ?? [];
 
-  const ids = Array.isArray(matchIds) ? matchIds.slice(0, 12) : [];
-  const requested = ids.length;
+  // Match details: Riot sometimes returns 500 for match-v5 temporarily.
+  // We soft-fail each match fetch, filter nulls, and expose partial stats.
+  const toAttempt = matchIds.slice(0, 12);
 
-  const matchDetailsRaw = await mapLimit(ids, 4, async (matchId) => {
-    const matchUrl = `${riotHostForCluster(
-      cluster
-    )}/lol/match/v5/matches/${encodeURIComponent(matchId)}`;
-
-    // ✅ Soft-fail: Riot 500s won't crash SSR; we'll just skip the match
+  const matchDetailsRaw = await mapLimit(toAttempt, 4, async (matchId) => {
+    const matchUrl = `${riotHostForCluster(cluster)}/lol/match/v5/matches/${encodeURIComponent(
+      matchId
+    )}`;
     return riotFetchJson<MatchV5>(matchUrl, {
       revalidate: 300,
-      attempts: 4,
+      attempts: 2,
       softFail: true,
+      log: false, // ✅ don’t spam logs when Riot is melting
     });
   });
 
-  const matchDetails = matchDetailsRaw.filter(
-    (m): m is MatchV5 => Boolean(m && m.info && m.metadata)
-  );
+  const matchDetails = matchDetailsRaw.filter((m): m is MatchV5 => Boolean(m));
+  const failedMatches = matchDetailsRaw.length - matchDetails.length;
 
-  const loaded = matchDetails.length;
-  const failedMatches = Math.max(0, requested - loaded);
-
-  // ✅ derive ddragon version once from the first loaded match
+  // Derive DDragon version from first loaded match if available
   const ddVersion = deriveDdVersionFromGameVersion(matchDetails?.[0]?.info?.gameVersion);
 
   const rows = matchDetails
@@ -334,8 +335,9 @@ export default async function SummonerProfilePage({ params }: { params: Params }
       attemptedRiotId: `${gameName}#${tagLine}`,
       ddVersion,
       partial: {
-        requested,
-        loaded,
+        idsReturned: matchIds.length,
+        matchDetailsAttempted: toAttempt.length,
+        matchDetailsLoaded: matchDetails.length,
         failedMatches,
       },
     },

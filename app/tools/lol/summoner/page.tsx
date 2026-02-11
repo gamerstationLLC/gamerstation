@@ -34,24 +34,25 @@ export default function LolSummonerLookupPage() {
           <header className="mb-8 flex items-center">
             {/* Left: Logo */}
             <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/gs-logo-v2.png"
                 alt="GamerStation"
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">TM</span>
+                GamerStation<span className="align-super text-[0.6em]">™</span>
               </span>
             </Link>
 
-            {/* Right: Calculators button */}
+            {/* Right: Tools button */}
             <a
               href="/tools"
               className="
                 ml-auto rounded-xl border border-neutral-800
                 bg-black px-4 py-2 text-sm text-neutral-200
                 transition
-                hover:border-grey-400
+                hover:border-neutral-600
                 hover:text-white
                 hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
               "
@@ -63,8 +64,8 @@ export default function LolSummonerLookupPage() {
           <h1 className="mt-2 text-4xl font-bold tracking-tight">Summoner Lookup</h1>
           <p className="mt-3 text-neutral-300">
             Enter a Riot ID like{" "}
-            <span className="font-semibold text-white">Faker#KR1</span>, choose the player's
-            server, and we'll take you to their match stats page.
+            <span className="font-semibold text-white">Faker#KR1</span> or just a{" "}
+            <span className="font-semibold text-white">Summoner Name</span>.
           </p>
 
           <div className="mt-10 rounded-2xl border border-neutral-800 bg-neutral-950/70 p-6 shadow-[0_0_40px_rgba(0,255,255,0.10)]">
@@ -74,8 +75,6 @@ export default function LolSummonerLookupPage() {
               routing).
             </div>
           </div>
-
-          
         </div>
       </div>
     </main>

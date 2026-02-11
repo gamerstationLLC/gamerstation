@@ -31,16 +31,12 @@ function mustKey() {
 }
 
 /**
- * Platform → regional routing for match-v5/account-v1, etc.
+ * Platform → regional routing for match-v5/account-v1.
  */
 export function platformToCluster(p: PlatformRegion): RegionalCluster {
-  // Americas
   if (p === "na1" || p === "br1" || p === "la1" || p === "la2") return "americas";
-  // Europe
   if (p === "euw1" || p === "eun1" || p === "ru" || p === "tr1") return "europe";
-  // Asia
   if (p === "kr" || p === "jp1") return "asia";
-  // SEA (newer regions)
   return "sea";
 }
 
@@ -81,24 +77,34 @@ function parseRetryAfterMs(res: Response): number | null {
   return Math.min(10_000, n * 1000);
 }
 
-type RiotFetchOpts = {
+export type RiotFetchOpts = {
   /**
    * If true (default), non-critical Riot failures (429/5xx) won't crash SSR.
    * We'll retry, then return null.
    */
   softFail?: boolean;
+
   /**
    * Total attempts including the first try. Default 4.
    */
   attempts?: number;
+
   /**
    * Base backoff in ms. Default 250.
    */
   backoffMs?: number;
+
   /**
-   * Next.js fetch options
+   * If false, do not console.warn on softFail final attempt.
+   * Default true.
    */
-  revalidate?: number; // seconds
+  log?: boolean;
+
+  /**
+   * Next.js fetch caching (seconds).
+   * NOTE: your route-level `export const revalidate` still controls ISR rebuild.
+   */
+  revalidate?: number;
 };
 
 /**
@@ -118,24 +124,19 @@ export async function riotFetchJson<T>(
   const attempts = Math.max(1, opts.attempts ?? 4);
   const backoffMs = Math.max(0, opts.backoffMs ?? 250);
   const revalidate = opts.revalidate;
+  const log = opts.log ?? true;
 
   let lastErr: unknown = null;
 
   for (let i = 0; i < attempts; i++) {
     try {
       const res = await fetch(url, {
-        headers: {
-          "X-Riot-Token": key,
-        },
-        // Keep SSR stable; your route-level `revalidate` controls ISR anyway.
+        headers: { "X-Riot-Token": key },
         next: typeof revalidate === "number" ? { revalidate } : undefined,
       });
 
-      if (res.ok) {
-        return (await res.json()) as T;
-      }
+      if (res.ok) return (await res.json()) as T;
 
-      // Read tiny body for debugging (Riot returns {"status":...})
       let bodyText = "";
       try {
         bodyText = await res.text();
@@ -143,12 +144,8 @@ export async function riotFetchJson<T>(
         bodyText = "";
       }
 
-      // 404 is usually "not found" (bad match id / deleted) — treat as soft null.
-      if (res.status === 404) {
-        return null;
-      }
+      if (res.status === 404) return null;
 
-      // Retry on rate limit and transient server errors.
       const isRetryable =
         res.status === 429 ||
         res.status === 500 ||
@@ -165,15 +162,11 @@ export async function riotFetchJson<T>(
         continue;
       }
 
-      // Not retryable or out of attempts
       const err = new RiotHttpError(url, res.status, bodyText);
       lastErr = err;
 
       if (softFail) {
-        // Log once at the end (avoid spamming)
-        if (i === attempts - 1) {
-          console.warn(String(err));
-        }
+        if (log && i === attempts - 1) console.warn(String(err));
         return null;
       }
 
@@ -181,7 +174,6 @@ export async function riotFetchJson<T>(
     } catch (e) {
       lastErr = e;
 
-      // Network errors can also be transient
       if (i < attempts - 1) {
         const jitter = Math.floor(Math.random() * 120);
         const exp = Math.min(4000, backoffMs * Math.pow(2, i));
@@ -190,7 +182,7 @@ export async function riotFetchJson<T>(
       }
 
       if (softFail) {
-        console.warn(`Riot fetch failed (soft): ${url}`, e);
+        if (log) console.warn(`Riot fetch failed (soft): ${url}`, e);
         return null;
       }
 
@@ -198,7 +190,6 @@ export async function riotFetchJson<T>(
     }
   }
 
-  // Should be unreachable, but keep TS happy
   if (softFail) return null;
   throw lastErr instanceof Error ? lastErr : new Error("Unknown Riot fetch failure");
 }
