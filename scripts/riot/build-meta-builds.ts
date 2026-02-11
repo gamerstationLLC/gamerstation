@@ -84,30 +84,6 @@ const RESET_SEEN_MATCHES = String(process.env.RESET_SEEN_MATCHES || "0") === "1"
 const RESET_SEEN_PUUIDS = String(process.env.RESET_SEEN_PUUIDS || "0") === "1";
 const RESET_CURSORS = String(process.env.RESET_CURSORS || "0") === "1";
 
-/* ==========================================================
-   ✅ Anti-500 “stable-fast” networking knobs (NEW)
-   - These are what actually reduce the 500 spam
-========================================================== */
-
-// Small random delay before each request. Smooths bursts.
-const REQUEST_JITTER_MS_MIN = Number(process.env.REQUEST_JITTER_MS_MIN || 50);
-const REQUEST_JITTER_MS_MAX = Number(process.env.REQUEST_JITTER_MS_MAX || 200);
-
-// Enforce minimum spacing between requests per kind (regional/platform).
-const MIN_SPACING_MS_REGIONAL = Number(process.env.MIN_SPACING_MS_REGIONAL || 60);
-const MIN_SPACING_MS_PLATFORM = Number(process.env.MIN_SPACING_MS_PLATFORM || 30);
-
-// Don’t retry 5xx forever. Riot 500s often won’t recover quickly.
-const RETRY_5XX_MAX = Number(process.env.RETRY_5XX_MAX || 3);
-
-// Rate-limit retries: base + exponential growth with jitter.
-const RETRY_BACKOFF_BASE_MS = Number(process.env.RETRY_BACKOFF_BASE_MS || 600);
-const RETRY_BACKOFF_MAX_MS = Number(process.env.RETRY_BACKOFF_MAX_MS || 6000);
-
-// Optional: if we see many 5xx in a row, cool down briefly.
-const ERROR_STREAK_COOLDOWN_AFTER = Number(process.env.ERROR_STREAK_COOLDOWN_AFTER || 6);
-const ERROR_STREAK_COOLDOWN_MS = Number(process.env.ERROR_STREAK_COOLDOWN_MS || 2000);
-
 console.log(
   "[env] RIOT_API_KEY:",
   process.env.RIOT_API_KEY ? `present len=${process.env.RIOT_API_KEY.length}` : "MISSING"
@@ -116,14 +92,7 @@ console.log("[env] RIOT_REGION (match-v5):", RIOT_REGION);
 console.log("[env] RIOT_PLATFORM (league/summoner):", RIOT_PLATFORM);
 console.log("[env] LADDER_TIER/QUEUE/MAX:", LADDER_TIER, LADDER_QUEUE, LADDER_MAX_PLAYERS);
 console.log("[env] Seed extras: SEED_MATCH_IDS:", SEED_MATCH_IDS.length, "SEED_MATCH_URLS:", SEED_MATCH_URLS.length);
-console.log(
-  `[env] STRICT WINDOW: CACHE_MAX_AGE_DAYS=${CACHE_MAX_AGE_DAYS} startTime=${START_TIME_SEC} cutoff=${new Date(
-    CUTOFF_MS
-  ).toISOString()}`
-);
-console.log(
-  `[env] NET: jitter=${REQUEST_JITTER_MS_MIN}-${REQUEST_JITTER_MS_MAX}ms spacing(regional/platform)=${MIN_SPACING_MS_REGIONAL}/${MIN_SPACING_MS_PLATFORM}ms retry5xx=${RETRY_5XX_MAX}`
-);
+console.log(`[env] STRICT WINDOW: CACHE_MAX_AGE_DAYS=${CACHE_MAX_AGE_DAYS} startTime=${START_TIME_SEC} cutoff=${new Date(CUTOFF_MS).toISOString()}`);
 
 const QUEUE_RANKED = 420;
 const QUEUES_CASUAL = new Set<number>([400, 430]);
@@ -230,34 +199,6 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
-
-async function jitter() {
-  const lo = Math.max(0, REQUEST_JITTER_MS_MIN);
-  const hi = Math.max(lo, REQUEST_JITTER_MS_MAX);
-  const ms = lo + Math.floor(Math.random() * (hi - lo + 1));
-  if (ms > 0) await sleep(ms);
-}
-
-// Per-kind spacing to prevent bursty patterns
-const lastReqAt: Record<"regional" | "platform", number> = {
-  regional: 0,
-  platform: 0,
-};
-
-async function enforceSpacing(kind: "regional" | "platform") {
-  const minMs = kind === "regional" ? MIN_SPACING_MS_REGIONAL : MIN_SPACING_MS_PLATFORM;
-  if (minMs <= 0) return;
-
-  const now = Date.now();
-  const elapsed = now - lastReqAt[kind];
-  const wait = minMs - elapsed;
-  if (wait > 0) await sleep(wait);
-  lastReqAt[kind] = Date.now();
-}
-
 async function pruneCacheByMtime(dir: string, maxAgeDays: number) {
   const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
   const cutoff = Date.now() - maxAgeMs;
@@ -295,43 +236,14 @@ function riotPlatformBase() {
   return `https://${RIOT_PLATFORM}.api.riotgames.com`;
 }
 
-function parseRetryAfterMs(value: string | null): number | null {
-  if (!value) return null;
-  const s = String(value).trim();
-  if (!s) return null;
-
-  // Most common: integer seconds
-  const asNum = Number(s);
-  if (Number.isFinite(asNum) && asNum > 0) return Math.floor(asNum * 1000);
-
-  // Sometimes it might be an HTTP date
-  const asDate = Date.parse(s);
-  if (!Number.isNaN(asDate)) {
-    const delta = asDate - Date.now();
-    if (delta > 0) return delta;
-  }
-
-  return null;
-}
-
-let serverErrorStreak = 0;
-
 async function fetchJsonWithRetry(
   url: string,
-  opts?: { retries429?: number; retries5xx?: number; kind?: "regional" | "platform" }
+  opts?: { retries?: number; kind?: "regional" | "platform" }
 ): Promise<any> {
+  const retries = opts?.retries ?? 5;
   const kind = opts?.kind ?? "regional";
-  const retries429 = opts?.retries429 ?? 10; // 429 can recover; keep this higher
-  const retries5xx = opts?.retries5xx ?? RETRY_5XX_MAX;
 
-  let attempt429 = 0;
-  let attempt5xx = 0;
-
-  while (true) {
-    // Smooth traffic
-    await enforceSpacing(kind);
-    await jitter();
-
+  for (let attempt = 0; attempt <= retries; attempt++) {
     const res = await fetch(url, {
       headers: {
         "X-Riot-Token": RIOT_API_KEY,
@@ -339,57 +251,20 @@ async function fetchJsonWithRetry(
       },
     });
 
-    // 429: obey Retry-After if present, otherwise exponential-ish
     if (res.status === 429) {
-      attempt429++;
-      const raMs = parseRetryAfterMs(res.headers.get("Retry-After"));
-      const waitMs =
-        raMs ??
-        clamp(
-          1200 + attempt429 * 800 + Math.floor(Math.random() * 600),
-          800,
-          15000
-        );
-
+      const ra = res.headers.get("Retry-After");
+      const waitMs = ra ? Number(ra) * 1000 : 1200 + attempt * 800;
       console.log(`429 rate limited (${kind}). Waiting ${waitMs}ms then retrying...`);
-
-      if (attempt429 > retries429) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(`${kind} fetch failed after 429 retries: 429 ${url}\n${txt}`);
-      }
-
       await sleep(waitMs);
       continue;
     }
 
-    // 5xx: retry only a few times, then skip upstream caller will decide
-    if (res.status >= 500) {
-      attempt5xx++;
-      serverErrorStreak++;
-
-      const backoff =
-        clamp(RETRY_BACKOFF_BASE_MS * attempt5xx + Math.floor(Math.random() * 500), 300, RETRY_BACKOFF_MAX_MS);
-
-      console.log(`${res.status} server error (${kind}). Waiting ${backoff}ms then retrying...`);
-
-      // Optional: cooldown if we're in a bad cluster moment
-      if (ERROR_STREAK_COOLDOWN_AFTER > 0 && serverErrorStreak >= ERROR_STREAK_COOLDOWN_AFTER) {
-        console.log(`[net] 5xx streak=${serverErrorStreak}. Cooling down ${ERROR_STREAK_COOLDOWN_MS}ms...`);
-        await sleep(ERROR_STREAK_COOLDOWN_MS);
-        serverErrorStreak = 0;
-      }
-
-      if (attempt5xx > retries5xx) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(`${kind} fetch failed: ${res.status} ${url}\n${txt}`);
-      }
-
-      await sleep(backoff);
+    if (res.status >= 500 && attempt < retries) {
+      const waitMs = 800 + attempt * 600;
+      console.log(`${res.status} server error (${kind}). Waiting ${waitMs}ms then retrying...`);
+      await sleep(waitMs);
       continue;
     }
-
-    // reset streak on success / non-5xx
-    serverErrorStreak = 0;
 
     if (!res.ok) {
       const txt = await res.text().catch(() => "");
@@ -398,14 +273,16 @@ async function fetchJsonWithRetry(
 
     return res.json();
   }
+
+  throw new Error(`${opts?.kind || "fetch"} failed after retries: ${url}`);
 }
 
-async function fetchRegionalJson(url: string, opts?: { retries429?: number; retries5xx?: number }) {
-  return fetchJsonWithRetry(url, { retries429: opts?.retries429, retries5xx: opts?.retries5xx, kind: "regional" });
+async function fetchRegionalJson(url: string, opts?: { retries?: number }) {
+  return fetchJsonWithRetry(url, { retries: opts?.retries, kind: "regional" });
 }
 
-async function fetchPlatformJson(url: string, opts?: { retries429?: number; retries5xx?: number }) {
-  return fetchJsonWithRetry(url, { retries429: opts?.retries429, retries5xx: opts?.retries5xx, kind: "platform" });
+async function fetchPlatformJson(url: string, opts?: { retries?: number }) {
+  return fetchJsonWithRetry(url, { retries: opts?.retries, kind: "platform" });
 }
 
 // Match-v5 ids (regional, paged)
@@ -429,10 +306,7 @@ async function getMatch(matchId: string, opts?: { cacheWrite?: boolean }): Promi
     return JSON.parse(raw);
   } catch {
     const url = `${riotRegionalBase()}/lol/match/v5/matches/${encodeURIComponent(matchId)}`;
-
-    // Match details are the flakiest endpoint: keep 5xx retries low.
-    const data = await fetchRegionalJson(url, { retries5xx: RETRY_5XX_MAX });
-
+    const data = await fetchRegionalJson(url);
     if (opts?.cacheWrite) {
       await fs.writeFile(cachePath, JSON.stringify(data), "utf-8");
     }
@@ -447,10 +321,7 @@ async function getTimeline(matchId: string): Promise<any> {
     return JSON.parse(raw);
   } catch {
     const url = `${riotRegionalBase()}/lol/match/v5/matches/${encodeURIComponent(matchId)}/timeline`;
-
-    // Timeline can be even flakier; still keep 5xx retries low.
-    const data = await fetchRegionalJson(url, { retries5xx: RETRY_5XX_MAX });
-
+    const data = await fetchRegionalJson(url);
     await fs.writeFile(cachePath, JSON.stringify(data), "utf-8");
     return data;
   }
@@ -783,7 +654,9 @@ async function ladderBootstrapPuuids(): Promise<string[]> {
   entries.sort((a, b) => Number(b?.leaguePoints || 0) - Number(a?.leaguePoints || 0));
   const top = entries.slice(0, Math.max(0, LADDER_MAX_PLAYERS));
 
-  console.log(`[ladder] ${LADDER_TIER} ${LADDER_QUEUE}: entries=${entries.length}, using=${top.length} (top LP)`);
+  console.log(
+    `[ladder] ${LADDER_TIER} ${LADDER_QUEUE}: entries=${entries.length}, using=${top.length} (top LP)`
+  );
 
   const puuids: string[] = [];
   let ok = 0;
@@ -999,7 +872,6 @@ async function main() {
       try {
         match = await getMatch(matchId, { cacheWrite: false }); // write only after strict filter passes
       } catch (e: any) {
-        // With the new retry policy, this should be far less spammy.
         console.warn(`Failed match ${matchId}: ${e?.message || e}`);
         continue;
       }
@@ -1011,7 +883,8 @@ async function main() {
         continue;
       }
 
-      // ✅ STRICT RECENCY FILTER:
+      // ✅ STRICT RECENCY FILTER (the one you asked for):
+      // Drop if missing gameCreation OR older than cutoff.
       const created = Number(info?.gameCreation || 0);
       if (!created) {
         strictDebug.skippedNoGameCreation += 1;
@@ -1119,7 +992,6 @@ async function main() {
   console.log(`Processed matches this run: ${matchesProcessed} (budget=${MAX_MATCHES_PER_RUN})`);
   console.log(`Added new PUUIDs this run: ${newPuuidsAdded} (cap=${MAX_NEW_PUUIDS_PER_RUN})`);
   console.log(`Wrote: ${OUT_RANKED_PATH}`);
-  console.log(`Wrote: ${OUT_CASUAL_PATH}`);
   console.log(`Wrote: ${OUT_CASUAL_PATH}`);
   console.log(`Cache dir: ${CACHE_DIR}`);
 }
