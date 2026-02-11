@@ -836,7 +836,7 @@ const url =
       </div>
 
       <div className="space-y-4">
-        <div className="mt-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="mt-3 rounded-2xl border border-white/10 bg-black/[.6] p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:gap-2">
               <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-wrap lg:items-center lg:gap-2">

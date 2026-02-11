@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 
@@ -9,7 +9,7 @@ export default function HubClient() {
   const metaHref = "/calculators/lol/meta";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div
@@ -37,7 +37,7 @@ export default function HubClient() {
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">™</span>
+                GamerStation<span className="align-super text-[0.6em]">â„¢</span>
               </span>
             </Link>
 
@@ -145,3 +145,4 @@ export default function HubClient() {
     </main>
   );
 }
+
