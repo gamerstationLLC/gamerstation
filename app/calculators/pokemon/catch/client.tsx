@@ -1,3 +1,4 @@
+﻿// app/calculators/pokemon/catch/client.tsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -204,11 +205,7 @@ function candidateByGameKeys(gameKey: string, label?: string, explicit?: string)
 }
 
 /**
- * ✅ NEW:
- * Your by_game JSON already contains `name` (lowercase) and `displayName`.
- * But your dropdown currentlyN shows "#25 · Pikachu" only if `displayName` is present.
- *
- * If older blobs are missing displayName, we can synthesize it here so you never see bare numbers.
+ * If older blobs are missing displayName, synthesize it here so dropdown never shows bare numbers.
  */
 function normalizeMons(rows: MonRow[]): MonRow[] {
   return (Array.isArray(rows) ? rows : [])
@@ -253,7 +250,7 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
   );
 
   const card =
-    "rounded-2xl border border-neutral-800 bg-black p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]";
+    "rounded-2xl border border-neutral-800 bg-black/[.7] p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.04)]";
 
   const effectiveTurn = useMemo(() => {
     if (ball === "quick") return 1;
@@ -267,11 +264,7 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
 
     const g = games.find((x) => x.gameKey === forGameKey) || null;
 
-    const candidates = candidateByGameKeys(
-      forGameKey,
-      g?.label,
-      (g as any)?.byGameFile // optional field; best if present
-    );
+    const candidates = candidateByGameKeys(forGameKey, g?.label, (g as any)?.byGameFile);
 
     let lastErr: unknown = null;
 
@@ -292,8 +285,7 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
       }
 
       const msg =
-        (lastErr && (lastErr as any).message) ||
-        `Failed to load by_game JSON for "${forGameKey}"`;
+        (lastErr && (lastErr as any).message) || `Failed to load by_game JSON for "${forGameKey}"`;
 
       setMons([]);
       setMonId("");
@@ -407,7 +399,9 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
             ))}
           </select>
 
-          {error ? <div className="mt-2 whitespace-pre-wrap text-xs text-red-400">{error}</div> : null}
+          {error ? (
+            <div className="mt-2 whitespace-pre-wrap text-xs text-red-400">{error}</div>
+          ) : null}
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -455,10 +449,14 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
             </select>
 
             {ball === "quick" ? (
-              <div className="mt-2 text-[11px] text-neutral-500">Quick Ball assumes Turn 1 (best-case).</div>
+              <div className="mt-2 text-[11px] text-neutral-500">
+                Quick Ball assumes Turn 1 (best-case).
+              </div>
             ) : null}
             {ball === "timer" ? (
-              <div className="mt-2 text-[11px] text-neutral-500">Timer Ball assumes ~Turn 10 (mid-fight).</div>
+              <div className="mt-2 text-[11px] text-neutral-500">
+                Timer Ball assumes ~Turn 10 (mid-fight).
+              </div>
             ) : null}
           </div>
         </div>

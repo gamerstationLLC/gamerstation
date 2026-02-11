@@ -23,14 +23,35 @@ export default function ArsenalPage() {
     <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-6xl">
         {/* Back */}
-        <header className="-ml-2">
-          <Link
-            href="/calculators/roblox"
-            className="text-sm text-neutral-300 hover:text-white"
-          >
-            â† Back to Roblox
-          </Link>
-        </header>
+        <header className="mb-8 flex items-center">
+  {/* Left: Logo */}
+  <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+    <img
+      src="/gs-logo-v2.png"
+      alt="GamerStation"
+      className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
+    />
+    <span className="text-lg font-black tracking-tight">
+      GamerStation<span className="align-super text-[0.6em]">TM</span>
+    </span>
+  </Link>
+
+  {/* Right: Tools button */}
+  <a
+  href="/calculators/roblox"
+  className="
+    ml-auto rounded-xl border border-neutral-800
+    bg-black px-4 py-2 text-sm text-neutral-200
+    transition
+    hover:border-grey-400
+   
+    hover:text-white
+    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+  "
+>
+  Roblox Hub
+</a>
+</header>
 
         {/* Title */}
         <h1 className="mt-8 text-4xl font-bold">

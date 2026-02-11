@@ -303,7 +303,7 @@ export default async function DotaHeroPage({
 
               <p className="mt-2 text-sm text-neutral-300">
                 {result.state === "rate_limited"
-                  ? "OpenDota is rate-limiting requests. Weâ€™ll be back in a moment."
+                  ? "OpenDota is rate-limiting requests. We'll be back in a moment."
                   : result.state === "timeout"
                   ? "OpenDota is responding slowly right now. Please try again shortly."
                   : "OpenDota is having issues right now. Please try again shortly."}

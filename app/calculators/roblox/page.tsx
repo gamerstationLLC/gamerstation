@@ -26,20 +26,35 @@ export default function RobloxCalculatorsPage() {
 
         <div className="relative">
   {/* Button pinned top-right */}
+  <header className="mb-8 flex items-center">
+  {/* Left: Logo */}
+  <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+    <img
+      src="/gs-logo-v2.png"
+      alt="GamerStation"
+      className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
+    />
+    <span className="text-lg font-black tracking-tight">
+      GamerStation<span className="align-super text-[0.6em]">TM</span>
+    </span>
+  </Link>
+
+  {/* Right: Tools button */}
   <a
-    href="/calculators"
-    className="
-      absolute right-0 top-0
-      rounded-xl border border-neutral-800
-      bg-black px-4 py-2 text-sm text-neutral-200
-      transition
-      hover:border-neutral
-      hover:text-white
-      hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
-    "
-  >
-    Calculators
-  </a>
+  href="/calculators"
+  className="
+    ml-auto rounded-xl border border-neutral-800
+    bg-black px-4 py-2 text-sm text-neutral-200
+    transition
+    hover:border-grey-400
+   
+    hover:text-white
+    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+  "
+>
+  Calculators
+</a>
+</header>
 
   <h1 className="mt-8 text-4xl font-bold">Roblox</h1>
   <p className="mt-3 text-neutral-300 max-w-2xl">
@@ -53,7 +68,7 @@ export default function RobloxCalculatorsPage() {
           {/* Blox Fruits */}
           <Link
             href="/calculators/roblox/bloxfruits"
-            className="rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
+            className="bg-black/[.7] rounded-2xl border border-neutral-800 p-6 hover:border-neutral-600 transition"
           >
             <div className="text-sm font-semibold">Blox Fruits</div>
             <div className="mt-2 text-sm text-neutral-400">
@@ -64,7 +79,7 @@ export default function RobloxCalculatorsPage() {
           {/* Arsenal */}
           <Link
             href="/calculators/roblox/arsenal"
-            className="group rounded-2xl border border-neutral-800  p-6 hover:border-neutral-600 transition"
+            className="bg-black/[.7] group rounded-2xl border border-neutral-800  p-6 hover:border-neutral-600 transition"
           >
             <div className="flex items-center justify-between">
               <div className="text-sm font-semibold">Arsenal</div>

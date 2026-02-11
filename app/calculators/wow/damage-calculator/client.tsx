@@ -47,38 +47,37 @@ type GearSlotKey =
 const GEAR_SLOTS: Array<{
   key: GearSlotKey;
   label: string;
-  inventoryTypeKeys: string[]; // matches either index inventoryTypeKey/slot OR detail.inventory_type.type
-  allowMulti?: boolean; // rings/trinkets
+  inventoryTypeKeys: string[];
+  allowMulti?: boolean;
 }> = [
-  { key: "HEAD", label: "Head", inventoryTypeKeys: ["HEAD"] },
-  { key: "NECK", label: "Neck", inventoryTypeKeys: ["NECK"] },
-  { key: "SHOULDER", label: "Shoulder", inventoryTypeKeys: ["SHOULDER"] },
-  { key: "BACK", label: "Back", inventoryTypeKeys: ["CLOAK", "BACK"] },
-  { key: "CHEST", label: "Chest", inventoryTypeKeys: ["CHEST", "ROBE"] },
-  { key: "WRIST", label: "Wrist", inventoryTypeKeys: ["WRIST"] },
-  { key: "HANDS", label: "Hands", inventoryTypeKeys: ["HANDS", "HAND"] },
-  { key: "WAIST", label: "Waist", inventoryTypeKeys: ["WAIST"] },
-  { key: "LEGS", label: "Legs", inventoryTypeKeys: ["LEGS"] },
-  { key: "FEET", label: "Feet", inventoryTypeKeys: ["FEET"] },
+  { key: "HEAD", label: "Head", inventoryTypeKeys: ["HEAD", "INVTYPE_HEAD"] },
+  { key: "NECK", label: "Neck", inventoryTypeKeys: ["NECK", "INVTYPE_NECK"] },
+  { key: "SHOULDER", label: "Shoulder", inventoryTypeKeys: ["SHOULDER", "INVTYPE_SHOULDER"] },
+  { key: "BACK", label: "Back", inventoryTypeKeys: ["CLOAK", "BACK", "INVTYPE_CLOAK"] },
+  { key: "CHEST", label: "Chest", inventoryTypeKeys: ["CHEST", "ROBE", "INVTYPE_CHEST"] },
+  { key: "WRIST", label: "Wrist", inventoryTypeKeys: ["WRIST", "INVTYPE_WRIST"] },
+  { key: "HANDS", label: "Hands", inventoryTypeKeys: ["HANDS", "HAND", "INVTYPE_HAND"] },
+  { key: "WAIST", label: "Waist", inventoryTypeKeys: ["WAIST", "INVTYPE_WAIST"] },
+  { key: "LEGS", label: "Legs", inventoryTypeKeys: ["LEGS", "INVTYPE_LEGS"] },
+  { key: "FEET", label: "Feet", inventoryTypeKeys: ["FEET", "INVTYPE_FEET"] },
 
-  { key: "FINGER", label: "Rings", inventoryTypeKeys: ["FINGER"], allowMulti: true },
-  { key: "TRINKET", label: "Trinkets", inventoryTypeKeys: ["TRINKET"], allowMulti: true },
+  { key: "FINGER", label: "Rings", inventoryTypeKeys: ["FINGER", "INVTYPE_FINGER"], allowMulti: true },
+  { key: "TRINKET", label: "Trinkets", inventoryTypeKeys: ["TRINKET", "INVTYPE_TRINKET"], allowMulti: true },
 
-  // Weapon slots: your DB may use WEAPON/TWOHWEAPON etc
   {
     key: "MAIN_HAND",
     label: "Main Hand",
-    inventoryTypeKeys: ["MAIN_HAND", "ONE_HAND", "WEAPONMAINHAND", "WEAPON"],
+    inventoryTypeKeys: ["MAIN_HAND", "ONE_HAND", "WEAPONMAINHAND", "WEAPON", "INVTYPE_WEAPONMAINHAND", "INVTYPE_WEAPON"],
   },
   {
     key: "OFF_HAND",
     label: "Off Hand",
-    inventoryTypeKeys: ["OFF_HAND", "HOLDABLE", "WEAPONOFFHAND", "WEAPON"],
+    inventoryTypeKeys: ["OFF_HAND", "HOLDABLE", "WEAPONOFFHAND", "WEAPON", "INVTYPE_WEAPONOFFHAND", "INVTYPE_HOLDABLE"],
   },
   {
     key: "TWO_HAND",
     label: "Two-Hand",
-    inventoryTypeKeys: ["TWO_HAND", "2HWEAPON", "TWOHWEAPON"],
+    inventoryTypeKeys: ["TWO_HAND", "2HWEAPON", "TWOHWEAPON", "INVTYPE_2HWEAPON"],
   },
 ];
 
@@ -108,7 +107,7 @@ function safeNum(n: number, fallback = 0) {
 }
 
 /* =========================
-   Compute (unchanged)
+   Compute
 ========================= */
 
 type CalcInputs = {
@@ -148,9 +147,7 @@ function computeSpecDps(spec: SpecPreset, inp: CalcInputs) {
   const burstUptime = clamp(inp.burstUptimePct / 100, 0, 1);
 
   const globalDamageMult =
-    pctToMult(inp.raidBuffPct) *
-    pctToMult(inp.consumablePct) *
-    pctToMult(inp.externalMultPct);
+    pctToMult(inp.raidBuffPct) * pctToMult(inp.consumablePct) * pctToMult(inp.externalMultPct);
 
   const rows = spec.abilities.map((a) => {
     const upmBase = inp.upmOverrides[a.id] ?? a.baseUpm;
@@ -160,11 +157,7 @@ function computeSpecDps(spec: SpecPreset, inp: CalcInputs) {
 
     const ups = clamp(upmEff, 0, 99999) / 60;
 
-    const raw =
-      a.base +
-      a.apCoeff * AP +
-      a.spCoeff * SP +
-      a.wdpsCoeff * safeNum(inp.weaponDps);
+    const raw = a.base + a.apCoeff * AP + a.spCoeff * SP + a.wdpsCoeff * safeNum(inp.weaponDps);
 
     const masteryApplied = a.masteryMode === "mult" ? masteryMult : 1;
 
@@ -172,9 +165,7 @@ function computeSpecDps(spec: SpecPreset, inp: CalcInputs) {
     const expectedHit = baseHit * expectedCritMult;
 
     const dr =
-      a.school === "PHYSICAL"
-        ? clamp(inp.armorDrPct / 100, 0, 0.95)
-        : clamp(inp.magicDrPct / 100, 0, 0.95);
+      a.school === "PHYSICAL" ? clamp(inp.armorDrPct / 100, 0, 0.95) : clamp(inp.magicDrPct / 100, 0, 0.95);
 
     const expectedAfterMit = expectedHit * (1 - dr);
     const dps = expectedAfterMit * ups;
@@ -189,7 +180,7 @@ function computeSpecDps(spec: SpecPreset, inp: CalcInputs) {
 }
 
 /* =========================
-   Small UI atoms (minimal)
+   UI atoms
 ========================= */
 
 function SmallNumberInput(props: {
@@ -241,7 +232,7 @@ function ChipButton(props: { active?: boolean; children: ReactNode; onClick: () 
 }
 
 /* =========================
-   Searchable dropdown
+   Search helpers
 ========================= */
 
 function norm(s: string) {
@@ -268,8 +259,7 @@ function SearchDropdown(props: {
   onClear?: () => void;
   maxResults?: number;
 }) {
-  const { placeholder, query, setQuery, results, onPick, selectedLabel, onClear, maxResults = 10 } =
-    props;
+  const { placeholder, query, setQuery, results, onPick, selectedLabel, onClear, maxResults = 10 } = props;
 
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -315,12 +305,6 @@ function SearchDropdown(props: {
         ) : null}
       </div>
 
-      {selectedLabel ? (
-        <div className="mt-2 text-[11px] text-neutral-400 truncate">
-          Selected: <span className="text-neutral-200 font-semibold">{selectedLabel}</span>
-        </div>
-      ) : null}
-
       {open ? (
         <div className="absolute z-40 mt-2 w-full overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-950 shadow-[0_0_30px_rgba(0,0,0,0.55)]">
           <div className="max-h-[320px] overflow-auto p-2">
@@ -338,19 +322,13 @@ function SearchDropdown(props: {
                   <div className="text-sm font-semibold text-white truncate">{String((r as any).name ?? "—")}</div>
                   <div className="mt-1 text-[11px] text-neutral-500 flex items-center gap-2">
                     <span className="truncate">
-                      {String(
-                        (r as any).inventoryTypeKey ??
-                          (r as any).slot ??
-                          (r as any).inventoryType ??
-                          "—"
-                      )}
+                      {String((r as any).inventoryTypeKey ?? (r as any).slot ?? (r as any).inventoryType ?? "—")}
                     </span>
                     {typeof (r as any).itemLevel === "number" ? (
                       <span>ilvl {(r as any).itemLevel}</span>
                     ) : typeof (r as any).ilvl === "number" ? (
                       <span>ilvl {(r as any).ilvl}</span>
                     ) : null}
-                    {(r as any).quality ? <span className="truncate">{String((r as any).quality)}</span> : null}
                   </div>
                 </button>
               ))
@@ -365,27 +343,17 @@ function SearchDropdown(props: {
 }
 
 /* =========================
-   Item parsing (UPDATED for Blizzard-style detail)
+   Item parsing
 ========================= */
 
 function sumStatsFromDetail(detail: any) {
   const out: Partial<Record<StatKey, number>> = {};
 
-  const stats =
-    detail?.stats ??
-    detail?.preview_item?.stats ??
-    detail?.previewItem?.stats ??
-    [];
+  const stats = detail?.stats ?? detail?.preview_item?.stats ?? detail?.previewItem?.stats ?? [];
 
   if (Array.isArray(stats)) {
     for (const s of stats) {
-      const type =
-        s?.type?.type ??
-        s?.type ??
-        s?.stat ??
-        s?.name ??
-        "";
-
+      const type = s?.type?.type ?? s?.type ?? s?.stat ?? s?.name ?? "";
       const val = Number(s?.value ?? s?.amount ?? 0);
       if (!type || !Number.isFinite(val)) continue;
 
@@ -416,13 +384,28 @@ function guessWeaponDps(detail: any): number {
 }
 
 /* =========================
-   Slot normalization (UPDATED)
+   Slot normalization (FIXED)
 ========================= */
 
 function normalizeSlotKey(raw: any): string {
-  const k = String(raw ?? "").toUpperCase().trim();
+  let k = String(raw ?? "").toUpperCase().trim();
   if (!k) return "";
-  if (k === "HAND") return "HANDS";
+
+  // ✅ common Blizzard index formats
+  // INVTYPE_HEAD, invtype_neck, etc
+  if (k.startsWith("INVTYPE_")) k = k.slice("INVTYPE_".length);
+
+  // some pipelines store "SLOT_HEAD" etc
+  if (k.startsWith("SLOT_")) k = k.slice("SLOT_".length);
+
+  // normalize oddities
+  if (k === "HAND") k = "HANDS";
+  if (k === "CLOAK") k = "CLOAK"; // explicit
+  if (k === "2HWEAPON") k = "2HWEAPON"; // keep
+  if (k === "TWOHWEAPON") k = "2HWEAPON";
+  if (k === "WEAPONMAINHAND") k = "WEAPONMAINHAND";
+  if (k === "WEAPONOFFHAND") k = "WEAPONOFFHAND";
+
   return k;
 }
 
@@ -431,10 +414,21 @@ function getRowSlotKey(r: any): string {
     r?.inventoryTypeKey ??
     r?.slot ??
     r?.inventoryType ??
+    r?.invType ??
+    r?.inventory_type ??
     r?.detail?.inventory_type?.type ??
     r?.detail?.preview_item?.inventory_type?.type;
 
   return normalizeSlotKey(type);
+}
+
+function normalizeIndexToArray(raw: any): ItemIndexRow[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (Array.isArray(raw?.rows)) return raw.rows;
+  if (Array.isArray(raw?.items)) return raw.items;
+  if (typeof raw === "object") return Object.values(raw);
+  return [];
 }
 
 /* =========================
@@ -443,12 +437,14 @@ function getRowSlotKey(r: any): string {
 
 export default function WowDamageCalcClient(props: {
   presets: PresetsFile | null;
-  itemsIndex: ItemIndexRow[];
+  itemsIndex: any;
 }) {
   const presets: PresetsFile = useMemo(() => {
     if (props.presets?.specs?.length) return props.presets;
     return { version: "missing", specs: [] };
   }, [props.presets]);
+
+  const itemsIndex: ItemIndexRow[] = useMemo(() => normalizeIndexToArray(props.itemsIndex), [props.itemsIndex]);
 
   const [specId, setSpecId] = useState<string>(() => presets.specs[0]?.id ?? "");
   useEffect(() => {
@@ -457,13 +453,7 @@ export default function WowDamageCalcClient(props: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presets.version, presets.specs.length]);
 
-  const spec = useMemo(() => {
-    return presets.specs.find((s) => s.id === specId) ?? presets.specs[0] ?? null;
-  }, [presets, specId]);
-
-  /* =========================
-     Inputs (compact)
-  ========================= */
+  const spec = useMemo(() => presets.specs.find((s) => s.id === specId) ?? presets.specs[0] ?? null, [presets, specId]);
 
   const [mobileTab, setMobileTab] = useState<MobileTab>("stats");
 
@@ -493,7 +483,6 @@ export default function WowDamageCalcClient(props: {
     setUpmOverrides((prev) => {
       const next: Record<string, number> = { ...prev };
       for (const a of spec.abilities) if (next[a.id] == null) next[a.id] = a.baseUpm;
-
       const allowed = new Set(spec.abilities.map((a) => a.id));
       for (const k of Object.keys(next)) if (!allowed.has(k)) delete next[k];
       return next;
@@ -505,22 +494,17 @@ export default function WowDamageCalcClient(props: {
     apFromMain,
     spFromMain,
     weaponDps,
-
     critPct,
     hastePct,
     masteryPct,
     versPct,
     critDamageBonusPct,
-
     armorDrPct,
     magicDrPct,
-
     burstUptimePct,
-
     raidBuffPct,
     consumablePct,
     externalMultPct,
-
     upmOverrides,
   };
 
@@ -530,15 +514,15 @@ export default function WowDamageCalcClient(props: {
   }, [spec, baseInputs]);
 
   /* =========================
-     Gear state (optional)
+     Gear dropdown state
   ========================= */
 
-  const itemsIndex = props.itemsIndex ?? [];
   const [primaryStat, setPrimaryStat] = useState<PrimaryStat>("STRENGTH");
-
   const [gear, setGear] = useState<Record<string, number[]>>(() => ({}));
   const [gearQuery, setGearQuery] = useState<Record<string, string>>(() => ({}));
   const [packCache, setPackCache] = useState<Record<number, PackedItem[]>>({});
+  const [autoApplyGear, setAutoApplyGear] = useState<boolean>(true);
+  const applySeqRef = useRef(0);
 
   async function getPack(packNo: number) {
     if (packCache[packNo]) return packCache[packNo];
@@ -563,20 +547,10 @@ export default function WowDamageCalcClient(props: {
   }
 
   const gearDerived = useMemo(() => {
-    return {
-      selectedCount: Object.values(gear).reduce((s, arr) => s + (arr?.length ?? 0), 0),
-    };
+    return { selectedCount: Object.values(gear).reduce((s, arr) => s + (arr?.length ?? 0), 0) };
   }, [gear]);
 
-  const [gearTotals, setGearTotals] = useState<{
-    primary: number;
-    crit: number;
-    haste: number;
-    mastery: number;
-    vers: number;
-    weaponDps: number;
-    loadedItems: number;
-  }>({
+  const [gearTotals, setGearTotals] = useState({
     primary: 0,
     crit: 0,
     haste: 0,
@@ -587,6 +561,8 @@ export default function WowDamageCalcClient(props: {
   });
 
   async function recomputeGearTotalsAndApply() {
+    const mySeq = ++applySeqRef.current;
+
     let primary = 0;
     let crit = 0;
     let haste = 0;
@@ -595,9 +571,7 @@ export default function WowDamageCalcClient(props: {
     let wDps = 0;
     let loaded = 0;
 
-    const allSelectedIds = Object.entries(gear).flatMap(([slotKey, ids]) =>
-      (ids ?? []).map((id) => ({ slotKey, id }))
-    );
+    const allSelectedIds = Object.entries(gear).flatMap(([slotKey, ids]) => (ids ?? []).map((id) => ({ slotKey, id })));
 
     const rowById = new Map<number, ItemIndexRow>();
     for (const r of itemsIndex) {
@@ -606,13 +580,14 @@ export default function WowDamageCalcClient(props: {
     }
 
     for (const pick of allSelectedIds) {
+      if (applySeqRef.current !== mySeq) return;
+
       const row = rowById.get(pick.id);
       if (!row) continue;
 
       const detail = await resolveItemDetail(row);
       if (!detail) continue;
 
-      // Filter out non-equippable if detail says so
       const invType = String(detail?.inventory_type?.type ?? detail?.preview_item?.inventory_type?.type ?? "");
       const isEquip = detail?.is_equippable ?? detail?.preview_item?.is_equippable;
       if (invType === "NON_EQUIP" || isEquip === false) continue;
@@ -631,29 +606,39 @@ export default function WowDamageCalcClient(props: {
       if (dps > wDps) wDps = dps;
     }
 
-    setGearTotals({
-      primary,
-      crit,
-      haste,
-      mastery,
-      vers,
-      weaponDps: wDps,
-      loadedItems: loaded,
-    });
+    if (applySeqRef.current !== mySeq) return;
+
+    setGearTotals({ primary, crit, haste, mastery, vers, weaponDps: wDps, loadedItems: loaded });
 
     if (primary > 0) setMainStat(primary);
     if (wDps > 0) setWeaponDps(wDps);
   }
 
+  useEffect(() => {
+    if (!autoApplyGear) return;
+    const t = window.setTimeout(() => {
+      recomputeGearTotalsAndApply().catch(() => {});
+    }, 250);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoApplyGear, gear, primaryStat, itemsIndex]);
+
   function slotResults(slot: (typeof GEAR_SLOTS)[number], q: string) {
     const tq = tokenizeQuery(q);
-    const keys = new Set(slot.inventoryTypeKeys.map((x) => String(x).toUpperCase()));
 
+    // ✅ Normalize slot keys on BOTH sides
+    const allowed = new Set(slot.inventoryTypeKeys.map((x) => normalizeSlotKey(x)));
+
+    // Primary pool: slot-matched
     let pool = itemsIndex.filter((r: any) => {
       const k = getRowSlotKey(r);
       if (!k) return false;
-      return keys.has(k);
+      return allowed.has(k);
     });
+
+    // ✅ Fallback: if your index doesn't have slot keys (or mismatch),
+    // don't dead-end the dropdown. Search globally by name.
+    if (!pool.length) pool = itemsIndex;
 
     if (tq.length) {
       pool = pool.filter((r: any) => {
@@ -667,7 +652,7 @@ export default function WowDamageCalcClient(props: {
     pool.sort(
       (a: any, b: any) =>
         safeNum(b?.itemLevel ?? b?.ilvl ?? 0, 0) - safeNum(a?.itemLevel ?? a?.ilvl ?? 0, 0) ||
-        String(a?.name).localeCompare(String(b?.name))
+        String(a?.name ?? "").localeCompare(String(b?.name ?? ""))
     );
 
     return pool;
@@ -692,7 +677,7 @@ export default function WowDamageCalcClient(props: {
   }
 
   /* =========================
-     Panels (minimal)
+     Panels
   ========================= */
 
   const Panel = (props: { title: string; right?: ReactNode; children: ReactNode }) => (
@@ -724,7 +709,6 @@ export default function WowDamageCalcClient(props: {
           className="h-10 rounded-xl border border-neutral-800 bg-black px-3 text-sm text-neutral-100 outline-none focus:border-neutral-600"
           value={primaryStat}
           onChange={(e) => setPrimaryStat(e.target.value as PrimaryStat)}
-          title="Primary stat to sum from gear"
         >
           <option value="STRENGTH">Strength</option>
           <option value="AGILITY">Agility</option>
@@ -735,27 +719,15 @@ export default function WowDamageCalcClient(props: {
           <span>{gearDerived.selectedCount} selected</span>
           <span>•</span>
           <span>{gearTotals.loadedItems} loaded</span>
+          <span>•</span>
+          <span>{itemsIndex.length} index</span>
         </div>
       </div>
-
-      {!spec ? (
-        <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/40 p-4 text-sm text-neutral-300">
-          No presets loaded. Ensure <span className="font-semibold text-white">/data/wow/quick-sim-presets.json</span>{" "}
-          exists (disk or Blob) and has at least one spec.
-        </div>
-      ) : null}
     </div>
   );
 
   const StatsPanel = (
-    <Panel
-      title="Stats"
-      right={
-        <div className="text-[11px] text-neutral-500">
-          AP/SP derived from Main Stat × multipliers.
-        </div>
-      }
-    >
+    <Panel title="Stats" right={<div className="text-[11px] text-neutral-500">AP/SP derived from Main Stat × multipliers.</div>}>
       <div className="grid gap-3 sm:grid-cols-2">
         <SmallNumberInput label="Main Stat" value={mainStat} onChange={setMainStat} step={50} />
         <SmallNumberInput label="Weapon DPS" value={weaponDps} onChange={setWeaponDps} step={5} />
@@ -766,20 +738,8 @@ export default function WowDamageCalcClient(props: {
         <SmallNumberInput label="Mastery %" value={masteryPct} onChange={setMasteryPct} step={0.5} suffix="%" />
         <SmallNumberInput label="Vers %" value={versPct} onChange={setVersPct} step={0.5} suffix="%" />
 
-        <SmallNumberInput
-          label="Burst Uptime %"
-          value={burstUptimePct}
-          onChange={setBurstUptimePct}
-          step={1}
-          suffix="%"
-        />
-        <SmallNumberInput
-          label="Crit Bonus %"
-          value={critDamageBonusPct}
-          onChange={setCritDamageBonusPct}
-          step={0.5}
-          suffix="%"
-        />
+        <SmallNumberInput label="Burst Uptime %" value={burstUptimePct} onChange={setBurstUptimePct} step={1} suffix="%" />
+        <SmallNumberInput label="Crit Bonus %" value={critDamageBonusPct} onChange={setCritDamageBonusPct} step={0.5} suffix="%" />
       </div>
 
       <details className="mt-4">
@@ -801,22 +761,10 @@ export default function WowDamageCalcClient(props: {
         <SmallNumberInput label="Magic DR %" value={magicDrPct} onChange={setMagicDrPct} step={0.5} suffix="%" />
 
         <SmallNumberInput label="Raid Buff %" value={raidBuffPct} onChange={setRaidBuffPct} step={0.5} suffix="%" />
-        <SmallNumberInput
-          label="Consumables %"
-          value={consumablePct}
-          onChange={setConsumablePct}
-          step={0.5}
-          suffix="%"
-        />
+        <SmallNumberInput label="Consumables %" value={consumablePct} onChange={setConsumablePct} step={0.5} suffix="%" />
 
         <div className="sm:col-span-2">
-          <SmallNumberInput
-            label="Custom Mult %"
-            value={externalMultPct}
-            onChange={setExternalMultPct}
-            step={0.5}
-            suffix="%"
-          />
+          <SmallNumberInput label="Custom Mult %" value={externalMultPct} onChange={setExternalMultPct} step={0.5} suffix="%" />
         </div>
       </div>
     </details>
@@ -824,7 +772,7 @@ export default function WowDamageCalcClient(props: {
 
   const GearPanel = (
     <details className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-5">
-      <summary className="cursor-pointer text-sm font-semibold text-neutral-200">Gear (Optional)</summary>
+      <summary className="cursor-pointer text-sm font-semibold text-neutral-200">Gear (Dropdowns)</summary>
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <button
@@ -834,55 +782,19 @@ export default function WowDamageCalcClient(props: {
         >
           Apply gear → inputs
         </button>
-        <div className="text-[11px] text-neutral-500">
-          Sums Primary + picks highest Weapon DPS from selected items.
-        </div>
-      </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
-          <div className="text-[11px] text-neutral-500">Last totals</div>
-          <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
-            <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-              <div className="text-[11px] text-neutral-500">Primary</div>
-              <div className="font-semibold text-neutral-200">{fmt(gearTotals.primary, 0)}</div>
-            </div>
-            <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-              <div className="text-[11px] text-neutral-500">Weapon DPS</div>
-              <div className="font-semibold text-neutral-200">{fmt(gearTotals.weaponDps, 0)}</div>
-            </div>
-            <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-              <div className="text-[11px] text-neutral-500">Crit (rating)</div>
-              <div className="font-semibold text-neutral-200">{fmt(gearTotals.crit, 0)}</div>
-            </div>
-            <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-              <div className="text-[11px] text-neutral-500">Haste (rating)</div>
-              <div className="font-semibold text-neutral-200">{fmt(gearTotals.haste, 0)}</div>
-            </div>
-            <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-              <div className="text-[11px] text-neutral-500">Mastery (rating)</div>
-              <div className="font-semibold text-neutral-200">{fmt(gearTotals.mastery, 0)}</div>
-            </div>
-            <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-              <div className="text-[11px] text-neutral-500">Vers (rating)</div>
-              <div className="font-semibold text-neutral-200">{fmt(gearTotals.vers, 0)}</div>
-            </div>
-          </div>
+        <button
+          type="button"
+          onClick={() => setAutoApplyGear((v) => !v)}
+          className={[
+            "h-10 rounded-xl border px-4 text-sm transition",
+            autoApplyGear ? "border-neutral-600 bg-black text-white" : "border-neutral-800 bg-neutral-950 text-neutral-300 hover:border-neutral-600 hover:text-white",
+          ].join(" ")}
+        >
+          Auto-apply: {autoApplyGear ? "On" : "Off"}
+        </button>
 
-          <div className="mt-3 text-[11px] text-neutral-500">
-            Note: rating → % conversion varies by level/expansion. Keep % inputs manual for now.
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
-          <div className="text-[11px] text-neutral-500">
-            Tip: search by name, then pick from top ilvl results.
-          </div>
-          <div className="mt-2 text-[11px] text-neutral-600">
-            Your pack files are read from{" "}
-            <span className="text-neutral-400 font-semibold">/data/wow/items/packs/</span>.
-          </div>
-        </div>
+        <div className="text-[11px] text-neutral-500">If your index uses INVTYPE_*, this build now normalizes it.</div>
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -895,7 +807,7 @@ export default function WowDamageCalcClient(props: {
             <div key={slotKey} className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-sm font-semibold text-neutral-200">{slot.label}</div>
-                <div className="text-[11px] text-neutral-500">{slot.inventoryTypeKeys.join("/")}</div>
+                <div className="text-[11px] text-neutral-500">{slot.inventoryTypeKeys.slice(0, 2).join("/")}</div>
               </div>
 
               <div className="mt-3 space-y-3">
@@ -908,9 +820,7 @@ export default function WowDamageCalcClient(props: {
                   return (
                     <div key={qKey}>
                       <SearchDropdown
-                        placeholder={
-                          allowMulti ? `Search ${slot.label} ${which + 1}…` : `Search ${slot.label}…`
-                        }
+                        placeholder={allowMulti ? `Search ${slot.label} ${which + 1}…` : `Search ${slot.label}…`}
                         query={q}
                         setQuery={(v) => setGearQuery((prev) => ({ ...prev, [qKey]: v }))}
                         results={results}
@@ -1001,67 +911,10 @@ export default function WowDamageCalcClient(props: {
             <div className="mt-1 font-bold">{fmt(computed.SP, 0)}</div>
           </div>
         </div>
-
-        <div className="mt-4 text-[11px] text-neutral-500">
-          Expected hit × rate (UPM). Sorted by contribution.
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-950/60 p-4">
-        <div className="text-sm font-semibold text-neutral-200">Breakdown</div>
-        <div className="mt-3 space-y-2">
-          {computed.rows.map((r) => {
-            const pct = computed.totalDps > 0 ? (r.dps / computed.totalDps) * 100 : 0;
-
-            return (
-              <div key={r.ability.id} className="rounded-2xl border border-neutral-800 bg-black/40 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold text-white truncate">{r.ability.name}</div>
-                    <div className="mt-1 text-[11px] text-neutral-500">
-                      {r.ability.school}
-                      {r.ability.hasteAffectsRate ? " • haste→rate" : ""}
-                      {r.ability.tags?.includes("burst") ? " • burst" : ""}
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-[11px] text-neutral-500">DPS</div>
-                    <div className="text-lg font-black">{fmt(r.dps, 1)}</div>
-                  </div>
-                </div>
-
-                <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
-                  <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-                    <div className="text-[11px] text-neutral-500">Expected Hit</div>
-                    <div className="font-semibold text-neutral-200">{fmt(r.expectedAfterMit, 0)}</div>
-                  </div>
-                  <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-                    <div className="text-[11px] text-neutral-500">Eff UPM</div>
-                    <div className="font-semibold text-neutral-200">{fmt(r.upmEff, 2)}</div>
-                  </div>
-                  <div className="rounded-xl border border-neutral-800 bg-black/30 p-2">
-                    <div className="text-[11px] text-neutral-500">Share</div>
-                    <div className="font-semibold text-neutral-200">{fmt(pct, 1)}%</div>
-                  </div>
-                </div>
-
-                <div className="mt-3 h-2 w-full overflow-hidden rounded-full border border-neutral-800 bg-black/30">
-                  <div className="h-full bg-white/15" style={{ width: `${clamp(pct, 0, 100)}%` }} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
       </div>
     </div>
   );
 
-  /* =========================
-     Render
-  ========================= */
-
-  // Mobile tabs (simple, minimal)
   const MobileTabs = (
     <div className="sm:hidden sticky top-3 z-30">
       <div className="rounded-2xl border border-neutral-800 bg-neutral-950/85 backdrop-blur p-2">
@@ -1085,8 +938,7 @@ export default function WowDamageCalcClient(props: {
       <div className="space-y-4">
         {TopBar}
         <div className="rounded-2xl border border-neutral-800 bg-black/40 p-4 text-sm text-neutral-300">
-          Missing presets. Create <span className="font-semibold text-white">/public/data/wow/quick-sim-presets.json</span>{" "}
-          (or upload to Blob) with at least one spec preset.
+          Missing presets. Create <span className="font-semibold text-white">/public/data/wow/quick-sim-presets.json</span> with at least one spec preset.
         </div>
       </div>
     );
@@ -1096,7 +948,6 @@ export default function WowDamageCalcClient(props: {
     <div className="space-y-4">
       {MobileTabs}
 
-      {/* Desktop: 2-column, sticky results */}
       <div className="hidden sm:grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] items-start">
         <div className="space-y-6">
           {TopBar}
@@ -1105,11 +956,9 @@ export default function WowDamageCalcClient(props: {
           {TargetPanel}
           {RotationPanel}
         </div>
-
         <div className="sticky top-6">{ResultsPanel}</div>
       </div>
 
-      {/* Mobile: tabbed content */}
       <div className="sm:hidden space-y-6">
         {TopBar}
         {mobileTab === "stats" ? (
@@ -1119,7 +968,6 @@ export default function WowDamageCalcClient(props: {
             {RotationPanel}
           </>
         ) : null}
-
         {mobileTab === "gear" ? <>{GearPanel}</> : null}
         {mobileTab === "results" ? <>{ResultsPanel}</> : null}
       </div>

@@ -93,24 +93,31 @@ jobs:
 
           echo "rebuild=$REBUILD" >> "$GITHUB_OUTPUT"
 
+          # Beefier runs (production key): higher caps + less checkpoint overhead.
           if [ "$REBUILD" = "true" ]; then
             echo "REPROCESS_BOOTSTRAP=1" >> "$GITHUB_ENV"
             echo "REPROCESS_SEEDS=1" >> "$GITHUB_ENV"
             echo "RESET_SEEN_MATCHES=1" >> "$GITHUB_ENV"
             echo "RESET_SEEN_PUUIDS=1" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=1" >> "$GITHUB_ENV"
-            echo "MAX_MATCHES_PER_RUN=5000" >> "$GITHUB_ENV"
-            echo "MAX_NEW_PUUIDS_PER_RUN=500" >> "$GITHUB_ENV"
-            echo "MATCHES_PER_PUUID=20" >> "$GITHUB_ENV"
+
+            # Rebuild: still heavy, but slightly more conservative for stability
+            echo "MAX_MATCHES_PER_RUN=80000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=8000" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=80" >> "$GITHUB_ENV"
+            echo "CHECKPOINT_EVERY=250" >> "$GITHUB_ENV"
           else
             echo "REPROCESS_BOOTSTRAP=0" >> "$GITHUB_ENV"
             echo "REPROCESS_SEEDS=0" >> "$GITHUB_ENV"
             echo "RESET_SEEN_MATCHES=0" >> "$GITHUB_ENV"
             echo "RESET_SEEN_PUUIDS=0" >> "$GITHUB_ENV"
             echo "RESET_CURSORS=0" >> "$GITHUB_ENV"
-            echo "MAX_MATCHES_PER_RUN=20000" >> "$GITHUB_ENV"
-            echo "MAX_NEW_PUUIDS_PER_RUN=4000" >> "$GITHUB_ENV"
-            echo "MATCHES_PER_PUUID=100" >> "$GITHUB_ENV"
+
+            # Incremental: very beefy (long run + high throughput)
+            echo "MAX_MATCHES_PER_RUN=120000" >> "$GITHUB_ENV"
+            echo "MAX_NEW_PUUIDS_PER_RUN=20000" >> "$GITHUB_ENV"
+            echo "MATCHES_PER_PUUID=250" >> "$GITHUB_ENV"
+            echo "CHECKPOINT_EVERY=250" >> "$GITHUB_ENV"
           fi
 
       - name: Crawl Riot matches (never fail job)
@@ -120,11 +127,11 @@ jobs:
           RIOT_PLATFORM: na1
           LADDER_QUEUE: RANKED_SOLO_5x5
           LADDER_TIER: challenger
-          LADDER_MAX_PLAYERS: "250"
+          LADDER_MAX_PLAYERS: "1000"
           MAX_MATCHES_PER_RUN: ${{ env.MAX_MATCHES_PER_RUN }}
           MAX_NEW_PUUIDS_PER_RUN: ${{ env.MAX_NEW_PUUIDS_PER_RUN }}
           MATCHES_PER_PUUID: ${{ env.MATCHES_PER_PUUID }}
-          CHECKPOINT_EVERY: "100"
+          CHECKPOINT_EVERY: ${{ env.CHECKPOINT_EVERY }}
           USE_TIMELINE: "0"
           REPROCESS_BOOTSTRAP: ${{ env.REPROCESS_BOOTSTRAP }}
           REPROCESS_SEEDS: ${{ env.REPROCESS_SEEDS }}

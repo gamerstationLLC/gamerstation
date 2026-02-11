@@ -93,13 +93,11 @@ export default async function WowDamageCalcPage() {
             </div>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <Link href="/calculators/wow" className={navBtn}>
-              WoW Hub
+              WoW
             </Link>
-            <Link href="/tools" className={navBtn}>
-              Tools
-            </Link>
+            
           </div>
         </header>
 

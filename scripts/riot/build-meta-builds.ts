@@ -240,7 +240,7 @@ async function fetchJsonWithRetry(
   url: string,
   opts?: { retries?: number; kind?: "regional" | "platform" }
 ): Promise<any> {
-  const retries = opts?.retries ?? 5;
+  const retries = opts?.retries ?? 10;
   const kind = opts?.kind ?? "regional";
 
   for (let attempt = 0; attempt <= retries; attempt++) {

@@ -326,7 +326,7 @@ export default function FortniteTTKPage() {
               </div>
               <div className="mt-3 text-xs text-neutral-500">
                 Rarity affects body damage. Headshots use multiplier on top of
-                the selected rarityâ€™s base damage.
+                the selected rarity's base damage.
               </div>
             </div>
 

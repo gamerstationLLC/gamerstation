@@ -97,16 +97,14 @@ export default async function Page() {
     {};
 
   const navBtn =
-    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+    "rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
     <main className="relative min-h-screen text-white">
       {/* Hub-style black background */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-black" />
-        <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_30%_20%,rgba(255,255,255,0.06),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_70%_10%,rgba(255,255,255,0.04),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1200px_800px_at_50%_60%,transparent_40%,rgba(0,0,0,0.8))]" />
+        <div className="absolute inset-0 bg-transparent" />
+        
       </div>
 
       <div className="mx-auto max-w-6xl px-6 py-12">
@@ -126,10 +124,21 @@ export default async function Page() {
             </span>
           </Link>
 
-          <div className="ml-auto">
-            <Link href="/calculators/lol/hub" className={navBtn}>
-              LoL Hub
-            </Link>
+          <div className="ml-auto w-black px-5">
+            <a
+  href="/calculators/lol/hub"
+  className="
+    ml-auto rounded-xl border border-neutral-800
+    bg-black px-4 py-2 text-sm text-neutral-200
+    transition
+    hover:border-grey-400
+   
+    hover:text-white
+    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+  "
+>
+  LoL Hub
+</a>
           </div>
         </header>
 

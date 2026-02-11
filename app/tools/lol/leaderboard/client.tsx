@@ -330,7 +330,7 @@ export default function LeaderboardClient({
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-black text-white">
+    <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.10]"
@@ -389,7 +389,9 @@ export default function LeaderboardClient({
                 <select
                   value={region}
                   onChange={(e) => setRegion(e.target.value as RegionKey)}
-                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none ${surfaceInput}`}
+                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none 
+bg-black text-white border-white/10 focus:border-white/30`}
+
                 >
                   {REGIONS.map((r) => (
                     <option key={r.key} value={r.key}>
@@ -404,7 +406,9 @@ export default function LeaderboardClient({
                 <select
                   value={queue}
                   onChange={(e) => setQueue(e.target.value as QueueKey)}
-                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none ${surfaceInput}`}
+                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none 
+bg-black text-white border-white/10 focus:border-white/30`}
+
                 >
                   {QUEUES.map((q) => (
                     <option key={q.key} value={q.key}>
@@ -419,7 +423,9 @@ export default function LeaderboardClient({
                 <select
                   value={tier}
                   onChange={(e) => setTier(e.target.value as TierKey)}
-                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none ${surfaceInput}`}
+                 className={`w-full rounded-xl border px-3 py-2 text-sm outline-none 
+bg-black text-white border-white/10 focus:border-white/30`}
+
                 >
                   {TIERS.map((t) => (
                     <option key={t.key} value={t.key}>

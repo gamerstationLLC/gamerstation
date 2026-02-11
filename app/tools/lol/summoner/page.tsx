@@ -63,8 +63,8 @@ export default function LolSummonerLookupPage() {
           <h1 className="mt-2 text-4xl font-bold tracking-tight">Summoner Lookup</h1>
           <p className="mt-3 text-neutral-300">
             Enter a Riot ID like{" "}
-            <span className="font-semibold text-white">Faker#KR1</span>, choose the playerâ€™s
-            server, and weâ€™ll take you to their match stats page.
+            <span className="font-semibold text-white">Faker#KR1</span>, choose the player's
+            server, and we'll take you to their match stats page.
           </p>
 
           <div className="mt-10 rounded-2xl border border-neutral-800 bg-neutral-950/70 p-6 shadow-[0_0_40px_rgba(0,255,255,0.10)]">

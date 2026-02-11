@@ -24,14 +24,35 @@ export default function BloxFruitsXPPage() {
     <main className="min-h-screen bg-transparent text-white px-6 py-16">
       <div className="mx-auto max-w-5xl">
         {/* Back link */}
-        <header className="-ml-2 mb-6">
-          <Link
-            href="/calculators/roblox/bloxfruits"
-            className="text-sm text-neutral-300 hover:text-white"
-          >
-            â† Back to Blox Fruits Hub
-          </Link>
-        </header>
+        <header className="mb-8 flex items-center">
+  {/* Left: Logo */}
+  <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+    <img
+      src="/gs-logo-v2.png"
+      alt="GamerStation"
+      className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
+    />
+    <span className="text-lg font-black tracking-tight">
+      GamerStation<span className="align-super text-[0.6em]">TM</span>
+    </span>
+  </Link>
+
+  {/* Right: Tools button */}
+  <a
+  href="/calculators/roblox/bloxfruits"
+  className="
+    ml-auto rounded-xl border border-neutral-800
+    bg-black px-4 py-2 text-sm text-neutral-200
+    transition
+    hover:border-grey-400
+   
+    hover:text-white
+    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+  "
+>
+  Blox Fruits Hub
+</a>
+</header>
 
         {/* Hero */}
         <h1 className="text-3xl sm:text-4xl font-bold">
