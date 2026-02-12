@@ -1,18 +1,15 @@
-﻿// app/tools/lol/summoner/page.tsx
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
 import SummonerLookupClient from "./client";
 
 export const metadata: Metadata = {
   title: "LoL Summoner Lookup (Riot ID) | GamerStation",
-  description:
-    "Search a League of Legends player by Riot ID (GameName#TAG) and view match history + aggregated stats.",
+  description: "Search a League of Legends player by Riot ID (GameName#TAG).",
 };
 
 export default function LolSummonerLookupPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
-      {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute inset-0 opacity-[0.10]"
@@ -30,9 +27,7 @@ export default function LolSummonerLookupPage() {
 
       <div className="relative px-6 py-16">
         <div className="mx-auto max-w-5xl">
-          {/* Header */}
           <header className="mb-8 flex items-center">
-            {/* Left: Logo */}
             <Link href="/" className="flex items-center gap-2 hover:opacity-90">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -45,7 +40,6 @@ export default function LolSummonerLookupPage() {
               </span>
             </Link>
 
-            {/* Right: Tools button */}
             <a
               href="/tools"
               className="
@@ -63,16 +57,13 @@ export default function LolSummonerLookupPage() {
 
           <h1 className="mt-2 text-4xl font-bold tracking-tight">Summoner Lookup</h1>
           <p className="mt-3 text-neutral-300">
-            Enter a Riot ID like{" "}
-            <span className="font-semibold text-white">Faker#KR1</span> or just a{" "}
-            <span className="font-semibold text-white">Summoner Name</span>.
+            Enter a Riot ID like <span className="font-semibold text-white">Faker#KR1</span>.
           </p>
 
           <div className="mt-10 rounded-2xl border border-neutral-800 bg-neutral-950/70 p-6 shadow-[0_0_40px_rgba(0,255,255,0.10)]">
             <SummonerLookupClient />
             <div className="mt-6 text-xs text-neutral-500">
-              Uses Riot Account-V1 + Match-V5 (regional routing) and Summoner-V4 (platform
-              routing).
+              Uses Account-V1 → auto-detect platform → Match-V5.
             </div>
           </div>
         </div>

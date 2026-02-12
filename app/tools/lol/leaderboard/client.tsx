@@ -147,10 +147,14 @@ function normalizeIconUrl(url?: string | null): string | null {
 
 /** Client-safe Blob URL builder (dev + prod) */
 function normalizeBase(b: string) {
-  return String(b ?? "").trim().replace(/\/+$/, "");
+  return String(b ?? "")
+    .trim()
+    .replace(/\/+$/, "");
 }
 function normalizePath(p: string) {
-  return String(p ?? "").trim().replace(/^\/+/, "");
+  return String(p ?? "")
+    .trim()
+    .replace(/^\/+/, "");
 }
 function blobUrl(pathnameInput: string): string {
   const pathname = normalizePath(pathnameInput);
@@ -196,6 +200,33 @@ function champIcon(champIdOrName: string, ddVersion: string) {
  */
 function champLink(champIdOrName: string) {
   return `/calculators/lol/champions/${encodeURIComponent(champKey(champIdOrName))}`;
+}
+
+/**
+ * ✅ Build link to your Summoner page.
+ * Preferred: /tools/lol/summoner/[region]/[gameName]/[tagLine]
+ * Fallback: /tools/lol/summoner?region=...&riotId=... (lets your Summoner page prefill if you support it)
+ */
+function parseRiotId(s: string): { gameName: string; tagLine: string } | null {
+  const raw = (s ?? "").trim();
+  if (!raw) return null;
+  const i = raw.lastIndexOf("#");
+  if (i <= 0 || i >= raw.length - 1) return null;
+  const gameName = raw.slice(0, i).trim();
+  const tagLine = raw.slice(i + 1).trim();
+  if (!gameName || !tagLine) return null;
+  return { gameName, tagLine };
+}
+
+function summonerHref(region: RegionKey, displayName: string) {
+  const riotId = parseRiotId(displayName);
+  if (riotId) {
+    return `/tools/lol/summoner/${encodeURIComponent(
+      riotId.gameName
+    )}/${encodeURIComponent(riotId.tagLine)}`;
+  }
+  // fallback: still clickable; your summoner page can choose to read these query params
+  return `/tools/lol/summoner?region=${encodeURIComponent(region)}&riotId=${encodeURIComponent(displayName)}`;
 }
 
 /**
@@ -321,7 +352,6 @@ export default function LeaderboardClient({
   }, [dataUrl]);
 
   const surfaceCard = "bg-neutral-950/70 border-neutral-800";
-  const surfaceInput = "bg-neutral-900/80 border-neutral-800 focus:border-neutral-600";
   const surfaceHeader = "bg-neutral-950/80";
   const surfaceRow = "bg-neutral-950/60";
   const surfaceHover = "";
@@ -371,8 +401,8 @@ export default function LeaderboardClient({
           <p className="mt-3 text-neutral-300">Browse top players and see their stats + most played champs.</p>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <Link href="/calculators/lol/hub" className={navBtn}>
-              LoL Hub
+            <Link href="/tools/lol/summoner" className={navBtn}>
+              Summoner Stats
             </Link>
             <Link href="/calculators/lol/meta" className={navBtn}>
               Meta
@@ -389,9 +419,7 @@ export default function LeaderboardClient({
                 <select
                   value={region}
                   onChange={(e) => setRegion(e.target.value as RegionKey)}
-                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none 
-bg-black text-white border-white/10 focus:border-white/30`}
-
+                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none bg-black text-white border-white/10 focus:border-white/30`}
                 >
                   {REGIONS.map((r) => (
                     <option key={r.key} value={r.key}>
@@ -406,9 +434,7 @@ bg-black text-white border-white/10 focus:border-white/30`}
                 <select
                   value={queue}
                   onChange={(e) => setQueue(e.target.value as QueueKey)}
-                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none 
-bg-black text-white border-white/10 focus:border-white/30`}
-
+                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none bg-black text-white border-white/10 focus:border-white/30`}
                 >
                   {QUEUES.map((q) => (
                     <option key={q.key} value={q.key}>
@@ -423,9 +449,7 @@ bg-black text-white border-white/10 focus:border-white/30`}
                 <select
                   value={tier}
                   onChange={(e) => setTier(e.target.value as TierKey)}
-                 className={`w-full rounded-xl border px-3 py-2 text-sm outline-none 
-bg-black text-white border-white/10 focus:border-white/30`}
-
+                  className={`w-full rounded-xl border px-3 py-2 text-sm outline-none bg-black text-white border-white/10 focus:border-white/30`}
                 >
                   {TIERS.map((t) => (
                     <option key={t.key} value={t.key}>
@@ -487,6 +511,8 @@ bg-black text-white border-white/10 focus:border-white/30`}
 
                       const champs = (r.topChamps ?? []).slice(0, 3);
 
+                      const playerHref = summonerHref(r.region, displayName);
+
                       return (
                         <div
                           key={rowKey}
@@ -495,29 +521,38 @@ bg-black text-white border-white/10 focus:border-white/30`}
                         >
                           <div className="col-span-1 text-neutral-400 tabular-nums">{r.rank}</div>
 
-                          {/* Player */}
-                          <div className="col-span-4 sm:col-span-4 min-w-0 flex items-center gap-2">
-                            {finalUrl ? (
-                              <div className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-black/40">
-                                <img
-                                  src={finalUrl}
-                                  alt=""
-                                  loading="lazy"
-                                  referrerPolicy="no-referrer"
-                                  className="block h-full w-full object-cover object-center"
-                                  draggable={false}
-                                  onError={() => setBrokenIcons((prev) => ({ ...prev, [rowKey]: true }))}
-                                />
-                              </div>
-                            ) : (
-                              <div className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 rounded-xl border border-neutral-800 bg-neutral-900/40" />
-                            )}
+                          {/* Player (CLICKABLE) */}
+                          <div className="col-span-4 sm:col-span-4 min-w-0">
+                            <Link
+                              href={playerHref}
+                              className="group min-w-0 flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
+                              aria-label={`Open summoner page for ${displayName}`}
+                            >
+                              {finalUrl ? (
+                                <div className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-black/40 group-hover:border-neutral-600 group-hover:shadow-[0_0_18px_rgba(0,255,255,0.20)]">
+                                  <img
+                                    src={finalUrl}
+                                    alt=""
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer"
+                                    className="block h-full w-full object-cover object-center"
+                                    draggable={false}
+                                    onError={() => setBrokenIcons((prev) => ({ ...prev, [rowKey]: true }))}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 rounded-xl border border-neutral-800 bg-neutral-900/40 group-hover:border-neutral-600" />
+                              )}
 
-                            <div className="min-w-0">
-                              <div className="min-w-0 truncate font-semibold text-neutral-200 whitespace-nowrap">
-                                {displayName}
+                              <div className="min-w-0">
+                                <div className="min-w-0 truncate font-semibold text-neutral-200 whitespace-nowrap group-hover:text-white">
+                                  {displayName}
+                                </div>
+                                <div className="hidden sm:block text-[11px] text-neutral-500 group-hover:text-neutral-400">
+                                  View profile →
+                                </div>
                               </div>
-                            </div>
+                            </Link>
                           </div>
 
                           {/* LP */}

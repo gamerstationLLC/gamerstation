@@ -201,10 +201,10 @@ export default function StatsClient({
         {/* Row 3 */}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
-            href="/calculators/lol"
+            href="/tools/lol/leaderboard"
             className="rounded-xl border border-neutral-800 bg-black px-3 py-2 text-sm text-neutral-300 hover:border-neutral-600 hover:text-white"
           >
-            LoL Hub
+            Leaderboard
           </Link>
 
           <Link
