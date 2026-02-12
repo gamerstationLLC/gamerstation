@@ -1,6 +1,7 @@
 // app/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
+import SiteSearch from "./_components/SiteSearch";
 
 // ✅ Homepage-only metadata (canonical + google verification)
 export const metadata: Metadata = {
@@ -18,49 +19,55 @@ export default function Home() {
     <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* Ambient background */}
       {/* Subtle top glow */}
-<div aria-hidden className="pointer-events-none absolute inset-0">
-  <div
-    className="
-      absolute -top-40 left-1/2 h-[1500px] w-[1500px]
-      -translate-x-1/2
-      rounded-full
-      bg-[radial-gradient(closest-side,rgba(0,255,255,0.12),transparent_100%)]
-      blur-80x80
-      opacity-45000
-    "
-  />
-  <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/60 to-black" />
-</div>
-
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div
+          className="
+            absolute -top-40 left-1/2 h-[1500px] w-[1500px]
+            -translate-x-1/2
+            rounded-full
+            bg-[radial-gradient(closest-side,rgba(0,255,255,0.12),transparent_100%)]
+            blur-80x80
+            opacity-45000
+          "
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/60 to-black" />
+      </div>
 
       <div className="relative mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         {/* Header */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Brand */}
-          <Link href="/" className="flex items-center min-w-0">
-            <img
-              src="/gs-logo-v2.png"
-              alt="GamerStation"
-              className="
-                gs-logo-hit
-                h-16 w-auto rounded-2xl bg-black p-1
-                shadow-[0_0_40px_rgba(0,255,255,0.15)]
-                sm:h-20 sm:p-2
-              "
-            />
+          <div className="min-w-0">
+            <Link href="/" className="flex items-center">
+              <img
+                src="/gs-logo-v2.png"
+                alt="GamerStation"
+                className="
+                  gs-logo-hit
+                  h-16 w-auto rounded-2xl bg-black p-1
+                  shadow-[0_0_40px_rgba(0,255,255,0.15)]
+                  sm:h-20 sm:p-2
+                "
+              />
 
-            {/* Title with the white underline sweep (right → left) */}
-            <h1
-              className="
-                gs-title-sweep
-                ml-3 translate-x-[2px] text-2xl font-black leading-none tracking-tight
-                sm:translate-x-[4px] sm:text-4xl
-                whitespace-nowrap
-              "
-            >
-              GamerStation<span className="align-super text-[0.65em]">™</span>
-            </h1>
-          </Link>
+              {/* Title with the white underline sweep (right → left) */}
+              <h1
+                className="
+                  gs-title-sweep
+                  ml-3 translate-x-[2px] text-2xl font-black leading-none tracking-tight
+                  sm:translate-x-[4px] sm:text-4xl
+                  whitespace-nowrap
+                "
+              >
+                GamerStation<span className="align-super text-[0.65em]">™</span>
+              </h1>
+            </Link>
+
+            {/* ✅ Mobile-only search directly under the title */}
+            <div className="mt-3 sm:hidden">
+              <SiteSearch />
+            </div>
+          </div>
 
           {/* Nav */}
           <nav className="flex items-center gap-2 sm:gap-3 text-sm sm:justify-end">
@@ -92,12 +99,10 @@ export default function Home() {
               Tools
             </a>
 
-            <button
-              disabled
-              className="hidden cursor-not-allowed sm:inline-flex rounded-xl border border-neutral-800 bg-neutral-900 px-4 py-2 text-sm text-neutral-500"
-            >
-              Compare (Coming soon)
-            </button>
+            {/* ✅ Desktop search stays in the nav */}
+            <div className="hidden sm:block">
+              <SiteSearch />
+            </div>
           </nav>
         </header>
 
