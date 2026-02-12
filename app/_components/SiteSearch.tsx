@@ -263,9 +263,7 @@ export default function SiteSearch() {
           aria-label="Search GamerStation pages"
         />
 
-        <div className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 select-none text-[10px] text-neutral-500">
-          ⏎
-        </div>
+        
       </div>
 
       {open && results.length > 0 && (

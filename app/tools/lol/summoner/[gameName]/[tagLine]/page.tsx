@@ -12,6 +12,12 @@ type AccountByRiotId = {
   tagLine: string;
 };
 
+type AccountByPuuid = {
+  puuid: string;
+  gameName: string;
+  tagLine: string;
+};
+
 type SummonerV4 = {
   id: string;
   accountId: string;
@@ -59,6 +65,18 @@ type MatchV5 = {
   };
 };
 
+type PlayerRef = {
+  gameName?: string;
+  tagLine?: string;
+  summonerName?: string;
+  teamId?: number;
+};
+
+type MatchPlayers = {
+  blue: PlayerRef[];
+  red: PlayerRef[];
+};
+
 type SummonerProfileData = {
   riotId: string;
   platform: string;
@@ -99,6 +117,7 @@ type SummonerProfileData = {
     dmgToChamps: number;
     vision: number;
     items: number[];
+    players?: MatchPlayers; // ✅ NEW: used by desktop-only Players panel
   }>;
   meta: {
     ddVersion?: string;
@@ -200,7 +219,8 @@ async function riotFetchJson<T>(
     if (retryable && i < attempts - 1) {
       const ra = res.headers.get("retry-after");
       const raMs = ra ? Math.min(10_000, Number(ra) * 1000) : null;
-      const backoff = Math.min(4000, 250 * Math.pow(2, i)) + Math.floor(Math.random() * 120);
+      const backoff =
+        Math.min(4000, 250 * Math.pow(2, i)) + Math.floor(Math.random() * 120);
       await sleep(raMs ?? backoff);
       continue;
     }
@@ -241,12 +261,18 @@ function deriveDdVersion(gameVersion?: string) {
   return `${parts[0]}.${parts[1]}.1`;
 }
 
-async function detectPlatformByPuuid(puuid: string): Promise<{ platform: Platform; summoner: SummonerV4 } | null> {
-  // Probe platforms until one returns Summoner-V4 for this puuid.
-  // This is the key trick that removes the server picker entirely.
+async function detectPlatformByPuuid(
+  puuid: string
+): Promise<{ platform: Platform; summoner: SummonerV4 } | null> {
   for (const p of PLATFORMS) {
-    const url = `${riotHostForPlatform(p)}/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(puuid)}`;
-    const s = await riotFetchJson<SummonerV4>(url, { attempts: 2, softFail: true, revalidate: 300 });
+    const url = `${riotHostForPlatform(p)}/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(
+      puuid
+    )}`;
+    const s = await riotFetchJson<SummonerV4>(url, {
+      attempts: 2,
+      softFail: true,
+      revalidate: 300,
+    });
     if (s?.puuid) return { platform: p, summoner: s };
   }
   return null;
@@ -259,7 +285,6 @@ async function detectPlatformByPuuid(puuid: string): Promise<{ platform: Platfor
 export default async function SummonerProfilePage({
   params,
 }: {
-  // Next 15: params is async
   params: Promise<RouteParams> | RouteParams;
 }) {
   const p = await Promise.resolve(params as any);
@@ -285,19 +310,25 @@ export default async function SummonerProfilePage({
   // 1) Account-V1 (regional) — we don’t know cluster yet, so try all clusters
   const clusters: Cluster[] = ["americas", "europe", "asia", "sea"];
   let account: AccountByRiotId | null = null;
+
   for (const c of clusters) {
     const url = `${riotHostForCluster(c)}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
       gameName
     )}/${encodeURIComponent(tagLine)}`;
-    const a = await riotFetchJson<AccountByRiotId>(url, { attempts: 2, softFail: true, revalidate: 300 });
+    const a = await riotFetchJson<AccountByRiotId>(url, {
+      attempts: 2,
+      softFail: true,
+      revalidate: 300,
+    });
     if (a?.puuid) {
       account = a;
       break;
     }
   }
+
   if (!account?.puuid) notFound();
 
-  // 2) Detect platform (Summoner-V4 probe) so we can route properly
+  // 2) Detect platform (Summoner-V4 probe)
   const detected = await detectPlatformByPuuid(account.puuid);
   if (!detected) notFound();
 
@@ -305,12 +336,16 @@ export default async function SummonerProfilePage({
   const cluster = platformToCluster(platform);
   const summoner = detected.summoner;
 
-  // 3) Match IDs (cluster routing)
+  // 3) Match IDs
   const matchIdsUrl = `${riotHostForCluster(cluster)}/lol/match/v5/matches/by-puuid/${encodeURIComponent(
     account.puuid
   )}/ids?start=0&count=20`;
 
-  const matchIds = await riotFetchJson<string[]>(matchIdsUrl, { attempts: 3, softFail: true, revalidate: 300 });
+  const matchIds = await riotFetchJson<string[]>(matchIdsUrl, {
+    attempts: 3,
+    softFail: true,
+    revalidate: 300,
+  });
   const ids = Array.isArray(matchIds) ? matchIds : [];
 
   // 4) Match details
@@ -323,12 +358,59 @@ export default async function SummonerProfilePage({
   const loadedMatches = matchDetails.filter(Boolean) as MatchV5[];
   const ddVersion = deriveDdVersion(loadedMatches[0]?.info?.gameVersion);
 
+  // ✅ NEW: Build RiotID map for participants (PUUID -> gameName/tagLine)
+  const uniquePuuids = Array.from(
+    new Set(
+      loadedMatches.flatMap((m) => m.info.participants.map((p) => p.puuid).filter(Boolean))
+    )
+  );
+
+  const accountByPuuid = new Map<string, { gameName: string; tagLine: string }>();
+
+  // Fetch in a controlled way; soft-fail so page still loads even if Riot is cranky.
+  const accountResults = await mapLimit(uniquePuuids, 6, async (puuid) => {
+    const url = `${riotHostForCluster(cluster)}/riot/account/v1/accounts/by-puuid/${encodeURIComponent(puuid)}`;
+    const a = await riotFetchJson<AccountByPuuid>(url, { attempts: 2, softFail: true, revalidate: 300 });
+    return { puuid, a };
+  });
+
+  for (const r of accountResults) {
+    if (r.a?.gameName && r.a?.tagLine) {
+      accountByPuuid.set(r.puuid, { gameName: r.a.gameName, tagLine: r.a.tagLine });
+    }
+  }
+
   const rows = loadedMatches
     .map((m) => {
       const me = m.info.participants.find((x) => x.puuid === account!.puuid);
       if (!me) return null;
 
       const cs = (me.totalMinionsKilled || 0) + (me.neutralMinionsKilled || 0);
+
+      // ✅ NEW: players per match (blue/red), enriched with RiotID if available
+      const blue = m.info.participants
+        .filter((p) => p.teamId === 100)
+        .map((p) => {
+          const riot = accountByPuuid.get(p.puuid);
+          return {
+            gameName: riot?.gameName,
+            tagLine: riot?.tagLine,
+            summonerName: p.summonerName,
+            teamId: p.teamId,
+          } satisfies PlayerRef;
+        });
+
+      const red = m.info.participants
+        .filter((p) => p.teamId === 200)
+        .map((p) => {
+          const riot = accountByPuuid.get(p.puuid);
+          return {
+            gameName: riot?.gameName,
+            tagLine: riot?.tagLine,
+            summonerName: p.summonerName,
+            teamId: p.teamId,
+          } satisfies PlayerRef;
+        });
 
       return {
         matchId: m.metadata.matchId,
@@ -349,6 +431,7 @@ export default async function SummonerProfilePage({
         dmgToChamps: me.totalDamageDealtToChampions,
         vision: me.visionScore,
         items: [me.item0, me.item1, me.item2, me.item3, me.item4, me.item5, me.item6],
+        players: { blue, red } satisfies MatchPlayers,
       };
     })
     .filter((x): x is NonNullable<typeof x> => Boolean(x));
@@ -414,8 +497,9 @@ export default async function SummonerProfilePage({
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
   return (
-    <main className="min-h-screen bg-transparent text-white px-6 py-16">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-screen bg-transparent text-white px-5 py-5">
+      {/* ✅ keep mobile the same, constrain desktop */}
+      <div className="mx-auto w-full max-w-6xl lg:max-w-4xl xl:max-w-5xl">
         <header className="flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -435,21 +519,21 @@ export default async function SummonerProfilePage({
         </header>
 
         <div className="mt-8">
-            <div className= "py-5 flex gap-3">
+          <div className="py-5 flex gap-3">
             <Link href="/tools/lol/leaderboard" className={navBtn}>
-            Leaderboard
-          </Link>
-          
-          <Link href="/calculators/lol/meta" className={navBtn}>
-            Meta
-          </Link>
+              Leaderboard
+            </Link>
 
-          <Link href="/tools/lol/summoner" className={navBtn}>
-            Search ID
-          </Link>
+            <Link href="/calculators/lol/meta" className={navBtn}>
+              Meta
+            </Link>
+
+            <Link href="/tools/lol/summoner" className={navBtn}>
+              Search ID
+            </Link>
           </div>
+
           <SummonerProfileClient data={data} />
-          
         </div>
       </div>
     </main>
