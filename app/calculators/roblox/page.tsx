@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Roblox Calculators | GamerStation",
   description:
-    "Roblox calculators for popular games like Blox Fruits, Arsenal, and more. XP, leveling, and combat toolsâ€”fast and free.",
+    "Roblox calculators for popular games like Blox Fruits, Arsenal, and more. XP, leveling, and combat tools fast and free.",
   alternates: {
     canonical: "/calculators/roblox",
   },

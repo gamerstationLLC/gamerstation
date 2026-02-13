@@ -65,12 +65,12 @@ async function getLatestPatch(): Promise<string> {
       },
     });
 
-    if (!res.ok) return "â€”";
+    if (!res.ok) return "";
 
     const data = await res.json();
-    return extractLatestPatchName(data) ?? "â€”";
+    return extractLatestPatchName(data) ?? "";
   } catch {
-    return "â€”";
+    return "";
   }
 }
 
@@ -160,7 +160,7 @@ export default async function DotaMetaPage() {
             Data from OpenDota.
             <span className="text-neutral-500">
               {" "}
-              (Daily refresh â€¢ Auto resets on patch change)
+              (Daily refresh & Auto resets on patch change)
             </span>
           </p>
 

@@ -79,12 +79,12 @@ async function getPatchFromSelf(): Promise<string> {
       headers: { Accept: "application/json" },
     });
 
-    if (!res.ok) return "â€”";
+    if (!res.ok) return "";
     const json = await res.json().catch(() => null);
     const patch = (json?.patch ?? "").toString().trim();
-    return patch || "â€”";
+    return patch || "";
   } catch {
-    return "â€”";
+    return "";
   }
 }
 
@@ -159,7 +159,7 @@ export default async function DotaHeroesIndexPage({
             refreshed often.
             <span className="text-neutral-500">
               {" "}
-              (Daily refresh â€¢ Auto resets on patch change)
+              (Daily refresh & Auto resets on patch change)
             </span>
           </p>
 

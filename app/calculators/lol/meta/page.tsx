@@ -69,7 +69,7 @@ export default function Page() {
 
         <h1 className="mt-6 text-3xl font-semibold tracking-tight">Current LoL Meta</h1>
         <p className="mt-2 text-sm text-white/65">
-          Best League of Legends builds, items, and meta champions for the current patch â€” ranked by real match data.
+          Best League of Legends builds, items, and meta champions for the current patch  ranked by real match data.
         </p>
 
         <div className="mt-6">

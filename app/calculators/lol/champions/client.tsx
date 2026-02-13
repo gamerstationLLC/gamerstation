@@ -65,6 +65,10 @@ export default function ChampionPickerClient({
         <Link href="/calculators/lol/hub" className={navBtn}>
           LoL Hub
         </Link>
+
+        <Link href="/calculators/lol" className={navBtn}>
+          LoL Damage Calculator
+        </Link>
       </div>
 
       {/* Search */}
@@ -103,33 +107,50 @@ export default function ChampionPickerClient({
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((c) => (
           <button
-            key={c.id}
-            type="button"
-            onClick={() => goToChampion(c)}
-            className="group rounded-2xl border border-neutral-800 bg-black/60 p-4 text-left transition hover:border-neutral-600 hover:bg-black/75"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold">{c.name}</div>
-                <div className="truncate text-xs text-neutral-400">{c.title}</div>
+  key={c.id}
+  type="button"
+  onClick={() => goToChampion(c)}
+  className="group rounded-2xl border border-neutral-800 bg-black/60 p-4 text-left transition hover:border-neutral-600 hover:bg-black/75"
+>
+  <div className="flex items-center gap-3">
+    {/* Champion Icon */}
+    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-black">
+      <img
+        src={`https://ddragon.leagueoflegends.com/cdn/15.1.1/img/champion/${c.id}.png`}
+        alt={`${c.name} icon`}
+        className="h-full w-full object-cover"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = "none";
+        }}
+      />
+    </div>
 
-                {!!c.tags?.length && (
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {c.tags.slice(0, 3).map((t) => (
-                      <span
-                        key={t}
-                        className="rounded-full border border-neutral-800 bg-black/50 px-2 py-0.5 text-[11px] text-neutral-300"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
+    {/* Name + Info */}
+    <div className="min-w-0 flex-1">
+      <div className="truncate text-sm font-semibold">{c.name}</div>
+      <div className="truncate text-xs text-neutral-400">{c.title}</div>
 
-              <div className="text-sm text-neutral-500 transition group-hover:text-neutral-200">→</div>
-            </div>
-          </button>
+      {!!c.tags?.length && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {c.tags.slice(0, 3).map((t) => (
+            <span
+              key={t}
+              className="rounded-full border border-neutral-800 bg-black/50 px-2 py-0.5 text-[11px] text-neutral-300"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+
+    {/* Arrow */}
+    <div className="text-sm text-neutral-500 transition group-hover:text-neutral-200">
+      →
+    </div>
+  </div>
+</button>
+
         ))}
       </div>
     </section>

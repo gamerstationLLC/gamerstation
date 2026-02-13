@@ -201,7 +201,7 @@ function shortSummaryFromText(s: string, maxLen = 190) {
   if (!clean) return "";
   const first = clean.split(/(?<=[.!?])\s+/)[0] ?? clean;
   if (first.length <= maxLen) return first;
-  return first.slice(0, maxLen - 1).trimEnd() + "â€¦";
+  return first.slice(0, maxLen - 1).trimEnd() + "¦";
 }
 
 function asNumArray(x: any): number[] | undefined {
@@ -356,7 +356,7 @@ export async function generateMetadata({
 
   const patch = file?.version ?? (await readPatchFallback()) ?? "latest";
   const safeName = champ?.name ?? slug;
-  const safeTitle = champ?.title ? ` â€” ${champ.title}` : "";
+  const safeTitle = champ?.title ? ` ” ${champ.title}` : "";
 
   const title = `${safeName}${safeTitle} Stats by Level (Patch ${patch}) | GamerStation`;
   const description =

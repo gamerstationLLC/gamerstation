@@ -65,7 +65,7 @@ export default function TermsPage() {
 
           <h2 className="mt-8 text-xl font-semibold text-white">2) No warranties</h2>
           <p>
-            The site is provided â€œas isâ€ and â€œas available.â€ We make no warranties of any kind, express or implied,
+            The site is provided as is. We make no warranties of any kind, express or implied,
             including accuracy, reliability, or fitness for a particular purpose.
           </p>
 

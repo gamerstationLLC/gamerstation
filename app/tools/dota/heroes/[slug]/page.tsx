@@ -143,12 +143,12 @@ async function getPatchCached(): Promise<string> {
       headers: { Accept: "application/json" },
     });
 
-    if (!res.ok) return "â€”";
+    if (!res.ok) return "";
     const json = await res.json();
     const name = (json?.patch ?? "").toString().trim();
-    return name || "â€”";
+    return name || "";
   } catch {
-    return "â€”";
+    return "";
   }
 }
 
@@ -439,7 +439,7 @@ export default async function DotaHeroPage({
   const proNet = proWin - proLoss;
 
   const proSampleNote =
-    proPick >= 80 ? "Good sample â€” pro winrate is fairly meaningful." : proPick >= 30 ? "Medium sample â€” use some caution." : "Small sample â€” use caution.";
+    proPick >= 80 ? "Good sample - pro winrate is fairly meaningful." : proPick >= 30 ? "Medium sample - use some caution." : "Small sample - use caution.";
 
   const canonicalUrl = `/tools/dota/heroes/${normalizedSlug}`;
 
@@ -489,7 +489,7 @@ export default async function DotaHeroPage({
               <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{heroName}</h1>
               <p className="mt-2 text-sm text-neutral-300 sm:text-base">
                 Public rank brackets + pro trends. Data from OpenDota.{" "}
-                <span className="text-neutral-500">(Cached ~10 minutes â€¢ patch-aware)</span>
+                <span className="text-neutral-500">(Cached ~10 minutes & patch-aware)</span>
               </p>
 
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
@@ -548,8 +548,8 @@ export default async function DotaHeroPage({
               pub={{
                 publicPicks,
                 publicWinrateAll,
-                bestBracket: bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "â€”",
-                worstBracket: worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "â€”",
+                bestBracket: bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "",
+                worstBracket: worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "",
                 topPickBrackets,
               }}
             />
@@ -561,11 +561,11 @@ export default async function DotaHeroPage({
                 <div className="flex flex-wrap gap-2 text-xs">
                   <Pill
                     label="Best bracket"
-                    value={bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : "â€”"}
+                    value={bestBracket ? `${bestBracket.label} (${(bestBracket.wr * 100).toFixed(1)}%)` : ""}
                   />
                   <Pill
                     label="Worst bracket"
-                    value={worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : "â€”"}
+                    value={worstBracket ? `${worstBracket.label} (${(worstBracket.wr * 100).toFixed(1)}%)` : ""}
                   />
                 </div>
               </div>
@@ -579,7 +579,7 @@ export default async function DotaHeroPage({
                       <div className="text-right tabular-nums text-neutral-200">
                         {b.picks.toLocaleString()}{" "}
                         <span className="text-neutral-500">({(b.share * 100).toFixed(1)}%)</span>{" "}
-                        <span className="text-neutral-500">â€¢</span>{" "}
+                        <span className="text-neutral-500">-</span>{" "}
                         <span
                           className={
                             b.wr >= 0.52 ? "text-green-300" : b.wr <= 0.48 ? "text-red-300" : "text-neutral-200"
@@ -612,14 +612,14 @@ export default async function DotaHeroPage({
                         <div className="col-span-4 font-medium text-neutral-100">{b.label}</div>
                         <div className="col-span-4 text-right tabular-nums text-neutral-200">{b.picks.toLocaleString()}</div>
                         <div className="col-span-2 text-right tabular-nums text-neutral-200">
-                          {publicPicks ? `${(share * 100).toFixed(1)}%` : "â€”"}
+                          {publicPicks ? `${(share * 100).toFixed(1)}%` : ""}
                         </div>
                         <div
                           className={`col-span-2 text-right tabular-nums ${
                             b.wr >= 0.52 ? "text-green-300" : b.wr <= 0.48 ? "text-red-300" : "text-neutral-200"
                           }`}
                         >
-                          {b.picks ? `${(b.wr * 100).toFixed(1)}%` : "â€”"}
+                          {b.picks ? `${(b.wr * 100).toFixed(1)}%` : ""}
                         </div>
                       </div>
                     );
@@ -628,7 +628,7 @@ export default async function DotaHeroPage({
               </div>
 
               <div className="mt-3 text-xs text-neutral-500">
-                Public totals are aggregated across all brackets. High winrate with tiny picks is bait â€” sanity check samples.
+                Public totals are aggregated across all brackets. High winrate with tiny picks is bait - sanity check samples.
               </div>
             </div>
           </div>
@@ -648,7 +648,7 @@ function Stat({
   format: "int" | "pct";
 }) {
   const text =
-    value == null ? "â€”" : format === "int" ? value.toLocaleString() : `${(value * 100).toFixed(1)}%`;
+    value == null ? "" : format === "int" ? value.toLocaleString() : `${(value * 100).toFixed(1)}%`;
 
   return (
     <div className="rounded-2xl border border-neutral-800 bg-black/60 p-4">

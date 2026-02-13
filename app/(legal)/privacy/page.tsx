@@ -109,7 +109,7 @@ export default function PrivacyPage() {
           <ul className="list-disc pl-6 space-y-2">
             <li>You can block cookies in your browser settings</li>
             <li>
-              You can use browser â€œDo Not Trackâ€ (note: it may not be honored by
+              You can use browser Do Not Track (note: it may not be honored by
               all services)
             </li>
           </ul>

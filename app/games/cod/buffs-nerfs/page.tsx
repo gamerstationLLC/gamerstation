@@ -40,13 +40,13 @@ const PATCH_NOTES: { weapon: string; change: PatchChange; details: string }[] = 
     weapon: "M15 MOD 0",
     change: "Buff",
     details:
-      "Max damage 32â†’33 and max range extended (0â€“38m â†’ 0â€“45m). Min damage 22â†’24; breakpoints pushed out. Bullet velocity 880â†’900.",
+      "Max damage 32â†’33 and max range extended (0-38m â†’ 0-45m). Min damage 22â†’24; breakpoints pushed out. Bullet velocity 880â†’900.",
   },
   {
     weapon: "Maddox RFB",
     change: "Buff",
     details:
-      "Mid damage 28â†’29 and mid range extends (37â€“48m â†’ 37â€“60m). Bullet velocity 650â†’870; vertical recoil reduced ~5%.",
+      "Mid damage 28â†’29 and mid range extends (37-48m â†’ 37-60m). Bullet velocity 650â†’870; vertical recoil reduced ~5%.",
   },
   {
     weapon: "MXR-17",
@@ -62,7 +62,7 @@ const PATCH_NOTES: { weapon: string; change: PatchChange; details: string }[] = 
     weapon: "X9 Maverick",
     change: "Buff",
     details:
-      "Max damage 48â†’50 and max range extended (0â€“45m â†’ 0â€“50m). Min damage 36â†’37; range breakpoints adjusted.",
+      "Max damage 48â†’50 and max range extended (0-45m â†’ 0-50m). Min damage 36â†’37; range breakpoints adjusted.",
   },
 
   {
@@ -87,7 +87,7 @@ const PATCH_NOTES: { weapon: string; change: PatchChange; details: string }[] = 
   {
     weapon: "MK.78 (LMG)",
     change: "Buff",
-    details: "Max range extended (0â€“42m â†’ 0â€“52m). Min damage 28â†’30.",
+    details: "Max range extended (0-42m â†’ 0-52m). Min damage 28â†’30.",
   },
 ];
 
@@ -147,7 +147,7 @@ export default function CodBuffsNerfsPage() {
           {/* Title */}
           <h1 className="mt-2 text-4xl font-bold">Weapon Buffs &amp; Nerfs</h1>
           <p className="mt-3 max-w-2xl text-neutral-300">
-            Patch watch for Call of Duty â€” expected buffs, nerfs, balance changes, and meta shifts.
+            Patch watch for Call of Duty - expected buffs, nerfs, balance changes, and meta shifts.
           </p>
 
           {/* Notes */}

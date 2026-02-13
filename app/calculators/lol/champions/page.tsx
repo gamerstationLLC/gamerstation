@@ -4,7 +4,7 @@ import Link from "next/link";
 import ChampionPickerClient, { type ChampionRow } from "./client";
 
 export const metadata: Metadata = {
-  title: "LoL Champions â€“ Search Champion Stats | GamerStation",
+  title: "LoL Champions “ Search Champion Stats | GamerStation",
   description:
     "Search League of Legends champions and open a champion stats page instantly. Data from Riot Data Dragon.",
   alternates: { canonical: "/calculators/lol/champions" },

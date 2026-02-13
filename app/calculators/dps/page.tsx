@@ -116,13 +116,13 @@ export default function DpsPage() {
                 label="Accuracy (%)"
                 value={accuracyPct}
                 onChange={setAccuracyPct}
-                hint="0â€“100"
+                hint="0“100"
               />
               <Field
                 label="Crit chance (%)"
                 value={critChancePct}
                 onChange={setCritChancePct}
-                hint="0â€“100"
+                hint="0“100"
               />
               <Field
                 label="Crit multiplier"

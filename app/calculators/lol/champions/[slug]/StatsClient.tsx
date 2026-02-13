@@ -317,7 +317,7 @@ export default function StatsClient({
               </span>
             </div>
             <div className="mt-1 text-xs text-neutral-400">
-              Descriptions from Data Dragon. Damage numbers from your overrides when available.
+              Descriptions from Data Dragon.
             </div>
           </div>
 

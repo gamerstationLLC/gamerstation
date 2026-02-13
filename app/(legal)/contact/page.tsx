@@ -57,7 +57,7 @@ export default function ContactPage() {
           </p>
 
           <p className="mt-3 text-sm text-neutral-400">
-            We usually respond within 1â€“3 business days.
+            We usually respond within 1-3 business days.
           </p>
         </div>
       </div>

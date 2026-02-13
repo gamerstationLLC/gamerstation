@@ -80,7 +80,7 @@ export default function BloxFruitsCombatPage() {
 
           <p className="text-neutral-400">
             Early versions will prioritize clarity over simulation. No clutter,
-            no confusing â€œblack boxâ€ math.
+            no confusing black box math.
           </p>
         </section>
 

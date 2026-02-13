@@ -96,7 +96,7 @@ export default function CalculatorsPage() {
             >
               <div className="text-sm font-semibold">Fortnite TTK Calculator</div>
               <div className="mt-2 text-sm text-neutral-400">
-                Per-rarity weapon damage â€¢ live fire rates
+                Per-rarity weapon damage and live fire rates
               </div>
             </Link>
 
