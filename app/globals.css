@@ -231,3 +231,7 @@ body {
     --gs-footer-ad-h: 120px;
   }
 }
+/* app/globals.css */
+:root {
+  --gs-sticky-footer-h: 0px;
+}

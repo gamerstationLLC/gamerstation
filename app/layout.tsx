@@ -4,7 +4,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import AdSenseSideRails from "./_components/AdSenseSideRails";
-import FooterAd from "./_components/FooterAd";
+import AdSenseDismissibleDock from "./_components/AdSenseDismissibleDock";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -93,12 +93,15 @@ export default function RootLayout({
 
         {/* App surface */}
         <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
-          {/* Content */}
           {children}
-
-          {/* ✅ Normal footer ad: appears at bottom of page (NOT sticky) */}
-          <FooterAd />
         </div>
+
+        {/* ✅ Global dismissible dock ad (ABOVE sticky footers) */}
+        <AdSenseDismissibleDock
+          adClient="ca-pub-9530220531970117"
+          adSlot="8335454155"
+          rememberHours={12}
+        />
 
         <Analytics />
       </body>
