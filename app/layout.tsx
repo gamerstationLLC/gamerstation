@@ -1,5 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
@@ -27,6 +28,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          id="adsense-script"
+          async
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9530220531970117"
+          crossOrigin="anonymous"
+        />
+      </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black text-white`}
         style={{
@@ -67,7 +78,7 @@ export default function RootLayout({
           />
         </div>
 
-        {/* 
+        {/*
           App surface: force transparency so page bg doesn't “fight” the global bg.
           Isolation keeps text rendering stable.
         */}
