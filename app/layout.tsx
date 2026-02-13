@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import AdSenseAnchorSpacer from "./_components/AdSenseAnchorSpacer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,6 +47,9 @@ export default function RootLayout({
           textRendering: "geometricPrecision",
         }}
       >
+        {/* Optional: keeps your own fixed UI above AdSense anchor */}
+        <AdSenseAnchorSpacer />
+
         {/* Global background (ALWAYS behind everything) */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
           {/* Spotlight / glow */}
@@ -78,11 +82,11 @@ export default function RootLayout({
           />
         </div>
 
-        {/*
-          App surface: force transparency so page bg doesn't “fight” the global bg.
-          Isolation keeps text rendering stable.
+        {/* 
+          App surface: keep transparent so page bg doesn't fight the global bg.
+          ✅ IMPORTANT: do NOT put transform on this wrapper, it breaks position:fixed descendants.
         */}
-        <div className="relative z-10 min-h-screen bg-transparent [isolation:isolate] [transform:translateZ(0)]">
+        <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
           {children}
         </div>
 
