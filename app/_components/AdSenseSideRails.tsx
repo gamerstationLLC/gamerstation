@@ -2,19 +2,11 @@
 
 import { useEffect, useRef } from "react";
 
-declare global {
-  interface Window {
-    adsbygoogle?: any[];
-  }
-}
-
 export default function AdSenseSideRails() {
   const leftRef = useRef<HTMLModElement | null>(null);
   const rightRef = useRef<HTMLModElement | null>(null);
 
   useEffect(() => {
-    // Only run on desktop (lg+) — if user resizes, we simply rely on CSS to hide/show.
-    // The pushes are safe even if ads don't fill.
     try {
       if (leftRef.current) (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {}
@@ -24,13 +16,7 @@ export default function AdSenseSideRails() {
   }, []);
 
   return (
-    <div
-      className="
-        hidden lg:block
-        pointer-events-none
-      "
-      aria-hidden="true"
-    >
+    <div className="hidden lg:block pointer-events-none" aria-hidden="true">
       {/* Left rail */}
       <div className="fixed left-0 top-0 z-40 h-screen w-[160px]">
         <div className="pointer-events-auto h-full px-2 pt-24">

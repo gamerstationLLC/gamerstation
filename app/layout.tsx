@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import AdSenseAnchorSpacer from "./_components/AdSenseAnchorSpacer";
 import AdSenseSideRails from "./_components/AdSenseSideRails";
+import FooterAd from "./_components/FooterAd";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,6 +33,14 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
+        {/* Warm up ad network connections */}
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="" />
+        <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossOrigin="" />
+        <link rel="preconnect" href="https://tpc.googlesyndication.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
+        <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
+
         {/* AdSense loader (global) */}
         <Script
           id="adsense-script"
@@ -51,10 +59,10 @@ export default function RootLayout({
           textRendering: "geometricPrecision",
         }}
       >
-        <AdSenseAnchorSpacer />
+        {/* ✅ Desktop-only side rails */}
         <AdSenseSideRails />
 
-        {/* Global background */}
+        {/* Global background (ALWAYS behind everything) */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
           <div
             className="absolute inset-0"
@@ -83,12 +91,13 @@ export default function RootLayout({
           />
         </div>
 
-        {/* Main app surface */}
-        <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate] pb-28">
+        {/* App surface */}
+        <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
+          {/* Content */}
           {children}
 
-          {/* Global footer */}
-          
+          {/* ✅ Normal footer ad: appears at bottom of page (NOT sticky) */}
+          <FooterAd />
         </div>
 
         <Analytics />

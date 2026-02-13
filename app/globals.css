@@ -33,6 +33,8 @@
 
   /* ✅ Helps Safari form controls + translucency render consistently */
   color-scheme: dark;
+
+  --sticky-footer-h: 0px;
 }
 
 body {
@@ -205,5 +207,27 @@ body {
     .gs-logo-hit {
       animation: none !important;
     }
+  }
+}
+
+
+.gs-sticky-footer {
+  height: var(--sticky-footer-h);
+}
+
+:root {
+  /* Approx height reserved for the global footer ad */
+  --gs-footer-ad-h: 140px;
+
+  /* How much bottom space the page reserves.
+     Default = footer ad height.
+     Sticky pages can override this to their sticky footer height. */
+  --gs-bottom-reserve: var(--gs-footer-ad-h);
+}
+
+/* Slightly smaller on mobile */
+@media (max-width: 640px) {
+  :root {
+    --gs-footer-ad-h: 120px;
   }
 }
