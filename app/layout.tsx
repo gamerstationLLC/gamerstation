@@ -33,14 +33,6 @@ export default function RootLayout({
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-        {/* Warm up ad network connections */}
-        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="" />
-        <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossOrigin="" />
-        <link rel="preconnect" href="https://tpc.googlesyndication.com" crossOrigin="" />
-        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-        <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
-        <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
-
         {/* AdSense loader (global) */}
         <Script
           id="adsense-script"
@@ -59,13 +51,10 @@ export default function RootLayout({
           textRendering: "geometricPrecision",
         }}
       >
-        {/* Optional: keeps your own fixed UI above AdSense anchor */}
         <AdSenseAnchorSpacer />
-
-        {/* ✅ Desktop-only side rails */}
         <AdSenseSideRails />
 
-        {/* Global background (ALWAYS behind everything) */}
+        {/* Global background */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
           <div
             className="absolute inset-0"
@@ -79,7 +68,6 @@ export default function RootLayout({
               `,
             }}
           />
-
           <div
             className="absolute inset-0"
             style={{
@@ -95,9 +83,12 @@ export default function RootLayout({
           />
         </div>
 
-        {/* IMPORTANT: no transforms here; transforms can break position:fixed descendants */}
-        <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
+        {/* Main app surface */}
+        <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate] pb-28">
           {children}
+
+          {/* Global footer */}
+          
         </div>
 
         <Analytics />
