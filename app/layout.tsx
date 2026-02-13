@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import AdSenseAnchorSpacer from "./_components/AdSenseAnchorSpacer";
+import AdSenseSideRails from "./_components/AdSenseSideRails";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,6 +31,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+        {/* Warm up ad network connections */}
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="" />
+        <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossOrigin="" />
+        <link rel="preconnect" href="https://tpc.googlesyndication.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
+        <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
+
+        {/* AdSense loader (global) */}
         <Script
           id="adsense-script"
           async
@@ -50,9 +62,11 @@ export default function RootLayout({
         {/* Optional: keeps your own fixed UI above AdSense anchor */}
         <AdSenseAnchorSpacer />
 
+        {/* ✅ Desktop-only side rails */}
+        <AdSenseSideRails />
+
         {/* Global background (ALWAYS behind everything) */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
-          {/* Spotlight / glow */}
           <div
             className="absolute inset-0"
             style={{
@@ -66,7 +80,6 @@ export default function RootLayout({
             }}
           />
 
-          {/* Vignette */}
           <div
             className="absolute inset-0"
             style={{
@@ -82,10 +95,7 @@ export default function RootLayout({
           />
         </div>
 
-        {/* 
-          App surface: keep transparent so page bg doesn't fight the global bg.
-          ✅ IMPORTANT: do NOT put transform on this wrapper, it breaks position:fixed descendants.
-        */}
+        {/* IMPORTANT: no transforms here; transforms can break position:fixed descendants */}
         <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
           {children}
         </div>
