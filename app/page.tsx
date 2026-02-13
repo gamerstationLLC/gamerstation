@@ -161,7 +161,7 @@ export default function Home() {
                   <div className="mt-1 text-xs text-neutral-400">Start here — most used tools.</div>
                 </div>
                 <div className="hidden sm:inline-flex rounded-full border border-white/10 bg-black/40 px-3 py-1 text-xs text-neutral-300">
-                  v0.1
+                  v2.0
                 </div>
               </div>
 
