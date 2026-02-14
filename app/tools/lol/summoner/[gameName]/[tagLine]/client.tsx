@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type PlayerRef = {
-  gameName?: string; // Riot ID game name (preferred)
-  tagLine?: string; // Riot ID tag line (preferred)
-  summonerName?: string; // fallback display (not linkable without tag)
-  champ?: string; // optional champ name (if you want to show later)
-  teamId?: number; // 100/200 optional
-  win?: boolean; // optional
+  gameName?: string;
+  tagLine?: string;
+  summonerName?: string;
+  champ?: string;
+  teamId?: number;
+  win?: boolean;
 };
 
 type MatchPlayers = {
@@ -36,8 +36,6 @@ type MatchRow = {
   vision: number;
   items: number[];
   gameVersion?: string;
-
-  // ✅ Optional: only needed for desktop "Players" column
   players?: MatchPlayers;
 };
 
@@ -259,8 +257,164 @@ function MetaPill({ children }: { children: React.ReactNode }) {
 }
 
 /* ---------------------------
-   Item icon w/ Data Dragon popover
+   Mode filtering + fetch
 --------------------------- */
+
+type ModeFilterKey = "recent" | "ranked" | "urf" | "arena";
+
+/**
+ * IMPORTANT:
+ * This page expects an API route that returns the last N matches for a given mode.
+ * Endpoint used below:
+ *   GET /api/tools/lol/mode-ranked?puuid=...&cluster=...&limit=12
+ *   GET /api/tools/lol/mode-urf?puuid=...&cluster=...&limit=12
+ *   GET /api/tools/lol/mode-arena?puuid=...&cluster=...&limit=12
+ *
+ * Response shape expected:
+ *   { matches: MatchRow[] }
+ */
+async function fetchModeMatches(args: {
+  puuid: string;
+  platform: string; // unused here, keep for signature compatibility
+  cluster: string;
+  mode: ModeFilterKey;
+  limit: number;
+  signal?: AbortSignal;
+}): Promise<MatchRow[]> {
+  const qs = new URLSearchParams({
+    puuid: args.puuid,
+    cluster: args.cluster,
+    limit: String(args.limit),
+  });
+
+  // If you DID NOT create mode-recent, keep recent local and never call fetch for it.
+  if (args.mode === "recent") return [];
+
+  const route =
+    args.mode === "ranked" ? "mode-ranked" : args.mode === "urf" ? "mode-urf" : "mode-arena";
+
+  const url = `/api/tools/lol/${route}?${qs.toString()}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    signal: args.signal,
+    headers: { Accept: "application/json" },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to load ${args.mode} matches (${res.status})`);
+  }
+
+  const json = (await res.json()) as { matches?: MatchRow[] };
+  return Array.isArray(json?.matches) ? json.matches : [];
+}
+
+function computeDerivedSummary(matches: MatchRow[]) {
+  const games = matches.length;
+  if (!games) {
+    return {
+      games: 0,
+      wins: 0,
+      losses: 0,
+      winRate: 0,
+      k: 0,
+      d: 0,
+      a: 0,
+      kda: "0.0",
+      avgCs: 0,
+      avgGold: 0,
+      avgDmgToChamps: 0,
+      avgVision: 0,
+      avgDurationSec: 0,
+      primaryRole: "",
+      topChamps: [] as Array<{ champ: string; games: number }>,
+    };
+  }
+
+  let wins = 0;
+  let k = 0,
+    d = 0,
+    a = 0;
+  let cs = 0,
+    gold = 0,
+    dmg = 0,
+    vision = 0;
+  let dur = 0;
+
+  const champCounts = new Map<string, number>();
+  const roleCounts = new Map<string, number>();
+
+  for (const m of matches) {
+    if (m.win) wins += 1;
+    k += m.kills ?? 0;
+    d += m.deaths ?? 0;
+    a += m.assists ?? 0;
+    cs += m.cs ?? 0;
+    gold += m.gold ?? 0;
+    dmg += m.dmgToChamps ?? 0;
+    vision += m.vision ?? 0;
+    dur += m.durationSec ?? 0;
+
+    const c = (m.champ || "").trim();
+    if (c) champCounts.set(c, (champCounts.get(c) ?? 0) + 1);
+
+    const r = (m.role || "").trim();
+    if (r) roleCounts.set(r, (roleCounts.get(r) ?? 0) + 1);
+  }
+
+  const losses = games - wins;
+  const winRate = Math.round((wins / games) * 100);
+  const kdaVal = (k + a) / Math.max(1, d);
+  const kda = fmt1(kdaVal);
+
+  const avgCs = Math.round(cs / games);
+  const avgGold = Math.round(gold / games);
+  const avgDmgToChamps = Math.round(dmg / games);
+  const avgVision = Math.round(vision / games);
+  const avgDurationSec = Math.round(dur / games);
+
+  const primaryRole =
+    Array.from(roleCounts.entries()).sort((x, y) => y[1] - x[1])[0]?.[0] ?? "";
+
+  const topChamps = Array.from(champCounts.entries())
+    .sort((x, y) => y[1] - x[1])
+    .slice(0, 10)
+    .map(([champ, games]) => ({ champ, games }));
+
+  return {
+    games,
+    wins,
+    losses,
+    winRate,
+    k,
+    d,
+    a,
+    kda,
+    avgCs,
+    avgGold,
+    avgDmgToChamps,
+    avgVision,
+    avgDurationSec,
+    primaryRole,
+    topChamps,
+  };
+}
+
+/* ---------------------------
+   Item icon w/ mobile-friendly popover (NO CLIPPING)
+--------------------------- */
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
+  }, []);
+  return isMobile;
+}
 
 function ItemIcon({
   ddVersion,
@@ -273,27 +427,88 @@ function ItemIcon({
   itemDb: Record<string, DdItem> | null;
   size?: number;
 }) {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
 
-  if (!itemId || itemId <= 0) return null; // (or keep placeholder if you want)
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null);
+
+  if (!itemId || itemId <= 0) return null;
 
   const url = `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/item/${itemId}.png`;
   const item = itemDb?.[String(itemId)];
   const title = item?.name ?? `Item ${itemId}`;
-
   const desc =
-    stripHtml(item?.plaintext) ||
-    stripHtml(item?.description) ||
-    "No description available.";
+    stripHtml(item?.plaintext) || stripHtml(item?.description) || "No description available.";
 
-  const popTop = size + 6;
+  function computePos() {
+    if (!btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+
+    // Desktop-ish floating card near icon; keep on-screen
+    const cardW = 320;
+    const pad = 12;
+
+    const left = Math.max(pad, Math.min(r.left + r.width / 2 - cardW / 2, window.innerWidth - cardW - pad));
+    const top = Math.min(r.bottom + 10, window.innerHeight - 12); // clamped; actual height handled by max-h
+
+    setPos({ top, left, width: cardW });
+  }
+
+  function openPanel() {
+    setOpen(true);
+    // compute immediately + after layout
+    requestAnimationFrame(() => computePos());
+  }
+
+  function closePanel() {
+    setOpen(false);
+  }
+
+  // Reposition on scroll/resize when open (desktop)
+  useEffect(() => {
+    if (!open || isMobile) return;
+
+    const on = () => computePos();
+    window.addEventListener("scroll", on, true);
+    window.addEventListener("resize", on);
+    return () => {
+      window.removeEventListener("scroll", on, true);
+      window.removeEventListener("resize", on);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isMobile]);
+
+  // Close on outside click + Esc
+  useEffect(() => {
+    if (!open) return;
+
+    function onDown(e: MouseEvent) {
+      const t = e.target as Node;
+      if (btnRef.current?.contains(t)) return;
+      if (panelRef.current?.contains(t)) return;
+      closePanel();
+    }
+
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") closePanel();
+    }
+
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
-    <div className="relative">
+    <>
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        onBlur={() => setOpen(false)}
+        onClick={() => (open ? closePanel() : openPanel())}
         style={{ width: size, height: size }}
         className="overflow-hidden rounded-xl border border-neutral-800 bg-black/35 outline-none transition hover:border-neutral-600"
         aria-label={title}
@@ -303,35 +518,90 @@ function ItemIcon({
       </button>
 
       {open ? (
-        <div
-          className="absolute right-0 z-30 w-[300px] rounded-2xl border border-neutral-800 bg-black/95 p-3 shadow-[0_0_30px_rgba(0,255,255,0.08)]"
-          style={{ top: popTop }}
-        >
-          <div className="flex items-start gap-2">
-            <div className="h-9 w-9 overflow-hidden rounded-xl border border-neutral-800 bg-black/60">
-              <img src={url} alt={title} className="h-full w-full object-cover" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-black text-white">{title}</div>
-              <div className="mt-0.5 text-[11px] text-neutral-400">
-                {item?.gold?.total ? `Cost: ${item.gold.total.toLocaleString()}g` : "Cost: —"}
-                {item?.gold?.sell ? ` · Sell: ${item.gold.sell.toLocaleString()}g` : ""}
+        <div className="fixed inset-0 z-[9999]">
+          {/* Backdrop */}
+          <button
+            type="button"
+            aria-label="Close item details"
+            onClick={closePanel}
+            className="absolute inset-0 bg-black/40"
+          />
+
+          {/* Mobile: bottom sheet (good UX, no careless expansion) */}
+          {isMobile ? (
+            <div
+              ref={panelRef}
+              className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[520px] rounded-t-3xl border border-neutral-800 bg-black/95 p-4 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]"
+            >
+              <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-white/10" />
+
+              <div className="flex items-start gap-3">
+                <div className="h-11 w-11 overflow-hidden rounded-2xl border border-neutral-800 bg-black/60">
+                  <img src={url} alt={title} className="h-full w-full object-cover" />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-base font-black text-white">{title}</div>
+                  <div className="mt-1 text-[11px] text-neutral-400">
+                    {item?.gold?.total ? `Cost: ${item.gold.total.toLocaleString()}g` : "Cost: —"}
+                    {item?.gold?.sell ? ` · Sell: ${item.gold.sell.toLocaleString()}g` : ""}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closePanel}
+                  className="rounded-2xl border border-neutral-800 bg-black/50 px-3 py-2 text-xs font-black text-neutral-200 hover:border-neutral-600 hover:text-white"
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="mt-3 max-h-[55vh] overflow-auto rounded-2xl border border-neutral-800 bg-black/40 p-3">
+                <div className="whitespace-pre-line text-[12px] leading-snug text-neutral-200">
+                  {desc}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-2 whitespace-pre-line text-[11px] leading-snug text-neutral-200">
-            {desc}
-          </div>
+          ) : (
+            // Desktop: floating card positioned near item, clamped on screen
+            <div
+              ref={panelRef}
+              className="absolute rounded-2xl border border-neutral-800 bg-black/95 p-3 shadow-[0_0_30px_rgba(0,255,255,0.08)]"
+              style={{
+                top: pos?.top ?? 100,
+                left: pos?.left ?? 20,
+                width: pos?.width ?? 320,
+                maxHeight: "60vh",
+                overflow: "auto",
+              }}
+            >
+              <div className="flex items-start gap-2">
+                <div className="h-9 w-9 overflow-hidden rounded-xl border border-neutral-800 bg-black/60">
+                  <img src={url} alt={title} className="h-full w-full object-cover" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-black text-white">{title}</div>
+                  <div className="mt-0.5 text-[11px] text-neutral-400">
+                    {item?.gold?.total ? `Cost: ${item.gold.total.toLocaleString()}g` : "Cost: —"}
+                    {item?.gold?.sell ? ` · Sell: ${item.gold.sell.toLocaleString()}g` : ""}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-2 whitespace-pre-line text-[11px] leading-snug text-neutral-200">
+                {desc}
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
-    </div>
+    </>
   );
 }
 
-
 /* ---------------------------
    Players (ultra-compact, 2 columns)
-   ✅ no scroll, truncates names, fits short row
 --------------------------- */
 
 function PlayersPanelCompact({
@@ -371,9 +641,7 @@ function PlayersPanelCompact({
   };
 
   return (
-    <div
-      className={`rounded-3xl border border-neutral-800 bg-black/18 p-3 flex flex-col ${className}`}
-    >
+    <div className={`rounded-3xl border border-neutral-800 bg-black/18 p-3 flex flex-col ${className}`}>
       <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
         Players
       </div>
@@ -401,8 +669,15 @@ function PlayersPanelCompact({
    Component
 --------------------------- */
 
+const LIMIT_PER_MODE = 12;
+
 export default function SummonerProfileClient({ data }: { data: SummonerProfileData }) {
   const [q, setQ] = useState("");
+  const [modeKey, setModeKey] = useState<ModeFilterKey>("recent");
+  const [loadingMode, setLoadingMode] = useState<ModeFilterKey | null>(null);
+  const [modeErr, setModeErr] = useState<string>("");
+
+  const abortRef = useRef<AbortController | null>(null);
 
   const ddVersion = useMemo(() => deriveDDragonVersion(data), [data]);
   const itemDb = useDdItems(ddVersion);
@@ -413,43 +688,145 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
     return `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/profileicon/${id}.png`;
   }, [data, ddVersion]);
 
+  // Cache per toggle: each must show last 12 matches for that mode.
+  const [modeCache, setModeCache] = useState<Record<ModeFilterKey, MatchRow[]>>(() => {
+    const recent = Array.isArray(data.matches) ? data.matches.slice(0, LIMIT_PER_MODE) : [];
+    return { recent, ranked: [], urf: [], arena: [] };
+  });
+
+  // Load matches for a mode when user clicks a toggle (and cache it).
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      setModeErr("");
+
+      const cached = modeCache[modeKey];
+      if (Array.isArray(cached) && cached.length > 0) return;
+
+      if (modeKey === "recent" && modeCache.recent.length > 0) return;
+
+      abortRef.current?.abort();
+      const ac = new AbortController();
+      abortRef.current = ac;
+
+      setLoadingMode(modeKey);
+
+      try {
+        const matches = await fetchModeMatches({
+          puuid: data.puuid,
+          platform: data.platform,
+          cluster: data.cluster,
+          mode: modeKey,
+          limit: LIMIT_PER_MODE,
+          signal: ac.signal,
+        });
+
+        if (cancelled) return;
+
+        setModeCache((prev) => ({
+          ...prev,
+          [modeKey]: Array.isArray(matches) ? matches.slice(0, LIMIT_PER_MODE) : [],
+        }));
+      } catch (e) {
+        if (cancelled) return;
+
+        const msg = e instanceof Error ? e.message : `Failed to load ${modeKey} matches.`;
+        setModeErr(msg);
+      } finally {
+        if (!cancelled) setLoadingMode(null);
+      }
+    }
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modeKey, data.puuid, data.platform, data.cluster]);
+
+  const modeMatches = useMemo(() => {
+    const ms = modeCache[modeKey] ?? [];
+    return Array.isArray(ms) ? ms.slice(0, LIMIT_PER_MODE) : [];
+  }, [modeCache, modeKey]);
+
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
-    if (!s) return data.matches;
-    return data.matches.filter((m) => {
+    if (!s) return modeMatches;
+    return modeMatches.filter((m) => {
       const hay = `${m.champ} ${m.role} ${m.mode} ${m.queueId}`.toLowerCase();
       return hay.includes(s);
     });
-  }, [q, data.matches]);
+  }, [q, modeMatches]);
 
   const matchIdsReturned = data.meta?.matchIdsReturned ?? 0;
   const matchDetailsLoaded = data.meta?.matchDetailsLoaded ?? data.matches.length;
   const matchDown = matchIdsReturned > 0 && matchDetailsLoaded === 0;
 
-  const avgDurationSec = useMemo(() => {
-    const ms = data.matches;
-    if (!ms?.length) return 0;
-    const sum = ms.reduce((acc, m) => acc + (m.durationSec || 0), 0);
-    return Math.round(sum / ms.length);
-  }, [data.matches]);
+  const derived = useMemo(() => computeDerivedSummary(modeMatches), [modeMatches]);
 
+  const avgDurationSec = derived.avgDurationSec;
   const avgMinutes = avgDurationSec ? avgDurationSec / 60 : 0;
-  const avgCsPerMin = avgMinutes ? data.summary.avgCs / avgMinutes : 0;
-  const avgGoldPerMin = avgMinutes ? data.summary.avgGold / avgMinutes : 0;
-  const avgDmgPerMin = avgMinutes ? data.summary.avgDmgToChamps / avgMinutes : 0;
+  const avgCsPerMin = avgMinutes ? derived.avgCs / avgMinutes : 0;
+  const avgGoldPerMin = avgMinutes ? derived.avgGold / avgMinutes : 0;
+  const avgDmgPerMin = avgMinutes ? derived.avgDmgToChamps / avgMinutes : 0;
 
-  const primaryRole = useMemo(() => {
-    const ms = data.matches;
-    if (!ms?.length) return "";
-    const counts = new Map<string, number>();
-    for (const m of ms) {
-      const r = (m.role || "").trim();
-      if (!r) continue;
-      counts.set(r, (counts.get(r) ?? 0) + 1);
-    }
-    const best = Array.from(counts.entries()).sort((a, b) => b[1] - a[1])[0];
-    return best?.[0] ?? "";
-  }, [data.matches]);
+  const primaryRole = derived.primaryRole;
+
+  const modeLabel =
+    modeKey === "recent"
+      ? "Recent"
+      : modeKey === "ranked"
+        ? "Ranked"
+        : modeKey === "urf"
+          ? "URF"
+          : "Arena";
+
+  const modeHelp =
+    modeKey === "recent"
+      ? "All queues"
+      : modeKey === "ranked"
+        ? "Solo/Duo + Flex"
+        : modeKey === "urf"
+          ? "URF only"
+          : "Arena only";
+
+  const modeButtons: Array<{ key: ModeFilterKey; label: string; sub?: string }> = [
+    { key: "recent", label: "Recent", sub: "12" },
+    { key: "ranked", label: "Ranked", sub: "12" },
+    { key: "urf", label: "URF", sub: "12" },
+    { key: "arena", label: "Arena", sub: "12" },
+  ];
+
+  const statsForDisplay =
+    derived.games > 0
+      ? {
+          games: derived.games,
+          wins: derived.wins,
+          losses: derived.losses,
+          winRate: derived.winRate,
+          kda: derived.kda,
+          avgCs: derived.avgCs,
+          avgGold: derived.avgGold,
+          avgDmgToChamps: derived.avgDmgToChamps,
+          avgVision: derived.avgVision,
+          topChamps: derived.topChamps,
+        }
+      : {
+          games: 0,
+          wins: 0,
+          losses: 0,
+          winRate: 0,
+          kda: "0.0",
+          avgCs: 0,
+          avgGold: 0,
+          avgDmgToChamps: 0,
+          avgVision: 0,
+          topChamps: [] as Array<{ champ: string; games: number }>,
+        };
+
+  const topChampsForDisplay = statsForDisplay.topChamps;
 
   return (
     <div className="space-y-5 sm:space-y-6">
@@ -460,21 +837,25 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-col items-center gap-3 text-center lg:items-start lg:text-left">
             <div className="flex items-center gap-4">
-              <div className="h-16 w-16 overflow-hidden rounded-3xl border border-neutral-800 bg-black shadow-[0_0_35px_rgba(0,255,255,0.18)]">
-                {summonerIconUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={summonerIconUrl}
-                    alt="Summoner icon"
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                ) : (
-                  <IconFallback text={data.riotId} />
-                )}
-              </div>
+              {/* ✅ Fix "pinch" look: use object-contain + slight padding so it scales clean on mobile */}
+              <div className="relative w-14 sm:w-16 lg:w-20 shrink-0">
+  <div className="relative aspect-square overflow-hidden rounded-3xl border border-neutral-800 bg-black shadow-[0_0_35px_rgba(0,255,255,0.18)]">
+    {summonerIconUrl ? (
+      <img
+        src={summonerIconUrl}
+        alt="Summoner icon"
+        className="absolute inset-0 h-full w-full object-cover"
+        draggable={false}
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = "none";
+        }}
+      />
+    ) : (
+      <IconFallback text={data.riotId} />
+    )}
+  </div>
+</div>
+
 
               <div className="min-w-0">
                 <div className="truncate text-2xl sm:text-3xl font-black tracking-tight">
@@ -488,10 +869,17 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                       {data.summoner.summonerLevel}
                     </span>
                   </MetaPill>
+
                   <MetaPill>
                     Loaded:{" "}
-                    <span className="font-semibold text-white">{data.summary.games}</span>
+                    <span className="font-semibold text-white">{statsForDisplay.games}</span>
                   </MetaPill>
+
+                  <MetaPill>
+                    Mode: <span className="text-white">{modeLabel}</span>
+                    <span className="text-neutral-500"> · {modeHelp}</span>
+                  </MetaPill>
+
                   {primaryRole ? (
                     <MetaPill>
                       Role: <span className="text-white">{primaryRole}</span>
@@ -512,9 +900,9 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
           </div>
 
           <div className="grid w-full grid-cols-3 gap-2 lg:w-[460px]">
-            <StatTile label="Win Rate" value={`${data.summary.winRate}%`} />
-            <StatTile label="W / L" value={`${data.summary.wins}/${data.summary.losses}`} />
-            <StatTile label="KDA" value={data.summary.kda} />
+            <StatTile label="Win Rate" value={`${statsForDisplay.winRate}%`} />
+            <StatTile label="W / L" value={`${statsForDisplay.wins}/${statsForDisplay.losses}`} />
+            <StatTile label="KDA" value={statsForDisplay.kda} />
           </div>
         </div>
 
@@ -525,11 +913,61 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
           </div>
         ) : null}
 
+        {/* Mode toggle (each shows last 12 for that mode) */}
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm text-neutral-400">
+            Pick a mode to load the <span className="text-white font-semibold">last 12</span>{" "}
+            matches for that queue (prevents URF/Arena from skewing ranked).
+          </div>
+
+          <div className="inline-flex w-full sm:w-auto items-stretch rounded-2xl border border-neutral-800 bg-black/35 p-1">
+            {modeButtons.map((b) => {
+              const active = b.key === modeKey;
+              const busy = loadingMode === b.key;
+              return (
+                <button
+                  key={b.key}
+                  type="button"
+                  onClick={() => setModeKey(b.key)}
+                  disabled={busy}
+                  className={`min-w-0 flex-1 sm:flex-none rounded-xl px-3 py-2 text-xs font-black transition ${
+                    active
+                      ? "bg-white text-black"
+                      : "bg-transparent text-neutral-200 hover:bg-black/40 hover:text-white"
+                  } ${busy ? "opacity-70" : ""}`}
+                  aria-pressed={active}
+                  title={`Load last ${LIMIT_PER_MODE} ${b.label} games`}
+                >
+                  <span className="block leading-none">
+                    {b.label}
+                    {busy ? <span className="ml-2 text-[10px] font-semibold">…</span> : null}
+                  </span>
+                  {b.sub ? (
+                    <span
+                      className={`mt-0.5 block text-[10px] font-semibold leading-none ${
+                        active ? "text-neutral-700" : "text-neutral-500"
+                      }`}
+                    >
+                      {b.sub}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {modeErr ? (
+          <div className="mt-3 rounded-2xl border border-rose-900/50 bg-rose-950/25 p-3 text-sm text-rose-200">
+            {modeErr}
+          </div>
+        ) : null}
+
         <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-          <StatTile label="Avg CS" value={data.summary.avgCs} />
-          <StatTile label="Avg Gold" value={fmtNum(data.summary.avgGold)} />
-          <StatTile label="Avg Dmg" value={fmtNum(data.summary.avgDmgToChamps)} />
-          <StatTile label="Avg Vision" value={data.summary.avgVision} />
+          <StatTile label="Avg CS" value={statsForDisplay.avgCs} />
+          <StatTile label="Avg Gold" value={fmtNum(statsForDisplay.avgGold)} />
+          <StatTile label="Avg Dmg" value={fmtNum(statsForDisplay.avgDmgToChamps)} />
+          <StatTile label="Avg Vision" value={statsForDisplay.avgVision} />
         </div>
 
         <div className="mt-3 hidden flex-wrap gap-2 md:flex">
@@ -540,22 +978,21 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
         </div>
 
         <div className="mt-4">
-          <div className="text-sm font-bold text-neutral-200">Most played (loaded)</div>
+          <div className="text-sm font-bold text-neutral-200">Most played (last 12)</div>
 
           <div className="mt-2 -mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {data.summary.topChamps.map((c) => {
+            {(topChampsForDisplay ?? []).map((c) => {
               const slug = champKeyToSlug(c.champ);
               const champIcon = `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/${c.champ}.png`;
 
               return (
                 <Link
-                  key={`${c.champ}-${c.games}`}
+                  key={`${modeKey}-${c.champ}-${c.games}`}
                   href={champHref(slug)}
                   className="snap-start group flex shrink-0 items-center gap-2 rounded-full border border-neutral-800 bg-black/35 px-3 py-2 text-xs text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.12)]"
                   title={`Go to ${c.champ} page`}
                 >
                   <span className="h-6 w-6 overflow-hidden rounded-full border border-neutral-800 bg-black">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={champIcon}
                       alt={`${c.champ} icon`}
@@ -582,7 +1019,12 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
         <div className="mx-auto w-full lg:max-w-[980px] xl:max-w-[1040px]">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <div className="text-xl sm:text-2xl font-black tracking-tight">Recent Matches</div>
+              <div className="text-xl sm:text-2xl font-black tracking-tight">
+                Matches{" "}
+                <span className="text-neutral-500">
+                  · {modeLabel} · last {LIMIT_PER_MODE}
+                </span>
+              </div>
               <div className="mt-1 text-sm text-neutral-400">
                 Tap a champion icon to open their page.
               </div>
@@ -595,6 +1037,12 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
               className="h-10 w-full rounded-2xl border border-neutral-800 bg-black/60 px-4 text-sm text-white outline-none placeholder:text-neutral-600 focus:border-neutral-600 sm:w-[340px]"
             />
           </div>
+
+          {loadingMode === modeKey ? (
+            <div className="mt-4 rounded-2xl border border-neutral-800 bg-black/30 p-4 text-sm text-neutral-300">
+              Loading last {LIMIT_PER_MODE} {modeLabel} matches…
+            </div>
+          ) : null}
 
           <div className="mt-4 space-y-3">
             {filtered.map((m) => {
@@ -612,9 +1060,9 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                     m.win ? "border-emerald-900/50" : "border-rose-900/40"
                   } bg-black/40 p-3 transition hover:border-neutral-600`}
                 >
-                  {/* ✅ Desktop: LEFT stats | MIDDLE items | RIGHT players — all fit in one short row */}
+                  {/* ✅ Desktop */}
                   <div className="hidden md:grid md:grid-cols-[minmax(0,1fr)_240px_300px] md:gap-3 md:items-stretch">
-                    {/* LEFT: compact match summary + stats */}
+                    {/* LEFT */}
                     <div className="min-w-0 rounded-3xl border border-neutral-800 bg-black/18 p-3">
                       <div className="flex items-start gap-3">
                         <Link
@@ -623,7 +1071,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                           title={`Open ${m.champ} page`}
                           aria-label={`Open ${m.champ} page`}
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={champIcon}
                             alt={`${m.champ} icon`}
@@ -665,7 +1112,10 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                       </div>
 
                       <div className="mt-3 grid grid-cols-4 gap-2">
-                        <StatTileSm label="K / D / A" value={`${m.kills}/${m.deaths}/${m.assists}`} />
+                        <StatTileSm
+                          label="K / D / A"
+                          value={`${m.kills}/${m.deaths}/${m.assists}`}
+                        />
                         <StatTileSm label="KDA" value={m.kda} />
                         <StatTileSm label="CS" value={m.cs} />
                         <StatTileSm label="DMG" value={fmtNum(m.dmgToChamps)} />
@@ -676,147 +1126,141 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                       </div>
                     </div>
 
-                    {/* MIDDLE: compact items block (dead space) */}
+                    {/* MIDDLE */}
                     <div className="rounded-3xl border border-neutral-800 bg-black/18 p-3 flex flex-col justify-between">
                       <div className="flex flex-col gap-2">
-  <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-    Items
-  </div>
+                        <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
+                          Items
+                        </div>
 
-  <div className="flex flex-wrap gap-1.5">
-    <ChipSm label="CS/m" value={fmt1(csPerMin)} />
-    <ChipSm label="Gold/m" value={fmt1(goldPerMin)} />
-    <ChipSm label="Vis" value={String(m.vision ?? 0)} />
-  </div>
-</div>
-
+                        <div className="flex flex-wrap gap-1.5">
+                          <ChipSm label="CS/m" value={fmt1(csPerMin)} />
+                          <ChipSm label="Gold/m" value={fmt1(goldPerMin)} />
+                          <ChipSm label="Vis" value={String(m.vision ?? 0)} />
+                        </div>
+                      </div>
 
                       <div className="mt-2 flex flex-wrap gap-1">
-  {m.items
-    ?.filter((id) => id && id > 0)
-    .map((itemId, i) => (
-      <ItemIcon
-        key={`${m.matchId}-item-${i}`}
-        ddVersion={ddVersion}
-        itemId={itemId}
-        itemDb={itemDb}
-        size={38}
-      />
-    ))}
-</div>
-
+                        {m.items
+                          ?.filter((id) => id && id > 0)
+                          .map((itemId, i) => (
+                            <ItemIcon
+                              key={`${m.matchId}-item-${i}`}
+                              ddVersion={ddVersion}
+                              itemId={itemId}
+                              itemDb={itemDb}
+                              size={38}
+                            />
+                          ))}
+                      </div>
 
                       <div className="mt-2 text-[10px] text-neutral-600">
                         Click an item for details.
                       </div>
                     </div>
 
-                    {/* RIGHT: players */}
+                    {/* RIGHT */}
                     <PlayersPanelCompact players={m.players} className="h-full" />
                   </div>
 
-                  {/* ✅ Mobile: unchanged */}
+                  {/* ✅ Mobile */}
                   <div className="md:hidden">
-  <div className="rounded-3xl border border-neutral-800 bg-black/18 p-3">
-    {/* Header */}
-    <div className="flex items-start gap-3">
-      <Link
-        href={champHref(slug)}
-        className="group relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-neutral-800 bg-black shadow-[0_0_25px_rgba(0,255,255,0.08)]"
-        title={`Open ${m.champ} page`}
-        aria-label={`Open ${m.champ} page`}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={champIcon}
-          alt={`${m.champ} icon`}
-          className="h-full w-full object-cover transition group-hover:scale-[1.03]"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
-        />
-      </Link>
+                    <div className="rounded-3xl border border-neutral-800 bg-black/18 p-3">
+                      <div className="flex items-start gap-3">
+                        <Link
+                          href={champHref(slug)}
+                          className="group relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-neutral-800 bg-black shadow-[0_0_25px_rgba(0,255,255,0.08)]"
+                          title={`Open ${m.champ} page`}
+                          aria-label={`Open ${m.champ} page`}
+                        >
+                          <img
+                            src={champIcon}
+                            alt={`${m.champ} icon`}
+                            className="h-full w-full object-cover transition group-hover:scale-[1.03]"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        </Link>
 
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <div className="min-w-0 truncate text-base font-black">{m.champ}</div>
-          <span
-            className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
-              m.win
-                ? "border-emerald-900/60 bg-emerald-950/30 text-emerald-200"
-                : "border-rose-900/60 bg-rose-950/30 text-rose-200"
-            }`}
-          >
-            {m.win ? "WIN" : "LOSS"}
-          </span>
-        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <div className="min-w-0 truncate text-base font-black">
+                              {m.champ}
+                            </div>
+                            <span
+                              className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+                                m.win
+                                  ? "border-emerald-900/60 bg-emerald-950/30 text-emerald-200"
+                                  : "border-rose-900/60 bg-rose-950/30 text-rose-200"
+                              }`}
+                            >
+                              {m.win ? "WIN" : "LOSS"}
+                            </span>
+                          </div>
 
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
-          <span className="rounded-full border border-neutral-800 bg-black/35 px-2.5 py-1 font-semibold text-neutral-300">
-            {m.role || "—"}
-          </span>
-          <span className="rounded-full border border-neutral-800 bg-black/35 px-2.5 py-1 font-semibold text-neutral-300">
-            {m.mode}
-          </span>
-          <span className="text-neutral-500">
-            {timeAgo(m.createdAt)}
-          </span>
-        </div>
-      </div>
-    </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
+                            <span className="rounded-full border border-neutral-800 bg-black/35 px-2.5 py-1 font-semibold text-neutral-300">
+                              {m.role || "—"}
+                            </span>
+                            <span className="rounded-full border border-neutral-800 bg-black/35 px-2.5 py-1 font-semibold text-neutral-300">
+                              {m.mode}
+                            </span>
+                            <span className="text-neutral-500">{timeAgo(m.createdAt)}</span>
+                          </div>
+                        </div>
+                      </div>
 
-    {/* Stats (always clean on mobile) */}
-    <div className="mt-3 grid grid-cols-2 gap-2">
-      <StatTile label="K / D / A" value={`${m.kills}/${m.deaths}/${m.assists}`} />
-      <StatTile label="KDA" value={m.kda} />
-      <StatTile label="CS" value={m.cs} />
-      <StatTile label="DMG" value={fmtNum(m.dmgToChamps)} />
-    </div>
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        <StatTile label="K / D / A" value={`${m.kills}/${m.deaths}/${m.assists}`} />
+                        <StatTile label="KDA" value={m.kda} />
+                        <StatTile label="CS" value={m.cs} />
+                        <StatTile label="DMG" value={fmtNum(m.dmgToChamps)} />
+                      </div>
 
-    {/* Items row (horizontal, no ugly wrapping) */}
-    <div className="mt-3 rounded-2xl border border-neutral-800 bg-black/20 p-2.5">
-      <div className="flex items-center justify-between gap-3">
-        <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-          Items
-        </div>
+                      <div className="mt-3 rounded-2xl border border-neutral-800 bg-black/20 p-2.5">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
+                            Items
+                          </div>
 
-        <div className="flex flex-wrap gap-1.5 justify-end">
-          <ChipSm label="CS/m" value={fmt1(csPerMin)} />
-          <ChipSm label="G/m" value={fmt1(goldPerMin)} />
-          <ChipSm label="Vis" value={String(m.vision ?? 0)} />
-        </div>
-      </div>
+                          <div className="flex flex-wrap gap-1.5 justify-end">
+                            <ChipSm label="CS/m" value={fmt1(csPerMin)} />
+                            <ChipSm label="G/m" value={fmt1(goldPerMin)} />
+                            <ChipSm label="Vis" value={String(m.vision ?? 0)} />
+                          </div>
+                        </div>
 
-      <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {(m.items ?? [])
-          .filter((id) => id && id > 0)
-          .slice(0, 7)
-          .map((itemId, i) => (
-            <ItemIcon
-              key={`${m.matchId}-m-item-${i}`}
-              ddVersion={ddVersion}
-              itemId={itemId}
-              itemDb={itemDb}
-              size={28}
-            />
-          ))}
-      </div>
+                        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                          {(m.items ?? [])
+                            .filter((id) => id && id > 0)
+                            .slice(0, 7)
+                            .map((itemId, i) => (
+                              <ItemIcon
+                                key={`${m.matchId}-m-item-${i}`}
+                                ddVersion={ddVersion}
+                                itemId={itemId}
+                                itemDb={itemDb}
+                                size={28}
+                              />
+                            ))}
+                        </div>
 
-      <div className="mt-1 text-[10px] text-neutral-600">Tap an item for details.</div>
-    </div>
+                        <div className="mt-1 text-[10px] text-neutral-600">
+                          Tap an item for details.
+                        </div>
+                      </div>
 
-    {/* Players */}
-    <div className="mt-3">
-      <PlayersPanelCompact players={m.players} />
-    </div>
+                      <div className="mt-3">
+                        <PlayersPanelCompact players={m.players} />
+                      </div>
 
-    {/* Footer */}
-    <div className="mt-3 text-[11px] text-neutral-600">
-      Match ID: <span className="text-neutral-400">{m.matchId.slice(0, 12)}…</span>
-    </div>
-  </div>
-</div>
-
+                      <div className="mt-3 text-[11px] text-neutral-600">
+                        Match ID:{" "}
+                        <span className="text-neutral-400">{m.matchId.slice(0, 12)}…</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -825,7 +1269,9 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
               <div className="rounded-2xl border border-neutral-800 bg-black/40 p-6 text-sm text-neutral-300">
                 {matchDown
                   ? "Match details are temporarily unavailable from Riot right now."
-                  : "No matches found for that filter."}
+                  : loadingMode === modeKey
+                    ? `Loading ${modeLabel} matches…`
+                    : `No matches found for “${modeLabel}” with that filter.`}
               </div>
             ) : null}
           </div>
