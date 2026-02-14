@@ -838,21 +838,24 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
           <div className="flex flex-col items-center gap-3 text-center lg:items-start lg:text-left">
             <div className="flex items-center gap-4">
               {/* ✅ Fix "pinch" look: use object-contain + slight padding so it scales clean on mobile */}
-              <div className="aspect-square w-14 sm:w-16 lg:w-20 shrink-0 overflow-hidden rounded-3xl border border-neutral-800 bg-black p-1 shadow-[0_0_35px_rgba(0,255,255,0.18)]">
-                {summonerIconUrl ? (
-                  <img
-                    src={summonerIconUrl}
-                    alt="Summoner icon"
-                    className="h-full w-full object-contain"
-                    style={{ imageRendering: "auto" }}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                ) : (
-                  <IconFallback text={data.riotId} />
-                )}
-              </div>
+              <div className="relative w-14 sm:w-16 lg:w-20 shrink-0">
+  <div className="relative aspect-square overflow-hidden rounded-3xl border border-neutral-800 bg-black shadow-[0_0_35px_rgba(0,255,255,0.18)]">
+    {summonerIconUrl ? (
+      <img
+        src={summonerIconUrl}
+        alt="Summoner icon"
+        className="absolute inset-0 h-full w-full object-cover"
+        draggable={false}
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = "none";
+        }}
+      />
+    ) : (
+      <IconFallback text={data.riotId} />
+    )}
+  </div>
+</div>
+
 
               <div className="min-w-0">
                 <div className="truncate text-2xl sm:text-3xl font-black tracking-tight">
