@@ -102,11 +102,13 @@ export default function RootLayout({
         {/* App surface */}
         <div className="relative z-10 min-h-[100dvh] bg-transparent">
   {children}
+
   <BottomOfPageAd
     client="ca-pub-9530220531970117"
-    slot="3730936686"
+    slot="3946559101"
   />
 </div>
+
 
 
         <Analytics />

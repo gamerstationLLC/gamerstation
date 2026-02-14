@@ -18,7 +18,10 @@ export default function BottomOfPageAd({ client, slot }: Props) {
   const pathname = usePathname();
   const pushedRef = useRef(false);
 
-  const insKey = useMemo(() => `bottom:${pathname}:${slot}`, [pathname, slot]);
+  const insKey = useMemo(
+    () => `bottom:${pathname}:${slot}`,
+    [pathname, slot]
+  );
 
   useEffect(() => {
     pushedRef.current = false;
@@ -39,11 +42,9 @@ export default function BottomOfPageAd({ client, slot }: Props) {
       <ins
         key={insKey}
         className="adsbygoogle"
-        style={{ display: "block", width: "100%", maxWidth: 1200 }}
+        style={{ display: "inline-block", width: 300, height: 100 }}
         data-ad-client={client}
         data-ad-slot={slot}
-        data-ad-format="auto"
-        data-full-width-responsive="true"
       />
     </div>
   );
