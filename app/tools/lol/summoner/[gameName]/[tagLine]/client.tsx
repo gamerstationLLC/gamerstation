@@ -262,29 +262,13 @@ function MetaPill({ children }: { children: React.ReactNode }) {
 
 type ModeFilterKey = "recent" | "ranked" | "urf" | "arena";
 
-function isRankedQueue(queueId: number) {
-  return queueId === 420 || queueId === 440;
-}
-
-function normMode(s: string) {
-  return (s || "").trim().toLowerCase();
-}
-
-function isUrfQueue(queueId: number, mode: string) {
-  const m = normMode(mode);
-  return queueId === 900 || m.includes("urf");
-}
-
-function isArenaQueue(queueId: number, mode: string) {
-  const m = normMode(mode);
-  return queueId === 1700 || queueId === 1701 || m.includes("arena");
-}
-
 /**
  * IMPORTANT:
  * This page expects an API route that returns the last N matches for a given mode.
  * Endpoint used below:
- *   GET /api/tools/lol/summoner/matches?puuid=...&platform=...&cluster=...&mode=ranked|urf|arena|recent&limit=12
+ *   GET /api/tools/lol/mode-ranked?puuid=...&cluster=...&limit=12
+ *   GET /api/tools/lol/mode-urf?puuid=...&cluster=...&limit=12
+ *   GET /api/tools/lol/mode-arena?puuid=...&cluster=...&limit=12
  *
  * Response shape expected:
  *   { matches: MatchRow[] }
@@ -293,7 +277,7 @@ async function fetchModeMatches(args: {
   puuid: string;
   platform: string; // unused here, keep for signature compatibility
   cluster: string;
-  mode: ModeFilterKey; // "recent" | "ranked" | "urf" | "arena"
+  mode: ModeFilterKey;
   limit: number;
   signal?: AbortSignal;
 }): Promise<MatchRow[]> {
@@ -303,18 +287,11 @@ async function fetchModeMatches(args: {
     limit: String(args.limit),
   });
 
+  // If you DID NOT create mode-recent, keep recent local and never call fetch for it.
+  if (args.mode === "recent") return [];
+
   const route =
-  args.mode === "ranked" ? "mode-ranked"
-  : args.mode === "urf" ? "mode-urf"
-  : "mode-arena";
-
-
-
-  // If you DID NOT create _erecent, just keep recent local and never call fetch for it.
-  if (args.mode === "recent") {
-    // Return empty so your component uses prefetched `data.matches`.
-    return [];
-  }
+    args.mode === "ranked" ? "mode-ranked" : args.mode === "urf" ? "mode-urf" : "mode-arena";
 
   const url = `/api/tools/lol/${route}?${qs.toString()}`;
 
@@ -331,7 +308,6 @@ async function fetchModeMatches(args: {
   const json = (await res.json()) as { matches?: MatchRow[] };
   return Array.isArray(json?.matches) ? json.matches : [];
 }
-
 
 function computeDerivedSummary(matches: MatchRow[]) {
   const games = matches.length;
@@ -425,8 +401,20 @@ function computeDerivedSummary(matches: MatchRow[]) {
 }
 
 /* ---------------------------
-   Item icon w/ Data Dragon popover
+   Item icon w/ mobile-friendly popover (NO CLIPPING)
 --------------------------- */
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
+  }, []);
+  return isMobile;
+}
 
 function ItemIcon({
   ddVersion,
@@ -439,27 +427,88 @@ function ItemIcon({
   itemDb: Record<string, DdItem> | null;
   size?: number;
 }) {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+
+  const [pos, setPos] = useState<{ top: number; left: number; width: number } | null>(null);
 
   if (!itemId || itemId <= 0) return null;
 
   const url = `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/item/${itemId}.png`;
   const item = itemDb?.[String(itemId)];
   const title = item?.name ?? `Item ${itemId}`;
-
   const desc =
-    stripHtml(item?.plaintext) ||
-    stripHtml(item?.description) ||
-    "No description available.";
+    stripHtml(item?.plaintext) || stripHtml(item?.description) || "No description available.";
 
-  const popTop = size + 6;
+  function computePos() {
+    if (!btnRef.current) return;
+    const r = btnRef.current.getBoundingClientRect();
+
+    // Desktop-ish floating card near icon; keep on-screen
+    const cardW = 320;
+    const pad = 12;
+
+    const left = Math.max(pad, Math.min(r.left + r.width / 2 - cardW / 2, window.innerWidth - cardW - pad));
+    const top = Math.min(r.bottom + 10, window.innerHeight - 12); // clamped; actual height handled by max-h
+
+    setPos({ top, left, width: cardW });
+  }
+
+  function openPanel() {
+    setOpen(true);
+    // compute immediately + after layout
+    requestAnimationFrame(() => computePos());
+  }
+
+  function closePanel() {
+    setOpen(false);
+  }
+
+  // Reposition on scroll/resize when open (desktop)
+  useEffect(() => {
+    if (!open || isMobile) return;
+
+    const on = () => computePos();
+    window.addEventListener("scroll", on, true);
+    window.addEventListener("resize", on);
+    return () => {
+      window.removeEventListener("scroll", on, true);
+      window.removeEventListener("resize", on);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isMobile]);
+
+  // Close on outside click + Esc
+  useEffect(() => {
+    if (!open) return;
+
+    function onDown(e: MouseEvent) {
+      const t = e.target as Node;
+      if (btnRef.current?.contains(t)) return;
+      if (panelRef.current?.contains(t)) return;
+      closePanel();
+    }
+
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") closePanel();
+    }
+
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   return (
-    <div className="relative">
+    <>
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        onBlur={() => setOpen(false)}
+        onClick={() => (open ? closePanel() : openPanel())}
         style={{ width: size, height: size }}
         className="overflow-hidden rounded-xl border border-neutral-800 bg-black/35 outline-none transition hover:border-neutral-600"
         aria-label={title}
@@ -469,28 +518,85 @@ function ItemIcon({
       </button>
 
       {open ? (
-        <div
-          className="absolute right-0 z-30 w-[300px] rounded-2xl border border-neutral-800 bg-black/95 p-3 shadow-[0_0_30px_rgba(0,255,255,0.08)]"
-          style={{ top: popTop }}
-        >
-          <div className="flex items-start gap-2">
-            <div className="h-9 w-9 overflow-hidden rounded-xl border border-neutral-800 bg-black/60">
-              <img src={url} alt={title} className="h-full w-full object-cover" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-black text-white">{title}</div>
-              <div className="mt-0.5 text-[11px] text-neutral-400">
-                {item?.gold?.total ? `Cost: ${item.gold.total.toLocaleString()}g` : "Cost: —"}
-                {item?.gold?.sell ? ` · Sell: ${item.gold.sell.toLocaleString()}g` : ""}
+        <div className="fixed inset-0 z-[9999]">
+          {/* Backdrop */}
+          <button
+            type="button"
+            aria-label="Close item details"
+            onClick={closePanel}
+            className="absolute inset-0 bg-black/40"
+          />
+
+          {/* Mobile: bottom sheet (good UX, no careless expansion) */}
+          {isMobile ? (
+            <div
+              ref={panelRef}
+              className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[520px] rounded-t-3xl border border-neutral-800 bg-black/95 p-4 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]"
+            >
+              <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-white/10" />
+
+              <div className="flex items-start gap-3">
+                <div className="h-11 w-11 overflow-hidden rounded-2xl border border-neutral-800 bg-black/60">
+                  <img src={url} alt={title} className="h-full w-full object-cover" />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-base font-black text-white">{title}</div>
+                  <div className="mt-1 text-[11px] text-neutral-400">
+                    {item?.gold?.total ? `Cost: ${item.gold.total.toLocaleString()}g` : "Cost: —"}
+                    {item?.gold?.sell ? ` · Sell: ${item.gold.sell.toLocaleString()}g` : ""}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={closePanel}
+                  className="rounded-2xl border border-neutral-800 bg-black/50 px-3 py-2 text-xs font-black text-neutral-200 hover:border-neutral-600 hover:text-white"
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="mt-3 max-h-[55vh] overflow-auto rounded-2xl border border-neutral-800 bg-black/40 p-3">
+                <div className="whitespace-pre-line text-[12px] leading-snug text-neutral-200">
+                  {desc}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="mt-2 whitespace-pre-line text-[11px] leading-snug text-neutral-200">
-            {desc}
-          </div>
+          ) : (
+            // Desktop: floating card positioned near item, clamped on screen
+            <div
+              ref={panelRef}
+              className="absolute rounded-2xl border border-neutral-800 bg-black/95 p-3 shadow-[0_0_30px_rgba(0,255,255,0.08)]"
+              style={{
+                top: pos?.top ?? 100,
+                left: pos?.left ?? 20,
+                width: pos?.width ?? 320,
+                maxHeight: "60vh",
+                overflow: "auto",
+              }}
+            >
+              <div className="flex items-start gap-2">
+                <div className="h-9 w-9 overflow-hidden rounded-xl border border-neutral-800 bg-black/60">
+                  <img src={url} alt={title} className="h-full w-full object-cover" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-black text-white">{title}</div>
+                  <div className="mt-0.5 text-[11px] text-neutral-400">
+                    {item?.gold?.total ? `Cost: ${item.gold.total.toLocaleString()}g` : "Cost: —"}
+                    {item?.gold?.sell ? ` · Sell: ${item.gold.sell.toLocaleString()}g` : ""}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-2 whitespace-pre-line text-[11px] leading-snug text-neutral-200">
+                {desc}
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
-    </div>
+    </>
   );
 }
 
@@ -584,7 +690,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
 
   // Cache per toggle: each must show last 12 matches for that mode.
   const [modeCache, setModeCache] = useState<Record<ModeFilterKey, MatchRow[]>>(() => {
-    // ✅ Pre-fill "recent" from server data (take 12). Others fetch on demand.
     const recent = Array.isArray(data.matches) ? data.matches.slice(0, LIMIT_PER_MODE) : [];
     return { recent, ranked: [], urf: [], arena: [] };
   });
@@ -596,14 +701,11 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
     async function run() {
       setModeErr("");
 
-      // If already cached, don’t refetch.
       const cached = modeCache[modeKey];
       if (Array.isArray(cached) && cached.length > 0) return;
 
-      // For "recent", we always have server-filled 12 (above). If somehow empty, fetch it too.
       if (modeKey === "recent" && modeCache.recent.length > 0) return;
 
-      // Abort any in-flight fetch (rapid toggle clicking)
       abortRef.current?.abort();
       const ac = new AbortController();
       abortRef.current = ac;
@@ -629,8 +731,7 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
       } catch (e) {
         if (cancelled) return;
 
-        const msg =
-          e instanceof Error ? e.message : `Failed to load ${modeKey} matches.`;
+        const msg = e instanceof Error ? e.message : `Failed to load ${modeKey} matches.`;
         setModeErr(msg);
       } finally {
         if (!cancelled) setLoadingMode(null);
@@ -659,7 +760,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
     });
   }, [q, modeMatches]);
 
-  // Keep your existing “Riot down” banner logic (based on initial load meta).
   const matchIdsReturned = data.meta?.matchIdsReturned ?? 0;
   const matchDetailsLoaded = data.meta?.matchDetailsLoaded ?? data.matches.length;
   const matchDown = matchIdsReturned > 0 && matchDetailsLoaded === 0;
@@ -737,22 +837,22 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-col items-center gap-3 text-center lg:items-start lg:text-left">
             <div className="flex items-center gap-4">
-              <div className="aspect-square w-14 sm:w-16 lg:w-20 shrink-0 overflow-hidden rounded-3xl border border-neutral-800 bg-black shadow-[0_0_35px_rgba(0,255,255,0.18)]">
-  {summonerIconUrl ? (
-    <img
-      src={summonerIconUrl}
-      alt="Summoner icon"
-      className="h-full w-full object-cover"
-      style={{ imageRendering: "auto" }}
-      onError={(e) => {
-        (e.currentTarget as HTMLImageElement).style.display = "none";
-      }}
-    />
-  ) : (
-    <IconFallback text={data.riotId} />
-  )}
-</div>
-
+              {/* ✅ Fix "pinch" look: use object-contain + slight padding so it scales clean on mobile */}
+              <div className="aspect-square w-14 sm:w-16 lg:w-20 shrink-0 overflow-hidden rounded-3xl border border-neutral-800 bg-black p-1 shadow-[0_0_35px_rgba(0,255,255,0.18)]">
+                {summonerIconUrl ? (
+                  <img
+                    src={summonerIconUrl}
+                    alt="Summoner icon"
+                    className="h-full w-full object-contain"
+                    style={{ imageRendering: "auto" }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <IconFallback text={data.riotId} />
+                )}
+              </div>
 
               <div className="min-w-0">
                 <div className="truncate text-2xl sm:text-3xl font-black tracking-tight">
@@ -890,7 +990,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                   title={`Go to ${c.champ} page`}
                 >
                   <span className="h-6 w-6 overflow-hidden rounded-full border border-neutral-800 bg-black">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={champIcon}
                       alt={`${c.champ} icon`}
@@ -969,7 +1068,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                           title={`Open ${m.champ} page`}
                           aria-label={`Open ${m.champ} page`}
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={champIcon}
                             alt={`${m.champ} icon`}
@@ -1062,7 +1160,7 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                     <PlayersPanelCompact players={m.players} className="h-full" />
                   </div>
 
-                  {/* ✅ Mobile (kept) */}
+                  {/* ✅ Mobile */}
                   <div className="md:hidden">
                     <div className="rounded-3xl border border-neutral-800 bg-black/18 p-3">
                       <div className="flex items-start gap-3">
@@ -1072,7 +1170,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                           title={`Open ${m.champ} page`}
                           aria-label={`Open ${m.champ} page`}
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={champIcon}
                             alt={`${m.champ} icon`}
