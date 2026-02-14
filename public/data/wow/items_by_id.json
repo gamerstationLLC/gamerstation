@@ -188635,6 +188635,40 @@
     ],
     "required_level": 70
   },
+  "207992": {
+    "id": 207992,
+    "name": "Fallen Drake's Bonesplitter",
+    "slot": "WEAPON",
+    "ilvl": 350,
+    "quality": "EPIC",
+    "item_class": "Weapon",
+    "item_subclass": "Axe",
+    "stats": {
+      "AGILITY": 8,
+      "STAMINA": 12,
+      "VERSATILITY": 7,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 8
+      },
+      {
+        "type": "STAMINA",
+        "value": 12
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 7
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 70
+  },
   "207994": {
     "id": 207994,
     "name": "Quel'Zaram, High Blade of the Lion",
