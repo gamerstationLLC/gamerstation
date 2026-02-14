@@ -103,7 +103,12 @@ export default function RootLayout({
         <div className="relative z-10 min-h-[100dvh] bg-transparent">
   {children}
 
-  <BottomOfPageAd client="ca-pub-9530220531970117" slot="3946559101" />
+  <BottomOfPageAd
+  client="ca-pub-9530220531970117"
+  mobileSlot="3946559101"
+  desktopSlot="5642784153"
+/>
+
 
 </div>
 
