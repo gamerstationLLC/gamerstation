@@ -31,32 +31,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, viewport-fit=cover"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-        {/* Warm up ad network connections */}
-        <link
-          rel="preconnect"
-          href="https://pagead2.googlesyndication.com"
-          crossOrigin=""
-        />
-        <link
-          rel="preconnect"
-          href="https://googleads.g.doubleclick.net"
-          crossOrigin=""
-        />
-        <link
-          rel="preconnect"
-          href="https://tpc.googlesyndication.com"
-          crossOrigin=""
-        />
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="" />
+        <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossOrigin="" />
+        <link rel="preconnect" href="https://tpc.googlesyndication.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
         <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
 
-        {/* AdSense loader (global) */}
         <Script
           id="adsense-script"
           async
@@ -74,14 +57,9 @@ export default function RootLayout({
           textRendering: "geometricPrecision",
         }}
       >
-        {/* Desktop-only side rails */}
         <AdSenseSideRails />
 
-        {/* Global background */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed inset-0 -z-10"
-        >
+        <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
           <div
             className="absolute inset-0"
             style={{
@@ -109,18 +87,12 @@ export default function RootLayout({
           />
         </div>
 
-        {/* App surface (NO transforms) */}
         <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
           {children}
         </div>
 
-        {/* Slim, X-able bottom bar ad (global) */}
-        <AdSenseDismissibleDock
-          client="ca-pub-9530220531970117"
-          slot="8335454155"
-          zIndex={99999} // ✅ ensures it sits above any page sticky footer
-          storageKey="gs_dismiss_ad_dock_v1"
-        />
+        {/* ✅ X-able bottom dock on ALL pages, on top of sticky footers */}
+        <AdSenseDismissibleDock slot="8372879537" zIndex={99999} />
 
         <Analytics />
       </body>
