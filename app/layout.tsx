@@ -4,7 +4,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import AdSenseSideRails from "./_components/AdSenseSideRails";
-import AdSenseDismissibleDock from "./_components/AdSenseDismissibleDock";
+import AdSenseBottomBar from "./_components/AdSenseBottomBar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,7 +31,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
 
         {/* Warm up ad network connections */}
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="" />
@@ -59,10 +62,10 @@ export default function RootLayout({
           textRendering: "geometricPrecision",
         }}
       >
-        {/* ✅ Desktop-only side rails */}
+        {/* Desktop-only side rails */}
         <AdSenseSideRails />
 
-        {/* Global background (ALWAYS behind everything) */}
+        {/* Global background */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
           <div
             className="absolute inset-0"
@@ -91,16 +94,15 @@ export default function RootLayout({
           />
         </div>
 
-        {/* App surface */}
+        {/* App surface (NO transforms) */}
         <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
           {children}
         </div>
 
-        {/* ✅ Global dismissible dock ad (ABOVE sticky footers) */}
-        <AdSenseDismissibleDock
-          adClient="ca-pub-9530220531970117"
-          adSlot="8335454155"
-          rememberHours={12}
+        {/* Slim, X-able bottom bar ad (global) */}
+        <AdSenseBottomBar
+          client="ca-pub-9530220531970117"
+          slot="8335454155"
         />
 
         <Analytics />
