@@ -4,6 +4,8 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import AdSenseSideRails from "./_components/AdSenseSideRails";
+import AdSenseAnchorSpacer from "./_components/AdSenseAnchorSpacer";
+import FooterAd from "./_components/FooterAd";
 import AdSenseDismissibleDock from "./_components/AdSenseDismissibleDock";
 import "./globals.css";
 
@@ -31,15 +33,28 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
 
-        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="" />
-        <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossOrigin="" />
+        {/* Warm up ad network connections */}
+        <link
+          rel="preconnect"
+          href="https://pagead2.googlesyndication.com"
+          crossOrigin=""
+        />
+        <link
+          rel="preconnect"
+          href="https://googleads.g.doubleclick.net"
+          crossOrigin=""
+        />
         <link rel="preconnect" href="https://tpc.googlesyndication.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
         <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
 
+        {/* AdSense loader (global) */}
         <Script
           id="adsense-script"
           async
@@ -57,8 +72,13 @@ export default function RootLayout({
           textRendering: "geometricPrecision",
         }}
       >
+        {/* ✅ Desktop-only side rails (component handles lg+ only) */}
         <AdSenseSideRails />
 
+        {/* Safe-area helper / bottom breathing room */}
+        <AdSenseAnchorSpacer />
+
+        {/* Global background */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
           <div
             className="absolute inset-0"
@@ -87,12 +107,16 @@ export default function RootLayout({
           />
         </div>
 
+        {/* App surface (NO transforms) */}
         <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
           {children}
+
+          {/* ✅ In-flow footer ad at the true bottom (responsive scaling) */}
+          <FooterAd client="ca-pub-9530220531970117" slot="8145648829" />
         </div>
 
-        {/* ✅ X-able bottom dock on ALL pages, on top of sticky footers */}
-        <AdSenseDismissibleDock slot="8372879537" zIndex={99999} />
+        {/* ✅ Global X-able dock (responsive scaling + reload per route) */}
+        <AdSenseDismissibleDock client="ca-pub-9530220531970117" slot="8145648829" />
 
         <Analytics />
       </body>

@@ -1,107 +1,104 @@
+// app/_components/AdSenseDismissibleDock.tsx
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
 type Props = {
-  client?: string;
-  slot: string; // your bottom bar slot (e.g. 8696313160 or 8372879537)
-  storageKey?: string; // per-site dismissal key
-  zIndex?: number; // make it win over sticky footers
+  client: string;
+  slot: string;
 };
 
-export default function AdSenseDismissibleDock({
-  client = "ca-pub-9530220531970117",
-  slot,
-  storageKey = "gs_dismiss_ad_dock_v1",
-  zIndex = 99999,
-}: Props) {
-  const insRef = useRef<HTMLModElement | null>(null);
-  const pushedRef = useRef(false);
+function safePushAds() {
+  try {
+    
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
+  } catch {
+    // ignore
+  }
+}
 
-  const [dismissed, setDismissed] = useState(true);
-  const [mounted, setMounted] = useState(false);
+export default function AdSenseDismissibleDock({ client, slot }: Props) {
+  const pathname = usePathname();
 
-  // show on all pages unless dismissed
-  const shouldShow = useMemo(() => true, []);
-
-  useEffect(() => {
-    setMounted(true);
-    try {
-      const v = localStorage.getItem(storageKey);
-      setDismissed(v === "1");
-    } catch {
-      setDismissed(false);
-    }
-  }, [storageKey]);
+  // You asked: reload on each page → do NOT persist dismissal.
+  const [dismissed, setDismissed] = useState(false);
+  const [vw, setVw] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!mounted || dismissed || !shouldShow) return;
-    if (!insRef.current) return;
-    if (pushedRef.current) return;
+    setDismissed(false);
+  }, [pathname]);
 
-    const runPush = () => {
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        pushedRef.current = true;
-      } catch {
-        // ignore
-      }
-    };
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
-    // Avoid blocking: push on idle / shortly after mount
-    if (typeof window.requestIdleCallback === "function") {
-      // @ts-ignore
-      window.requestIdleCallback(runPush, { timeout: 1500 });
-    } else {
-      setTimeout(runPush, 250);
-    }
-  }, [mounted, dismissed, shouldShow]);
+  // 728x90 scaled down on small screens (slim bar, never fullscreen)
+  const scale = useMemo(() => {
+    if (!vw) return 1;
+    const max = Math.min(1, (vw - 24) / 728); // 12px padding each side
+    return Math.max(0.42, max);
+  }, [vw]);
 
-  const close = () => {
-    setDismissed(true);
-    try {
-      localStorage.setItem(storageKey, "1");
-    } catch {
-      // ignore
-    }
-  };
+  const insKey = useMemo(() => `${pathname}:${slot}`, [pathname, slot]);
 
-  if (!mounted || dismissed || !shouldShow) return null;
+  useEffect(() => {
+    if (dismissed) return;
+    const t = window.setTimeout(() => safePushAds(), 60);
+    return () => window.clearTimeout(t);
+  }, [dismissed, pathname]);
+
+  if (dismissed) return null;
+
+  const scaledHeight = Math.round(90 * scale);
 
   return (
     <div
       className="fixed inset-x-0 bottom-0"
-      style={{ zIndex }}
-      aria-label="Advertisement"
+      style={{
+        zIndex: 99999, // sits above sticky footers (and can be X'd)
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
     >
-      {/* safe-area padding for iOS */}
-      <div className="mx-auto w-full max-w-[1200px] px-2 pb-[max(env(safe-area-inset-bottom),0px)]">
-        <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/70 shadow-[0_10px_40px_rgba(0,0,0,0.6)] backdrop-blur">
-          {/* Close button */}
+      <div className="mx-auto w-full max-w-[980px] px-3 pb-3">
+        <div
+          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/80 shadow-2xl backdrop-blur"
+          style={{
+            height: scaledHeight + 14, // slim container height
+          }}
+        >
           <button
             type="button"
-            onClick={close}
             aria-label="Close ad"
-            className="absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-full bg-black/60 text-white/80 hover:text-white border border-white/10"
+            onClick={() => setDismissed(true)}
+            className="absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white hover:bg-white/15"
           >
             ×
           </button>
 
-          {/* Ad container: keep it slim-ish on mobile */}
-          <div className="px-2 py-2">
-            <ins
-              ref={insRef}
-              className="adsbygoogle block w-full"
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ padding: 10 }}
+          >
+            <div
               style={{
-                display: "block",
-                // helps prevent “full screen white box” vibes on mobile
-                minHeight: 60,
+                width: 728,
+                height: 90,
+                transform: `scale(${scale})`,
+                transformOrigin: "center",
               }}
-              data-ad-client={client}
-              data-ad-slot={slot}
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
+            >
+              <ins
+                key={insKey}
+                className="adsbygoogle"
+                style={{ display: "inline-block", width: 728, height: 90 }}
+                data-ad-client={client}
+                data-ad-slot={slot}
+              />
+            </div>
           </div>
         </div>
       </div>
