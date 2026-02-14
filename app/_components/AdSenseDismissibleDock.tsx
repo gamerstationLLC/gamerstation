@@ -1,100 +1,166 @@
 // app/_components/AdSenseDismissibleDock.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Props = {
-  client: string;
-  slot: string;
+  client: string; // "ca-pub-..."
+  slot: string;   // "8145648829"
+  /**
+   * If you ever want the user's X to persist across route changes,
+   * flip this to true and it will store state in sessionStorage.
+   * For now, you said you want it to reload on each page => false.
+   */
+  persistDismiss?: boolean;
 };
 
-function safePushAds() {
-  try {
-    
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-  } catch {
-    // ignore
-  }
-}
-
-export default function AdSenseDismissibleDock({ client, slot }: Props) {
-  const pathname = usePathname();
-
-  // You asked: reload on each page → do NOT persist dismissal.
+export default function AdSenseDismissibleDock({
+  client,
+  slot,
+  persistDismiss = false,
+}: Props) {
   const [dismissed, setDismissed] = useState(false);
-  const [vw, setVw] = useState<number | null>(null);
+
+  // used to avoid double-push in StrictMode / remounts
+  const pushedRef = useRef(false);
+
+  // scale logic (728 -> fit container)
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [hostW, setHostW] = useState(0);
+
+  const baseW = 728;
+  const baseH = 90;
+
+  const scale = useMemo(() => {
+    if (!hostW) return 1;
+    return Math.min(1, hostW / baseW);
+  }, [hostW]);
+
+  const scaledH = Math.round(baseH * scale);
+
+  // optional persistence (OFF by default since you want reload-per-page)
+  useEffect(() => {
+    if (!persistDismiss) return;
+    try {
+      const v = sessionStorage.getItem("gs_ads_dock_dismissed");
+      if (v === "1") setDismissed(true);
+    } catch {}
+  }, [persistDismiss]);
 
   useEffect(() => {
-    setDismissed(false);
-  }, [pathname]);
+    if (!persistDismiss) return;
+    try {
+      sessionStorage.setItem("gs_ads_dock_dismissed", dismissed ? "1" : "0");
+    } catch {}
+  }, [dismissed, persistDismiss]);
 
+  // observe width so we can scale down on mobile
   useEffect(() => {
-    const onResize = () => setVw(window.innerWidth);
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    if (!hostRef.current) return;
+
+    const el = hostRef.current;
+    const ro = new ResizeObserver(() => {
+      const w = el.getBoundingClientRect().width;
+      setHostW(Math.floor(w));
+    });
+
+    ro.observe(el);
+    // initial
+    setHostW(Math.floor(el.getBoundingClientRect().width));
+
+    return () => ro.disconnect();
   }, []);
 
-  // 728x90 scaled down on small screens (slim bar, never fullscreen)
-  const scale = useMemo(() => {
-    if (!vw) return 1;
-    const max = Math.min(1, (vw - 24) / 728); // 12px padding each side
-    return Math.max(0.42, max);
-  }, [vw]);
-
-  const insKey = useMemo(() => `${pathname}:${slot}`, [pathname, slot]);
-
+  // push ad after mount (and after the script is available)
   useEffect(() => {
     if (dismissed) return;
-    const t = window.setTimeout(() => safePushAds(), 60);
-    return () => window.clearTimeout(t);
-  }, [dismissed, pathname]);
+    if (pushedRef.current) return;
+
+    const run = () => {
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        pushedRef.current = true;
+      } catch {
+        // ignore
+      }
+    };
+
+    // give Next hydration + ads script a moment
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(run, { timeout: 1500 });
+    } else {
+      setTimeout(run, 400);
+    }
+  }, [dismissed]);
 
   if (dismissed) return null;
 
-  const scaledHeight = Math.round(90 * scale);
-
   return (
     <div
-      className="fixed inset-x-0 bottom-0"
+      className="fixed left-0 right-0 bottom-0 z-[9999]"
       style={{
-        zIndex: 99999, // sits above sticky footers (and can be X'd)
         paddingBottom: "env(safe-area-inset-bottom)",
       }}
     >
-      <div className="mx-auto w-full max-w-[980px] px-3 pb-3">
+      {/* Centered dock container */}
+      <div
+        ref={hostRef}
+        className="
+          relative mx-auto
+          w-[min(100vw,900px)]
+          px-3
+        "
+      >
+        {/* Background bar */}
         <div
-          className="relative overflow-hidden rounded-2xl border border-white/10 bg-black/80 shadow-2xl backdrop-blur"
+          className="
+            relative overflow-hidden rounded-2xl
+            border border-white/10
+            bg-black/80 backdrop-blur
+            shadow-[0_10px_35px_rgba(0,0,0,0.55)]
+          "
           style={{
-            height: scaledHeight + 14, // slim container height
+            // keep the bar slim and predictable on mobile
+            height: scaledH + 14, // + padding room
           }}
         >
+          {/* Close button */}
           <button
             type="button"
             aria-label="Close ad"
             onClick={() => setDismissed(true)}
-            className="absolute right-2 top-2 z-10 grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white hover:bg-white/15"
+            className="
+              absolute right-2 top-1/2 -translate-y-1/2
+              h-9 w-9 rounded-full
+              bg-white/10 hover:bg-white/15
+              border border-white/10
+              text-white/90
+              grid place-items-center
+              z-10
+            "
           >
-            ×
+            ✕
           </button>
 
+          {/* Ad area (scaled) */}
           <div
-            className="absolute inset-0 flex items-center justify-center"
-            style={{ padding: 10 }}
+            className="absolute left-2 top-1/2 -translate-y-1/2"
+            style={{
+              width: `calc(100% - 56px)`, // leave room for X
+              height: scaledH,
+            }}
           >
             <div
               style={{
-                width: 728,
-                height: 90,
+                width: baseW,
+                height: baseH,
                 transform: `scale(${scale})`,
-                transformOrigin: "center",
+                transformOrigin: "left center",
               }}
             >
               <ins
-                key={insKey}
                 className="adsbygoogle"
-                style={{ display: "inline-block", width: 728, height: 90 }}
+                style={{ display: "inline-block", width: baseW, height: baseH }}
                 data-ad-client={client}
                 data-ad-slot={slot}
               />
