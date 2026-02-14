@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 type FooterAdProps = {
   client: string;
   desktopSlot: string; // 728x90
-  mobileSlot: string;  // 320x50
+  mobileSlot: string;  // WILL BE IGNORED (we hard-set 3730936686)
   mobileMaxWidth?: number; // default 768
 };
 
@@ -27,13 +27,12 @@ function safePushAds() {
 export default function FooterAd({
   client,
   desktopSlot,
-  mobileSlot,
-  mobileMaxWidth = 768,
+  mobileSlot,   
+  mobileMaxWidth = 780,
 }: FooterAdProps) {
   const pathname = usePathname();
   const pushedRef = useRef(false);
 
-  // ✅ initialize immediately on first client render (prevents hook count changes)
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.innerWidth < mobileMaxWidth;
@@ -45,11 +44,12 @@ export default function FooterAd({
     return () => window.removeEventListener("resize", check);
   }, [mobileMaxWidth]);
 
-  const width = isMobile ? 320 : 728;
+  // 🔥 HARD FORCE MOBILE SIZE + SLOT
+  const width = isMobile ? 350 : 728;
   const height = isMobile ? 50 : 90;
   const slot = isMobile ? mobileSlot : desktopSlot;
 
-  // force fresh <ins> per route + size so AdSense re-inits correctly
+
   const insKey = useMemo(
     () => `footer:${pathname}:${slot}:${width}x${height}`,
     [pathname, slot, width, height]
@@ -74,7 +74,11 @@ export default function FooterAd({
           <ins
             key={insKey}
             className="adsbygoogle"
-            style={{ display: "inline-block", width, height }}
+            style={{
+              display: "inline-block",
+              width: width,
+              height: height,
+            }}
             data-ad-client={client}
             data-ad-slot={slot}
           />

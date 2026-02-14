@@ -111,8 +111,9 @@ export default function RootLayout({
             <FooterAd
   client="ca-pub-9530220531970117"
   desktopSlot="8145648829"
-  mobileSlot="3438350693"
+  mobileSlot="3730936686"
 />
+
 
           </div>
         </div>
