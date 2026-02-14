@@ -8,15 +8,20 @@ export default function AdSenseSideRails() {
 
   useEffect(() => {
     try {
-      if (leftRef.current) (window.adsbygoogle = window.adsbygoogle || []).push({});
+      if (leftRef.current) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
     } catch {}
+
     try {
-      if (rightRef.current) (window.adsbygoogle = window.adsbygoogle || []).push({});
+      if (rightRef.current) {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      }
     } catch {}
   }, []);
 
   return (
-    <div className="hidden lg:block pointer-events-none" aria-hidden="true">
+    <div className="hidden xl:block pointer-events-none" aria-hidden="true">
       {/* Left rail */}
       <div className="fixed left-0 top-0 z-40 h-screen w-[160px]">
         <div className="pointer-events-auto h-full px-2 pt-24">
