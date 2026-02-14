@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 
 type FooterAdProps = {
   client: string;
-  desktopSlot: string; // 728x90
-  mobileSlot: string;  // WILL BE IGNORED (we hard-set 3730936686)
-  mobileMaxWidth?: number; // default 768
+  desktopSlot: string; // intended 728x90
+  mobileSlot: string; // responsive mobile slot
+  mobileMaxWidth?: number; // default 780
 };
 
 declare global {
@@ -27,7 +27,7 @@ function safePushAds() {
 export default function FooterAd({
   client,
   desktopSlot,
-  mobileSlot,   
+  mobileSlot,
   mobileMaxWidth = 780,
 }: FooterAdProps) {
   const pathname = usePathname();
@@ -44,16 +44,13 @@ export default function FooterAd({
     return () => window.removeEventListener("resize", check);
   }, [mobileMaxWidth]);
 
-  // 🔥 HARD FORCE MOBILE SIZE + SLOT
-  const width = isMobile ? 350 : 728;
-  const height = isMobile ? 50 : 90;
   const slot = isMobile ? mobileSlot : desktopSlot;
 
-
-  const insKey = useMemo(
-    () => `footer:${pathname}:${slot}:${width}x${height}`,
-    [pathname, slot, width, height]
-  );
+  const insKey = useMemo(() => `footer:${pathname}:${slot}:${isMobile ? "m" : "d"}`, [
+    pathname,
+    slot,
+    isMobile,
+  ]);
 
   useEffect(() => {
     pushedRef.current = false;
@@ -65,23 +62,33 @@ export default function FooterAd({
     }, 80);
 
     return () => window.clearTimeout(t);
-  }, [pathname, slot, width, height]);
+  }, [pathname, slot, isMobile]);
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-3 pb-6 pt-10">
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
         <div className="flex items-center justify-center">
-          <ins
-            key={insKey}
-            className="adsbygoogle"
-            style={{
-              display: "inline-block",
-              width: width,
-              height: height,
-            }}
-            data-ad-client={client}
-            data-ad-slot={slot}
-          />
+          {isMobile ? (
+            // ✅ Mobile: responsive. Do NOT force width/height.
+            <ins
+              key={insKey}
+              className="adsbygoogle"
+              style={{ display: "block", width: "100%" }}
+              data-ad-client={client}
+              data-ad-slot={mobileSlot}
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            />
+          ) : (
+            // ✅ Desktop: fixed leaderboard (728x90)
+            <ins
+              key={insKey}
+              className="adsbygoogle"
+              style={{ display: "inline-block", width: 728, height: 90 }}
+              data-ad-client={client}
+              data-ad-slot={desktopSlot}
+            />
+          )}
         </div>
       </div>
     </div>
