@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 
 type FooterAdProps = {
   client: string;
-  desktopSlot: string; // intended 728x90
-  mobileSlot: string; // responsive mobile slot
+  desktopSlot: string; // intended 728x90 (we'll use this for desktop)
+  mobileSlot: string; // mobile responsive slot
   mobileMaxWidth?: number; // default 780
 };
 
@@ -44,13 +44,16 @@ export default function FooterAd({
     return () => window.removeEventListener("resize", check);
   }, [mobileMaxWidth]);
 
+  // ✅ Desktop should use the fixed 728x90 unit you pasted (slot 5642784153)
+  // If you want to hard-force that slot regardless of prop, do:
+  // const desktopFixedSlot = "5642784153";
+  // But since you're passing it from layout, we just use desktopSlot.
   const slot = isMobile ? mobileSlot : desktopSlot;
 
-  const insKey = useMemo(() => `footer:${pathname}:${slot}:${isMobile ? "m" : "d"}`, [
-    pathname,
-    slot,
-    isMobile,
-  ]);
+  const insKey = useMemo(
+    () => `footer:${pathname}:${slot}:${isMobile ? "m" : "d"}`,
+    [pathname, slot, isMobile]
+  );
 
   useEffect(() => {
     pushedRef.current = false;
@@ -59,7 +62,7 @@ export default function FooterAd({
       if (pushedRef.current) return;
       safePushAds();
       pushedRef.current = true;
-    }, 80);
+    }, 120);
 
     return () => window.clearTimeout(t);
   }, [pathname, slot, isMobile]);
@@ -69,7 +72,7 @@ export default function FooterAd({
       <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
         <div className="flex items-center justify-center">
           {isMobile ? (
-            // ✅ Mobile: responsive. Do NOT force width/height.
+            // ✅ Mobile: keep exactly the same responsive behavior
             <ins
               key={insKey}
               className="adsbygoogle"
@@ -80,7 +83,7 @@ export default function FooterAd({
               data-full-width-responsive="true"
             />
           ) : (
-            // ✅ Desktop: fixed leaderboard (728x90)
+            // ✅ Desktop: fixed 728x90 (matches the snippet you pasted)
             <ins
               key={insKey}
               className="adsbygoogle"
