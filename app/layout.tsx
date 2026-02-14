@@ -4,9 +4,9 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import AdSenseAnchorSpacer from "./_components/AdSenseAnchorSpacer";
-import FooterAd from "./_components/FooterAd";
 import GlobalAds from "./_components/GlobalAds";
 import "./globals.css";
+import BottomOfPageAd from "./_components/BottomOfPageAd";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -67,10 +67,7 @@ export default function RootLayout({
           textRendering: "geometricPrecision",
         }}
       >
-        {/* small spacer (harmless) */}
-        
-
-        {/* Desktop rails + dismissible dock (dock remounts per route in GlobalAds) */}
+        <AdSenseAnchorSpacer />
         <GlobalAds />
 
         {/* Global background */}
@@ -102,23 +99,15 @@ export default function RootLayout({
           />
         </div>
 
-        {/* App surface (NO transforms) */}
-        
-          {children}
+        {/* App surface */}
+        <div className="relative z-10 min-h-[100dvh] bg-transparent">
+  {children}
+  <BottomOfPageAd
+    client="ca-pub-9530220531970117"
+    slot="3730936686"
+  />
+</div>
 
-          {/* In-flow footer ad at the true bottom */}
-          
-         <FooterAd
-  client="ca-pub-9530220531970117"
-  desktopSlot="5642784153"
-  mobileSlot="3730936686"
-/>
-
-
-
-
-          
-       
 
         <Analytics />
       </body>
