@@ -1,11 +1,14 @@
-// app/_components/AdSenseDismissibleDock.tsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type Props = {
   client: string; // "ca-pub-..."
-  slot: string;   // "8145648829"
+  // Desktop slot (728x90)
+  slot: string;
+  // Mobile slot (300x50). Default set to the one you chose.
+  mobileSlot?: string;
+
   /**
    * If you ever want the user's X to persist across route changes,
    * flip this to true and it will store state in sessionStorage.
@@ -17,6 +20,7 @@ type Props = {
 export default function AdSenseDismissibleDock({
   client,
   slot,
+  mobileSlot = "4944770416",
   persistDismiss = false,
 }: Props) {
   const [dismissed, setDismissed] = useState(false);
@@ -24,17 +28,26 @@ export default function AdSenseDismissibleDock({
   // used to avoid double-push in StrictMode / remounts
   const pushedRef = useRef(false);
 
-  // scale logic (728 -> fit container)
+  // container width observer
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [hostW, setHostW] = useState(0);
 
-  const baseW = 728;
-  const baseH = 90;
+  // breakpoint
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Decide ad unit by breakpoint
+  const { baseW, baseH, activeSlot } = useMemo(() => {
+    if (isMobile) {
+      return { baseW: 300, baseH: 50, activeSlot: mobileSlot };
+    }
+    return { baseW: 728, baseH: 90, activeSlot: slot };
+  }, [isMobile, mobileSlot, slot]);
+
+  // scale only if container is narrower than the unit
   const scale = useMemo(() => {
     if (!hostW) return 1;
     return Math.min(1, hostW / baseW);
-  }, [hostW]);
+  }, [hostW, baseW]);
 
   const scaledH = Math.round(baseH * scale);
 
@@ -54,7 +67,7 @@ export default function AdSenseDismissibleDock({
     } catch {}
   }, [dismissed, persistDismiss]);
 
-  // observe width so we can scale down on mobile
+  // observe width so we can scale down if needed
   useEffect(() => {
     if (!hostRef.current) return;
 
@@ -65,10 +78,18 @@ export default function AdSenseDismissibleDock({
     });
 
     ro.observe(el);
-    // initial
     setHostW(Math.floor(el.getBoundingClientRect().width));
 
     return () => ro.disconnect();
+  }, []);
+
+  // detect mobile
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    const update = () => setIsMobile(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
   }, []);
 
   // push ad after mount (and after the script is available)
@@ -91,16 +112,19 @@ export default function AdSenseDismissibleDock({
     } else {
       setTimeout(run, 400);
     }
-  }, [dismissed]);
+  }, [dismissed, activeSlot]);
+
+  // IMPORTANT: if breakpoint/slot changes, we must allow another push
+  useEffect(() => {
+    pushedRef.current = false;
+  }, [activeSlot]);
 
   if (dismissed) return null;
 
   return (
     <div
       className="fixed left-0 right-0 bottom-0 z-[9999]"
-      style={{
-        paddingBottom: "env(safe-area-inset-bottom)",
-      }}
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {/* Centered dock container */}
       <div
@@ -120,8 +144,8 @@ export default function AdSenseDismissibleDock({
             shadow-[0_10px_35px_rgba(0,0,0,0.55)]
           "
           style={{
-            // keep the bar slim and predictable on mobile
-            height: scaledH + 14, // + padding room
+            // slim + predictable height
+            height: scaledH + 16, // padding room
           }}
         >
           {/* Close button */}
@@ -142,7 +166,7 @@ export default function AdSenseDismissibleDock({
             ✕
           </button>
 
-          {/* Ad area (scaled) */}
+          {/* Ad area (scaled if needed) */}
           <div
             className="absolute left-2 top-1/2 -translate-y-1/2"
             style={{
@@ -162,7 +186,7 @@ export default function AdSenseDismissibleDock({
                 className="adsbygoogle"
                 style={{ display: "inline-block", width: baseW, height: baseH }}
                 data-ad-client={client}
-                data-ad-slot={slot}
+                data-ad-slot={activeSlot}
               />
             </div>
           </div>

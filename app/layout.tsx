@@ -70,7 +70,7 @@ export default function RootLayout({
         {/* small spacer (harmless) */}
         <AdSenseAnchorSpacer />
 
-        {/* Desktop rails + dismissible dock (dock remounts per route) */}
+        {/* Desktop rails + dismissible dock (dock remounts per route in GlobalAds) */}
         <GlobalAds />
 
         {/* Global background */}
@@ -106,7 +106,7 @@ export default function RootLayout({
         <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
           {children}
 
-          {/* In-flow footer ad at the true bottom (sticky footers will naturally sit above it) */}
+          {/* In-flow footer ad at the true bottom */}
           <div className="mt-10 pb-10">
             <FooterAd client="ca-pub-9530220531970117" slot="8145648829" />
           </div>
