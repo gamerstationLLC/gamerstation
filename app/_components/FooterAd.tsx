@@ -5,16 +5,16 @@ import { usePathname } from "next/navigation";
 
 type FooterAdProps = {
   client: string;
-
-  // Desktop footer (728x90)
-  desktopSlot: string;
-
-  // Mobile footer (320x50)
-  mobileSlot: string;
-
-  // optional breakpoint (default: 768)
-  mobileMaxWidth?: number;
+  desktopSlot: string; // 728x90
+  mobileSlot: string;  // 320x50
+  mobileMaxWidth?: number; // default 768
 };
+
+declare global {
+  interface Window {
+    adsbygoogle?: any[];
+  }
+}
 
 function safePushAds() {
   try {
@@ -31,26 +31,25 @@ export default function FooterAd({
   mobileMaxWidth = 768,
 }: FooterAdProps) {
   const pathname = usePathname();
-  const [isMobile, setIsMobile] = useState<boolean | null>(null);
-
-  // Avoid double push in StrictMode / hot reload
   const pushedRef = useRef(false);
+
+  // ✅ initialize immediately on first client render (prevents hook count changes)
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < mobileMaxWidth;
+  });
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < mobileMaxWidth);
-    check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, [mobileMaxWidth]);
-
-  // If we don't know yet (SSR -> hydration), render nothing to avoid wrong-size flash
-  if (isMobile === null) return null;
 
   const width = isMobile ? 320 : 728;
   const height = isMobile ? 50 : 90;
   const slot = isMobile ? mobileSlot : desktopSlot;
 
-  // Force a fresh <ins> per route + mode so AdSense re-initializes
+  // force fresh <ins> per route + size so AdSense re-inits correctly
   const insKey = useMemo(
     () => `footer:${pathname}:${slot}:${width}x${height}`,
     [pathname, slot, width, height]
@@ -63,7 +62,7 @@ export default function FooterAd({
       if (pushedRef.current) return;
       safePushAds();
       pushedRef.current = true;
-    }, 120);
+    }, 80);
 
     return () => window.clearTimeout(t);
   }, [pathname, slot, width, height]);
