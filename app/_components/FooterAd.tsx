@@ -5,10 +5,15 @@ import { usePathname } from "next/navigation";
 
 type FooterAdProps = {
   client: string;
-  // Desktop slot (728x90)
-  slot: string;
-  // Mobile slot (320x50)
-  mobileSlot?: string;
+
+  // Desktop footer (728x90)
+  desktopSlot: string;
+
+  // Mobile footer (320x50)
+  mobileSlot: string;
+
+  // optional breakpoint (default: 768)
+  mobileMaxWidth?: number;
 };
 
 function safePushAds() {
@@ -21,50 +26,47 @@ function safePushAds() {
 
 export default function FooterAd({
   client,
-  slot,
-  mobileSlot = "3438350693",
+  desktopSlot,
+  mobileSlot,
+  mobileMaxWidth = 768,
 }: FooterAdProps) {
   const pathname = usePathname();
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
-  const [isMobile, setIsMobile] = useState(false);
+  // Avoid double push in StrictMode / hot reload
   const pushedRef = useRef(false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 768px)");
-    const update = () => setIsMobile(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
+    const check = () => setIsMobile(window.innerWidth < mobileMaxWidth);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [mobileMaxWidth]);
 
-  const { w, h, activeSlot } = useMemo(() => {
-    if (isMobile) return { w: 320, h: 50, activeSlot: mobileSlot };
-    return { w: 728, h: 90, activeSlot: slot };
-  }, [isMobile, mobileSlot, slot]);
+  // If we don't know yet (SSR -> hydration), render nothing to avoid wrong-size flash
+  if (isMobile === null) return null;
 
-  // Force a fresh <ins> per route so AdSense re-initializes
+  const width = isMobile ? 320 : 728;
+  const height = isMobile ? 50 : 90;
+  const slot = isMobile ? mobileSlot : desktopSlot;
+
+  // Force a fresh <ins> per route + mode so AdSense re-initializes
   const insKey = useMemo(
-    () => `footer:${pathname}:${activeSlot}`,
-    [pathname, activeSlot]
+    () => `footer:${pathname}:${slot}:${width}x${height}`,
+    [pathname, slot, width, height]
   );
 
-  // allow push again whenever route or slot changes
   useEffect(() => {
     pushedRef.current = false;
-  }, [pathname, activeSlot]);
 
-  useEffect(() => {
-    if (pushedRef.current) return;
-
-    const run = () => {
+    const t = window.setTimeout(() => {
+      if (pushedRef.current) return;
       safePushAds();
       pushedRef.current = true;
-    };
+    }, 120);
 
-    // small delay so the <ins> exists in DOM and script is ready
-    const t = window.setTimeout(run, 80);
     return () => window.clearTimeout(t);
-  }, [pathname, activeSlot]);
+  }, [pathname, slot, width, height]);
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-3 pb-6 pt-10">
@@ -73,9 +75,9 @@ export default function FooterAd({
           <ins
             key={insKey}
             className="adsbygoogle"
-            style={{ display: "inline-block", width: w, height: h }}
+            style={{ display: "inline-block", width, height }}
             data-ad-client={client}
-            data-ad-slot={activeSlot}
+            data-ad-slot={slot}
           />
         </div>
       </div>

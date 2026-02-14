@@ -108,7 +108,12 @@ export default function RootLayout({
 
           {/* In-flow footer ad at the true bottom */}
           <div className="mt-10 pb-10">
-            <FooterAd client="ca-pub-9530220531970117" slot="8145648829" />
+            <FooterAd
+  client="ca-pub-9530220531970117"
+  desktopSlot="8145648829"
+  mobileSlot="3438350693"
+/>
+
           </div>
         </div>
 
