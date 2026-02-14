@@ -33,20 +33,20 @@ const PATCH_NOTES: { weapon: string; change: PatchChange; details: string }[] = 
     weapon: 'DS20 Mirage (18.9" Westerlies Barrel)',
     change: "Buff",
     details:
-      "Mid-Range Barrel update: now grants ~7% ADS movement speed; Medium Damage Range 1 benefit improved (25% â†’ 35%).",
+      "Mid-Range Barrel update: now grants ~7% ADS movement speed; Medium Damage Range 1 benefit improved (25% - 35%).",
   },
 
   {
     weapon: "M15 MOD 0",
     change: "Buff",
     details:
-      "Max damage 32â†’33 and max range extended (0-38m â†’ 0-45m). Min damage 22â†’24; breakpoints pushed out. Bullet velocity 880â†’900.",
+      "Max damage 32-33 and max range extended (0-38m - 0-45m). Min damage 22-24; breakpoints pushed out. Bullet velocity 880-900.",
   },
   {
     weapon: "Maddox RFB",
     change: "Buff",
     details:
-      "Mid damage 28â†’29 and mid range extends (37-48m â†’ 37-60m). Bullet velocity 650â†’870; vertical recoil reduced ~5%.",
+      "Mid damage 28-29 and mid range extends (37-48m â†’ 37-60m). Bullet velocity 650â†’870; vertical recoil reduced ~5%.",
   },
   {
     weapon: "MXR-17",

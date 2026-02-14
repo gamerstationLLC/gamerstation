@@ -3,10 +3,9 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import AdSenseSideRails from "./_components/AdSenseSideRails";
 import AdSenseAnchorSpacer from "./_components/AdSenseAnchorSpacer";
 import FooterAd from "./_components/FooterAd";
-import AdSenseDismissibleDock from "./_components/AdSenseDismissibleDock";
+import GlobalAds from "./_components/GlobalAds";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,11 +43,7 @@ export default function RootLayout({
           href="https://pagead2.googlesyndication.com"
           crossOrigin=""
         />
-        <link
-          rel="preconnect"
-          href="https://googleads.g.doubleclick.net"
-          crossOrigin=""
-        />
+        <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossOrigin="" />
         <link rel="preconnect" href="https://tpc.googlesyndication.com" crossOrigin="" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
@@ -72,11 +67,11 @@ export default function RootLayout({
           textRendering: "geometricPrecision",
         }}
       >
-        {/* ✅ Desktop-only side rails (component handles lg+ only) */}
-        <AdSenseSideRails />
-
-        {/* Safe-area helper / bottom breathing room */}
+        {/* small spacer (harmless) */}
         <AdSenseAnchorSpacer />
+
+        {/* Desktop rails + dismissible dock (dock remounts per route) */}
+        <GlobalAds />
 
         {/* Global background */}
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
@@ -111,12 +106,11 @@ export default function RootLayout({
         <div className="relative z-10 min-h-[100dvh] bg-transparent [isolation:isolate]">
           {children}
 
-          {/* ✅ In-flow footer ad at the true bottom (responsive scaling) */}
-          <FooterAd client="ca-pub-9530220531970117" slot="8145648829" />
+          {/* In-flow footer ad at the true bottom (sticky footers will naturally sit above it) */}
+          <div className="mt-10 pb-10">
+            <FooterAd client="ca-pub-9530220531970117" slot="8145648829" />
+          </div>
         </div>
-
-        {/* ✅ Global X-able dock (responsive scaling + reload per route) */}
-        <AdSenseDismissibleDock client="ca-pub-9530220531970117" slot="8145648829" />
 
         <Analytics />
       </body>
