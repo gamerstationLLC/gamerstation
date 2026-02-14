@@ -4,7 +4,7 @@ import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import AdSenseSideRails from "./_components/AdSenseSideRails";
-import AdSenseBottomBar from "./_components/AdSenseBottomBar";
+import AdSenseDismissibleDock from "./_components/AdSenseDismissibleDock";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,9 +37,21 @@ export default function RootLayout({
         />
 
         {/* Warm up ad network connections */}
-        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="" />
-        <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossOrigin="" />
-        <link rel="preconnect" href="https://tpc.googlesyndication.com" crossOrigin="" />
+        <link
+          rel="preconnect"
+          href="https://pagead2.googlesyndication.com"
+          crossOrigin=""
+        />
+        <link
+          rel="preconnect"
+          href="https://googleads.g.doubleclick.net"
+          crossOrigin=""
+        />
+        <link
+          rel="preconnect"
+          href="https://tpc.googlesyndication.com"
+          crossOrigin=""
+        />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
         <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
@@ -66,7 +78,10 @@ export default function RootLayout({
         <AdSenseSideRails />
 
         {/* Global background */}
-        <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 -z-10"
+        >
           <div
             className="absolute inset-0"
             style={{
@@ -100,9 +115,11 @@ export default function RootLayout({
         </div>
 
         {/* Slim, X-able bottom bar ad (global) */}
-        <AdSenseBottomBar
+        <AdSenseDismissibleDock
           client="ca-pub-9530220531970117"
           slot="8335454155"
+          zIndex={99999} // ✅ ensures it sits above any page sticky footer
+          storageKey="gs_dismiss_ad_dock_v1"
         />
 
         <Analytics />
