@@ -19,13 +19,25 @@ type AccountByPuuid = {
 };
 
 type SummonerV4 = {
-  id: string;
+  id: string; // ✅ encryptedSummonerId (needed for LP)
   accountId: string;
   puuid: string;
   name: string;
   profileIconId: number;
   revisionDate: number;
   summonerLevel: number;
+};
+
+type LeagueEntryV4 = {
+  leagueId: string;
+  queueType: string; // "RANKED_SOLO_5x5" | "RANKED_FLEX_SR" | ...
+  tier: string; // "CHALLENGER" | "GRANDMASTER" | ...
+  rank: string; // "I" | "II" | ...
+  summonerId: string;
+  summonerName: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
 };
 
 type MatchV5 = {
@@ -83,6 +95,17 @@ type SummonerProfileData = {
   cluster: string;
   puuid: string;
   summoner: { profileIconId: number; summonerLevel: number };
+
+  // ✅ NEW: Ranked (LP) info for header
+  ranked?: {
+    queue: "RANKED_SOLO_5x5" | "RANKED_FLEX_SR" | string;
+    tier: string;
+    rank: string;
+    lp: number;
+    wins: number;
+    losses: number;
+  } | null;
+
   summary: {
     games: number;
     wins: number;
@@ -117,7 +140,7 @@ type SummonerProfileData = {
     dmgToChamps: number;
     vision: number;
     items: number[];
-    players?: MatchPlayers; // ✅ NEW: used by desktop-only Players panel
+    players?: MatchPlayers;
   }>;
   meta: {
     ddVersion?: string;
@@ -278,6 +301,25 @@ async function detectPlatformByPuuid(
   return null;
 }
 
+function pickRanked(entries: LeagueEntryV4[] | null) {
+  if (!Array.isArray(entries) || entries.length === 0) return null;
+
+  // Prefer Solo > Flex
+  const solo = entries.find((e) => e.queueType === "RANKED_SOLO_5x5");
+  const flex = entries.find((e) => e.queueType === "RANKED_FLEX_SR");
+  const e = solo ?? flex ?? entries[0];
+  if (!e) return null;
+
+  return {
+    queue: e.queueType,
+    tier: e.tier,
+    rank: e.rank,
+    lp: e.leaguePoints,
+    wins: e.wins,
+    losses: e.losses,
+  };
+}
+
 /* ---------------------------
    Page
 --------------------------- */
@@ -336,6 +378,17 @@ export default async function SummonerProfilePage({
   const cluster = platformToCluster(platform);
   const summoner = detected.summoner;
 
+  // ✅ 2.5) Ranked (LP) — League-V4 (platform routing)
+  const leagueUrl = `${riotHostForPlatform(platform)}/lol/league/v4/entries/by-summoner/${encodeURIComponent(
+    summoner.id
+  )}`;
+  const leagueEntries = await riotFetchJson<LeagueEntryV4[]>(leagueUrl, {
+    attempts: 2,
+    softFail: true,
+    revalidate: 300,
+  });
+  const ranked = pickRanked(leagueEntries);
+
   // 3) Match IDs
   const matchIdsUrl = `${riotHostForCluster(cluster)}/lol/match/v5/matches/by-puuid/${encodeURIComponent(
     account.puuid
@@ -370,7 +423,11 @@ export default async function SummonerProfilePage({
   // Fetch in a controlled way; soft-fail so page still loads even if Riot is cranky.
   const accountResults = await mapLimit(uniquePuuids, 6, async (puuid) => {
     const url = `${riotHostForCluster(cluster)}/riot/account/v1/accounts/by-puuid/${encodeURIComponent(puuid)}`;
-    const a = await riotFetchJson<AccountByPuuid>(url, { attempts: 2, softFail: true, revalidate: 300 });
+    const a = await riotFetchJson<AccountByPuuid>(url, {
+      attempts: 2,
+      softFail: true,
+      revalidate: 300,
+    });
     return { puuid, a };
   });
 
@@ -387,7 +444,6 @@ export default async function SummonerProfilePage({
 
       const cs = (me.totalMinionsKilled || 0) + (me.neutralMinionsKilled || 0);
 
-      // ✅ NEW: players per match (blue/red), enriched with RiotID if available
       const blue = m.info.participants
         .filter((p) => p.teamId === 100)
         .map((p) => {
@@ -470,6 +526,10 @@ export default async function SummonerProfilePage({
     cluster,
     puuid: account.puuid,
     summoner: { profileIconId: summoner.profileIconId, summonerLevel: summoner.summonerLevel },
+
+    // ✅ passes to client (so LP stops showing —)
+    ranked,
+
     summary: {
       games: rows.length,
       wins,
@@ -498,7 +558,6 @@ export default async function SummonerProfilePage({
 
   return (
     <main className="min-h-screen bg-transparent text-white px-5 py-5">
-      {/* ✅ keep mobile the same, constrain desktop */}
       <div className="mx-auto w-full max-w-6xl lg:max-w-4xl xl:max-w-5xl">
         <header className="flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-3">

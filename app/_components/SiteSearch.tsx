@@ -5,18 +5,23 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type Entry = {
-  href: string; // path only (e.g. "/tools/lol/summoner/na1/...")
-  label: string;
+  href: string; // path only
+  label: string; // fallback label (path-derived)
+  display?: string; // resolved H1/title (cached)
 };
 
-function toLabelFromPath(path: string) {
-  const clean = path.split("?")[0].split("#")[0];
-  const parts = clean
-    .split("/")
+function titleCaseSegment(seg: string) {
+  const s = decodeURIComponent(seg || "")
+    .replace(/[-_]+/g, " ")
+    .trim();
+  if (!s) return "";
+  // keep acronyms like "ttk" -> "TTK"
+  if (s.length <= 4 && /^[a-z0-9 ]+$/.test(s)) return s.toUpperCase();
+  return s
+    .split(" ")
     .filter(Boolean)
-    .map((p) => decodeURIComponent(p).replace(/[-_]+/g, " "));
-  if (parts.length === 0) return "Home";
-  return parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" / ");
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 function normalizePathFromUrl(url: string) {
@@ -27,6 +32,23 @@ function normalizePathFromUrl(url: string) {
     if (!url.startsWith("/")) return `/${url}`;
     return url;
   }
+}
+
+function toLabelFromPath(path: string) {
+  const clean = path.split("?")[0].split("#")[0];
+  const parts = clean.split("/").filter(Boolean).map(titleCaseSegment);
+  if (parts.length === 0) return "Home";
+  return parts.join(" / ");
+}
+
+function dedupePaths(paths: string[]) {
+  const set = new Set<string>();
+  for (const p of paths) {
+    const clean = p.split("?")[0].split("#")[0];
+    const normalized = clean !== "/" ? clean.replace(/\/+$/, "") : "/";
+    set.add(normalized);
+  }
+  return Array.from(set);
 }
 
 async function fetchSitemapPaths(): Promise<string[]> {
@@ -42,7 +64,9 @@ async function fetchSitemapPaths(): Promise<string[]> {
       const doc = parser.parseFromString(xmlText, "application/xml");
 
       // Sitemap index → fetch children
-      const sitemapLocs = Array.from(doc.querySelectorAll("sitemapindex sitemap loc"))
+      const sitemapLocs = Array.from(
+        doc.querySelectorAll("sitemapindex sitemap loc"),
+      )
         .map((n) => n.textContent?.trim())
         .filter(Boolean) as string[];
 
@@ -81,14 +105,82 @@ async function fetchSitemapPaths(): Promise<string[]> {
   return [];
 }
 
-function dedupePaths(paths: string[]) {
-  const set = new Set<string>();
-  for (const p of paths) {
-    const clean = p.split("?")[0].split("#")[0];
-    const normalized = clean !== "/" ? clean.replace(/\/+$/, "") : "/";
-    set.add(normalized);
+// ✅ Turn <title> "Something | GamerStation" into "Something"
+function cleanTitle(t: string) {
+  const s = (t || "").trim();
+  if (!s) return "";
+  return s.replace(/\s*\|\s*GamerStation.*$/i, "").trim();
+}
+
+// ✅ Fetch H1 (preferred) or Title from same-origin HTML
+async function fetchDisplayForPath(path: string): Promise<string> {
+  if (!path || path.startsWith("/api")) return "";
+
+  const res = await fetch(path, {
+    cache: "force-cache",
+    credentials: "same-origin",
+  });
+  if (!res.ok) return "";
+
+  const html = await res.text();
+  const doc = new DOMParser().parseFromString(html, "text/html");
+
+  const h1 = doc.querySelector("h1")?.textContent?.trim() || "";
+  if (h1) return h1;
+
+  const title = doc.querySelector("title")?.textContent?.trim() || "";
+  return cleanTitle(title);
+}
+
+/**
+ * ✅ The key: immediate, stable display title derived from href.
+ * This prevents the breadcrumb flash / switching.
+ */
+function immediateTitleFromHref(href: string, fallbackLabel: string) {
+  const clean = (href || "/").split("?")[0].split("#")[0];
+  if (clean === "/" || clean === "") return "Home";
+
+  const parts = clean.split("/").filter(Boolean);
+
+  // Special-case: LoL Champion index page
+  if (clean === "/calculators/lol/champions") return "LoL Champion Index";
+
+  // Special-case: Champion detail pages → last segment is champ id/name
+  if (parts.length >= 4 && parts[0] === "calculators" && parts[1] === "lol" && parts[2] === "champions") {
+    const champ = titleCaseSegment(parts[3] || "");
+    if (champ) return champ;
   }
-  return Array.from(set);
+
+  // Generic: last segment (nice-looking)
+  const last = titleCaseSegment(parts[parts.length - 1] || "");
+  if (last && !/^\d+$/.test(last)) return last;
+
+  // Worst case fallback
+  return fallbackLabel || toLabelFromPath(clean);
+}
+
+/**
+ * Optional context line. For your case this makes champs feel clean:
+ * Title: "Akali"
+ * Context: "LoL Champions"
+ */
+function contextFromHref(href: string) {
+  const clean = (href || "/").split("?")[0].split("#")[0];
+  const parts = clean.split("/").filter(Boolean);
+
+  if (clean === "/calculators/lol/champions") return "Calculators";
+  if (parts[0] === "calculators" && parts[1] === "lol" && parts[2] === "champions") return "LoL Champions";
+  if (parts[0] === "calculators" && parts[1] === "lol") return "LoL Calculators";
+  if (parts[0] === "tools" && parts[1] === "lol") return "LoL Tools";
+  if (parts[0] === "tools" && parts[1] === "dota") return "Dota Tools";
+
+  // A light generic context: parent path (without showing slashes to users)
+  if (parts.length >= 2) {
+    const parent = titleCaseSegment(parts[parts.length - 2]);
+    return parent || "";
+  }
+
+  return "";
 }
 
 const FALLBACK: Entry[] = [
@@ -117,6 +209,11 @@ export default function SiteSearch() {
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  // href -> display cache (memory)
+  const displayCacheRef = useRef<Map<string, string>>(new Map());
+  // in-flight fetches (avoid duplicate)
+  const inflightRef = useRef<Map<string, Promise<string>>>(new Map());
 
   useEffect(() => {
     let cancelled = false;
@@ -156,14 +253,18 @@ export default function SiteSearch() {
     const maybePath = q.includes("gamerstation.gg")
       ? normalizePathFromUrl(q)
       : q.startsWith("/")
-      ? q
-      : "";
+        ? q
+        : "";
 
     const scored = entries
       .map((e) => {
-        const hay = `${e.label} ${e.href}`.toLowerCase();
-        let score = 0;
+        const immediate = immediateTitleFromHref(e.href, e.label);
+        const display = e.display || immediate;
 
+        // ✅ Search uses display + label + href, but UI won’t show href.
+        const hay = `${display} ${e.label} ${e.href}`.toLowerCase();
+
+        let score = 0;
         if (maybePath && e.href.toLowerCase() === maybePath) score += 1000;
         if (e.href.toLowerCase() === q) score += 800;
         if (hay.includes(q)) score += 200;
@@ -173,8 +274,8 @@ export default function SiteSearch() {
           if (hay.includes(t)) score += 25;
         }
 
-        if (e.label.toLowerCase().startsWith(q)) score += 50;
-        if (e.href.toLowerCase().startsWith(q)) score += 50;
+        if (display.toLowerCase().startsWith(q)) score += 80;
+        if (e.label.toLowerCase().startsWith(q)) score += 40;
 
         return { e, score };
       })
@@ -185,6 +286,91 @@ export default function SiteSearch() {
 
     return scored.length > 0 ? scored : entries.slice(0, 10);
   }, [entries, query]);
+
+  // ✅ Resolve titles for visible results, but only "upgrade" if better than immediate title
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+
+    const keyPrefix = "gs:searchDisplay:";
+
+    async function ensureDisplay(href: string) {
+      const mem = displayCacheRef.current.get(href);
+      if (mem) return mem;
+
+      try {
+        const ss = sessionStorage.getItem(keyPrefix + href);
+        if (ss) {
+          displayCacheRef.current.set(href, ss);
+          return ss;
+        }
+      } catch {}
+
+      const inflight = inflightRef.current.get(href);
+      if (inflight) return inflight;
+
+      const p = (async () => {
+        try {
+          const display = await fetchDisplayForPath(href);
+          const finalDisplay = (display || "").trim();
+          if (finalDisplay) {
+            displayCacheRef.current.set(href, finalDisplay);
+            try {
+              sessionStorage.setItem(keyPrefix + href, finalDisplay);
+            } catch {}
+          }
+          return finalDisplay;
+        } catch {
+          return "";
+        } finally {
+          inflightRef.current.delete(href);
+        }
+      })();
+
+      inflightRef.current.set(href, p);
+      return p;
+    }
+
+    (async () => {
+      const visible = results.slice(0, 10);
+      const updates: Array<{ href: string; display: string }> = [];
+
+      for (const r of visible) {
+        const fetched = await ensureDisplay(r.href);
+        if (cancelled) return;
+        if (!fetched) continue;
+
+        // ✅ only apply if it improves on what we already show
+        const immediate = immediateTitleFromHref(r.href, r.label);
+        const isBetter =
+          fetched.trim().length > 0 &&
+          fetched.trim().toLowerCase() !== immediate.trim().toLowerCase();
+
+        // If fetched is same as immediate, we can skip updating to avoid any rerender “switch”
+        if (isBetter) updates.push({ href: r.href, display: fetched.trim() });
+      }
+
+      if (cancelled || updates.length === 0) return;
+
+      setEntries((prev) => {
+        const map = new Map(updates.map((u) => [u.href, u.display]));
+        let changed = false;
+        const next = prev.map((e) => {
+          const d = map.get(e.href);
+          if (d && e.display !== d) {
+            changed = true;
+            return { ...e, display: d };
+          }
+          return e;
+        });
+        return changed ? next : prev;
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, results]);
 
   useEffect(() => {
     setActive(0);
@@ -262,8 +448,6 @@ export default function SiteSearch() {
           "
           aria-label="Search GamerStation pages"
         />
-
-        
       </div>
 
       {open && results.length > 0 && (
@@ -284,6 +468,13 @@ export default function SiteSearch() {
           <div className="max-h-[260px] sm:max-h-[320px] overflow-auto p-2">
             {results.map((r, idx) => {
               const isActive = idx === active;
+
+              // ✅ immediate = stable (no breadcrumb flash)
+              const immediate = immediateTitleFromHref(r.href, r.label);
+              const display = (r.display || immediate).trim() || immediate;
+
+              const ctx = contextFromHref(r.href);
+
               return (
                 <button
                   key={r.href}
@@ -295,8 +486,19 @@ export default function SiteSearch() {
                     ${isActive ? "bg-white/10" : "hover:bg-white/5"}
                   `}
                 >
-                  <div className="text-sm font-semibold text-white/90 truncate">{r.label}</div>
-                  <div className="mt-0.5 text-xs text-neutral-400 truncate">{r.href}</div>
+                  <div className="text-sm font-semibold text-white/90 truncate">
+                    {display}
+                  </div>
+
+                  {/* ✅ optional context line (no slashes) */}
+                  {ctx ? (
+                    <div className="mt-0.5 text-xs text-neutral-400 truncate">
+                      {ctx}
+                    </div>
+                  ) : null}
+
+                  {/* keep href for accessibility/search/debug but never show it */}
+                  <span className="sr-only">{r.href}</span>
                 </button>
               );
             })}
@@ -304,7 +506,9 @@ export default function SiteSearch() {
 
           <div className="flex items-center justify-between border-t border-white/10 px-3 py-2 text-[11px] text-neutral-500">
             <span className="truncate">↑↓ • Enter to open • Esc to close</span>
-            <span className="shrink-0 text-neutral-600">{entries === FALLBACK ? "fallback" : "sitemap"}</span>
+            <span className="shrink-0 text-neutral-600">
+              {entries === FALLBACK ? "fallback" : "sitemap"}
+            </span>
           </div>
         </div>
       )}

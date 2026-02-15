@@ -474,17 +474,7 @@ export default function PokemonCatchCalcClient(props: { games: GameDef[] }) {
         ) : (
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-4">
-              {selectedMon.sprite ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={selectedMon.sprite}
-                  alt={monDisplayName(selectedMon)}
-                  className="h-20 w-20 rounded-xl border border-neutral-800 bg-neutral-950 object-contain"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="h-20 w-20 rounded-xl border border-neutral-800 bg-neutral-950" />
-              )}
+              
 
               <div>
                 <div className="text-lg font-black tracking-tight">

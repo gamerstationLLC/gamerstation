@@ -215,7 +215,7 @@ function StatTile({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-/** ✅ Compact stat tile for match rows (keeps row short) */
+/** Compact stat tile for match rows */
 function StatTileSm({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-2xl border border-neutral-800 bg-black/35 px-2.5 py-2">
@@ -237,7 +237,7 @@ function Chip({ label, value }: { label: string; value: string }) {
   );
 }
 
-/** ✅ Smaller chip for tight match rows */
+/** Smaller chip for match rows */
 function ChipSm({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-full border border-neutral-800 bg-black/30 px-2.5 py-1 text-[10px] font-semibold text-neutral-200">
@@ -287,7 +287,6 @@ async function fetchModeMatches(args: {
     limit: String(args.limit),
   });
 
-  // If you DID NOT create mode-recent, keep recent local and never call fetch for it.
   if (args.mode === "recent") return [];
 
   const route =
@@ -445,20 +444,20 @@ function ItemIcon({
   function computePos() {
     if (!btnRef.current) return;
     const r = btnRef.current.getBoundingClientRect();
-
-    // Desktop-ish floating card near icon; keep on-screen
     const cardW = 320;
     const pad = 12;
 
-    const left = Math.max(pad, Math.min(r.left + r.width / 2 - cardW / 2, window.innerWidth - cardW - pad));
-    const top = Math.min(r.bottom + 10, window.innerHeight - 12); // clamped; actual height handled by max-h
+    const left = Math.max(
+      pad,
+      Math.min(r.left + r.width / 2 - cardW / 2, window.innerWidth - cardW - pad)
+    );
+    const top = Math.min(r.bottom + 10, window.innerHeight - 12);
 
     setPos({ top, left, width: cardW });
   }
 
   function openPanel() {
     setOpen(true);
-    // compute immediately + after layout
     requestAnimationFrame(() => computePos());
   }
 
@@ -466,7 +465,6 @@ function ItemIcon({
     setOpen(false);
   }
 
-  // Reposition on scroll/resize when open (desktop)
   useEffect(() => {
     if (!open || isMobile) return;
 
@@ -480,7 +478,6 @@ function ItemIcon({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isMobile]);
 
-  // Close on outside click + Esc
   useEffect(() => {
     if (!open) return;
 
@@ -519,7 +516,6 @@ function ItemIcon({
 
       {open ? (
         <div className="fixed inset-0 z-[9999]">
-          {/* Backdrop */}
           <button
             type="button"
             aria-label="Close item details"
@@ -527,7 +523,6 @@ function ItemIcon({
             className="absolute inset-0 bg-black/40"
           />
 
-          {/* Mobile: bottom sheet (good UX, no careless expansion) */}
           {isMobile ? (
             <div
               ref={panelRef}
@@ -564,7 +559,6 @@ function ItemIcon({
               </div>
             </div>
           ) : (
-            // Desktop: floating card positioned near item, clamped on screen
             <div
               ref={panelRef}
               className="absolute rounded-2xl border border-neutral-800 bg-black/95 p-3 shadow-[0_0_30px_rgba(0,255,255,0.08)]"
@@ -618,8 +612,7 @@ function PlayersPanelCompact({
     "rounded-md border border-neutral-800 bg-black/25 px-2 py-[5px] text-[9px] font-semibold leading-tight transition min-w-0";
 
   const render = (p: PlayerRef, key: string) => {
-    const label =
-      p.gameName && p.tagLine ? `${p.gameName}#${p.tagLine}` : p.summonerName ?? "—";
+    const label = p.gameName && p.tagLine ? `${p.gameName}#${p.tagLine}` : p.summonerName ?? "—";
     const clickable = Boolean(p.gameName && p.tagLine);
 
     const content = <span className="block truncate">{label}</span>;
@@ -642,9 +635,7 @@ function PlayersPanelCompact({
 
   return (
     <div className={`rounded-3xl border border-neutral-800 bg-black/18 p-3 flex flex-col ${className}`}>
-      <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-        Players
-      </div>
+      <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">Players</div>
 
       <div className="mt-2 grid grid-cols-2 gap-2 min-w-0">
         <div className="min-w-0">
@@ -660,6 +651,539 @@ function PlayersPanelCompact({
             {red.map((p, i) => render(p, `r-${i}-${p.gameName ?? p.summonerName ?? "x"}`))}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------
+   Teammate rank fetch + compute
+--------------------------- */
+
+const MATCH_DETAILS_ROUTE = "/api/tools/lol/match-details";
+
+type RiotParticipantLite = {
+  puuid?: string;
+  teamId?: number;
+  championName?: string;
+
+  visionScore?: number;
+  totalDamageDealtToChampions?: number;
+  goldEarned?: number;
+
+  totalMinionsKilled?: number;
+  neutralMinionsKilled?: number;
+
+  // ✅ add these for teammate ranks
+  kills?: number;
+  deaths?: number;
+
+  // some APIs may already provide "cs"
+  cs?: number;
+};
+
+function pickParticipants(payload: any): RiotParticipantLite[] {
+  const parts =
+    payload?.participants ??
+    payload?.info?.participants ??
+    payload?.match?.info?.participants ??
+    payload?.data?.info?.participants;
+
+  return Array.isArray(parts) ? parts : [];
+}
+
+function safeNum(n: any) {
+  const v = Number(n);
+  return Number.isFinite(v) ? v : 0;
+}
+
+function csFrom(p: RiotParticipantLite) {
+  if (Number.isFinite(Number(p.cs))) return safeNum(p.cs);
+  return safeNum(p.totalMinionsKilled) + safeNum(p.neutralMinionsKilled);
+}
+
+function rankAmongDesc(values: number[], target: number) {
+  // rank = 1 + count of values strictly greater than target (tie-safe)
+  let better = 0;
+  for (const v of values) if (v > target) better += 1;
+  return better + 1;
+}
+
+/** ✅ Compact teammate "pill" (grid-friendly) */
+function RankPill({
+  label,
+  value,
+  rank,
+  n,
+}: {
+  label: string;
+  value: string;
+  rank: number | null;
+  n: number | null;
+}) {
+  return (
+    <div className="rounded-2xl border border-neutral-800 bg-black/25 px-3 py-2">
+      <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
+        {label}
+      </div>
+      <div className="mt-0.5 text-[14px] font-black text-white">{value}</div>
+      <div className="mt-0.5 text-[11px] font-semibold text-neutral-300">
+        Team:{" "}
+        <span className="text-white font-black">{rank && n ? `${rank}/${n}` : "—"}</span>
+      </div>
+    </div>
+  );
+}
+
+async function fetchMatchDetails(args: {
+  matchId: string;
+  cluster: string;
+  puuid: string;
+  signal?: AbortSignal;
+}) {
+  const qs = new URLSearchParams({
+    matchId: args.matchId,
+    cluster: args.cluster,
+    puuid: args.puuid,
+  });
+
+  const url = `${MATCH_DETAILS_ROUTE}?${qs.toString()}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    signal: args.signal,
+    headers: { Accept: "application/json" },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to load match details (${res.status})`);
+  }
+
+  return res.json();
+}
+
+function computeTeammateRanks(payload: any, ownerPuuid: string) {
+  const parts = pickParticipants(payload);
+  if (parts.length < 8) return null;
+
+  const me = parts.find((p) => p?.puuid && p.puuid === ownerPuuid) ?? null;
+  if (!me || typeof me.teamId !== "number") return null;
+
+  const team = parts.filter((p) => p?.teamId === me.teamId);
+  if (team.length < 2) return null;
+
+  const teamVision = team.map((p) => safeNum(p.visionScore));
+  const teamDmg = team.map((p) => safeNum(p.totalDamageDealtToChampions));
+  const teamGold = team.map((p) => safeNum(p.goldEarned));
+  const teamCs = team.map((p) => csFrom(p));
+  const teamKills = team.map((p) => safeNum(p.kills));
+  const teamDeaths = team.map((p) => safeNum(p.deaths));
+
+  const myVision = safeNum(me.visionScore);
+  const myDmg = safeNum(me.totalDamageDealtToChampions);
+  const myGold = safeNum(me.goldEarned);
+  const myCs = csFrom(me);
+  const myKills = safeNum(me.kills);
+  const myDeaths = safeNum(me.deaths);
+
+  const n = team.length;
+
+  return {
+    n,
+    vision: { value: myVision, rank: rankAmongDesc(teamVision, myVision) },
+    dmg: { value: myDmg, rank: rankAmongDesc(teamDmg, myDmg) },
+    gold: { value: myGold, rank: rankAmongDesc(teamGold, myGold) },
+    cs: { value: myCs, rank: rankAmongDesc(teamCs, myCs) },
+    kills: { value: myKills, rank: rankAmongDesc(teamKills, myKills) },
+    deaths: { value: myDeaths, rank: rankAmongDesc(teamDeaths, myDeaths) },
+  };
+}
+
+/* ---------------------------
+   Match card (hooks-safe)
+--------------------------- */
+
+function MatchCard({
+  m,
+  ddVersion,
+  itemDb,
+  ownerPuuid,
+  cluster,
+}: {
+  m: MatchRow;
+  ddVersion: string;
+  itemDb: Record<string, DdItem> | null;
+  ownerPuuid: string;
+  cluster: string;
+}) {
+  const [openRanks, setOpenRanks] = useState(false); // ✅ auto-collapsed on initial load
+  const [rankLoading, setRankLoading] = useState(false);
+  const [rankErr, setRankErr] = useState("");
+  const [rankData, setRankData] = useState<ReturnType<typeof computeTeammateRanks> | null>(null);
+
+  const abortRef = useRef<AbortController | null>(null);
+
+  const slug = useMemo(() => champKeyToSlug(m.champ), [m.champ]);
+  const champIcon = useMemo(
+    () => `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/${m.champ}.png`,
+    [ddVersion, m.champ]
+  );
+
+  const minutes = m.durationSec ? m.durationSec / 60 : 0;
+  const csPerMin = minutes ? m.cs / minutes : 0;
+  const goldPerMin = minutes ? m.gold / minutes : 0;
+
+  // Fetch teammate ranks only when opened the first time
+  useEffect(() => {
+    if (!openRanks) return;
+    if (rankData || rankLoading) return;
+
+    let cancelled = false;
+    setRankErr("");
+    setRankLoading(true);
+
+    abortRef.current?.abort();
+    const ac = new AbortController();
+    abortRef.current = ac;
+
+    (async () => {
+      try {
+        const payload = await fetchMatchDetails({
+          matchId: m.matchId,
+          cluster,
+          puuid: ownerPuuid,
+          signal: ac.signal,
+        });
+
+        if (cancelled) return;
+
+        const computed = computeTeammateRanks(payload, ownerPuuid);
+        if (!computed) {
+          setRankErr("Teammate comparison isn’t available for this match (missing participant stats).");
+          setRankData(null);
+        } else {
+          setRankData(computed);
+        }
+      } catch (e) {
+        if (cancelled) return;
+        const msg = e instanceof Error ? e.message : "Failed to load match details.";
+        setRankErr(msg);
+        setRankData(null);
+      } finally {
+        if (!cancelled) setRankLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      ac.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openRanks, m.matchId, cluster, ownerPuuid]);
+
+  return (
+    <div
+      className={`rounded-3xl border ${
+        m.win ? "border-emerald-900/50" : "border-rose-900/40"
+      } bg-black/40 p-3 transition hover:border-neutral-600`}
+    >
+      {/* ✅ Desktop */}
+      <div className="hidden md:grid md:grid-cols-[minmax(0,1fr)_240px_300px] md:gap-3 md:items-stretch">
+        {/* LEFT */}
+        <div className="min-w-0 rounded-3xl border border-neutral-800 bg-black/18 p-3">
+          <div className="flex items-start gap-3">
+            <Link
+              href={champHref(slug)}
+              className="group relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-neutral-800 bg-black shadow-[0_0_25px_rgba(0,255,255,0.08)]"
+              title={`Open ${m.champ} page`}
+              aria-label={`Open ${m.champ} page`}
+            >
+              <img
+                src={champIcon}
+                alt={`${m.champ} icon`}
+                className="h-full w-full object-cover transition group-hover:scale-[1.03]"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            </Link>
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 truncate text-[17px] font-black">{m.champ}</div>
+                <span
+                  className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+                    m.win
+                      ? "border-emerald-900/60 bg-emerald-950/30 text-emerald-200"
+                      : "border-rose-900/60 bg-rose-950/30 text-rose-200"
+                  }`}
+                >
+                  {m.win ? "WIN" : "LOSS"}
+                </span>
+              </div>
+
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
+                <span className="rounded-full border border-neutral-800 bg-black/30 px-2.5 py-1 font-semibold text-neutral-300">
+                  {m.role || "—"}
+                </span>
+                <span className="rounded-full border border-neutral-800 bg-black/30 px-2.5 py-1 font-semibold text-neutral-300">
+                  {m.mode}
+                </span>
+                <span className="text-neutral-500">
+                  · {fmtDur(m.durationSec)} · {timeAgo(m.createdAt)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-3 grid grid-cols-4 gap-2">
+            <StatTileSm label="K / D / A" value={`${m.kills}/${m.deaths}/${m.assists}`} />
+            <StatTileSm label="KDA" value={m.kda} />
+            <StatTileSm label="CS" value={m.cs} />
+            <StatTileSm label="DMG" value={fmtNum(m.dmgToChamps)} />
+          </div>
+
+          <div className="mt-2 text-[10px] text-neutral-600">
+            Match ID: <span className="text-neutral-300">{m.matchId}</span>
+          </div>
+        </div>
+
+        {/* MIDDLE */}
+        <div className="rounded-3xl border border-neutral-800 bg-black/18 p-3 flex flex-col justify-between">
+          <div className="flex flex-col gap-2">
+            <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">Items</div>
+
+            <div className="flex flex-wrap gap-1.5">
+              <ChipSm label="CS/m" value={fmt1(csPerMin)} />
+              <ChipSm label="Gold/m" value={fmt1(goldPerMin)} />
+              <ChipSm label="Vis" value={String(m.vision ?? 0)} />
+            </div>
+          </div>
+
+          <div className="mt-2 flex flex-wrap gap-1">
+            {m.items
+              ?.filter((id) => id && id > 0)
+              .map((itemId, i) => (
+                <ItemIcon
+                  key={`${m.matchId}-item-${i}`}
+                  ddVersion={ddVersion}
+                  itemId={itemId}
+                  itemDb={itemDb}
+                  size={38}
+                />
+              ))}
+          </div>
+
+          <div className="mt-2 text-[10px] text-neutral-600">Click an item for details.</div>
+        </div>
+
+        {/* RIGHT */}
+        <PlayersPanelCompact players={m.players} className="h-full" />
+      </div>
+
+      {/* ✅ Mobile */}
+      <div className="md:hidden">
+        <div className="rounded-3xl border border-neutral-800 bg-black/18 p-3">
+          <div className="flex items-start gap-3">
+            <Link
+              href={champHref(slug)}
+              className="group relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-neutral-800 bg-black shadow-[0_0_25px_rgba(0,255,255,0.08)]"
+              title={`Open ${m.champ} page`}
+              aria-label={`Open ${m.champ} page`}
+            >
+              <img
+                src={champIcon}
+                alt={`${m.champ} icon`}
+                className="h-full w-full object-cover transition group-hover:scale-[1.03]"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            </Link>
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 truncate text-base font-black">{m.champ}</div>
+                <span
+                  className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+                    m.win
+                      ? "border-emerald-900/60 bg-emerald-950/30 text-emerald-200"
+                      : "border-rose-900/60 bg-rose-950/30 text-rose-200"
+                  }`}
+                >
+                  {m.win ? "WIN" : "LOSS"}
+                </span>
+              </div>
+
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
+                <span className="rounded-full border border-neutral-800 bg-black/35 px-2.5 py-1 font-semibold text-neutral-300">
+                  {m.role || "—"}
+                </span>
+                <span className="rounded-full border border-neutral-800 bg-black/35 px-2.5 py-1 font-semibold text-neutral-300">
+                  {m.mode}
+                </span>
+                <span className="text-neutral-500">{timeAgo(m.createdAt)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <StatTile label="K / D / A" value={`${m.kills}/${m.deaths}/${m.assists}`} />
+            <StatTile label="KDA" value={m.kda} />
+            <StatTile label="CS" value={m.cs} />
+            <StatTile label="DMG" value={fmtNum(m.dmgToChamps)} />
+          </div>
+
+          <div className="mt-3 rounded-2xl border border-neutral-800 bg-black/20 p-2.5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
+                Items
+              </div>
+
+              <div className="flex flex-wrap gap-1.5 justify-end">
+                <ChipSm label="CS/m" value={fmt1(csPerMin)} />
+                <ChipSm label="G/m" value={fmt1(goldPerMin)} />
+                <ChipSm label="Vis" value={String(m.vision ?? 0)} />
+              </div>
+            </div>
+
+            <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {(m.items ?? [])
+                .filter((id) => id && id > 0)
+                .slice(0, 7)
+                .map((itemId, i) => (
+                  <ItemIcon
+                    key={`${m.matchId}-m-item-${i}`}
+                    ddVersion={ddVersion}
+                    itemId={itemId}
+                    itemDb={itemDb}
+                    size={28}
+                  />
+                ))}
+            </div>
+
+            <div className="mt-1 text-[10px] text-neutral-600">Tap an item for details.</div>
+          </div>
+
+          <div className="mt-3">
+            <PlayersPanelCompact players={m.players} />
+          </div>
+
+          <div className="mt-3 text-[11px] text-neutral-600">
+            Match ID: <span className="text-neutral-400">{m.matchId.slice(0, 12)}…</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ✅ Teammate ranks (collapsed by default) */}
+      <div className="mt-3 rounded-3xl border border-neutral-800 bg-black/18 p-3">
+        <button
+          type="button"
+          onClick={() => setOpenRanks((v) => !v)}
+          className="flex w-full items-center justify-between gap-3 rounded-2xl border border-neutral-800 bg-black/25 px-3 py-2 text-left transition hover:border-neutral-600"
+          aria-expanded={openRanks}
+          aria-controls={`team-ranks-${m.matchId}`}
+        >
+          <div className="min-w-0">
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-neutral-500">
+              Teammate Ranks
+            </div>
+            <div className="mt-0.5 text-[12px] font-semibold text-neutral-200">
+              Vision / Damage / Gold / CS / Kills / Deaths vs your team
+            </div>
+          </div>
+
+          {/* ✅ Centered icon (no font glyph drift) */}
+          <div
+            className={`grid h-9 w-9 place-items-center rounded-2xl border border-neutral-800 bg-black/40 text-white transition ${
+              openRanks ? "rotate-45" : ""
+            }`}
+            aria-hidden
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="block"
+            >
+              <path
+                d="M12 5v14M5 12h14"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+        </button>
+
+        {openRanks ? (
+          <div id={`team-ranks-${m.matchId}`} className="mt-3 space-y-2">
+            {rankLoading ? (
+              <div className="rounded-2xl border border-neutral-800 bg-black/25 p-3 text-sm text-neutral-300">
+                Loading teammate ranks…
+              </div>
+            ) : rankErr ? (
+              <div className="rounded-2xl border border-rose-900/50 bg-rose-950/25 p-3 text-sm text-rose-200">
+                {rankErr}
+                <div className="mt-2 text-[11px] text-rose-200/80">
+                  If your server route is named differently, update{" "}
+                  <span className="font-black">MATCH_DETAILS_ROUTE</span> in this file.
+                </div>
+              </div>
+            ) : rankData ? (
+              <>
+                {/* ✅ 6 compact pills that align in columns */}
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+                  <RankPill
+                    label="Vision"
+                    value={String(rankData.vision.value)}
+                    rank={rankData.vision.rank}
+                    n={rankData.n}
+                  />
+                  <RankPill
+                    label="Damage"
+                    value={fmtNum(rankData.dmg.value)}
+                    rank={rankData.dmg.rank}
+                    n={rankData.n}
+                  />
+                  <RankPill
+                    label="Gold"
+                    value={fmtNum(rankData.gold.value)}
+                    rank={rankData.gold.rank}
+                    n={rankData.n}
+                  />
+                  <RankPill
+                    label="CS"
+                    value={String(rankData.cs.value)}
+                    rank={rankData.cs.rank}
+                    n={rankData.n}
+                  />
+                  <RankPill
+                    label="Kills"
+                    value={String(rankData.kills.value)}
+                    rank={rankData.kills.rank}
+                    n={rankData.n}
+                  />
+                  <RankPill
+                    label="Deaths"
+                    value={String(rankData.deaths.value)}
+                    rank={rankData.deaths.rank}
+                    n={rankData.n}
+                  />
+                </div>
+
+                <div className="text-[10px] text-neutral-600">
+                  Ranks are computed from Riot match participants (same team as the profile owner).
+                </div>
+              </>
+            ) : (
+              <div className="rounded-2xl border border-neutral-800 bg-black/25 p-3 text-sm text-neutral-300">
+                No teammate rank data available for this match yet.
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -688,13 +1212,11 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
     return `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/profileicon/${id}.png`;
   }, [data, ddVersion]);
 
-  // Cache per toggle: each must show last 12 matches for that mode.
   const [modeCache, setModeCache] = useState<Record<ModeFilterKey, MatchRow[]>>(() => {
     const recent = Array.isArray(data.matches) ? data.matches.slice(0, LIMIT_PER_MODE) : [];
     return { recent, ranked: [], urf: [], arena: [] };
   });
 
-  // Load matches for a mode when user clicks a toggle (and cache it).
   useEffect(() => {
     let cancelled = false;
 
@@ -730,7 +1252,6 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
         }));
       } catch (e) {
         if (cancelled) return;
-
         const msg = e instanceof Error ? e.message : `Failed to load ${modeKey} matches.`;
         setModeErr(msg);
       } finally {
@@ -837,25 +1358,23 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-col items-center gap-3 text-center lg:items-start lg:text-left">
             <div className="flex items-center gap-4">
-              {/* ✅ Fix "pinch" look: use object-contain + slight padding so it scales clean on mobile */}
               <div className="relative w-14 sm:w-16 lg:w-20 shrink-0">
-  <div className="relative aspect-square overflow-hidden rounded-3xl border border-neutral-800 bg-black shadow-[0_0_35px_rgba(0,255,255,0.18)]">
-    {summonerIconUrl ? (
-      <img
-        src={summonerIconUrl}
-        alt="Summoner icon"
-        className="absolute inset-0 h-full w-full object-cover"
-        draggable={false}
-        onError={(e) => {
-          (e.currentTarget as HTMLImageElement).style.display = "none";
-        }}
-      />
-    ) : (
-      <IconFallback text={data.riotId} />
-    )}
-  </div>
-</div>
-
+                <div className="relative aspect-square overflow-hidden rounded-3xl border border-neutral-800 bg-black shadow-[0_0_35px_rgba(0,255,255,0.18)]">
+                  {summonerIconUrl ? (
+                    <img
+                      src={summonerIconUrl}
+                      alt="Summoner icon"
+                      className="absolute inset-0 h-full w-full object-cover"
+                      draggable={false}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <IconFallback text={data.riotId} />
+                  )}
+                </div>
+              </div>
 
               <div className="min-w-0">
                 <div className="truncate text-2xl sm:text-3xl font-black tracking-tight">
@@ -865,14 +1384,11 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                 <div className="mt-2 flex flex-wrap justify-center gap-2 lg:justify-start">
                   <MetaPill>
                     Level:{" "}
-                    <span className="font-semibold text-white">
-                      {data.summoner.summonerLevel}
-                    </span>
+                    <span className="font-semibold text-white">{data.summoner.summonerLevel}</span>
                   </MetaPill>
 
                   <MetaPill>
-                    Loaded:{" "}
-                    <span className="font-semibold text-white">{statsForDisplay.games}</span>
+                    Loaded: <span className="font-semibold text-white">{statsForDisplay.games}</span>
                   </MetaPill>
 
                   <MetaPill>
@@ -913,7 +1429,7 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
           </div>
         ) : null}
 
-        {/* Mode toggle (each shows last 12 for that mode) */}
+        {/* Mode toggle */}
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm text-neutral-400">
             Pick a mode to load the <span className="text-white font-semibold">last 12</span>{" "}
@@ -1025,9 +1541,7 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
                   · {modeLabel} · last {LIMIT_PER_MODE}
                 </span>
               </div>
-              <div className="mt-1 text-sm text-neutral-400">
-                Tap a champion icon to open their page.
-              </div>
+              <div className="mt-1 text-sm text-neutral-400">Tap a champion icon to open their page.</div>
             </div>
 
             <input
@@ -1045,225 +1559,16 @@ export default function SummonerProfileClient({ data }: { data: SummonerProfileD
           ) : null}
 
           <div className="mt-4 space-y-3">
-            {filtered.map((m) => {
-              const slug = champKeyToSlug(m.champ);
-              const champIcon = `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/${m.champ}.png`;
-
-              const minutes = m.durationSec ? m.durationSec / 60 : 0;
-              const csPerMin = minutes ? m.cs / minutes : 0;
-              const goldPerMin = minutes ? m.gold / minutes : 0;
-
-              return (
-                <div
-                  key={m.matchId}
-                  className={`rounded-3xl border ${
-                    m.win ? "border-emerald-900/50" : "border-rose-900/40"
-                  } bg-black/40 p-3 transition hover:border-neutral-600`}
-                >
-                  {/* ✅ Desktop */}
-                  <div className="hidden md:grid md:grid-cols-[minmax(0,1fr)_240px_300px] md:gap-3 md:items-stretch">
-                    {/* LEFT */}
-                    <div className="min-w-0 rounded-3xl border border-neutral-800 bg-black/18 p-3">
-                      <div className="flex items-start gap-3">
-                        <Link
-                          href={champHref(slug)}
-                          className="group relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-neutral-800 bg-black shadow-[0_0_25px_rgba(0,255,255,0.08)]"
-                          title={`Open ${m.champ} page`}
-                          aria-label={`Open ${m.champ} page`}
-                        >
-                          <img
-                            src={champIcon}
-                            alt={`${m.champ} icon`}
-                            className="h-full w-full object-cover transition group-hover:scale-[1.03]"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.display = "none";
-                            }}
-                          />
-                        </Link>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <div className="min-w-0 truncate text-[17px] font-black">
-                              {m.champ}
-                            </div>
-                            <span
-                              className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
-                                m.win
-                                  ? "border-emerald-900/60 bg-emerald-950/30 text-emerald-200"
-                                  : "border-rose-900/60 bg-rose-950/30 text-rose-200"
-                              }`}
-                            >
-                              {m.win ? "WIN" : "LOSS"}
-                            </span>
-                          </div>
-
-                          <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
-                            <span className="rounded-full border border-neutral-800 bg-black/30 px-2.5 py-1 font-semibold text-neutral-300">
-                              {m.role || "—"}
-                            </span>
-                            <span className="rounded-full border border-neutral-800 bg-black/30 px-2.5 py-1 font-semibold text-neutral-300">
-                              {m.mode}
-                            </span>
-                            <span className="text-neutral-500">
-                              · {fmtDur(m.durationSec)} · {timeAgo(m.createdAt)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-3 grid grid-cols-4 gap-2">
-                        <StatTileSm
-                          label="K / D / A"
-                          value={`${m.kills}/${m.deaths}/${m.assists}`}
-                        />
-                        <StatTileSm label="KDA" value={m.kda} />
-                        <StatTileSm label="CS" value={m.cs} />
-                        <StatTileSm label="DMG" value={fmtNum(m.dmgToChamps)} />
-                      </div>
-
-                      <div className="mt-2 text-[10px] text-neutral-600">
-                        Match ID: <span className="text-neutral-300">{m.matchId}</span>
-                      </div>
-                    </div>
-
-                    {/* MIDDLE */}
-                    <div className="rounded-3xl border border-neutral-800 bg-black/18 p-3 flex flex-col justify-between">
-                      <div className="flex flex-col gap-2">
-                        <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-                          Items
-                        </div>
-
-                        <div className="flex flex-wrap gap-1.5">
-                          <ChipSm label="CS/m" value={fmt1(csPerMin)} />
-                          <ChipSm label="Gold/m" value={fmt1(goldPerMin)} />
-                          <ChipSm label="Vis" value={String(m.vision ?? 0)} />
-                        </div>
-                      </div>
-
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {m.items
-                          ?.filter((id) => id && id > 0)
-                          .map((itemId, i) => (
-                            <ItemIcon
-                              key={`${m.matchId}-item-${i}`}
-                              ddVersion={ddVersion}
-                              itemId={itemId}
-                              itemDb={itemDb}
-                              size={38}
-                            />
-                          ))}
-                      </div>
-
-                      <div className="mt-2 text-[10px] text-neutral-600">
-                        Click an item for details.
-                      </div>
-                    </div>
-
-                    {/* RIGHT */}
-                    <PlayersPanelCompact players={m.players} className="h-full" />
-                  </div>
-
-                  {/* ✅ Mobile */}
-                  <div className="md:hidden">
-                    <div className="rounded-3xl border border-neutral-800 bg-black/18 p-3">
-                      <div className="flex items-start gap-3">
-                        <Link
-                          href={champHref(slug)}
-                          className="group relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-neutral-800 bg-black shadow-[0_0_25px_rgba(0,255,255,0.08)]"
-                          title={`Open ${m.champ} page`}
-                          aria-label={`Open ${m.champ} page`}
-                        >
-                          <img
-                            src={champIcon}
-                            alt={`${m.champ} icon`}
-                            className="h-full w-full object-cover transition group-hover:scale-[1.03]"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.display = "none";
-                            }}
-                          />
-                        </Link>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <div className="min-w-0 truncate text-base font-black">
-                              {m.champ}
-                            </div>
-                            <span
-                              className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
-                                m.win
-                                  ? "border-emerald-900/60 bg-emerald-950/30 text-emerald-200"
-                                  : "border-rose-900/60 bg-rose-950/30 text-rose-200"
-                              }`}
-                            >
-                              {m.win ? "WIN" : "LOSS"}
-                            </span>
-                          </div>
-
-                          <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-neutral-400">
-                            <span className="rounded-full border border-neutral-800 bg-black/35 px-2.5 py-1 font-semibold text-neutral-300">
-                              {m.role || "—"}
-                            </span>
-                            <span className="rounded-full border border-neutral-800 bg-black/35 px-2.5 py-1 font-semibold text-neutral-300">
-                              {m.mode}
-                            </span>
-                            <span className="text-neutral-500">{timeAgo(m.createdAt)}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-3 grid grid-cols-2 gap-2">
-                        <StatTile label="K / D / A" value={`${m.kills}/${m.deaths}/${m.assists}`} />
-                        <StatTile label="KDA" value={m.kda} />
-                        <StatTile label="CS" value={m.cs} />
-                        <StatTile label="DMG" value={fmtNum(m.dmgToChamps)} />
-                      </div>
-
-                      <div className="mt-3 rounded-2xl border border-neutral-800 bg-black/20 p-2.5">
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
-                            Items
-                          </div>
-
-                          <div className="flex flex-wrap gap-1.5 justify-end">
-                            <ChipSm label="CS/m" value={fmt1(csPerMin)} />
-                            <ChipSm label="G/m" value={fmt1(goldPerMin)} />
-                            <ChipSm label="Vis" value={String(m.vision ?? 0)} />
-                          </div>
-                        </div>
-
-                        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                          {(m.items ?? [])
-                            .filter((id) => id && id > 0)
-                            .slice(0, 7)
-                            .map((itemId, i) => (
-                              <ItemIcon
-                                key={`${m.matchId}-m-item-${i}`}
-                                ddVersion={ddVersion}
-                                itemId={itemId}
-                                itemDb={itemDb}
-                                size={28}
-                              />
-                            ))}
-                        </div>
-
-                        <div className="mt-1 text-[10px] text-neutral-600">
-                          Tap an item for details.
-                        </div>
-                      </div>
-
-                      <div className="mt-3">
-                        <PlayersPanelCompact players={m.players} />
-                      </div>
-
-                      <div className="mt-3 text-[11px] text-neutral-600">
-                        Match ID:{" "}
-                        <span className="text-neutral-400">{m.matchId.slice(0, 12)}…</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {filtered.map((m) => (
+              <MatchCard
+                key={m.matchId}
+                m={m}
+                ddVersion={ddVersion}
+                itemDb={itemDb}
+                ownerPuuid={data.puuid}
+                cluster={data.cluster}
+              />
+            ))}
 
             {filtered.length === 0 ? (
               <div className="rounded-2xl border border-neutral-800 bg-black/40 p-6 text-sm text-neutral-300">

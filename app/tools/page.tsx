@@ -5,7 +5,153 @@ export const metadata = {
   description: "Stats tools, leaderboards, and utilities across games.",
 };
 
+type ToolItem = {
+  title: string;
+  desc: string;
+  href: string;
+};
+
+type GameGroup = {
+  key: string;
+  name: string;
+  subtitle?: string;
+  items: ToolItem[];
+};
+
+function GroupAccordion({
+  group,
+  defaultOpen = false,
+}: {
+  group: GameGroup;
+  defaultOpen?: boolean;
+}) {
+  return (
+    <details
+      className="
+        group rounded-2xl border border-neutral-800 bg-black/50
+        transition hover:border-neutral-600
+      "
+      open={defaultOpen}
+    >
+      <summary
+        className="
+          cursor-pointer list-none select-none
+          px-6 py-4
+          flex items-center gap-3
+        "
+      >
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-white/90">{group.name}</div>
+          {group.subtitle ? (
+            <div className="mt-1 text-xs text-neutral-400">{group.subtitle}</div>
+          ) : null}
+        </div>
+
+        <div className="ml-auto flex items-center gap-2 text-xs text-neutral-400">
+          <span>{group.items.length} tools</span>
+          <span
+            className="
+              transition-transform duration-200
+              group-open:rotate-180
+            "
+            aria-hidden
+          >
+            ▾
+          </span>
+        </div>
+      </summary>
+
+      <div className="px-6 pb-5 pt-1">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {group.items.map((it) => (
+            <Link
+              key={it.href}
+              href={it.href}
+              className="
+                rounded-2xl border border-neutral-800 bg-black/60 p-6
+                transition hover:border-neutral-600 hover:bg-black/75
+              "
+            >
+              <div className="text-sm font-semibold">{it.title}</div>
+              <div className="mt-2 text-sm text-neutral-400">{it.desc}</div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </details>
+  );
+}
+
 export default function ToolsPage() {
+  const groups: GameGroup[] = [
+    {
+      key: "lol",
+      name: "League of Legends",
+      subtitle: "Summoners, leaderboards, tiers, and meta tools.",
+      items: [
+        {
+          title: "LoL Summoner Stats",
+          desc: "Look up your Riot ID and get a clean, real-time breakdown of your ranked stats, match history, and performance.",
+          href: "/tools/lol/summoner",
+        },
+        {
+          title: "LoL Leaderboards",
+          desc: "Filter top players by region/role.",
+          href: "/tools/lol/leaderboard",
+        },
+        {
+          title: "LoL Champion Tier List",
+          desc: "Filter champions by winrate, pickrate, etc.",
+          href: "/tools/lol/champion-tiers",
+        },
+        {
+          title: "LoL Champion Index",
+          desc: "Base stats + ability numbers.",
+          href: "/calculators/lol/champions",
+        },
+        {
+          title: "LoL Meta",
+          desc: "Role-based boots + core items from real ranked matches.",
+          href: "/calculators/lol/meta",
+        },
+      ],
+    },
+    {
+      key: "dota",
+      name: "Dota 2",
+      subtitle: "Meta pages and hero browsing.",
+      items: [
+        {
+          title: "Dota 2 Meta",
+          desc: "Winrate, MMR estimate, and pickrate (OpenDota).",
+          href: "/tools/dota/meta",
+        },
+        {
+          title: "Dota 2 Hero Index",
+          desc: "Current heros and stats.",
+          href: "/tools/dota/heroes",
+        },
+      ],
+    },
+    {
+      key: "cod",
+      name: "Call of Duty",
+      subtitle: "Loadouts and patch watch.",
+      items: [
+        {
+          title: "COD Meta Loadouts",
+          desc: "Current best weapon builds for Warzone and Multiplayer.",
+          href: "/games/cod/meta-loadouts",
+        },
+        {
+          title: "COD Weapon Buffs / Nerfs",
+          desc: "Patch watch: expected buffs, nerfs, rebalances, and meta shifts.",
+          href: "/games/cod/buffs-nerfs",
+        },
+      ],
+    },
+  ];
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-transparent text-white">
       {/* Ambient background */}
@@ -36,7 +182,7 @@ export default function ToolsPage() {
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">TM</span>
+                GamerStation<span className="align-super text-[0.6em]">™</span>
               </span>
             </Link>
 
@@ -58,111 +204,16 @@ export default function ToolsPage() {
 
           <h1 className="mt-2 text-4xl font-bold tracking-tight">Tools</h1>
           <p className="mt-3 text-neutral-300">
-            This is the hub for non-calculator utilities (leaderboards, meta pages, indexes).
+            This is the hub for non-calculator utilities (leaderboards, meta
+            pages, indexes).
           </p>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div className="mt-10 grid gap-4">
+  {groups.map((g) => (
+    <GroupAccordion key={g.key} group={g} />
+  ))}
+</div>
 
-
-<Link
-              href="/tools/lol/summoner"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">LoL Summoner Stats</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Look up your Riot ID and get a clean, real-time breakdown of your ranked stats, match history, and performance.
-              </div>
-            </Link>
- 
-
-            <Link
-              href="/tools/lol/leaderboard"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">LoL Leaderboards</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Filter top players by region/role.
-              </div>
-            </Link>
-
-<Link
-              href="/tools/lol/champion-tiers"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">LoL Champion Tier List</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Filter champions by winrate, pickrate, etc.
-              </div>
-            </Link>
-
-            <Link
-              href="/calculators/lol/champions"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">LoL Champion Index</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Base stats + ability numbers.
-              </div>
-            </Link>
-
-            <Link
-              href="/calculators/lol/meta"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">LoL Meta</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Role-based boots + core items from real ranked matches.
-              </div>
-            </Link>
-
-            {/* âœ… Dota 2 Player Stats */}
-            <Link
-              href="/tools/dota/meta"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">Dota 2 Meta</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Winrate, MMR estimate, and pickrate (OpenDota).
-              </div>
-            </Link>
-
-{/* âœ… Dota 2 champ index */}
-            <Link
-              href="/tools/dota/heroes"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">Dota 2 Hero Index</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Current heros and stats.
-              </div>
-            </Link>
-
-
-
-            {/* Meta Loadouts */}
-            <Link
-              href="/games/cod/meta-loadouts"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">COD Meta Loadouts</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Current best weapon builds for Warzone and Multiplayer.
-              </div>
-            </Link>
-
-            {/* Weapon Buffs / Nerfs */}
-            <Link
-              href="/games/cod/buffs-nerfs"
-              className="rounded-2xl border border-neutral-800 bg-black/60 p-6 transition hover:border-neutral-600 hover:bg-black/75"
-            >
-              <div className="text-sm font-semibold">COD Weapon Buffs / Nerfs</div>
-              <div className="mt-2 text-sm text-neutral-400">
-                Patch watch: expected buffs, nerfs, rebalances, and meta shifts.
-              </div>
-            </Link>
-
-            
-          </div>
         </div>
       </div>
     </main>
