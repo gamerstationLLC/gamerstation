@@ -387,9 +387,9 @@ type PuuidTopChampsCacheRow = {
 
 function normalizePuuid(raw: any): string | null {
   const s = typeof raw === "string" ? raw.trim() : "";
-  if (!s) return null;
-  return s.replace(/^_+/, "") || null;
+  return s || null;
 }
+
 
 function safeKey(s: string) {
   // Keep same behavior across scripts (your finalize uses this same regex)
