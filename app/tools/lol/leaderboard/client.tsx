@@ -1,8 +1,8 @@
-// app/tools/lol/leaderboard/client.tsx
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export type RegionKey = "na1" | "euw1" | "kr";
 export type QueueKey = "RANKED_SOLO_5x5" | "RANKED_FLEX_SR";
@@ -162,7 +162,6 @@ function blobUrl(pathnameInput: string): string {
 
   if (!pathname) return "/";
   if (!base) {
-    // In case you forgot the env var locally, you still get *something*.
     console.warn("NEXT_PUBLIC_BLOB_BASE_URL not set — falling back to relative path:", pathname);
     return `/${pathname}`;
   }
@@ -194,19 +193,10 @@ function champIcon(champIdOrName: string, ddVersion: string) {
   return `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/${id}.png`;
 }
 
-/**
- * ✅ FIXED ROUTE:
- * your tree is /calculators/lol/champions/[slug]
- */
 function champLink(champIdOrName: string) {
   return `/calculators/lol/champions/${encodeURIComponent(champKey(champIdOrName))}`;
 }
 
-/**
- * ✅ Build link to your Summoner page.
- * Preferred: /tools/lol/summoner/[region]/[gameName]/[tagLine]
- * Fallback: /tools/lol/summoner?region=...&riotId=... (lets your Summoner page prefill if you support it)
- */
 function parseRiotId(s: string): { gameName: string; tagLine: string } | null {
   const raw = (s ?? "").trim();
   if (!raw) return null;
@@ -218,20 +208,12 @@ function parseRiotId(s: string): { gameName: string; tagLine: string } | null {
   return { gameName, tagLine };
 }
 
-function summonerHref(region: RegionKey, displayName: string) {
-  const riotId = parseRiotId(displayName);
-  if (riotId) {
-    return `/tools/lol/summoner/${encodeURIComponent(
-      riotId.gameName
-    )}/${encodeURIComponent(riotId.tagLine)}`;
-  }
-  // fallback: still clickable; your summoner page can choose to read these query params
-  return `/tools/lol/summoner?region=${encodeURIComponent(region)}&riotId=${encodeURIComponent(displayName)}`;
+function summonerPathFromRiotId(gameName: string, tagLine: string) {
+  return `/tools/lol/summoner/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
 }
 
 /**
  * ✅ Square champ icon that AUTO-SHRINKS with viewport.
- * Uses a CSS variable --champ set on each row; clamped to keep it sane.
  */
 function ChampSquareIcon({
   src,
@@ -270,6 +252,8 @@ export default function LeaderboardClient({
   initialTier,
   initialGeneratedAt,
 }: Props) {
+  const router = useRouter();
+
   const [region, setRegion] = useState<RegionKey>(initialRegion);
   const [queue, setQueue] = useState<QueueKey>(initialQueue);
   const [tier, setTier] = useState<TierKey>(initialTier);
@@ -282,10 +266,17 @@ export default function LeaderboardClient({
 
   const [brokenIcons, setBrokenIcons] = useState<Record<string, true>>({});
 
+  // ✅ display overrides keyed by puuid (self-heal if blob has wrong name)
+  const [nameOverrideByPuuid, setNameOverrideByPuuid] = useState<Record<string, string>>({});
+
+  // ✅ de-dupe in-flight lookups
+  const inFlightRef = useRef<Map<string, Promise<{ riotId: string; gameName: string; tagLine: string } | null>>>(
+    new Map()
+  );
+
   // ✅ Use a modern default, then replace with latest DDragon version on mount.
   const [ddVersion, setDdVersion] = useState<string>("15.1.1");
 
-  // ✅ Fetch latest ddVersion once (prevents ORB from new icon IDs).
   useEffect(() => {
     let cancelled = false;
 
@@ -309,7 +300,7 @@ export default function LeaderboardClient({
     };
   }, []);
 
-  // ✅ ALWAYS read from Blob (dev + prod) so you don’t have to commit/push to test.
+  // ✅ ALWAYS read from Blob (dev + prod)
   const dataUrl = useMemo(() => {
     const pathname = `data/lol/leaderboards/${region}/${queue}.${tier.toLowerCase()}.json`;
     return blobUrl(pathname);
@@ -323,7 +314,6 @@ export default function LeaderboardClient({
       setErr(null);
 
       try {
-        // ✅ no-store + cache buster: avoid “stuck at 2/6” due to any caching layers
         const bust = `cb=${Date.now()}`;
         const url = dataUrl.includes("?") ? `${dataUrl}&${bust}` : `${dataUrl}?${bust}`;
 
@@ -335,6 +325,8 @@ export default function LeaderboardClient({
         setRows(toRows(json));
         setGeneratedAt(json.generatedAt ?? null);
         setBrokenIcons({});
+        setNameOverrideByPuuid({}); // reset overrides per load (keeps UI consistent per selection)
+        inFlightRef.current.clear();
       } catch (e: any) {
         if (cancelled) return;
         setErr(e?.message ?? "Failed to load leaderboard.");
@@ -350,6 +342,30 @@ export default function LeaderboardClient({
       cancelled = true;
     };
   }, [dataUrl]);
+
+  async function resolveRiotIdByPuuid(puuid: string, reg: RegionKey) {
+    const key = `${reg}:${puuid}`;
+    const existing = inFlightRef.current.get(key);
+    if (existing) return existing;
+
+    const p = (async () => {
+      try {
+        const res = await fetch(
+          `/api/tools/lol/account/by-puuid?region=${encodeURIComponent(reg)}&puuid=${encodeURIComponent(puuid)}`,
+          { cache: "no-store" }
+        );
+        if (!res.ok) return null;
+        const data = (await res.json()) as any;
+        if (!data?.ok || !data?.gameName || !data?.tagLine || !data?.riotId) return null;
+        return { riotId: String(data.riotId), gameName: String(data.gameName), tagLine: String(data.tagLine) };
+      } catch {
+        return null;
+      }
+    })();
+
+    inFlightRef.current.set(key, p);
+    return p;
+  }
 
   const surfaceCard = "bg-neutral-950/70 border-neutral-800";
   const surfaceHeader = "bg-neutral-950/80";
@@ -477,11 +493,9 @@ export default function LeaderboardClient({
             {err ? <div className="mt-3 text-sm text-red-300">{err}</div> : null}
           </div>
 
-          {/* ✅ mobile: no horizontal scroll; desktop unchanged (still scrolls if needed) */}
           <div className="-mx-2 sm:mx-0 mt-6 overflow-x-hidden sm:overflow-x-auto rounded-2xl border border-neutral-800">
             <div className="px-1 sm:px-0">
               <div className="min-w-0 sm:min-w-[760px]">
-                {/* Header */}
                 <div
                   className={`grid grid-cols-12 gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-3 text-[9px] sm:text-xs text-neutral-400 ${surfaceHeader}`}
                 >
@@ -492,7 +506,6 @@ export default function LeaderboardClient({
                   <div className="col-span-2 sm:col-span-2 text-right whitespace-nowrap">Most Played</div>
                 </div>
 
-                {/* Body */}
                 <div className={`divide-y divide-neutral-800 ${surfaceRow}`}>
                   {rows.length === 0 ? (
                     <div className="px-2 sm:px-4 py-10 text-sm text-neutral-400">
@@ -501,7 +514,9 @@ export default function LeaderboardClient({
                   ) : (
                     rows.map((r) => {
                       const rowKey = `${r.region}-${r.queue}-${r.tier}-${r.puuid}`;
-                      const displayName = (r.summonerName ?? "").trim() || "Unknown";
+
+                      const overrideName = nameOverrideByPuuid[r.puuid];
+                      const displayName = (overrideName ?? r.summonerName ?? "").trim() || "Unknown";
 
                       const preferredUrl = normalizeIconUrl(r.profileIconUrl);
                       const fallbackUrl = getFallbackIconUrl(r.profileIconId ?? null, ddVersion);
@@ -511,7 +526,13 @@ export default function LeaderboardClient({
 
                       const champs = (r.topChamps ?? []).slice(0, 3);
 
-                      const playerHref = summonerHref(r.region, displayName);
+                      // best-effort href (used if lookup fails)
+                      const parsed = parseRiotId(displayName);
+                      const fallbackHref = parsed
+                        ? summonerPathFromRiotId(parsed.gameName, parsed.tagLine)
+                        : `/tools/lol/summoner?region=${encodeURIComponent(r.region)}&riotId=${encodeURIComponent(
+                            displayName
+                          )}`;
 
                       return (
                         <div
@@ -521,12 +542,30 @@ export default function LeaderboardClient({
                         >
                           <div className="col-span-1 text-neutral-400 tabular-nums">{r.rank}</div>
 
-                          {/* Player (CLICKABLE) */}
                           <div className="col-span-4 sm:col-span-4 min-w-0">
                             <Link
-                              href={playerHref}
+                              href={fallbackHref}
                               className="group min-w-0 flex items-center gap-2 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
                               aria-label={`Open summoner page for ${displayName}`}
+                              onClick={async (e) => {
+                                // ✅ self-heal on click: puuid -> true Riot ID (Account-V1)
+                                if (!r.puuid) return;
+
+                                // if we already have a resolved override, just allow default nav
+                                if (nameOverrideByPuuid[r.puuid]) return;
+
+                                e.preventDefault();
+
+                                const resolved = await resolveRiotIdByPuuid(r.puuid, r.region);
+                                if (resolved?.riotId) {
+                                  setNameOverrideByPuuid((prev) => ({ ...prev, [r.puuid]: resolved.riotId }));
+                                  router.push(summonerPathFromRiotId(resolved.gameName, resolved.tagLine));
+                                  return;
+                                }
+
+                                // fallback to whatever we had
+                                router.push(fallbackHref);
+                              }}
                             >
                               {finalUrl ? (
                                 <div className="h-7 w-7 sm:h-8 sm:w-8 shrink-0 overflow-hidden rounded-xl border border-neutral-800 bg-black/40 group-hover:border-neutral-600 group-hover:shadow-[0_0_18px_rgba(0,255,255,0.20)]">
@@ -555,18 +594,15 @@ export default function LeaderboardClient({
                             </Link>
                           </div>
 
-                          {/* LP */}
                           <div className="col-span-3 sm:col-span-2 text-right tabular-nums text-neutral-200 whitespace-nowrap text-[13px] sm:text-sm">
                             {fmtInt(r.lp)}
                           </div>
 
-                          {/* W-L */}
                           <div className="col-span-2 sm:col-span-3 text-right tabular-nums text-neutral-300 whitespace-nowrap text-[11px] sm:text-sm">
                             <span className="sm:hidden">({r.wins}-{r.losses})</span>
                             <span className="hidden sm:inline">{fmtWL(r.wins, r.losses)}</span>
                           </div>
 
-                          {/* Most Played */}
                           <div className="col-span-2 sm:col-span-2 flex items-center justify-end">
                             <div className="flex flex-wrap justify-end gap-1 sm:gap-2">
                               {champs.length ? (

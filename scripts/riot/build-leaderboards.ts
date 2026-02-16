@@ -31,9 +31,6 @@ const CONCURRENCY = Number(process.env.LEADERBOARD_CONCURRENCY || "") || 1;
 // Extra gap after each enrich attempt (ms)
 const GAP_MS = Number(process.env.LEADERBOARD_GAP_MS || "") || 1200;
 
-// How many recent match IDs to try for getting riotIdGameName/tagline
-const MATCH_IDS_COUNT = Number(process.env.LEADERBOARD_MATCH_IDS_COUNT || "") || 2;
-
 // how many recent matches to compute "Most Played" champs from
 const TOP_CHAMPS_MATCH_COUNT = Number(process.env.LEADERBOARD_TOP_CHAMPS_MATCH_COUNT || "") || 6;
 
@@ -41,16 +38,13 @@ const TOP_CHAMPS_MATCH_COUNT = Number(process.env.LEADERBOARD_TOP_CHAMPS_MATCH_C
 const REQ_MIN_GAP_MS = Number(process.env.LEADERBOARD_REQ_MIN_GAP_MS || "") || 250;
 
 // Cache TTLs
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-const ANON_TTL_MS = 2 * 60 * 60 * 1000;
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // account name cache TTL (authoritative)
 const SUMMONER_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const TOPCHAMPS_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
-// Warming pass settings (extra tries for missing cache)
+// Warming pass settings
 const WARM_MAX_PASSES = Number(process.env.LEADERBOARD_WARM_PASSES || "") || 2;
-// Warming concurrency: keep low; summoner-v4 and match-v5 rate limits are sensitive
 const WARM_CONCURRENCY = Number(process.env.LEADERBOARD_WARM_CONCURRENCY || "") || 1;
-// Extra delay between warm passes
 const WARM_PASS_GAP_MS = Number(process.env.LEADERBOARD_WARM_PASS_GAP_MS || "") || 1500;
 
 const DEBUG = process.env.LEADERBOARD_DEBUG === "1";
@@ -81,7 +75,7 @@ function sleep(ms: number) {
 }
 
 // -------------------------
-// Abort / timeout detection (Node/undici can say "The operation was canceled.")
+// Abort / timeout detection
 function isAbortLike(err: any) {
   const name = String(err?.name || "").toLowerCase();
   const msg = String(err?.message || err || "").toLowerCase();
@@ -108,14 +102,10 @@ async function withRateLimit<T>(fn: () => Promise<T>): Promise<T> {
   await gate;
   try {
     const now = Date.now();
-
-    // Add tiny jitter to avoid perfectly periodic bursts across endpoints
     const jitter = Math.floor(Math.random() * 60); // 0..59ms
     const wait = Math.max(0, REQ_MIN_GAP_MS + jitter - (now - _lastReqAt));
-
     if (wait > 0) await sleep(wait);
     _lastReqAt = Date.now();
-
     return await fn();
   } finally {
     release();
@@ -127,13 +117,10 @@ async function withRateLimit<T>(fn: () => Promise<T>): Promise<T> {
 const IS_WIN = process.platform === "win32";
 
 async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
-  // ✅ Important: start timeout ONLY after we pass the rate-limit gate.
-  // Otherwise AbortSignal.timeout can expire while we are waiting in the limiter queue.
   return await withRateLimit(async () => {
     const finalInit: RequestInit = { ...init };
 
     if (!IS_WIN) {
-      // Node 20+: AbortSignal.timeout exists
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sig = (AbortSignal as any).timeout ? (AbortSignal as any).timeout(timeoutMs) : undefined;
       if (sig) finalInit.signal = sig;
@@ -245,8 +232,6 @@ type MatchV5DTO = {
   info?: {
     participants?: Array<{
       puuid: string;
-      riotIdGameName?: string;
-      riotIdTagline?: string;
       championName?: string;
     }>;
   };
@@ -258,6 +243,12 @@ type SummonerV4DTO = {
   name: string;
   profileIconId: number;
   summonerLevel: number;
+};
+
+type AccountV1DTO = {
+  puuid: string;
+  gameName: string;
+  tagLine: string;
 };
 
 // -------------------------
@@ -369,7 +360,6 @@ type PuuidNameCacheRow = {
   display: string;
 };
 
-// IMPORTANT: allow summonerId to be null (your cache already has rows like that)
 type PuuidSummonerCacheRow = {
   fetchedAt: number;
   puuid: string;
@@ -385,14 +375,15 @@ type PuuidTopChampsCacheRow = {
   topChamps: Array<{ name: string; count: number }>;
 };
 
+// ✅ IMPORTANT: normalize exactly like finalize (strip leading underscores too)
 function normalizePuuid(raw: any): string | null {
   const s = typeof raw === "string" ? raw.trim() : "";
-  return s || null;
+  if (!s) return null;
+  const cleaned = s.replace(/^_+/, "");
+  return cleaned || null;
 }
 
-
 function safeKey(s: string) {
-  // Keep same behavior across scripts (your finalize uses this same regex)
   return s.replace(/[^a-zA-Z0-9_-]/g, "_");
 }
 
@@ -444,7 +435,6 @@ async function readPuuidSummonerCache(platform: RegionKey, puuid: string): Promi
     if (!row?.fetchedAt) return null;
     if (Date.now() - row.fetchedAt > SUMMONER_TTL_MS) return null;
 
-    // Accept rows even if summonerId is null (as long as icon/level exist)
     const iconOk = Number.isFinite(row.profileIconId as any) && (row.profileIconId as number) > 0;
     const lvlOk = Number.isFinite(row.summonerLevel as any) && (row.summonerLevel as number) > 0;
     if (!iconOk && !lvlOk && !row.summonerId) return null;
@@ -480,7 +470,68 @@ async function writePuuidTopChampsCache(platform: RegionKey, row: PuuidTopChamps
 }
 
 // -------------------------
-// Match-v5 helpers
+// Account-v1 (AUTHORITATIVE name mapping)
+async function accountByPuuid(regional: RegionalKey, puuid: string): Promise<AccountV1DTO> {
+  return regionalGet<AccountV1DTO>(regional, `/riot/account/v1/accounts/by-puuid/${encodeURIComponent(puuid)}`);
+}
+
+function formatRiotId(gameName: string | null, tagLine: string | null) {
+  if (gameName && tagLine) return `${gameName}#${tagLine}`;
+  if (gameName) return gameName;
+  return "Anonymous";
+}
+
+function anonNameRow(puuid: string): PuuidNameCacheRow {
+  return {
+    fetchedAt: Date.now(),
+    puuid,
+    gameName: null,
+    tagLine: null,
+    display: "Anonymous",
+  };
+}
+
+async function resolveAccountName(platform: RegionKey, puuidRaw: string): Promise<PuuidNameCacheRow> {
+  const puuid = normalizePuuid(puuidRaw) || puuidRaw;
+
+  const cached = await readPuuidNameCache(platform, puuid);
+  if (cached) return cached;
+
+  const regional = regionalFor(platform);
+
+  try {
+    const dto = await accountByPuuid(regional, puuid);
+
+    const gameName = (dto?.gameName ?? "").trim() || null;
+    const tagLine = (dto?.tagLine ?? "").trim() || null;
+
+    const row: PuuidNameCacheRow = {
+      fetchedAt: Date.now(),
+      puuid,
+      gameName,
+      tagLine,
+      display: formatRiotId(gameName, tagLine),
+    };
+
+    writePuuidNameCache(platform, row).catch(() => {});
+    return row;
+  } catch (e: any) {
+    if (DEBUG) {
+      console.log(
+        `[warn] account-v1 failed platform=${platform} puuid=${puuid.slice(0, 10)}... err=${String(
+          e?.message || e
+        )}`
+      );
+    }
+    const row = anonNameRow(puuid);
+    // still write short-lived anon row so we don’t hammer repeatedly
+    writePuuidNameCache(platform, row).catch(() => {});
+    return row;
+  }
+}
+
+// -------------------------
+// Match-v5 helpers (ONLY for top champs)
 async function matchIdsByPuuid(regional: RegionalKey, puuid: string, count: number): Promise<string[]> {
   return regionalGet<string[]>(
     regional,
@@ -492,79 +543,36 @@ async function matchById(regional: RegionalKey, matchId: string): Promise<MatchV
   return regionalGet<MatchV5DTO>(regional, `/lol/match/v5/matches/${encodeURIComponent(matchId)}`);
 }
 
-function formatRiotId(gameName: string | null, tagLine: string | null) {
-  if (gameName && tagLine) return `${gameName}#${tagLine}`;
-  if (gameName) return gameName;
-  return "Anonymous";
-}
-
-function anonRow(puuid: string): PuuidNameCacheRow {
-  const shiftedFetchedAt = Date.now() - (CACHE_TTL_MS - ANON_TTL_MS);
-  return {
-    fetchedAt: shiftedFetchedAt,
-    puuid,
-    gameName: null,
-    tagLine: null,
-    display: "Anonymous",
-  };
-}
-
-// ✅ Single-pass enrichment from ONE set of match IDs + match fetches
-async function resolveNameAndTopChampsFromMatches(
+async function resolveTopChampsFromMatches(
   platform: RegionKey,
   puuidRaw: string,
   champIdMap: Map<string, string>
-): Promise<{
-  nameRow: PuuidNameCacheRow;
-  topChamps: Array<{ name: string; count: number }> | null;
-  sampleGames: number | null;
-}> {
+): Promise<{ topChamps: Array<{ name: string; count: number }> | null; sampleGames: number | null }> {
   const puuid = normalizePuuid(puuidRaw) || puuidRaw;
 
-  const cachedName = await readPuuidNameCache(platform, puuid);
   const cachedTop = await readPuuidTopChampsCache(platform, puuid);
-
-  const haveName = !!cachedName;
-  const haveTop = !!cachedTop;
-
-  if (haveName && haveTop) {
+  if (cachedTop) {
     return {
-      nameRow: cachedName!,
-      topChamps: cachedTop!.topChamps,
-      sampleGames: cachedTop!.sampleGames,
+      topChamps: cachedTop.topChamps,
+      sampleGames: cachedTop.sampleGames,
     };
   }
 
   const regional = regionalFor(platform);
 
-  const wantIds = Math.max(MATCH_IDS_COUNT, TOP_CHAMPS_MATCH_COUNT);
   let ids: string[] = [];
   try {
-    ids = await matchIdsByPuuid(regional, puuid, wantIds);
+    ids = await matchIdsByPuuid(regional, puuid, TOP_CHAMPS_MATCH_COUNT);
   } catch {
-    const nameRow = cachedName ?? anonRow(puuid);
-    if (!cachedName) writePuuidNameCache(platform, nameRow).catch(() => {});
-    return {
-      nameRow,
-      topChamps: cachedTop?.topChamps ?? null,
-      sampleGames: cachedTop?.sampleGames ?? null,
-    };
+    return { topChamps: null, sampleGames: null };
   }
-
-  let nameRow: PuuidNameCacheRow | null = cachedName ?? null;
 
   const counts = new Map<string, number>();
   let sample = 0;
 
-  const needName = !haveName;
-  const needTop = !haveTop;
-
   for (let i = 0; i < ids.length; i++) {
     const matchId = ids[i];
     if (!matchId) continue;
-
-    const topDone = !needTop || i >= TOP_CHAMPS_MATCH_COUNT;
-    if ((!needName || !!nameRow) && topDone) break;
 
     let match: MatchV5DTO | null = null;
     try {
@@ -576,74 +584,42 @@ async function resolveNameAndTopChampsFromMatches(
     const me = (match?.info?.participants ?? []).find((x) => x?.puuid === puuid);
     if (!me) continue;
 
-    if (!nameRow && needName && i < MATCH_IDS_COUNT) {
-      const gameName = (me.riotIdGameName ?? "").trim() || null;
-      const tagLine = (me.riotIdTagline ?? "").trim() || null;
-
-      if (gameName && tagLine) {
-        nameRow = {
-          fetchedAt: Date.now(),
-          puuid,
-          gameName,
-          tagLine,
-          display: formatRiotId(gameName, tagLine),
-        };
-        writePuuidNameCache(platform, nameRow).catch(() => {});
-      }
-    }
-
-    if (needTop && i < TOP_CHAMPS_MATCH_COUNT) {
-      const rawChamp = (me.championName ?? "").trim();
-      const ddId = toDDragonChampId(rawChamp, champIdMap);
-      if (ddId) {
-        counts.set(ddId, (counts.get(ddId) || 0) + 1);
-        sample++;
-      }
+    const rawChamp = (me.championName ?? "").trim();
+    const ddId = toDDragonChampId(rawChamp, champIdMap);
+    if (ddId) {
+      counts.set(ddId, (counts.get(ddId) || 0) + 1);
+      sample++;
     }
   }
 
-  if (!nameRow) {
-    nameRow = anonRow(puuid);
-    writePuuidNameCache(platform, nameRow).catch(() => {});
+  if (sample > 0 && counts.size > 0) {
+    const top = [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([name, count]) => ({ name, count }));
+
+    const row: PuuidTopChampsCacheRow = {
+      fetchedAt: Date.now(),
+      puuid,
+      sampleGames: sample,
+      topChamps: top,
+    };
+    writePuuidTopChampsCache(platform, row).catch(() => {});
+    if (GAP_MS > 0) await sleep(GAP_MS);
+    return { topChamps: top, sampleGames: sample };
   }
 
-  let topChamps: Array<{ name: string; count: number }> | null = cachedTop?.topChamps ?? null;
-  let sampleGames: number | null = cachedTop?.sampleGames ?? null;
-
-  if (needTop) {
-    if (sample > 0 && counts.size > 0) {
-      const top = [...counts.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
-        .map(([name, count]) => ({ name, count }));
-
-      const row: PuuidTopChampsCacheRow = {
-        fetchedAt: Date.now(),
-        puuid,
-        sampleGames: sample,
-        topChamps: top,
-      };
-      writePuuidTopChampsCache(platform, row).catch(() => {});
-
-      topChamps = top;
-      sampleGames = sample;
-    } else {
-      // still write a row to avoid hammering match-v5 for PUUIDs with no usable champ mapping
-      const row: PuuidTopChampsCacheRow = {
-        fetchedAt: Date.now(),
-        puuid,
-        sampleGames: sample || 0,
-        topChamps: [],
-      };
-      writePuuidTopChampsCache(platform, row).catch(() => {});
-      topChamps = null;
-      sampleGames = sample > 0 ? sample : null;
-    }
-  }
-
+  // Still write a row to avoid re-hammering
+  const row: PuuidTopChampsCacheRow = {
+    fetchedAt: Date.now(),
+    puuid,
+    sampleGames: sample || 0,
+    topChamps: [],
+  };
+  writePuuidTopChampsCache(platform, row).catch(() => {});
   if (GAP_MS > 0) await sleep(GAP_MS);
 
-  return { nameRow, topChamps, sampleGames };
+  return { topChamps: null, sampleGames: sample > 0 ? sample : null };
 }
 
 // -------------------------
@@ -669,7 +645,6 @@ async function resolveSummoner(platform: RegionKey, puuidRaw: string): Promise<P
       summonerLevel: Number.isFinite(dto.summonerLevel) && dto.summonerLevel > 0 ? dto.summonerLevel : null,
     };
 
-    // Always write the row if it has *anything* useful (icon/level/id)
     if (row.summonerId || row.profileIconId || row.summonerLevel) {
       writePuuidSummonerCache(platform, row).catch(() => {});
       if (GAP_MS > 0) await sleep(GAP_MS);
@@ -706,7 +681,7 @@ async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T, idx: numb
 }
 
 // -------------------------
-// Warming: ensure cache coverage for any missing fields
+// Warming helpers
 function needsIconOrLevel(p: OutputPlayer) {
   return !p.profileIconId || !p.summonerLevel;
 }
@@ -717,90 +692,80 @@ function needsNameBits(p: OutputPlayer) {
   return !p.gameName || !p.tagLine;
 }
 
-async function warmCachesForPlayers(
-  platform: RegionKey,
-  players: OutputPlayer[],
-  champIdMap: Map<string, string>
-): Promise<void> {
-  // Unique PUUIDs that are missing something
-  const missing = new Map<string, { needSummoner: boolean; needMatches: boolean }>();
+async function warmCachesForPlayers(platform: RegionKey, players: OutputPlayer[], champIdMap: Map<string, string>) {
+  const missing = new Map<string, { needSummoner: boolean; needTop: boolean; needName: boolean }>();
 
   for (const p of players) {
     const puuid = normalizePuuid(p.puuid) || p.puuid;
     const needSummoner = needsIconOrLevel(p);
-    const needMatches = needsTop(p) || needsNameBits(p);
-    if (!needSummoner && !needMatches) continue;
+    const needTop = needsTop(p);
+    const needName = needsNameBits(p);
+    if (!needSummoner && !needTop && !needName) continue;
 
-    const cur = missing.get(puuid) ?? { needSummoner: false, needMatches: false };
+    const cur = missing.get(puuid) ?? { needSummoner: false, needTop: false, needName: false };
     cur.needSummoner = cur.needSummoner || needSummoner;
-    cur.needMatches = cur.needMatches || needMatches;
+    cur.needTop = cur.needTop || needTop;
+    cur.needName = cur.needName || needName;
     missing.set(puuid, cur);
   }
 
   if (missing.size === 0) return;
 
-  const tasks = [...missing.entries()]; // [puuid, flags]
-
+  const tasks = [...missing.entries()];
   if (DEBUG) {
     const s = tasks.filter(([, f]) => f.needSummoner).length;
-    const m = tasks.filter(([, f]) => f.needMatches).length;
-    console.log(`[warm] ${platform} missing: summoner=${s} matches=${m} total=${tasks.length}`);
+    const n = tasks.filter(([, f]) => f.needName).length;
+    const t = tasks.filter(([, f]) => f.needTop).length;
+    console.log(`[warm] ${platform} missing: summoner=${s} name=${n} top=${t} total=${tasks.length}`);
   }
 
   for (let pass = 1; pass <= WARM_MAX_PASSES; pass++) {
-    let progressSumm = 0;
-    let progressMatch = 0;
-
     await mapLimit(tasks, WARM_CONCURRENCY, async ([puuid, flags], idx) => {
-      // If already cached by previous attempts, skip
       if (flags.needSummoner) {
         const cached = await readPuuidSummonerCache(platform, puuid);
-        if (!cached) {
-          await resolveSummoner(platform, puuid);
-        }
+        if (!cached) await resolveSummoner(platform, puuid);
         const cached2 = await readPuuidSummonerCache(platform, puuid);
         if (cached2) flags.needSummoner = false;
       }
 
-      if (flags.needMatches) {
-        const cachedName = await readPuuidNameCache(platform, puuid);
-        const cachedTop = await readPuuidTopChampsCache(platform, puuid);
-        if (!cachedName || !cachedTop) {
-          await resolveNameAndTopChampsFromMatches(platform, puuid, champIdMap);
-        }
-        const cachedName2 = await readPuuidNameCache(platform, puuid);
-        const cachedTop2 = await readPuuidTopChampsCache(platform, puuid);
-        if (cachedName2 && cachedTop2) flags.needMatches = false;
+      if (flags.needName) {
+        const cached = await readPuuidNameCache(platform, puuid);
+        if (!cached) await resolveAccountName(platform, puuid);
+        const cached2 = await readPuuidNameCache(platform, puuid);
+        if (cached2 && cached2.gameName && cached2.tagLine) flags.needName = false;
+      }
+
+      if (flags.needTop) {
+        const cached = await readPuuidTopChampsCache(platform, puuid);
+        if (!cached) await resolveTopChampsFromMatches(platform, puuid, champIdMap);
+        const cached2 = await readPuuidTopChampsCache(platform, puuid);
+        if (cached2) flags.needTop = false;
       }
 
       if (!DEBUG && idx > 0 && idx % 25 === 0) {
-        // light progress
-        progressSumm = tasks.filter(([, f]) => f.needSummoner).length;
-        progressMatch = tasks.filter(([, f]) => f.needMatches).length;
-        console.log(
-          `[warm] ${platform} pass=${pass}/${WARM_MAX_PASSES} remaining summ=${progressSumm} matches=${progressMatch}`
-        );
+        const remainingSumm = tasks.filter(([, f]) => f.needSummoner).length;
+        const remainingName = tasks.filter(([, f]) => f.needName).length;
+        const remainingTop = tasks.filter(([, f]) => f.needTop).length;
+        console.log(`[warm] ${platform} pass=${pass}/${WARM_MAX_PASSES} remaining summ=${remainingSumm} name=${remainingName} top=${remainingTop}`);
       }
 
       return null;
     });
 
     const remainingSumm = tasks.filter(([, f]) => f.needSummoner).length;
-    const remainingMatch = tasks.filter(([, f]) => f.needMatches).length;
+    const remainingName = tasks.filter(([, f]) => f.needName).length;
+    const remainingTop = tasks.filter(([, f]) => f.needTop).length;
 
     if (DEBUG) {
-      console.log(`[warm] ${platform} pass=${pass} remaining summ=${remainingSumm} matches=${remainingMatch}`);
+      console.log(`[warm] ${platform} pass=${pass} remaining summ=${remainingSumm} name=${remainingName} top=${remainingTop}`);
     }
 
-    if (remainingSumm === 0 && remainingMatch === 0) break;
+    if (remainingSumm === 0 && remainingName === 0 && remainingTop === 0) break;
     if (WARM_PASS_GAP_MS > 0) await sleep(WARM_PASS_GAP_MS);
   }
 }
 
-async function patchPlayersFromCache(
-  platform: RegionKey,
-  players: OutputPlayer[]
-): Promise<{ missingIconOrLevelAfter: number; missingTopAfter: number }> {
+async function patchPlayersFromCache(platform: RegionKey, players: OutputPlayer[]) {
   let missIconOrLevel = 0;
   let missTop = 0;
 
@@ -816,7 +781,6 @@ async function patchPlayersFromCache(
 
     const nm = await readPuuidNameCache(platform, puuid);
     if (nm) {
-      // prefer cached display always
       if (nm.display) p.summonerName = nm.display;
       if (!p.gameName && nm.gameName) p.gameName = nm.gameName;
       if (!p.tagLine && nm.tagLine) p.tagLine = nm.tagLine;
@@ -855,9 +819,8 @@ async function buildOne(platform: RegionKey, queue: QueueKey, tier: TierKey, cha
       console.log(`[leaderboards] ${platform} ${queue} ${tier} progress ${idx}/${sorted.length}`);
     }
 
-    // Summoner-v4 FIRST (cheap + critical for icons/level)
+    // Summoner-v4 FIRST (icons/level)
     const summRow = await resolveSummoner(platform, puuid);
-
     const summonerIdFallback = (p.summonerId ?? "").trim() || null;
 
     const profileIconId =
@@ -870,8 +833,11 @@ async function buildOne(platform: RegionKey, queue: QueueKey, tier: TierKey, cha
         ? (summRow.summonerLevel as number)
         : null;
 
-    // match-v5 sampling (expensive)
-    const { nameRow, topChamps, sampleGames } = await resolveNameAndTopChampsFromMatches(platform, puuid, champIdMap);
+    // ✅ AUTHORITATIVE Riot ID (Account-v1 by PUUID)
+    const nameRow = await resolveAccountName(platform, puuid);
+
+    // Top champs (match-v5 sampling)
+    const topRes = await resolveTopChampsFromMatches(platform, puuid, champIdMap);
 
     const out: OutputPlayer = {
       puuid,
@@ -882,8 +848,8 @@ async function buildOne(platform: RegionKey, queue: QueueKey, tier: TierKey, cha
       profileIconId,
       summonerLevel,
 
-      topChamps: topChamps && topChamps.length ? topChamps : null,
-      sampleGames: sampleGames && sampleGames > 0 ? sampleGames : null,
+      topChamps: topRes.topChamps && topRes.topChamps.length ? topRes.topChamps : null,
+      sampleGames: topRes.sampleGames && topRes.sampleGames > 0 ? topRes.sampleGames : null,
 
       gameName: nameRow.gameName,
       tagLine: nameRow.tagLine,
@@ -903,19 +869,21 @@ async function buildOne(platform: RegionKey, queue: QueueKey, tier: TierKey, cha
 
   const players: OutputPlayer[] = enriched.filter((x): x is OutputPlayer => x !== null);
 
-  // ✅ WARM CACHES for missing data, then patch from cache before writing output
+  // Warm caches for missing data, then patch
   const missingBeforeIcons = players.filter(needsIconOrLevel).length;
   const missingBeforeTop = players.filter(needsTop).length;
+  const missingBeforeName = players.filter(needsNameBits).length;
 
-  if (missingBeforeIcons > 0 || missingBeforeTop > 0) {
+  if (missingBeforeIcons > 0 || missingBeforeTop > 0 || missingBeforeName > 0) {
     console.log(
-      `[leaderboards] ${platform} ${queue} ${tier} warming cache missingIconsOrLevel=${missingBeforeIcons} missingTop=${missingBeforeTop}`
+      `[leaderboards] ${platform} ${queue} ${tier} warming cache missingIconsOrLevel=${missingBeforeIcons} missingTop=${missingBeforeTop} missingName=${missingBeforeName}`
     );
     await warmCachesForPlayers(platform, players, champIdMap);
     const after = await patchPlayersFromCache(platform, players);
 
+    const missingNameAfter = players.filter(needsNameBits).length;
     console.log(
-      `[leaderboards] ${platform} ${queue} ${tier} after warm missingIconsOrLevel=${after.missingIconOrLevelAfter} missingTop=${after.missingTopAfter}`
+      `[leaderboards] ${platform} ${queue} ${tier} after warm missingIconsOrLevel=${after.missingIconOrLevelAfter} missingTop=${after.missingTopAfter} missingName=${missingNameAfter}`
     );
   }
 
@@ -940,7 +908,7 @@ async function buildOne(platform: RegionKey, queue: QueueKey, tier: TierKey, cha
 async function main() {
   console.log("[leaderboards] build start", new Date().toISOString());
   console.log(
-    `[leaderboards] debug=${DEBUG ? "on" : "off"} single=${SINGLE ? "on" : "off"} topN=${TOP_N} conc=${CONCURRENCY} warmConc=${WARM_CONCURRENCY} warmPasses=${WARM_MAX_PASSES} gapMs=${GAP_MS} matchIds=${MATCH_IDS_COUNT} topChampsMatchCount=${TOP_CHAMPS_MATCH_COUNT} reqMinGapMs=${REQ_MIN_GAP_MS} win=${IS_WIN ? "1" : "0"}`
+    `[leaderboards] debug=${DEBUG ? "on" : "off"} single=${SINGLE ? "on" : "off"} topN=${TOP_N} conc=${CONCURRENCY} warmConc=${WARM_CONCURRENCY} warmPasses=${WARM_MAX_PASSES} gapMs=${GAP_MS} topChampsMatchCount=${TOP_CHAMPS_MATCH_COUNT} reqMinGapMs=${REQ_MIN_GAP_MS} win=${IS_WIN ? "1" : "0"}`
   );
 
   await ensureCacheDirs();

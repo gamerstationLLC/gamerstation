@@ -110,10 +110,16 @@ export default function ToolsPage() {
           href: "/calculators/lol/champions",
         },
         {
+          title: "LoL Item Index",
+          desc: "Item stats and descriptions.",
+          href: "/tools/lol/items",
+        },
+        {
           title: "LoL Meta",
           desc: "Role-based boots + core items from real ranked matches.",
           href: "/calculators/lol/meta",
         },
+        
       ],
     },
     {

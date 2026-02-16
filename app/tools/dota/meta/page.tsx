@@ -152,11 +152,11 @@ export default async function DotaMetaPage() {
           </header>
 
           <h1 className="text-4xl font-bold tracking-tight">
-            Dota 2 Meta
+            Dota 2 Meta & Tier List
           </h1>
 
           <p className="mt-3 text-neutral-300">
-            Highest pick rate + best win rate by rank bracket, plus pro trends.
+            Dota 2 tier list and current meta. Highest pick rate + best win rate by rank bracket, plus pro trends.
             Data from OpenDota.
             <span className="text-neutral-500">
               {" "}

@@ -146,15 +146,250 @@ jobs:
         if: always()
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
+          # IMPORTANT: keep these paths aligned with your app's Blob reads (rel = data/lol/...)
+          BLOB_UPLOADS: "data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
           BLOB_CACHE_SECONDS: "300"
           LOL_PATCH: ${{ github.run_id }}
-          BLOB_FORCE_OVERWRITE: "1"   # ✅ force overwrites (manifest + any stable keys)
+          BLOB_FORCE_OVERWRITE: "1"
         run: |
           set +e
           if [ -n "$BLOB_READ_WRITE_TOKEN" ]; then
             node scripts/blob/upload-data.mjs || true
           fi
+          exit 0
+
+      # -------------------------------------------------------------------
+      # Items usage: generate -> merge with existing blob -> overwrite blob
+      # -------------------------------------------------------------------
+
+      - name: Build items_usage from latest meta (ranked/casual/combined)
+        if: always()
+        run: |
+          set +e
+          # This should be YOUR existing generator script/command.
+          # Keep it here so it runs ONLY after meta builds are finalized + uploaded.
+          #
+          # Expected outputs (disk): public/data/lol/items_usage_ranked.json
+          #                          public/data/lol/items_usage_casual.json
+          #                          public/data/lol/items_usage_combined.json
+          #
+          # If your script outputs into data/lol instead of public/data/lol,
+          # change it in the script OR tweak the merge step's local path list.
+          npm run lol:build:items-usage || true
+          exit 0
+
+      - name: Merge items_usage with existing Blob and overwrite Blob with merged
+        if: always()
+        env:
+          NEXT_PUBLIC_BLOB_BASE_URL: ${{ secrets.NEXT_PUBLIC_BLOB_BASE_URL }}
+          BLOB_BASE_URL: ${{ secrets.BLOB_BASE_URL }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          BLOB_CACHE_SECONDS: "300"
+          LOL_PATCH: ${{ github.run_id }}
+          BLOB_FORCE_OVERWRITE: "1"
+        run: |
+          set +e
+
+          node - <<'NODE'
+          const fs = require("fs");
+          const fsp = require("fs/promises");
+          const path = require("path");
+
+          const base =
+            process.env.NEXT_PUBLIC_BLOB_BASE_URL ||
+            process.env.BLOB_BASE_URL ||
+            process.env.NEXT_PUBLIC_BLOB_BASE ||
+            "";
+
+          const REVALIDATE = 300;
+
+          function clamp01(n) {
+            if (!Number.isFinite(n)) return 0;
+            return Math.max(0, Math.min(1, n));
+          }
+
+          async function fetchJson(url) {
+            try {
+              const res = await fetch(url, { next: { revalidate: REVALIDATE } });
+              if (!res.ok) return null;
+              return await res.json();
+            } catch {
+              return null;
+            }
+          }
+
+          async function readLocalJson(relCandidates) {
+            for (const rel of relCandidates) {
+              const abs = path.join(process.cwd(), rel);
+              try {
+                const raw = await fsp.readFile(abs, "utf8");
+                return { json: JSON.parse(raw), abs, rel };
+              } catch {}
+            }
+            return { json: null, abs: null, rel: null };
+          }
+
+          async function writeLocalJson(outRel, json) {
+            const abs = path.join(process.cwd(), outRel);
+            await fsp.mkdir(path.dirname(abs), { recursive: true });
+            await fsp.writeFile(abs, JSON.stringify(json, null, 2) + "\n", "utf8");
+            return abs;
+          }
+
+          function mergeUsage(oldFile, newFile, sourceLabel) {
+            const nowIso = new Date().toISOString();
+
+            const oldItems = Array.isArray(oldFile?.items) ? oldFile.items : [];
+            const newItems = Array.isArray(newFile?.items) ? newFile.items : [];
+
+            const byItem = new Map();
+
+            function upsertItem(row) {
+              if (!row || !Number.isFinite(row.itemId)) return;
+              const itemId = Number(row.itemId);
+
+              const prev = byItem.get(itemId) || {
+                itemId,
+                slug: row.slug || "",
+                games: 0,
+                wins: 0,
+                topChamps: new Map(), // champId -> { champId, games, wins }
+              };
+
+              // prefer latest slug if present
+              if (row.slug) prev.slug = row.slug;
+
+              prev.games += Number(row.games || 0);
+              prev.wins += Number(row.wins || 0);
+
+              const champs = Array.isArray(row.topChamps) ? row.topChamps : [];
+              for (const c of champs) {
+                const champId = Number(c?.champId);
+                if (!Number.isFinite(champId)) continue;
+                const pc = prev.topChamps.get(champId) || { champId, games: 0, wins: 0 };
+                pc.games += Number(c.games || 0);
+                pc.wins += Number(c.wins || 0);
+                prev.topChamps.set(champId, pc);
+              }
+
+              byItem.set(itemId, prev);
+            }
+
+            // Merge old + new
+            for (const r of oldItems) upsertItem(r);
+            for (const r of newItems) upsertItem(r);
+
+            // Rebuild output rows
+            const outItems = Array.from(byItem.values()).map((it) => {
+              const top = Array.from(it.topChamps.values())
+                .map((c) => ({
+                  champId: c.champId,
+                  games: c.games,
+                  wins: c.wins,
+                  winrate: c.games > 0 ? clamp01(c.wins / c.games) : 0,
+                }))
+                .sort((a, b) => b.games - a.games)
+                .slice(0, 12);
+
+              return {
+                itemId: it.itemId,
+                slug: it.slug || "",
+                games: it.games,
+                wins: it.wins,
+                winrate: it.games > 0 ? clamp01(it.wins / it.games) : 0,
+                topChamps: top,
+              };
+            });
+
+            // Stable sort: most played first
+            outItems.sort((a, b) => b.games - a.games);
+
+            return {
+              generatedAt: nowIso,
+              source: sourceLabel,
+              patchBucket: newFile?.patchBucket || oldFile?.patchBucket,
+              items: outItems,
+            };
+          }
+
+          async function fetchOldFromBlob(rel) {
+            if (!base) return null;
+
+            // Support both possible key styles: "data/..." and "public/data/..."
+            const url1 = `${base.replace(/\/+$/, "")}/${rel.replace(/^\/+/, "")}`;
+            const url2 = `${base.replace(/\/+$/, "")}/public/${rel.replace(/^\/+/, "")}`;
+
+            return (await fetchJson(url1)) || (await fetchJson(url2)) || null;
+          }
+
+          async function runOne(source) {
+            const rel = `data/lol/items_usage_${source}.json`;
+
+            // Local candidates (in case your generator writes to either location)
+            const localCandidates = [
+              path.join("public", rel),
+              path.join(rel), // data/lol/... (repo-root)
+            ];
+
+            const oldRemote = await fetchOldFromBlob(rel);
+            const { json: newLocal } = await readLocalJson(localCandidates);
+
+            if (!newLocal?.items?.length && !oldRemote?.items?.length) {
+              console.log(`[items_usage:${source}] nothing to merge (no local, no remote)`);
+              return null;
+            }
+
+            const merged = mergeUsage(oldRemote, newLocal, source);
+
+            // Always write to public/ because your Next.js reads /public/data/...
+            const outAbs = await writeLocalJson(path.join("public", rel), merged);
+            console.log(`[items_usage:${source}] wrote merged -> ${outAbs}`);
+
+            return path.join("public", rel);
+          }
+
+          (async () => {
+            const outputs = [];
+            for (const source of ["ranked", "casual", "combined"]) {
+              const outRel = await runOne(source);
+              if (outRel) outputs.push(outRel);
+            }
+
+            // Print outputs so the next step can upload them
+            await fsp.writeFile(
+              path.join(process.cwd(), ".items_usage_outputs.txt"),
+              outputs.join("\n") + "\n",
+              "utf8"
+            );
+
+            console.log("[items_usage] outputs:", outputs);
+          })().catch((e) => {
+            console.error("[items_usage] merge failed:", e);
+            process.exit(0); // never fail job
+          });
+          NODE
+
+          # Upload the merged (public) files to Blob by overwriting the keys
+          if [ -n "$BLOB_READ_WRITE_TOKEN" ]; then
+            # Build BLOB_UPLOADS dynamically from what we actually wrote
+            UPLOADS=""
+            while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              # line is like: public/data/lol/items_usage_ranked.json
+              rel="${line#public/}"   # => data/lol/items_usage_ranked.json
+              if [ -n "$UPLOADS" ]; then
+                UPLOADS="${UPLOADS};${rel}=${line}"
+              else
+                UPLOADS="${rel}=${line}"
+              fi
+            done < .items_usage_outputs.txt
+
+            echo "BLOB_UPLOADS=$UPLOADS"
+            if [ -n "$UPLOADS" ]; then
+              BLOB_UPLOADS="$UPLOADS" node scripts/blob/upload-data.mjs || true
+            fi
+          fi
+
           exit 0
 
       - name: Commit & push static data only
