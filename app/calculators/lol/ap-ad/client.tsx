@@ -743,13 +743,7 @@ export default function LolItemCompareClient({
           <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Results</h2>
-              <button
-                type="button"
-                onClick={() => setShowAll((v) => !v)}
-                className="rounded-xl border border-neutral-800 bg-black px-3 py-2 text-xs font-semibold text-neutral-200 hover:border-neutral-600"
-              >
-                {showAll ? "Show less" : "Show more"}
-              </button>
+              
             </div>
 
             {eff ? (
