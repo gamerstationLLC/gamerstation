@@ -1,174 +1,246 @@
-// app/calculators/lol/ap-ad/page.tsx
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Suspense } from "react";
-import ApAdClient, { type ChampionRow } from "./client";
-import { blobUrl } from "@/lib/blob-client";
 
-export type ItemRow = Record<string, any>;
-export type SpellsOverrides = Record<string, any>;
+import ItemCompareClient from "./client";
+import { readPublicJson } from "@/lib/server/readPublicJson";
 
-/**
- * Keeping this page dynamic prevents build-time failures if data is temporarily missing
- * and avoids Next trying to prerender client-side search param usage.
- */
-export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "LoL Item Compare (Champion Stats + Deltas) | GamerStation",
+  description:
+    "Pick a champion to import base stats by level, then compare two items with clean green/red deltas. Summoner's Rift items only.",
+};
 
-/**
- * Fetch JSON from either:
- * - Vercel Blob (when NEXT_PUBLIC_BLOB_BASE_URL is set)
- * - Local /public fallback (when it is not set)
- *
- * IMPORTANT:
- * This avoids fs/path and fixes Next file tracing issues entirely.
- */
-async function fetchJson<T>(pathname: string): Promise<T | null> {
+// keep it similar to your LoL page
+export const revalidate = 21600; // 6 hours
+
+type LolChampionFile = {
+  version?: string;
+  champions?: any[];
+};
+
+type LolItemsFile = {
+  version?: string;
+  data?: Record<string, any>;
+};
+
+export type ChampionIndexRow = {
+  id: string; // Data Dragon champion "id" (e.g., "Aatrox")
+  key?: string; // numeric key as string if present
+  name: string;
+  title?: string;
+  partype?: string;
+  tags?: string[];
+  stats: {
+    hp: number;
+    hpperlevel: number;
+
+    armor: number;
+    armorperlevel: number;
+
+    spellblock: number;
+    spellblockperlevel: number;
+
+    // AA fields
+    attackdamage: number;
+    attackdamageperlevel: number;
+
+    attackspeed: number;
+    attackspeedperlevel: number;
+  };
+};
+
+export type ItemRow = {
+  id: string;
+  name: string;
+  gold: number | null;
+  purchasable: boolean;
+  tags: string[];
+  stats: Record<string, number>;
+  description: string;
+};
+
+async function getLatestDdragonVersion(): Promise<string> {
+  let fallback = "unknown";
+
   try {
-    const url = blobUrl(pathname); // returns "/data/..." locally or "https://.../data/..." in prod
-    const res = await fetch(url, {
-      // keep it fresh-ish; Blob CDN cache is controlled by upload script cacheControlMaxAge
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
+    const local = await readPublicJson<{ version?: string }>("data/lol/version.json");
+    fallback = local.version ?? fallback;
   } catch {
-    return null;
+    // ignore
+  }
+
+  try {
+    const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
+      next: { revalidate: 21600 },
+    });
+    if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
+    const versions = (await res.json()) as string[];
+    return versions?.[0] ?? fallback;
+  } catch {
+    return fallback;
   }
 }
 
-function normalizeChampionRows(data: any): ChampionRow[] {
-  if (Array.isArray(data)) return data as ChampionRow[];
-  if (data?.data && typeof data.data === "object") return Object.values(data.data) as ChampionRow[];
-  if (Array.isArray(data?.champions)) return data.champions as ChampionRow[];
-  return [];
+async function loadLolIndex(version: string): Promise<{
+  patch: string;
+  champions: ChampionIndexRow[];
+}> {
+  // EXACTLY like your LoL calc: disk public json
+  const json = await readPublicJson<LolChampionFile>("data/lol/champions_full.json");
+  const patch = version;
+
+  const champions: ChampionIndexRow[] = (json.champions ?? [])
+    .map((c: any) => ({
+      id: String(c.id),
+      key: c.key != null ? String(c.key) : undefined,
+      name: String(c.name),
+      title: c.title,
+      tags: c.tags ?? [],
+      partype: c.partype ?? "",
+      stats: {
+        hp: Number(c.stats?.hp ?? 0),
+        hpperlevel: Number(c.stats?.hpperlevel ?? 0),
+
+        armor: Number(c.stats?.armor ?? 0),
+        armorperlevel: Number(c.stats?.armorperlevel ?? 0),
+
+        spellblock: Number(c.stats?.spellblock ?? 0),
+        spellblockperlevel: Number(c.stats?.spellblockperlevel ?? 0),
+
+        attackdamage: Number(c.stats?.attackdamage ?? 0),
+        attackdamageperlevel: Number(c.stats?.attackdamageperlevel ?? 0),
+
+        attackspeed: Number(c.stats?.attackspeed ?? 0),
+        attackspeedperlevel: Number(c.stats?.attackspeedperlevel ?? 0),
+      },
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return { patch, champions };
 }
 
-function normalizeItemRows(data: any): ItemRow[] {
-  if (Array.isArray(data)) return data as ItemRow[];
-  if (data?.data && typeof data.data === "object") return Object.values(data.data) as ItemRow[];
-  if (Array.isArray(data?.items)) return data.items as ItemRow[];
-  return [];
+async function loadLolItems(version: string): Promise<{ patch: string; items: ItemRow[] }> {
+  // EXACTLY like your LoL calc: disk public json
+  const json = await readPublicJson<LolItemsFile>("data/lol/items.json");
+  const patch = version;
+
+  const SR_MAP_ID = "11";
+
+  const rows = Object.entries(json.data ?? {}).map(([id, it]: any) => ({
+    id: String(id),
+    name: String(it?.name ?? id),
+    gold: typeof it?.gold?.total === "number" ? it.gold.total : null,
+    purchasable: it?.gold?.purchasable ?? true,
+    tags: Array.isArray(it?.tags) ? it.tags : [],
+    stats: (it?.stats ?? {}) as Record<string, number>,
+    description: String(it?.description ?? ""),
+    _maps: it?.maps,
+    _inStore: it?.inStore,
+  }));
+
+  const srOnly = rows.filter((x) => {
+    const allowedByMap = x._maps?.[SR_MAP_ID] !== false;
+    const allowedInStore = x._inStore !== false;
+    return allowedByMap && allowedInStore;
+  });
+
+  const purch = srOnly.filter((x) => x.purchasable);
+
+  // de-dupe by name; keep higher gold version (same as your page)
+  const byName = new Map<string, (typeof purch)[number]>();
+  for (const it of purch) {
+    const k = it.name.trim().toLowerCase();
+    const prev = byName.get(k);
+    if (!prev) {
+      byName.set(k, it);
+      continue;
+    }
+    const prevGold = prev.gold ?? -1;
+    const nextGold = it.gold ?? -1;
+    if (nextGold > prevGold) byName.set(k, it);
+  }
+
+  const items: ItemRow[] = Array.from(byName.values())
+    .map(({ _maps, _inStore, ...rest }) => rest as ItemRow)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return { patch, items };
 }
 
-async function loadPatch(): Promise<string> {
-  // Your project has used a few different names historically — try them safely.
-  const v =
-    (await fetchJson<any>("data/lol/versions.json")) ??
-    (await fetchJson<any>("data/lol/version.json")) ??
-    null;
-
-  if (Array.isArray(v) && v[0]) return String(v[0]);
-  if (typeof v === "string") return v;
-  if (v?.patch) return String(v.patch);
-  if (v?.version) return String(v.version);
-
-  return "latest";
+function LoadingShell() {
+  return (
+    <main className="min-h-screen bg-transparent text-white px-6 py-12">
+      <div className="mx-auto max-w-6xl">
+        <div className="h-4 w-44 rounded bg-white/10" />
+        <div className="mt-8 h-10 w-[min(560px,100%)] rounded bg-white/10" />
+        <div className="mt-4 h-4 w-[min(720px,100%)] rounded bg-white/10" />
+        <div className="mt-10 h-[520px] w-full rounded-2xl bg-white/5" />
+      </div>
+    </main>
+  );
 }
 
-export default async function Page() {
-  const patch = await loadPatch();
+const topButtonClass =
+  "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
-  // Champions (try common filenames)
-  const championsRaw =
-    (await fetchJson<any>("data/lol/champions_index.json")) ??
-    (await fetchJson<any>("data/lol/champions.json")) ??
-    (await fetchJson<any>("data/lol/champions_full.json")) ??
-    (await fetchJson<any>("data/lol/ddragon/championFull.json")) ??
-    (await fetchJson<any>("data/lol/ddragon/champion.json")) ??
-    null;
+export default async function LolItemComparePage() {
+  const version = await getLatestDdragonVersion();
 
-  const champions = normalizeChampionRows(championsRaw);
-
-  // Items (try common filenames)
-  const itemsRaw =
-    (await fetchJson<any>("data/lol/items.json")) ??
-    (await fetchJson<any>("data/lol/items_index.json")) ??
-    (await fetchJson<any>("data/lol/items_full.json")) ??
-    (await fetchJson<any>("data/lol/item.json")) ??
-    (await fetchJson<any>("data/lol/ddragon/item.json")) ??
-    (await fetchJson<any>("data/lol/ddragon/items.json")) ??
-    null;
-
-  const items = normalizeItemRows(itemsRaw);
-
-  // Spell overrides (numeric truth for spell damage)
-  const overrides =
-    (await fetchJson<SpellsOverrides>("data/lol/spells_overrides.json")) ??
-    (await fetchJson<SpellsOverrides>("data/lol/overrides/spells_overrides.json")) ??
-    {};
-
-  const navBtn =
-    "rounded-xl border border-neutral-800 bg-transparent px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+  const [{ patch, champions }, { items }] = await Promise.all([
+    loadLolIndex(version),
+    loadLolItems(version),
+  ]);
 
   return (
-    <main className="relative min-h-screen text-white">
-      {/* Hub-style black background */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-transparent" />
-        
-      </div>
-
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        {/* ✅ Standard GS header: brand left + Calculators pill top-right */}
+    <main className="min-h-screen bg-transparent text-white px-6 py-12">
+      <div className="mx-auto max-w-6xl">
         <header className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 hover:opacity-90">
             <img
               src="/gs-logo-v2.png"
               alt="GamerStation"
-              className="
-                h-10 w-10 rounded-xl bg-black p-1
-                shadow-[0_0_30px_rgba(0,255,255,0.35)]
-              "
+              className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.35)]"
             />
             <span className="text-lg font-black tracking-tight">
               GamerStation<span className="align-super text-[0.6em]">™</span>
             </span>
           </Link>
 
-          <div className="ml-auto w-black px-5">
-            <a
-  href="/calculators/lol/hub"
-  className="
-    ml-auto rounded-xl border border-neutral-800
-    bg-black px-4 py-2 text-sm text-neutral-200
-    transition
-    hover:border-grey-400
-   
-    hover:text-white
-    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
-  "
->
-  LoL Hub
-</a>
+          <div className="ml-auto flex items-center gap-2">
+            <Link href="/calculators/lol/hub" className={topButtonClass}>
+              LoL Hub
+            </Link>
+            
           </div>
         </header>
 
-        <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">
-          League of Legends AP / AD Stat Impact
-        </h1>
+        <h1 className="mt-6 text-4xl sm:text-5xl font-bold tracking-tight">LoL Item Compare</h1>
 
         <p className="mt-2 text-sm text-neutral-400 italic">
           Not affiliated with, endorsed by, or sponsored by Riot Games.
         </p>
 
-        <p className="mt-3 max-w-3xl text-neutral-300">
-          See exactly how much{" "}
-          <span className="font-semibold text-white">+10 Ability Power</span> or{" "}
-          <span className="font-semibold text-white">+10 Attack Damage</span> changes your{" "}
-          <span className="font-semibold text-white">real damage after Armor &amp; Magic Resist</span>.
-          Perfect for item decisions, build optimization, and breakpoint checks.
+        <p className="mt-3 text-neutral-300 max-w-3xl">
+          Pick a champion (imports base stats by level), then compare two items with clean stat deltas.
+          Summoner&apos;s Rift items only.
         </p>
 
-        <div className="mt-10">
-          <Suspense
-            fallback={
-              <div className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6 text-sm text-neutral-300">
-                Loading calculator…
-              </div>
-            }
-          >
-            <ApAdClient champions={champions} patch={patch} items={items} overrides={overrides} />
-          </Suspense>
+        <div className="mt-1 flex flex-wrap items-center gap-2 py-2">
+          <Link href="/tools/lol/meta" className={topButtonClass}>
+            Meta
+          </Link>
+          <Link href="/tools/lol/champion-tiers" className={topButtonClass}>
+            Champion Tiers
+          </Link>
+          <Link href="/calculators/lol/champions" className={topButtonClass}>
+            Index
+          </Link>
         </div>
+
+        <Suspense fallback={<LoadingShell />}>
+          <ItemCompareClient champions={champions} items={items} patch={patch} />
+        </Suspense>
       </div>
     </main>
   );
