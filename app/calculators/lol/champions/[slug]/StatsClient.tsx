@@ -225,7 +225,7 @@ export default function StatsClient({
             href={calcHref}
             className="rounded-xl border border-neutral-800 bg-white px-3 py-2 text-sm font-semibold text-black hover:bg-neutral-200"
           >
-            Open Damage Calc (import {championId})
+            Open Damage Calc
           </Link>
         </div>
       </div>

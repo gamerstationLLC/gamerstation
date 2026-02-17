@@ -15,7 +15,7 @@ type ChampionRow = {
   title?: string;
   stats?: Record<string, number>;
 
-  // âœ… from your fetch script
+  // ✅ from your fetch script
   spells?: Array<{
     name?: string;
     tooltip?: string;
@@ -33,7 +33,7 @@ type ChampionRow = {
 };
 
 type ChampionsFullFile = {
-  version?: string;
+  version?: string; // NOTE: may represent "last changed" depending on your pipeline
   champions?: ChampionRow[];
 };
 
@@ -126,20 +126,54 @@ async function readChampionsFull(): Promise<ChampionsFullFile> {
     )) ?? null;
 
   if (!file) {
-    // Keep behavior consistent: if file missing, throw so callers can catch.
     throw new Error("champions_full.json missing (local and blob)");
   }
   return file;
 }
 
-async function readPatchFallback(): Promise<string | undefined> {
-  const json =
-    (await readJsonLocalFirstBlobFallback<{ version?: string }>(
-      VERSION_LOCAL,
-      VERSION_BLOB
-    )) ?? null;
+/**
+ * ✅ IMPORTANT:
+ * We want the *current* live patch label to be the latest Data Dragon version,
+ * not "the last time this champion changed".
+ *
+ * Source priority:
+ * 1) your version.json (local then blob)
+ * 2) Riot ddragon versions endpoint (server fetch)
+ */
+let currentPatchPromise: Promise<string | undefined> | null = null;
 
-  return json?.version;
+async function readCurrentPatch(): Promise<string | undefined> {
+  if (!currentPatchPromise) {
+    currentPatchPromise = (async () => {
+      // 1) Your version.json (preferred)
+      const json =
+        (await readJsonLocalFirstBlobFallback<{ version?: string }>(
+          VERSION_LOCAL,
+          VERSION_BLOB
+        )) ?? null;
+
+      const v = json?.version?.trim();
+      if (v) return v;
+
+      // 2) Fallback to Data Dragon live versions (first element is latest)
+      try {
+        const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
+          // allow caching on server; keeps it fresh without hammering
+          next: { revalidate: 60 * 60 }, // 1 hour
+        });
+        if (!res.ok) return undefined;
+        const arr = (await res.json()) as unknown;
+        if (Array.isArray(arr) && typeof arr[0] === "string" && arr[0].trim()) {
+          return String(arr[0]).trim();
+        }
+      } catch {
+        // ignore
+      }
+
+      return undefined;
+    })();
+  }
+  return currentPatchPromise;
 }
 
 /* ------------------- slug + champion helpers ------------------- */
@@ -335,7 +369,7 @@ function buildAbilitiesFromChampion(
 }
 
 /**
- * âœ… Dynamic metadata per champion page (SEO)
+ * ✅ Dynamic metadata per champion page (SEO)
  */
 export async function generateMetadata({
   params,
@@ -354,7 +388,7 @@ export async function generateMetadata({
   const champions = file?.champions ?? [];
   const champ = findChampionBySlug(champions, slug);
 
-  const patch = file?.version ?? (await readPatchFallback()) ?? "latest";
+  const patch = (await readCurrentPatch()) ?? file?.version ?? "current";
   const safeName = champ?.name ?? slug;
   const safeTitle = champ?.title ? ` ” ${champ.title}` : "";
 
@@ -386,7 +420,7 @@ export async function generateMetadata({
 }
 
 /**
- * âœ… Prebuild all champion slug pages
+ * ✅ Prebuild all champion slug pages
  */
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   try {
@@ -415,7 +449,8 @@ export default async function LolChampionPage({
   const champ = findChampionBySlug(champions, slug);
   if (!champ) return notFound();
 
-  const patch = file?.version ?? (await readPatchFallback()) ?? "latest";
+  // ✅ Use *current* patch label/version
+  const patch = (await readCurrentPatch()) ?? file?.version ?? "current";
 
   const championId = champ.id;
   const championName = champ.name;
