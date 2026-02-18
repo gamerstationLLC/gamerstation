@@ -57,31 +57,35 @@ export type ItemRow = {
   description: string;
 };
 
+/* -------------------- Blob helpers -------------------- */
+
+function blobUrl(pathname: string) {
+  const base = process.env.NEXT_PUBLIC_BLOB_BASE_URL;
+  if (!base) return null;
+  return `${base.replace(/\/+$/, "")}/${pathname.replace(/^\/+/, "")}`;
+}
+
+async function fetchJsonFromBlob<T>(pathname: string, revalidateSeconds = 300): Promise<T | null> {
+  const url = blobUrl(pathname);
+  if (!url) return null;
+
+  try {
+    const res = await fetch(url, { next: { revalidate: revalidateSeconds } });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * ✅ Cached "latest patch" getter with safe fallback.
- * - Uses Data Dragon versions endpoint (cached by Next)
- * - Falls back to your local public version.json if Riot fetch fails
+ * ✅ Blob-only patch getter.
+ * Source of truth: Blob -> data/lol/version.json
  */
-async function getLatestDdragonVersion(): Promise<string> {
-  let fallback = "unknown";
-
-  try {
-    const local = await readPublicJson<{ version?: string }>("data/lol/version.json");
-    fallback = local.version ?? fallback;
-  } catch {
-    // ignore
-  }
-
-  try {
-    const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
-      next: { revalidate: 21600 }, // 6 hours
-    });
-    if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
-    const versions = (await res.json()) as string[];
-    return versions?.[0] ?? fallback;
-  } catch {
-    return fallback;
-  }
+async function getPatchFromBlobOnly(): Promise<string> {
+  const json = await fetchJsonFromBlob<{ version?: string }>("data/lol/version.json", 300);
+  const v = String(json?.version ?? "").trim();
+  return v || "unknown";
 }
 
 async function loadLolIndex(version: string): Promise<{
@@ -186,7 +190,6 @@ const topButtonClass =
 function SeoBlock({ patch }: { patch: string }) {
   return (
     <section className="mt-10 border-t border-white/10 pt-8">
-      {/* Collapsed by default, but still server-rendered content for crawlers */}
       <details className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6" open={false}>
         <summary className="cursor-pointer select-none list-none">
           <div className="flex items-center justify-between gap-4">
@@ -290,14 +293,14 @@ function SeoBlock({ patch }: { patch: string }) {
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
-              <div className="text-sm font-semibold text-neutral-100">Is GamerStation affiliated with Riot?</div>
+              <div className="text-sm font-semibold text-neutral-100">
+                Is GamerStation affiliated with Riot?
+              </div>
               <p className="mt-1 text-sm text-neutral-300">
                 No — not affiliated with, endorsed by, or sponsored by Riot Games.
               </p>
             </div>
           </div>
-
-          
         </div>
       </details>
     </section>
@@ -305,7 +308,8 @@ function SeoBlock({ patch }: { patch: string }) {
 }
 
 export default async function LolCalculatorPage() {
-  const version = await getLatestDdragonVersion();
+  // ✅ patch/version comes ONLY from Blob now
+  const version = await getPatchFromBlobOnly();
 
   const [{ patch, champions }, { items }] = await Promise.all([
     loadLolIndex(version),
@@ -316,7 +320,6 @@ export default async function LolCalculatorPage() {
     <main className="min-h-screen bg-transparent text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center gap-3">
-          {/* GS brand */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90">
             <img
               src="/gs-logo-v2.png"
@@ -327,11 +330,10 @@ export default async function LolCalculatorPage() {
               "
             />
             <span className="text-lg font-black tracking-tight">
-              GamerStation<span className="align-super text-[0.6em]">TM</span>
+              GamerStation<span className="align-super text-[0.6em]">™</span>
             </span>
           </Link>
 
-          {/* Top-right: ONLY Calculators */}
           <div className="ml-auto">
             <Link href="/calculators/lol/hub" className={topButtonClass}>
               LoL Hub
@@ -352,7 +354,6 @@ export default async function LolCalculatorPage() {
           window. [Summoner&apos;s Rift Only]
         </p>
 
-        {/* ✅ 3 buttons right above the inputs card (i.e., above LolClient) */}
         <div className="mt-1 flex flex-wrap items-center gap-2 py-2">
           <Link href="/tools/lol/meta" className={topButtonClass}>
             Meta
@@ -365,12 +366,10 @@ export default async function LolCalculatorPage() {
           </Link>
         </div>
 
-        {/* ✅ Required by Next when LolClient uses useSearchParams() */}
         <Suspense fallback={<LoadingShell />}>
           <LolClient champions={champions} patch={patch} items={items} />
         </Suspense>
 
-        {/* ✅ Bottom-of-page SEO block (collapsed by default) */}
         <SeoBlock patch={patch} />
       </div>
     </main>

@@ -146,7 +146,7 @@ export default function StatsClient({
     };
   }, [level, stats]);
 
-  // ✅ SEO-ish helper values (rendered directly under the line in your screenshot)
+  // ✅ SEO-ish helper values
   const adLevel1 = useMemo(
     () => statAtLevel(stats.attackdamage, stats.attackdamageperlevel, 1),
     [stats.attackdamage, stats.attackdamageperlevel]
@@ -172,12 +172,13 @@ export default function StatsClient({
     [patch, championId]
   );
 
+  const safeName = championName || championId;
+  const canonical = `/calculators/lol/champions/${String(championId || "").toLowerCase()}`;
+
   return (
-    // ✅ Mobile edge-to-edge: remove the big side gutters on small screens
     <main className="mx-auto w-full max-w-6xl px-2 py-6 sm:px-4">
-      {/* ===== Header (matches your other pages) ===== */}
+      {/* ===== Header ===== */}
       <div className="mb-4">
-        {/* Row 1 */}
         <div className="flex items-center justify-between gap-3">
           <GSBrand />
 
@@ -189,7 +190,6 @@ export default function StatsClient({
           </Link>
         </div>
 
-        {/* Row 2 */}
         <div className="mt-3 flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <img
@@ -208,7 +208,6 @@ export default function StatsClient({
           </div>
         </div>
 
-        {/* Row 3 */}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Link
             href="/tools/lol/leaderboard"
@@ -240,13 +239,58 @@ export default function StatsClient({
         </div>
       </div>
 
-      {/* ✅ This is the line in your screenshot */}
+      {/* ✅ line in screenshot */}
       <p className="max-w-3xl text-sm text-neutral-300">
         Base stats and per-level scaling. For real fight math (items, resists, combos), use the
         calculator.
       </p>
 
-      {/* ✅ NEW LINE: directly below the screenshot line */}
+      {/* ✅ INSERTED FAQ block (right under the sentence above) */}
+      <section className="mt-6">
+        <details className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+          <summary className="cursor-pointer select-none px-4 py-3 text-sm font-semibold text-white hover:bg-white/10">
+            About {safeName} stats, scaling, and level 18 values
+            <span className="ml-2 text-xs font-normal text-neutral-400">(FAQ • click to expand)</span>
+          </summary>
+
+          <div className="px-4 pb-4 pt-3 text-sm text-neutral-300">
+            <p className="mb-3">
+              This page shows <strong>{safeName} stats by level</strong> (levels 1–18) for the{" "}
+              <strong>current LoL patch {patch}</strong>, including{" "}
+              <strong>base attack damage</strong>, <strong>attack damage scaling</strong>,{" "}
+              <strong>attack speed scaling</strong>, HP, armor, and magic resist.
+            </p>
+
+            <p className="mb-3">
+              If you searched for <strong>“{safeName} base attack damage level 18”</strong> or{" "}
+              <strong>“{safeName} AD at level 18”</strong>, use the slider above and set it to{" "}
+              <strong>Lv 18</strong>. The stat cards update instantly.
+            </p>
+
+            <p className="mb-3">
+              <strong>Attack speed</strong> is computed using Riot’s per-level growth model:{" "}
+              <em>base AS × (1 + growth% × (level − 1))</em>. This is why champions with similar base
+              AS can end up with very different AS at level 18.
+            </p>
+
+            <p className="mb-3">
+              Want real fight math like burst combos, DPS, resist shredding, and item passives? Open
+              the{" "}
+              <Link href={calcHref} className="text-white underline">
+                LoL damage calculator
+              </Link>{" "}
+              with {safeName} pre-loaded.
+            </p>
+
+            <p className="text-xs text-neutral-500">
+              Data source: Riot Data Dragon (numbers). Not affiliated with or endorsed by Riot Games.
+              Canonical: <span className="text-neutral-300">{canonical}</span>
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {/* ✅ NEW LINE: directly below */}
       <p className="mt-1 max-w-3xl break-words text-sm text-neutral-400">
         Looking for{" "}
         <span className="font-semibold text-white">{championName}</span>{" "}

@@ -131,8 +131,6 @@ function SeoBlock() {
               </p>
             </div>
           </div>
-
-          
         </div>
       </details>
     </section>
@@ -171,7 +169,7 @@ export default function Page() {
               className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
             />
             <span className="text-lg font-black tracking-tight">
-              GamerStation<span className="align-super text-[0.6em]">TM</span>
+              GamerStation<span className="align-super text-[0.6em]">™</span>
             </span>
           </Link>
 

@@ -103,7 +103,6 @@ const CHAMPIONS_FULL_LOCAL = path.join(
   "lol",
   "champions_full.json"
 );
-const VERSION_LOCAL = path.join(process.cwd(), "public", "data", "lol", "version.json");
 const OVERRIDES_LOCAL = path.join(
   process.cwd(),
   "public",
@@ -114,7 +113,7 @@ const OVERRIDES_LOCAL = path.join(
 
 // Blob pathnames (relative to NEXT_PUBLIC_BLOB_BASE_URL)
 const CHAMPIONS_FULL_BLOB = "data/lol/champions_full.json";
-const VERSION_BLOB = "data/lol/version.json";
+const VERSION_BLOB = "data/lol/version.json"; // ✅ version ONLY from blob
 const OVERRIDES_BLOB = "data/lol/spells_overrides.json";
 
 /* -------------------- data loaders -------------------- */
@@ -126,17 +125,16 @@ async function readChampionsFull(): Promise<ChampionsFullFile> {
       CHAMPIONS_FULL_BLOB
     )) ?? null;
 
-  if (!file) {
-    throw new Error("champions_full.json missing (local and blob)");
-  }
+  if (!file) throw new Error("champions_full.json missing (local and blob)");
   return file;
 }
 
 /**
  * ✅ Patch label source of truth:
- * 1) your version.json (local then blob)
+ * 1) Blob version.json ONLY
  * 2) Riot ddragon versions endpoint (server fetch)
  *
+ * We DO NOT use local version.json.
  * We DO NOT use champions_full.version for SEO patch labeling.
  */
 let currentPatchPromise: Promise<string> | null = null;
@@ -144,13 +142,8 @@ let currentPatchPromise: Promise<string> | null = null;
 async function readCurrentPatch(): Promise<string> {
   if (!currentPatchPromise) {
     currentPatchPromise = (async () => {
-      // 1) Your version.json (preferred)
-      const json =
-        (await readJsonLocalFirstBlobFallback<{ version?: string }>(
-          VERSION_LOCAL,
-          VERSION_BLOB
-        )) ?? null;
-
+      // 1) Blob version.json ONLY
+      const json = await fetchJsonFromBlob<{ version?: string }>(VERSION_BLOB);
       const v = String(json?.version ?? "").trim();
       if (v) return v;
 
@@ -369,7 +362,7 @@ function buildAbilitiesFromChampion(
 
 /**
  * ✅ Dynamic metadata per champion page (SEO)
- * Patch label comes from version.json (preferred) so Google shows current patch.
+ * Patch label comes from Blob version.json so Google shows current patch.
  */
 export async function generateMetadata({
   params,
@@ -388,13 +381,13 @@ export async function generateMetadata({
   const champions = file?.champions ?? [];
   const champ = findChampionBySlug(champions, slug);
 
-  const patch = await readCurrentPatch(); // ✅ always prefer version.json
+  const patch = await readCurrentPatch(); // ✅ blob-only
   const safeName = champ?.name ?? slug;
   const safeTitle = champ?.title ? ` — ${champ.title}` : "";
 
   const title = `${safeName}${safeTitle} Stats by Level (Patch ${patch}) | GamerStation`;
   const description =
-    `View ${safeName} base stats and per-level scaling for HP, armor, MR, AD, and attack speed. ` +
+    `View ${safeName} stats by level (1–18), including base attack damage, armor, MR, HP, and attack speed scaling. ` +
     `Current patch ${patch}. Not affiliated with or endorsed by Riot Games.`;
 
   const canonical = `/calculators/lol/champions/${slug}`;
@@ -449,7 +442,7 @@ export default async function LolChampionPage({
   const champ = findChampionBySlug(champions, slug);
   if (!champ) return notFound();
 
-  // ✅ Use *current* patch label/version (version.json -> ddragon fallback)
+  // ✅ Patch label from blob-only version.json
   const patch = await readCurrentPatch();
 
   const championId = champ.id;
@@ -460,9 +453,13 @@ export default async function LolChampionPage({
   const overridesEntry = await findOverridesEntryByChampionId(championId).catch(() => null);
   const abilities = buildAbilitiesFromChampion(champ, overridesEntry);
 
+  const safeName = championName || championId;
+  const canonical = `/calculators/lol/champions/${slug}`;
+
   return (
     <main className="min-h-screen bg-transparent text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
+        
         <StatsClient
           championId={championId}
           championName={championName}
@@ -472,6 +469,9 @@ export default async function LolChampionPage({
           abilities={abilities}
           defaultLevel={1}
         />
+
+        {/* ✅ SEO / About (SSR, collapsed) */}
+       
       </div>
     </main>
   );
