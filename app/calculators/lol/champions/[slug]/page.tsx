@@ -61,8 +61,9 @@ async function fetchJsonFromBlob<T>(pathname: string): Promise<T | null> {
 
   try {
     const res = await fetch(url, {
-      // These data files change often; avoid stale caches server-side.
-      cache: "no-store",
+      // ✅ allow Next to revalidate instead of pure no-store
+      // (helps crawlers see stable titles)
+      next: { revalidate: 60 * 60 }, // 1 hour
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -132,17 +133,15 @@ async function readChampionsFull(): Promise<ChampionsFullFile> {
 }
 
 /**
- * ✅ IMPORTANT:
- * We want the *current* live patch label to be the latest Data Dragon version,
- * not "the last time this champion changed".
- *
- * Source priority:
+ * ✅ Patch label source of truth:
  * 1) your version.json (local then blob)
  * 2) Riot ddragon versions endpoint (server fetch)
+ *
+ * We DO NOT use champions_full.version for SEO patch labeling.
  */
-let currentPatchPromise: Promise<string | undefined> | null = null;
+let currentPatchPromise: Promise<string> | null = null;
 
-async function readCurrentPatch(): Promise<string | undefined> {
+async function readCurrentPatch(): Promise<string> {
   if (!currentPatchPromise) {
     currentPatchPromise = (async () => {
       // 1) Your version.json (preferred)
@@ -152,25 +151,25 @@ async function readCurrentPatch(): Promise<string | undefined> {
           VERSION_BLOB
         )) ?? null;
 
-      const v = json?.version?.trim();
+      const v = String(json?.version ?? "").trim();
       if (v) return v;
 
-      // 2) Fallback to Data Dragon live versions (first element is latest)
+      // 2) Fallback: Data Dragon versions (latest is first)
       try {
         const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
-          // allow caching on server; keeps it fresh without hammering
           next: { revalidate: 60 * 60 }, // 1 hour
         });
-        if (!res.ok) return undefined;
+        if (!res.ok) return "current";
         const arr = (await res.json()) as unknown;
-        if (Array.isArray(arr) && typeof arr[0] === "string" && arr[0].trim()) {
-          return String(arr[0]).trim();
+        if (Array.isArray(arr) && typeof arr[0] === "string") {
+          const vv = String(arr[0]).trim();
+          if (vv) return vv;
         }
       } catch {
         // ignore
       }
 
-      return undefined;
+      return "current";
     })();
   }
   return currentPatchPromise;
@@ -370,6 +369,7 @@ function buildAbilitiesFromChampion(
 
 /**
  * ✅ Dynamic metadata per champion page (SEO)
+ * Patch label comes from version.json (preferred) so Google shows current patch.
  */
 export async function generateMetadata({
   params,
@@ -388,14 +388,14 @@ export async function generateMetadata({
   const champions = file?.champions ?? [];
   const champ = findChampionBySlug(champions, slug);
 
-  const patch = (await readCurrentPatch()) ?? file?.version ?? "current";
+  const patch = await readCurrentPatch(); // ✅ always prefer version.json
   const safeName = champ?.name ?? slug;
-  const safeTitle = champ?.title ? ` ” ${champ.title}` : "";
+  const safeTitle = champ?.title ? ` — ${champ.title}` : "";
 
   const title = `${safeName}${safeTitle} Stats by Level (Patch ${patch}) | GamerStation`;
   const description =
     `View ${safeName} base stats and per-level scaling for HP, armor, MR, AD, and attack speed. ` +
-    `Patch ${patch}. Not affiliated with or endorsed by Riot Games.`;
+    `Current patch ${patch}. Not affiliated with or endorsed by Riot Games.`;
 
   const canonical = `/calculators/lol/champions/${slug}`;
 
@@ -449,8 +449,8 @@ export default async function LolChampionPage({
   const champ = findChampionBySlug(champions, slug);
   if (!champ) return notFound();
 
-  // ✅ Use *current* patch label/version
-  const patch = (await readCurrentPatch()) ?? file?.version ?? "current";
+  // ✅ Use *current* patch label/version (version.json -> ddragon fallback)
+  const patch = await readCurrentPatch();
 
   const championId = champ.id;
   const championName = champ.name;

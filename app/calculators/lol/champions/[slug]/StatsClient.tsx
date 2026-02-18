@@ -146,6 +146,16 @@ export default function StatsClient({
     };
   }, [level, stats]);
 
+  // ✅ SEO-ish helper values (rendered directly under the line in your screenshot)
+  const adLevel1 = useMemo(
+    () => statAtLevel(stats.attackdamage, stats.attackdamageperlevel, 1),
+    [stats.attackdamage, stats.attackdamageperlevel]
+  );
+  const adLevel18 = useMemo(
+    () => statAtLevel(stats.attackdamage, stats.attackdamageperlevel, 18),
+    [stats.attackdamage, stats.attackdamageperlevel]
+  );
+
   // Order defensively: P Q W E R
   const abilityList = useMemo(() => {
     const order: AbilityKey[] = ["P", "Q", "W", "E", "R"];
@@ -230,9 +240,20 @@ export default function StatsClient({
         </div>
       </div>
 
+      {/* ✅ This is the line in your screenshot */}
       <p className="max-w-3xl text-sm text-neutral-300">
         Base stats and per-level scaling. For real fight math (items, resists, combos), use the
         calculator.
+      </p>
+
+      {/* ✅ NEW LINE: directly below the screenshot line */}
+      <p className="mt-1 max-w-3xl break-words text-sm text-neutral-400">
+        Looking for{" "}
+        <span className="font-semibold text-white">{championName}</span>{" "}
+        <span className="font-semibold text-white">base attack damage level 18</span>? On patch{" "}
+        <span className="font-semibold text-white">{patch}</span>, {championName} has{" "}
+        <span className="font-semibold text-white">{fmt(adLevel1, 2)}</span> base AD at level 1 and{" "}
+        <span className="font-semibold text-white">{fmt(adLevel18, 2)}</span> base AD at level 18.
       </p>
 
       {/* Stats card */}
@@ -316,9 +337,7 @@ export default function StatsClient({
                 {coveredCount}/4 damage mapped
               </span>
             </div>
-            <div className="mt-1 text-xs text-neutral-400">
-              Descriptions from Data Dragon.
-            </div>
+            <div className="mt-1 text-xs text-neutral-400">Descriptions from Data Dragon.</div>
           </div>
 
           <div className="text-xs text-neutral-400">
@@ -346,7 +365,6 @@ export default function StatsClient({
                 key={ab.key}
                 className="overflow-hidden rounded-2xl border border-white/10 bg-black/30"
               >
-                {/* Clickable header */}
                 <button
                   type="button"
                   onClick={() => setOpen((prev) => ({ ...prev, [ab.key]: !isOpen }))}
@@ -388,7 +406,6 @@ export default function StatsClient({
                           </div>
 
                           {ab.summary ? (
-                            // ✅ Prevent weird tokens ({{ ... }}) from forcing overflow on mobile
                             <div className="mt-1 line-clamp-2 break-words text-xs text-neutral-300">
                               {ab.summary}
                             </div>
@@ -428,7 +445,6 @@ export default function StatsClient({
                   </div>
                 </button>
 
-                {/* Expandable body */}
                 {isOpen ? (
                   <div className="border-t border-white/10 px-4 pb-4 pt-3">
                     {ab.key !== "P" ? (
