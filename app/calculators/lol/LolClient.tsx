@@ -2534,14 +2534,7 @@ useEffect(() => {
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={addOneAutoToBurst}
-                    disabled={!Number.isFinite(oneAutoRaw)}
-                    className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
-                  >
-                    Add 1 AA
-                  </button>
+                  
                 </div>
 
                 {/* Only show manual buckets when rotation is off */}
@@ -2610,7 +2603,7 @@ useEffect(() => {
             <div className="mt-4 text-[11px] leading-relaxed text-neutral-500">
               <span className="font-semibold text-neutral-400">Legend:</span>{" "}
               HP = Health, AD = Attack Damage, AP = Ability Power, AS = Attack Speed, MR = Magic Resist, AA = Auto Attack,
-              DPS = Damage per Second, TTK = Time to Kill, Pen = Penetration (Armor/MR)
+              DPS = Damage per Second, Pen = Penetration (Armor/MR)
             </div>
           </div>
         </section>

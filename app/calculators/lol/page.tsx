@@ -7,7 +7,7 @@ import LolClient from "./LolClient";
 import { readPublicJson } from "@/lib/server/readPublicJson";
 
 export const metadata: Metadata = {
-  title: "LoL Damage Calculator (Burst, DPS, TTK) | GamerStation",
+  title: "LoL Damage Calculator (Burst, DPS) | GamerStation",
   description:
     "LoL damage calculator for burst combos, DPS, and time-to-kill. Compare items and stats using Riot Data Dragon values. Simple & Advanced modes.",
 };
@@ -210,7 +210,7 @@ function SeoBlock({ patch }: { patch: string }) {
         <div className="mt-4 space-y-5 text-sm text-neutral-300">
           <p>
             GamerStation’s <strong>League of Legends damage calculator</strong> helps you estimate{" "}
-            <strong>combo damage</strong>, <strong>DPS</strong>, and <strong>time-to-kill (TTK)</strong>{" "}
+            <strong>combo damage</strong> and <strong>DPS</strong>{" "}
             on the current patch using Riot’s Data Dragon values. It’s built for fast “real fight math”:
             items, base stats, and enemy resistances.
           </p>
@@ -224,9 +224,7 @@ function SeoBlock({ patch }: { patch: string }) {
               <li>
                 <strong>DPS</strong> over a short window (autos + abilities)
               </li>
-              <li>
-                <strong>TTK</strong> (how fast you can kill a target) with armor/MR applied
-              </li>
+              
               <li>
                 Damage comparisons across <strong>items</strong> and <strong>stats</strong>
               </li>
