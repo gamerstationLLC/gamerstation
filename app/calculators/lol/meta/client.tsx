@@ -816,9 +816,7 @@ export default function MetaClient() {
           Min display {meta.minDisplaySample}
         </span>
 
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
-          Generated {formatGeneratedAtStable(meta.generatedAt)}
-        </span>
+    
       </div>
     );
   }, [meta, patch, displayPatch]);
