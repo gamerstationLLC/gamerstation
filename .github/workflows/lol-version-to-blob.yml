@@ -2,8 +2,8 @@ name: Update LoL Patch Version (Blob)
 
 on:
   schedule:
-    # Midnight Eastern Time = 05:00 UTC (standard time). This runs daily at 05:00 UTC.
-    - cron: "0 5 * * *"
+    # Every 6 hours
+    - cron: "0 */6 * * *"
   workflow_dispatch: {}
 
 concurrency:
@@ -35,28 +35,38 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Fetch latest Data Dragon patch -> public/data/lol/version.json
+      - name: Write SR realm patch/version -> public/data/lol/version.json
         run: |
           set -euo pipefail
-          mkdir -p public/data/lol
+          node scripts/lol/write-version-json.mjs
+          echo "-----"
+          cat public/data/lol/version.json
 
-          # Latest is first element
-          VERSION="$(curl -fsSL https://ddragon.leagueoflegends.com/api/versions.json | node -e 'const a=JSON.parse(require("fs").readFileSync(0,"utf8")); process.stdout.write(String(a?.[0] ?? ""))')"
-
-          if [ -z "$VERSION" ]; then
-            echo "Failed to fetch latest Data Dragon version."
-            exit 1
-          fi
-
-          echo "{\"version\":\"$VERSION\"}" > public/data/lol/version.json
-          echo "Wrote public/data/lol/version.json => $VERSION"
+      - name: Sanity check version.json (avoid uploading unknown)
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require("fs");
+          const j = JSON.parse(fs.readFileSync("public/data/lol/version.json","utf8"));
+          const patch = String(j.patch || "").trim();
+          const dd = String(j.ddragon || j.version || "").trim();
+          if (!patch || patch === "unknown" || patch === "—") {
+            console.error("Refusing to upload: patch is missing/unknown:", patch);
+            process.exit(1);
+          }
+          if (!dd || dd === "unknown" || dd === "—") {
+            console.error("Refusing to upload: ddragon/version is missing/unknown:", dd);
+            process.exit(1);
+          }
+          console.log("Sanity OK:", { patch, dd });
+          NODE
 
       - name: Upload version.json to Blob (overwrite)
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
           BLOB_CACHE_SECONDS: "300"
           BLOB_FORCE_OVERWRITE: "1"
-          # IMPORTANT: format is LOCAL=DEST (your upload script parses localRel on the left)
+          # IMPORTANT: format is LOCAL=DEST
           BLOB_UPLOADS: "public/data/lol/version.json=data/lol/version.json"
         run: |
           set +e
