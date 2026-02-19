@@ -396,7 +396,7 @@ export async function generateMetadata({
   const safeName = champ?.name ?? slug;
   const safeTitle = champ?.title ? ` — ${champ.title}` : "";
 
-  const title = `${safeName}${safeTitle} Stats by Level (Patch ${patch}) | GamerStation`;
+  const title = `${safeName}${safeTitle} Stats by Level | GamerStation`;
   const description =
     `View ${safeName} stats by level (1–18), including base attack damage, armor, MR, HP, and attack speed scaling. ` +
     `Current patch ${patch}. Not affiliated with or endorsed by Riot Games.`;
