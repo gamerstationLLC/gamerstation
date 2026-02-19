@@ -324,7 +324,7 @@ function sortArrow(active: boolean, desc: boolean) {
 
 export default function LolChampionTiersClient({
   initialRows,
-  patch = "—",   // display patch (26.x)
+  patch = "—", // display patch (26.x)
   ddragon = "—", // asset version (16.x.x)
   hrefBase = "/calculators/lol/champions",
 }: {
@@ -434,9 +434,6 @@ export default function LolChampionTiersClient({
       const existing = (r.icon || r.image || "").toString().trim();
 
       // Resolve DDragon champion ID:
-      // - If your row.key is numeric, map via champion.json key->id
-      // - Else map by exact name -> id
-      // - Else fallback: attempt to use displayName as id (won't work for "Lee Sin" etc)
       const keyStr = (r.key ?? "").toString().trim();
 
       let champId = "";
@@ -474,16 +471,18 @@ export default function LolChampionTiersClient({
     }
     const hasRoleData = roleSet.size >= 2;
 
-    let filtered = derivedBase;
+    // ✅ IMPORTANT:
+    // Compute tiers on the "base list" after role + minGames filtering,
+    // and only apply name search AFTER tiers are assigned.
     const effectiveRole = hasRoleData ? role : "all";
 
-    if (effectiveRole !== "all") filtered = filtered.filter((r) => r.role === effectiveRole);
-    if (query) filtered = filtered.filter((r) => r.name.toLowerCase().includes(query));
-    filtered = filtered.filter((r) => r.games >= minGames);
+    let baseForTier = derivedBase;
+    if (effectiveRole !== "all") baseForTier = baseForTier.filter((r) => r.role === effectiveRole);
+    baseForTier = baseForTier.filter((r) => r.games >= minGames);
 
-    const gVals = filtered.map((r) => Math.log1p(r.games));
-    const wVals = filtered.map((r) => r.winrate);
-    const bVals = filtered.map((r) => r.banrate);
+    const gVals = baseForTier.map((r) => Math.log1p(r.games));
+    const wVals = baseForTier.map((r) => r.winrate);
+    const bVals = baseForTier.map((r) => r.banrate);
 
     const muG = mean(gVals);
     const sdG = std(gVals, muG);
@@ -496,7 +495,7 @@ export default function LolChampionTiersClient({
     const W_WIN = 0.65;
     const W_BAN = mode === "pro" ? 0.20 : 0.05;
 
-    const withScores = filtered.map((r) => {
+    const withScoresBase = baseForTier.map((r) => {
       const zG = (Math.log1p(r.games) - muG) / sdG;
       const zW = (r.winrate - muW) / sdW;
       const zB = (r.banrate - muB) / sdB;
@@ -504,7 +503,7 @@ export default function LolChampionTiersClient({
       return { ...r, score };
     });
 
-    const byScore = [...withScores].sort((a, b) => b.score - a.score);
+    const byScore = [...withScoresBase].sort((a, b) => b.score - a.score);
     const n = byScore.length;
 
     const tierById = new Map<string, Tier>();
@@ -513,12 +512,17 @@ export default function LolChampionTiersClient({
       tierById.set(byScore[i].id, tierFromPercentile(p));
     }
 
-    const finalRows: Row[] = withScores.map((r) => {
+    const finalBaseRows: Row[] = withScoresBase.map((r) => {
       const tier = tierById.get(r.id) ?? "—";
       return { ...r, tier, tierRank: TIER_RANK[tier] ?? 9 };
     });
 
-    finalRows.sort((a, b) => {
+    // ✅ now apply search filter ONLY for display (tiers stay stable)
+    let visible = finalBaseRows;
+    if (query) visible = visible.filter((r) => r.name.toLowerCase().includes(query));
+
+    // ✅ sort visible rows
+    visible.sort((a, b) => {
       const av =
         sortBy === "tier"
           ? a.tierRank
@@ -542,7 +546,7 @@ export default function LolChampionTiersClient({
       return desc ? -diff : diff;
     });
 
-    return { rows: finalRows.slice(0, 200), hasRoleData };
+    return { rows: visible.slice(0, 200), hasRoleData };
   }, [initialRows, champMap, ddragonLive, mode, role, q, minGames, sortBy, desc]);
 
   useEffect(() => {
@@ -597,7 +601,6 @@ export default function LolChampionTiersClient({
               </div>
             </div>
 
-            {/* Optional: show both versions for debugging */}
             <div className="text-[11px] text-neutral-500">
               Patch <span className="text-neutral-300">{patchLive}</span>{" "}
               <span className="text-neutral-700">•</span>{" "}
