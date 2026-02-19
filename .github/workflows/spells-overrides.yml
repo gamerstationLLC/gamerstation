@@ -1,0 +1,88 @@
+name: spells-overrides
+
+on:
+  schedule:
+    - cron: "0 */8 * * *" # every 8 hours
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: spells-overrides
+  cancel-in-progress: true
+
+jobs:
+  spells-overrides:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Where your generator writes the file
+      LOCAL_PATH: public/data/lol/spells_overrides.json
+
+      # Where it lives in Blob
+      BLOB_PATH: data/lol/spells_overrides.json
+      BLOB_PUBLIC_BASE: https://or3vgdqybw6oou7j.public.blob.vercel-storage.com
+
+      # Needed by your upload script
+      BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Generate spells overrides (local file)
+        run: node scripts/gen_spells_overrides.mjs
+
+      - name: Compare local vs blob (skip upload if unchanged)
+        id: cmp
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f "$LOCAL_PATH" ]; then
+            echo "Local file missing: $LOCAL_PATH"
+            exit 1
+          fi
+
+          LOCAL_SHA=$(sha256sum "$LOCAL_PATH" | awk '{print $1}')
+          echo "local_sha=$LOCAL_SHA" >> $GITHUB_OUTPUT
+
+          REMOTE_URL="$BLOB_PUBLIC_BASE/$BLOB_PATH"
+          echo "Remote URL: $REMOTE_URL"
+
+          # blob may not exist on first run
+          if curl -fsSL "$REMOTE_URL" -o /tmp/remote_spells_overrides.json; then
+            REMOTE_SHA=$(sha256sum /tmp/remote_spells_overrides.json | awk '{print $1}')
+          else
+            REMOTE_SHA=""
+          fi
+
+          echo "remote_sha=$REMOTE_SHA" >> $GITHUB_OUTPUT
+
+          if [ "$LOCAL_SHA" = "$REMOTE_SHA" ] && [ -n "$REMOTE_SHA" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes detected. Skipping upload."
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected. Will upload."
+          fi
+
+      - name: Upload spells overrides to Blob
+        if: steps.cmp.outputs.changed == 'true'
+        run: node scripts/blob/upload-spells-overrides.mjs
+
+      - name: Print blob URL
+        run: echo "$BLOB_PUBLIC_BASE/$BLOB_PATH"
