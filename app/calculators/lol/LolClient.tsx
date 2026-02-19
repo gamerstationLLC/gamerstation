@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { ChampionIndexRow, ItemRow } from "./page";
+import { blobUrl } from "@/lib/blob-client";
+
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
@@ -612,7 +614,14 @@ function computeSpellRawDamage(opts: {
 // ==============================
 
 // Extract first damage placeholder key from tooltip, preferring typed tags.
-function extractCalcKeyFromTooltip(tooltip?: string): { key: string; dmg: "phys" | "magic" | "true" } | null {
+// ==============================
+// CommunityDragon tooltip-calculation parsing (works for ALL champs)
+// ==============================
+
+// Extract first damage placeholder key from tooltip, preferring typed tags.
+function extractCalcKeyFromTooltip(
+  tooltip?: string
+): { key: string; dmg: "phys" | "magic" | "true" } | null {
   if (!tooltip) return null;
   const t = String(tooltip);
 
@@ -622,15 +631,22 @@ function extractCalcKeyFromTooltip(tooltip?: string): { key: string; dmg: "phys"
     { tag: "trueDamage", dmg: "true" as const },
   ];
 
+  // Allow @ and : in keys because some CD placeholders include suffixes.
+  // Examples seen: {{ qdamage }}, {{ qdamage2 }}, {{ qdamage@Effect1 }}
+  const KEY = "([a-zA-Z0-9_@:]+)";
+
   for (const { tag, dmg } of typed) {
     // match: <physicalDamage> ... {{ qdamage }} ... </physicalDamage>
-    const re = new RegExp(`<${tag}>[\\s\\S]*?\\{\\{\\s*([a-zA-Z0-9_]+)\\s*\\}\\}[\\s\\S]*?<\\/${tag}>`, "i");
+    const re = new RegExp(
+      `<${tag}>[\\s\\S]*?\\{\\{\\s*${KEY}\\s*\\}\\}[\\s\\S]*?<\\/${tag}>`,
+      "i"
+    );
     const m = re.exec(t);
     if (m?.[1]) return { key: m[1], dmg };
   }
 
   // fallback: first {{ key }}
-  const m2 = /\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/.exec(t);
+  const m2 = new RegExp(`\\{\\{\\s*${KEY}\\s*\\}\\}`).exec(t);
   if (m2?.[1]) return { key: m2[1], dmg: "magic" }; // unknown → treat as magic by default
   return null;
 }
@@ -645,23 +661,44 @@ function pickRankedNumber(val: any, rank: number): number {
   return 0;
 }
 
-// Best-effort evaluator for CommunityDragon "spellCalculations" entries.
-// Supports the common pattern: base values per rank + coefficients that scale with AP/AD/bonusAD.
+/**
+ * CommunityDragon calculations are NOT fully standardized.
+ * We keep this evaluator intentionally conservative:
+ * - pull a "base ranked value" from many possible field names
+ * - add AP/AD/bonusAD scaling from many possible coefficient shapes
+ * If we can't confidently read it, return 0 (safe).
+ */
 function evalCdCalculation(
-  calc: any,
+  calcAny: any,
   rank: number,
   stats: { ap: number; ad: number; bonusAd: number }
 ): number {
-  if (!calc) return 0;
+  if (!calcAny) return 0;
 
-  // 1) Base values (most common)
-  // Common shapes:
-  // - { values: [10,20,30,40,50], ... }
-  // - { values: [[10,20,30,40,50]], ... }  (nested)
-  // - { values: { "1": 10, "2": 20, ... } }
+  // unwrap common wrappers: { calculation: {...} }, { mCalculation: {...} }, { calc: {...} }
+  const calc =
+    calcAny.calculation ??
+    calcAny.mCalculation ??
+    calcAny.calc ??
+    calcAny.mCalc ??
+    calcAny;
+
+  // -----------------------
+  // 1) Base ranked values
+  // -----------------------
   let base = 0;
 
-  const values = (calc as any).values ?? (calc as any).value ?? null;
+  // Common value containers
+  const values =
+    calc.values ??
+    calc.value ??
+    calc.mValues ??
+    calc.mValue ??
+    calc.baseValues ??
+    calc.mBaseValues ??
+    calc.mDataValues ??
+    null;
+
   if (Array.isArray(values)) {
     if (values.length && Array.isArray(values[0])) {
       // nested arrays: pick first numeric row that looks ranked
@@ -677,31 +714,68 @@ function evalCdCalculation(
       base = pickRankedNumber(values, rank);
     }
   } else if (values && typeof values === "object") {
-    const arr = Object.keys(values)
+    // object map: { "1": 10, "2": 20, ... } or { "0": 10, "1": 20, ... }
+    const keys = Object.keys(values);
+    const arr = keys
       .sort((a, b) => Number(a) - Number(b))
       .map((k) => (values as any)[k]);
     base = pickRankedNumber(arr, rank);
   }
 
-  // 2) Coefficients (AP/AD scalings)
+  // -----------------------
+  // 2) Coefficients / scalings
+  // -----------------------
   let scaling = 0;
-  const coeffs = (calc as any).coefficients;
-  if (Array.isArray(coeffs)) {
-    for (const c of coeffs) {
-      const coef = pickRankedNumber((c as any).coefficient ?? (c as any).coeff ?? (c as any).value, rank);
-      if (!Number.isFinite(coef) || coef === 0) continue;
 
-      const rawKey = String((c as any).scaling ?? (c as any).stat ?? (c as any).link ?? "").toLowerCase();
+  // Common coefficient containers
+  const coeffs =
+    calc.coefficients ??
+    calc.mCoefficients ??
+    calc.mCoefficient ??
+    calc.scalings ??
+    calc.mScalings ??
+    calc.parts ??
+    calc.mParts ??
+    null;
 
-      if (rawKey.includes("bonus") && rawKey.includes("attack")) {
-        scaling += coef * stats.bonusAd;
-      } else if (rawKey.includes("attack") || rawKey.includes("ad")) {
-        scaling += coef * stats.ad;
-      } else if (rawKey.includes("ability") || rawKey.includes("spell") || rawKey.includes("magic") || rawKey.includes("ap")) {
-        scaling += coef * stats.ap;
-      } else {
-        // unknown coefficient type → ignore (keeps us safe)
-      }
+  const list: any[] = Array.isArray(coeffs) ? coeffs : [];
+
+  for (const c of list) {
+    if (!c) continue;
+
+    // coefficient number may live in a lot of names
+    const coef =
+      pickRankedNumber(c.coefficient ?? c.coeff ?? c.value ?? c.mValue ?? c.mCoefficient, rank) ||
+      0;
+
+    if (!Number.isFinite(coef) || coef === 0) continue;
+
+    // scaling key may live in a lot of names
+    const rawKey = String(c.scaling ?? c.stat ?? c.link ?? c.mScaling ?? c.mStat ?? c.name ?? "")
+      .toLowerCase()
+      .replace(/\s+/g, "");
+
+    // Accept a bunch of common variants:
+    // - spellpower / abilitypower / ap
+    // - attackdamage / totalad / ad
+    // - bonusattackdamage / bonusad
+    if (
+      rawKey.includes("bonus") &&
+      (rawKey.includes("attack") || rawKey.includes("ad"))
+    ) {
+      scaling += coef * (Number.isFinite(stats.bonusAd) ? stats.bonusAd : 0);
+    } else if (rawKey.includes("attackdamage") || rawKey === "ad" || rawKey.includes("totalad")) {
+      scaling += coef * (Number.isFinite(stats.ad) ? stats.ad : 0);
+    } else if (
+      rawKey.includes("spellpower") ||
+      rawKey.includes("abilitypower") ||
+      rawKey === "ap" ||
+      rawKey.includes("spelldamage") ||
+      rawKey.includes("magic")
+    ) {
+      scaling += coef * (Number.isFinite(stats.ap) ? stats.ap : 0);
+    } else {
+      // unknown coefficient type → ignore (safe)
     }
   }
 
@@ -727,7 +801,16 @@ function computeSpellRawDamageFromCd(opts: {
   const calcRef = extractCalcKeyFromTooltip(spell.tooltip);
   if (!calcRef?.key) return null;
 
-  const calc = ddFull.spellCalculations?.[calcRef.key];
+  // Sometimes placeholders have suffixes like "@Effect1".
+  // Try exact key first, then try stripping suffix after "@" or ":".
+  const rawKey = calcRef.key;
+  const baseKey = rawKey.split("@")[0]?.split(":")[0] ?? rawKey;
+
+  const calc =
+    ddFull.spellCalculations?.[rawKey] ??
+    ddFull.spellCalculations?.[baseKey] ??
+    null;
+
   const raw = evalCdCalculation(calc, rank, {
     ap: Number.isFinite(effAp) ? effAp : 0,
     ad: Number.isFinite(effAd) ? effAd : 0,
@@ -740,6 +823,7 @@ function computeSpellRawDamageFromCd(opts: {
   if (calcRef.dmg === "true") return { phys: 0, magic: 0, trueDmg: raw, rawTotal: raw };
   return { phys: 0, magic: raw, trueDmg: 0, rawTotal: raw };
 }
+
 
 export default function LolClient({
   champions,
@@ -771,22 +855,28 @@ export default function LolClient({
   // External overrides (slot-based): loaded once, never triggers rerenders
   const externalOverridesRef = useRef<ExternalOverridesJson | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/data/lol/spells_overrides.json", { cache: "no-store" });
-        if (!res.ok) return;
-        const json = (await res.json()) as ExternalOverridesJson;
-        if (!cancelled) externalOverridesRef.current = json;
-      } catch {
-        // ignore
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // import { blobUrl } from "@/lib/blob-client";  // add this import at top
+
+useEffect(() => {
+  let cancelled = false;
+  (async () => {
+    try {
+      const blob = blobUrl("data/lol/spells_overrides.json");
+      const url = blob ?? "/data/lol/spells_overrides.json";
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) return;
+      const json = (await res.json()) as ExternalOverridesJson;
+      if (!cancelled) externalOverridesRef.current = json;
+    } catch {
+      // ignore
+    }
+  })();
+  return () => {
+    cancelled = true;
+  };
+}, []);
+
 
 
   // ✅ Import champion from URL once: /calculators/lol?champion=Ahri
