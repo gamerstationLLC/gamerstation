@@ -96,7 +96,8 @@ function GSBrand() {
 export default function StatsClient({
   championId,
   championName,
-  patch,
+  patch, // display patch (can be 26.x if you want)
+  imagePatch, // ✅ real Data Dragon version (e.g. 16.3.1) for images
   calcHref,
   stats,
   abilities,
@@ -105,6 +106,7 @@ export default function StatsClient({
   championId: string;
   championName: string;
   patch: string;
+  imagePatch: string;
   calcHref: string;
   stats: ChampionBaseStats;
   abilities: ChampionAbility[];
@@ -167,9 +169,10 @@ export default function StatsClient({
     return abilityList.filter((ab) => ab.key !== "P" && isNumericAbility(ab)).length;
   }, [abilityList]);
 
+  // ✅ IMPORTANT: use imagePatch for Data Dragon URLs (NOT display patch)
   const champImg = useMemo(
-    () => `https://ddragon.leagueoflegends.com/cdn/${patch}/img/champion/${championId}.png`,
-    [patch, championId]
+    () => `https://ddragon.leagueoflegends.com/cdn/${imagePatch}/img/champion/${championId}.png`,
+    [imagePatch, championId]
   );
 
   const safeName = championName || championId;
@@ -239,13 +242,11 @@ export default function StatsClient({
         </div>
       </div>
 
-      {/* ✅ line in screenshot */}
       <p className="max-w-3xl text-sm text-neutral-300">
         Base stats and per-level scaling. For real fight math (items, resists, combos), use the
         calculator.
       </p>
 
-      {/* ✅ INSERTED FAQ block (right under the sentence above) */}
       <section className="mt-6">
         <details className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
           <summary className="cursor-pointer select-none px-4 py-3 text-sm font-semibold text-white hover:bg-white/10">
@@ -290,7 +291,6 @@ export default function StatsClient({
         </details>
       </section>
 
-      {/* ✅ NEW LINE: directly below */}
       <p className="mt-1 max-w-3xl break-words text-sm text-neutral-400">
         Looking for{" "}
         <span className="font-semibold text-white">{championName}</span>{" "}

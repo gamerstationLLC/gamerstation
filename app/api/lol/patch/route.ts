@@ -1,20 +1,20 @@
-﻿import { NextResponse } from "next/server";
-import fs from "node:fs/promises";
-import path from "node:path";
+﻿// app/api/lol/patch/route.ts
+import { NextResponse } from "next/server";
+import { getLolVersion } from "../_shared/getLolVersion";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  try {
-    const p = path.join(process.cwd(), "public", "data", "lol", "version.json");
-    const raw = await fs.readFile(p, "utf-8");
-    const json = JSON.parse(raw);
+  const v = await getLolVersion();
 
-    return NextResponse.json(
-      { patch: json.patch ?? json.version ?? "unknown" },
-      { status: 200 }
-    );
-  } catch {
-    return NextResponse.json({ patch: "unknown" }, { status: 200 });
-  }
+  return NextResponse.json(
+    {
+      patch: v.patch, // display patch (26.x)
+      ddragon: v.ddragon, // asset version (16.x.x)
+      source: v.source,
+      fallbackUsed: v.fallbackUsed,
+      updatedAt: v.updatedAt,
+    },
+    { status: 200 }
+  );
 }

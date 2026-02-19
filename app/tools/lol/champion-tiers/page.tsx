@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import LolChampionTiersClient, { type ChampionStatsRow } from "./client";
-import { readPublicJson } from "@/lib/blob"; // ✅ switched to Blob-first helper
+import { readPublicJson } from "@/lib/blob"; // Blob-first helper
 
 export const metadata = {
   title: "LoL Champion Tiers (S–D) | GamerStation",
@@ -14,7 +14,7 @@ export const dynamic = "force-static";
 export const revalidate = 600;
 
 // -----------------------------
-// Helpers (Blob-first now)
+// Helpers (Blob-first)
 // -----------------------------
 async function readJsonSafe<T>(pathname: string): Promise<T | null> {
   try {
@@ -24,13 +24,22 @@ async function readJsonSafe<T>(pathname: string): Promise<T | null> {
   }
 }
 
-async function guessPatch(): Promise<string> {
-  const v1 = await readJsonSafe<any>("data/lol/version.json");
-  const v2 = await readJsonSafe<any>("data/lol/patch.json");
+type VersionJson = {
+  patch?: string; // display patch (26.x)
+  version?: string; // legacy alias for display patch
+  ddragon?: string; // asset version (16.x.x) - optional
+};
 
-  const p = String(v1?.version ?? v1?.patch ?? v2?.version ?? v2?.patch ?? "").trim();
+async function guessVersionFromBlob(): Promise<{ patch: string; ddragon: string }> {
+  const v = await readJsonSafe<VersionJson>("data/lol/version.json");
+  const display = String(v?.patch ?? v?.version ?? "").trim();
+  const dd = String(v?.ddragon ?? "").trim();
 
-  return p || "—";
+  return {
+    patch: display || "—",
+    // if blob doesn't contain ddragon yet, we let client resolve it via /api/lol/patch
+    ddragon: dd || "—",
+  };
 }
 
 async function loadChampionTierRows(): Promise<ChampionStatsRow[]> {
@@ -69,7 +78,6 @@ function GSBrand() {
 function SeoBlock({ patch }: { patch: string }) {
   return (
     <section className="mt-8 border-t border-white/10 pt-6">
-      {/* Collapsed by default, still rendered as HTML */}
       <details className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6" open={false}>
         <summary className="cursor-pointer select-none list-none">
           <div className="flex items-center justify-between gap-4">
@@ -92,32 +100,14 @@ function SeoBlock({ patch }: { patch: string }) {
             <strong>current patch</strong> (Patch <strong>{patch}</strong>). It groups champions
             into <strong>S, A, B, C, and D tiers</strong> using a blended score that emphasizes{" "}
             <strong>win rate</strong>, <strong>pick rate</strong>, and <strong>ban rate</strong>{" "}
-            (when available). Use it to quickly spot <strong>meta champions</strong> that are
-            performing well right now.
+            (when available).
           </p>
-
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold text-white">Common searches this matches</h3>
-            <ul className="list-disc pl-5 text-sm text-white/80">
-              <li>LoL tier list</li>
-              <li>League of Legends tier list</li>
-              <li>LoL tier list patch {patch}</li>
-              <li>best champions right now</li>
-              <li>meta champions</li>
-              <li>best champs for ranked</li>
-              <li>best champions by role (top/jungle/mid/adc/support)</li>
-              <li>LoL ranked tier list</li>
-            </ul>
-          </div>
 
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-white">How to use it</h3>
             <ul className="list-disc pl-5 text-sm text-white/80">
               <li>
                 Start with <strong>S tier</strong> to find high-impact picks.
-              </li>
-              <li>
-                Filter/sort (in the client) to compare champions by the underlying stats.
               </li>
               <li>
                 Pair it with{" "}
@@ -131,7 +121,7 @@ function SeoBlock({ patch }: { patch: string }) {
                 <Link href="/calculators/lol" className="text-white hover:underline">
                   LoL Damage Calculator
                 </Link>{" "}
-                to test burst/DPS with the items you see in meta builds.
+                to test burst/DPS.
               </li>
             </ul>
           </div>
@@ -147,7 +137,10 @@ function SeoBlock({ patch }: { patch: string }) {
 }
 
 export default async function LolChampionTiersPage() {
-  const [patch, initialRows] = await Promise.all([guessPatch(), loadChampionTierRows()]);
+  const [{ patch, ddragon }, initialRows] = await Promise.all([
+    guessVersionFromBlob(),
+    loadChampionTierRows(),
+  ]);
 
   const cacheLabel = formatCacheLabel(revalidate);
 
@@ -178,18 +171,13 @@ export default async function LolChampionTiersPage() {
           </Link>
 
           <div className="ml-auto flex items-center gap-2">
-            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1 text-xs text-neutral-400">
-              Patch <span className="text-neutral-200">{patch}</span>
-            </span>
+            
 
-            <span className="rounded-full border border-neutral-800 bg-black/40 px-3 py-1 text-xs text-neutral-400">
-              Cache <span className="text-neutral-200">{cacheLabel}</span>
-            </span>
+            
           </div>
         </div>
-        <div>
+
         <SeoBlock patch={patch} />
-        </div>
       </div>
 
       <Suspense
@@ -199,17 +187,18 @@ export default async function LolChampionTiersPage() {
           </div>
         }
       >
-        
-        <LolChampionTiersClient initialRows={initialRows} patch={patch} hrefBase="/calculators/lol/champions" />
+        <LolChampionTiersClient
+          initialRows={initialRows}
+          patch={patch} // display patch (26.x)
+          ddragon={ddragon} // asset version (16.x.x) or "—"
+          hrefBase="/calculators/lol/champions"
+        />
       </Suspense>
 
       <div className="mt-4 text-xs text-neutral-500">
         Tiers are computed from a blended score (pick volume + winrate + banrate when applicable).
         This is a meta snapshot, not a guarantee for every matchup.
       </div>
-
-      {/* ✅ Collapsed SEO content at bottom */}
-      
     </main>
   );
 }

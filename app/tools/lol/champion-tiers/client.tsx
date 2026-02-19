@@ -7,39 +7,31 @@ import { useEffect, useMemo, useState } from "react";
 export type ChampionStatsRow = {
   id?: number | string;
 
-  // name/identity
-  name?: string; // "Ahri"
+  name?: string;
   championName?: string;
-  key?: string; // optional
-  slug?: string; // preferred
+  key?: string;
+  slug?: string;
 
-  // images (optional)
   icon?: string;
   image?: string;
 
-  // core stats (any of these)
   games?: number;
   picks?: number;
-
   wins?: number;
-  winrate?: number; // 0..1
+  winrate?: number;
 
   bans?: number;
-  banrate?: number; // 0..1
+  banrate?: number;
 
-  // optional grouping
-  role?: string; // top/jungle/mid/bot/support
+  role?: string;
   lane?: string;
 
-  // sometimes datasets have nested by-role buckets
-  // (we don't assume exact field names; we detect common shapes)
   [key: string]: any;
 };
 
 type Mode = "ranked" | "pro";
 type RoleKey = "all" | "top" | "jungle" | "mid" | "bot" | "support";
 type SortKey = "tier" | "games" | "winrate" | "banrate";
-
 type Tier = "S" | "A" | "B" | "C" | "D" | "—";
 
 const TIER_RANK: Record<Tier, number> = {
@@ -116,7 +108,6 @@ function normalizeRole(raw: any): RoleKey {
   const s = (raw ?? "").toString().toLowerCase().trim();
   if (!s) return "all";
 
-  // common synonyms
   if (s === "top" || s === "toplane" || s === "top_lane") return "top";
   if (s === "jungle" || s === "jg" || s === "jng") return "jungle";
   if (s === "mid" || s === "middle" || s === "midlane" || s === "mid_lane") return "mid";
@@ -130,42 +121,156 @@ function normalizeRole(raw: any): RoleKey {
     s === "bot_lane"
   )
     return "bot";
-  if (
-    s === "support" ||
-    s === "sup" ||
-    s === "utility" ||
-    s === "supp" ||
-    s === "bot_support"
-  )
+  if (s === "support" || s === "sup" || s === "utility" || s === "supp" || s === "bot_support")
     return "support";
 
   return "all";
 }
 
 /**
- * Data Dragon square:
- * https://ddragon.leagueoflegends.com/cdn/<patch>/img/champion/Ahri.png
+ * ✅ Use DDRAGON ASSET VERSION for images:
+ * https://ddragon.leagueoflegends.com/cdn/<ddragon>/img/champion/Ahri.png
  */
-function buildDdragonSquareUrl(patch: string, championName: string) {
-  const ver = (patch || "").toString().trim();
-  const cleanName = (championName || "").toString().trim();
-  if (!cleanName) return "";
-  if (ver && ver !== "—") {
-    return `https://ddragon.leagueoflegends.com/cdn/${ver}/img/champion/${cleanName}.png`;
-  }
-  return `https://ddragon.leagueoflegends.com/cdn/img/champion/${cleanName}.png`;
+function buildDdragonSquareUrl(ddragon: string, champId: string) {
+  const ver = (ddragon || "").toString().trim();
+  const id = (champId || "").toString().trim();
+  if (!ver || ver === "—" || ver === "unknown" || !id) return "";
+  return `https://ddragon.leagueoflegends.com/cdn/${ver}/img/champion/${id}.png`;
 }
 
-async function fetchLatestPatchClient(): Promise<string | null> {
+// --------- PATCH + DDRAGON RESOLUTION (NEW ROUTES) ---------
+
+function norm(x: any) {
+  const v = String(x ?? "").trim();
+  if (!v || v === "—" || v === "unknown") return "";
+  return v;
+}
+
+async function fetchPatchAndDdragon(): Promise<{ patch: string; ddragon: string } | null> {
+  // prefer your canonical route:
+  const urls = ["/api/lol/patch", "/api/version"];
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) continue;
+      const json = await res.json();
+
+      const patch = norm(json?.patch ?? json?.version);
+      const ddragon = norm(json?.ddragon);
+
+      // patch is display patch (26.x), ddragon is asset version (16.x.x)
+      if (patch || ddragon) return { patch: patch || "—", ddragon: ddragon || "—" };
+    } catch {
+      // try next
+    }
+  }
+
+  return null;
+}
+
+type DDragonChampionIndex = {
+  data: Record<
+    string,
+    {
+      id: string; // "LeeSin"
+      key: string; // "64"
+      name: string; // "Lee Sin"
+    }
+  >;
+};
+
+type ChampMap = {
+  byNameLower: Map<string, string>;
+  byKeyNum: Map<string, string>;
+};
+
+async function fetchChampionMap(ddragon: string): Promise<ChampMap | null> {
+  const ver = (ddragon || "").toString().trim();
+  if (!ver || ver === "—" || ver === "unknown") return null;
+
   try {
-    const res = await fetch("/api/lol/patch", { cache: "no-store" });
+    const url = `https://ddragon.leagueoflegends.com/cdn/${ver}/data/en_US/champion.json`;
+    const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return null;
-    const json = await res.json();
-    const name = (json?.patch ?? "").toString().trim();
-    return name && name !== "—" ? name : null;
+
+    const json = (await res.json()) as DDragonChampionIndex;
+
+    const byNameLower = new Map<string, string>();
+    const byKeyNum = new Map<string, string>();
+
+    for (const k of Object.keys(json.data || {})) {
+      const c = json.data[k];
+      if (!c?.id) continue;
+
+      const nm = (c.name ?? "").toString().trim().toLowerCase();
+      if (nm) byNameLower.set(nm, c.id);
+
+      const keyNum = (c.key ?? "").toString().trim();
+      if (keyNum) byKeyNum.set(keyNum, c.id);
+    }
+
+    return { byNameLower, byKeyNum };
   } catch {
     return null;
   }
+}
+
+/**
+ * Role buckets detection (unchanged)
+ */
+function pickRoleBuckets(r: ChampionStatsRow): Partial<Record<RoleKey, any>> | null {
+  const candidates = [
+    r.roles,
+    r.byRole,
+    r.by_role,
+    r.lanes,
+    r.byLane,
+    r.by_lane,
+    r.roleStats,
+    r.role_stats,
+  ];
+
+  for (const c of candidates) {
+    if (c && typeof c === "object" && !Array.isArray(c)) {
+      const out: Partial<Record<RoleKey, any>> = {};
+      for (const k of Object.keys(c)) {
+        const rk = normalizeRole(k);
+        if (rk !== "all" && c[k] && typeof c[k] === "object") out[rk] = c[k];
+      }
+      if (Object.keys(out).length) return out;
+    }
+  }
+
+  const flatOut: Partial<Record<RoleKey, any>> = {};
+  const flatKeys: Array<[RoleKey, any]> = [
+    ["top", (r as any).top],
+    ["jungle", (r as any).jungle],
+    ["mid", (r as any).mid],
+    ["bot", (r as any).bot],
+    ["support", (r as any).support],
+  ];
+  for (const [rk, v] of flatKeys) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      if ("games" in v || "picks" in v || "wins" in v || "winrate" in v || "bans" in v || "banrate" in v) {
+        flatOut[rk] = v;
+      }
+    }
+  }
+  return Object.keys(flatOut).length ? flatOut : null;
+}
+
+function computeCoreFromRow(r: any) {
+  const games = clampMin0(Number(r.games ?? r.picks ?? 0));
+  const wins =
+    clampMin0(Number(r.wins ?? 0)) ||
+    (Number.isFinite(r.winrate) ? Math.round(clampMin0(Number(r.winrate)) * games) : 0);
+  const bans = clampMin0(Number(r.bans ?? 0));
+
+  const winrate = Number.isFinite(r.winrate) ? clampMin0(Number(r.winrate)) : games ? wins / games : 0;
+  const banrate = Number.isFinite(r.banrate) ? clampMin0(Number(r.banrate)) : games ? bans / games : 0;
+
+  return { games, wins, bans, winrate, banrate };
 }
 
 type Row = {
@@ -217,94 +322,22 @@ function sortArrow(active: boolean, desc: boolean) {
   return desc ? "\u00A0↓" : "\u00A0↑";
 }
 
-/**
- * If your tiers JSON is per-champ only: role filtering is not real.
- * If your tiers JSON includes per-role buckets: we expand them into real rows.
- *
- * Supported shapes (auto-detected):
- *  - row.role / row.lane: "top" | "jungle" | ...
- *  - row.roles: { top: {...stats}, mid: {...stats}, ... }
- *  - row.byRole / row.by_role: { ... }
- *  - row.lanes / row.byLane / row.by_lane: { ... }
- *  - row.top / row.jungle / row.mid / row.bot / row.support (object buckets)
- */
-function pickRoleBuckets(r: ChampionStatsRow): Partial<Record<RoleKey, any>> | null {
-  const candidates = [
-    r.roles,
-    r.byRole,
-    r.by_role,
-    r.lanes,
-    r.byLane,
-    r.by_lane,
-    r.roleStats,
-    r.role_stats,
-  ];
-
-  for (const c of candidates) {
-    if (c && typeof c === "object" && !Array.isArray(c)) {
-      const out: Partial<Record<RoleKey, any>> = {};
-      for (const k of Object.keys(c)) {
-        const rk = normalizeRole(k);
-        if (rk !== "all" && c[k] && typeof c[k] === "object") out[rk] = c[k];
-      }
-      if (Object.keys(out).length) return out;
-    }
-  }
-
-  // also support flat keys like r.top / r.jungle etc if they look like stat buckets
-  const flatOut: Partial<Record<RoleKey, any>> = {};
-  const flatKeys: Array<[RoleKey, any]> = [
-    ["top", (r as any).top],
-    ["jungle", (r as any).jungle],
-    ["mid", (r as any).mid],
-    ["bot", (r as any).bot],
-    ["support", (r as any).support],
-  ];
-  for (const [rk, v] of flatKeys) {
-    if (v && typeof v === "object" && !Array.isArray(v)) {
-      // only treat as bucket if it contains at least one stat-ish field
-      if (
-        "games" in v ||
-        "picks" in v ||
-        "wins" in v ||
-        "winrate" in v ||
-        "bans" in v ||
-        "banrate" in v
-      ) {
-        flatOut[rk] = v;
-      }
-    }
-  }
-  return Object.keys(flatOut).length ? flatOut : null;
-}
-
-function computeCoreFromRow(r: any) {
-  const games = clampMin0(Number(r.games ?? r.picks ?? 0));
-  const wins =
-    clampMin0(Number(r.wins ?? 0)) ||
-    (Number.isFinite(r.winrate) ? Math.round(clampMin0(Number(r.winrate)) * games) : 0);
-  const bans = clampMin0(Number(r.bans ?? 0));
-
-  const winrate = Number.isFinite(r.winrate) ? clampMin0(Number(r.winrate)) : games ? wins / games : 0;
-  const banrate = Number.isFinite(r.banrate) ? clampMin0(Number(r.banrate)) : games ? bans / games : 0;
-
-  return { games, wins, bans, winrate, banrate };
-}
-
 export default function LolChampionTiersClient({
   initialRows,
-  patch = "—",
+  patch = "—",   // display patch (26.x)
+  ddragon = "—", // asset version (16.x.x)
   hrefBase = "/calculators/lol/champions",
 }: {
   initialRows: ChampionStatsRow[];
   patch?: string;
+  ddragon?: string;
   hrefBase?: string;
 }) {
   const [mode, setMode] = useState<Mode>("ranked");
   const [role, setRole] = useState<RoleKey>("all");
 
   const [sortBy, setSortBy] = useState<SortKey>("tier");
-  const [desc, setDesc] = useState(false); // tier: S->D
+  const [desc, setDesc] = useState(false);
   const [q, setQ] = useState("");
 
   const [minGamesText, setMinGamesText] = useState("20");
@@ -313,28 +346,37 @@ export default function LolChampionTiersClient({
     return Number.isFinite(n) && n >= 0 ? n : 0;
   }, [minGamesText]);
 
+  // ✅ separate display patch vs asset version
   const [patchLive, setPatchLive] = useState<string>(patch || "—");
-
-  useEffect(() => {
-    setPatchLive(patch || "—");
-  }, [patch]);
+  const [ddragonLive, setDdragonLive] = useState<string>(ddragon || "—");
+  const [champMap, setChampMap] = useState<ChampMap | null>(null);
 
   useEffect(() => {
     let alive = true;
 
     async function refresh() {
-      const latest = await fetchLatestPatchClient();
+      const v = await fetchPatchAndDdragon();
       if (!alive) return;
-      if (latest) setPatchLive(latest);
+
+      if (v?.patch) setPatchLive(v.patch);
+      if (v?.ddragon) setDdragonLive(v.ddragon);
+
+      const map = await fetchChampionMap(v?.ddragon || ddragonLive);
+      if (!alive) return;
+      if (map) setChampMap(map);
     }
 
+    // run once on mount
     refresh();
+
+    // periodic refresh
     const id = window.setInterval(refresh, 5 * 60 * 1000);
 
     return () => {
       alive = false;
       window.clearInterval(id);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function onSortClick(key: SortKey) {
@@ -353,12 +395,10 @@ export default function LolChampionTiersClient({
   const { rows, hasRoleData } = useMemo((): { rows: Row[]; hasRoleData: boolean } => {
     const query = q.trim().toLowerCase();
 
-    // Expand into per-role rows if dataset provides role buckets,
-    // otherwise fall back to row.role/lane if present.
     const expanded: Array<{
       base: ChampionStatsRow;
       role: RoleKey;
-      statsSource: any; // either base row or role bucket
+      statsSource: any;
       keySuffix: string;
     }> = [];
 
@@ -370,23 +410,13 @@ export default function LolChampionTiersClient({
         for (const rk of ["top", "jungle", "mid", "bot", "support"] as const) {
           const b = buckets[rk];
           if (!b) continue;
-          expanded.push({
-            base: r,
-            role: rk,
-            statsSource: b,
-            keySuffix: `:${rk}`,
-          });
+          expanded.push({ base: r, role: rk, statsSource: b, keySuffix: `:${rk}` });
         }
         continue;
       }
 
       const rk = normalizeRole(r.role ?? r.lane);
-      expanded.push({
-        base: r,
-        role: rk,
-        statsSource: r,
-        keySuffix: rk !== "all" ? `:${rk}` : "",
-      });
+      expanded.push({ base: r, role: rk, statsSource: r, keySuffix: rk !== "all" ? `:${rk}` : "" });
     }
 
     const derivedBase = expanded.map((x, i): Omit<Row, "score" | "tier" | "tierRank"> => {
@@ -402,7 +432,22 @@ export default function LolChampionTiersClient({
       const slug = (r.slug || slugifyLoL(displayName)).toString();
 
       const existing = (r.icon || r.image || "").toString().trim();
-      const imgUrl = existing ? existing : buildDdragonSquareUrl(patchLive, displayName);
+
+      // Resolve DDragon champion ID:
+      // - If your row.key is numeric, map via champion.json key->id
+      // - Else map by exact name -> id
+      // - Else fallback: attempt to use displayName as id (won't work for "Lee Sin" etc)
+      const keyStr = (r.key ?? "").toString().trim();
+
+      let champId = "";
+      if (keyStr && /^\d+$/.test(keyStr) && champMap?.byKeyNum) {
+        champId = champMap.byKeyNum.get(keyStr) ?? "";
+      }
+      if (!champId && champMap?.byNameLower) {
+        champId = champMap.byNameLower.get(displayName.toLowerCase()) ?? "";
+      }
+
+      const imgUrl = existing ? existing : buildDdragonSquareUrl(ddragonLive, champId);
 
       const idBase = (r.id ?? r.key ?? slug).toString();
       const id = `${idBase}${x.keySuffix}`;
@@ -423,9 +468,6 @@ export default function LolChampionTiersClient({
       };
     });
 
-    // Determine if role filtering is actually meaningful:
-    // - any row has a non-"all" role
-    // - AND we have at least 2 distinct roles represented
     const roleSet = new Set<RoleKey>();
     for (const r of derivedBase) {
       if (r.role !== "all") roleSet.add(r.role);
@@ -433,8 +475,6 @@ export default function LolChampionTiersClient({
     const hasRoleData = roleSet.size >= 2;
 
     let filtered = derivedBase;
-
-    // Only apply role filter if role data is real; otherwise keep "all"
     const effectiveRole = hasRoleData ? role : "all";
 
     if (effectiveRole !== "all") filtered = filtered.filter((r) => r.role === effectiveRole);
@@ -447,10 +487,8 @@ export default function LolChampionTiersClient({
 
     const muG = mean(gVals);
     const sdG = std(gVals, muG);
-
     const muW = mean(wVals);
     const sdW = std(wVals, muW);
-
     const muB = mean(bVals);
     const sdB = std(bVals, muB);
 
@@ -505,9 +543,8 @@ export default function LolChampionTiersClient({
     });
 
     return { rows: finalRows.slice(0, 200), hasRoleData };
-  }, [initialRows, patchLive, mode, role, q, minGames, sortBy, desc]);
+  }, [initialRows, champMap, ddragonLive, mode, role, q, minGames, sortBy, desc]);
 
-  // If role data isn't real, force UI back to "all"
   useEffect(() => {
     if (!hasRoleData && role !== "all") setRole("all");
   }, [hasRoleData, role]);
@@ -528,16 +565,22 @@ export default function LolChampionTiersClient({
             <div className="text-sm font-semibold text-white">Tier List Filters</div>
 
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => setMode("ranked")} className={mode === "ranked" ? BTN_ACTIVE : BTN}>
+              <button
+                type="button"
+                onClick={() => setMode("ranked")}
+                className={mode === "ranked" ? BTN_ACTIVE : BTN}
+              >
                 Ranked
               </button>
-              <button type="button" onClick={() => setMode("pro")} className={mode === "pro" ? BTN_ACTIVE : BTN}>
+              <button
+                type="button"
+                onClick={() => setMode("pro")}
+                className={mode === "pro" ? BTN_ACTIVE : BTN}
+              >
                 Pro
               </button>
 
               <div className="mx-2 hidden h-8 w-px bg-neutral-800 lg:block" />
-
-              
 
               <div className="ml-1 self-center text-xs text-neutral-500">
                 Sort:{" "}
@@ -552,6 +595,13 @@ export default function LolChampionTiersClient({
                 </span>{" "}
                 <span className="text-neutral-600">{desc ? "↓" : "↑"}</span>
               </div>
+            </div>
+
+            {/* Optional: show both versions for debugging */}
+            <div className="text-[11px] text-neutral-500">
+              Patch <span className="text-neutral-300">{patchLive}</span>{" "}
+              <span className="text-neutral-700">•</span>{" "}
+              Assets <span className="text-neutral-300">{ddragonLive}</span>
             </div>
           </div>
 
@@ -687,8 +737,7 @@ export default function LolChampionTiersClient({
         <div className="mt-1 leading-relaxed">
           Tiers are a snapshot from <span className="text-neutral-200">win rate</span> (primary),{" "}
           <span className="text-neutral-200">sample size</span> (stability), and{" "}
-          <span className="text-neutral-200">ban pressure</span> (Pro mode tie-breaker). Use this as a quick meta overview
-          — matchup and team comp still matter.
+          <span className="text-neutral-200">ban pressure</span> (Pro mode tie-breaker).
         </div>
       </div>
     </section>

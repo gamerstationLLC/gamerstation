@@ -1,15 +1,18 @@
-// app/api/_shared/getLolVersion.ts
+// app/api/lol/_shared/getLolVersion.ts
 import fs from "node:fs/promises";
 import path from "node:path";
 
 export type VersionJson = {
-  patch?: string;
-  ddragon?: string;
-  version?: string; // legacy alias
+  patch?: string; // display patch (e.g. "26.4")
+  ddragon?: string; // ddragon asset version (e.g. "16.4.1") - optional
+  version?: string; // legacy alias (treat as display patch)
   chosenRealm?: string | null;
   updatedAt?: string;
   source?: string;
 };
+
+type Source = "blob" | "disk" | "realms" | "none";
+type DdragonSource = "realms" | "versions" | "none";
 
 const VERSION_BLOB_PATH = "data/lol/version.json";
 const VERSION_DISK_PATH = path.join(process.cwd(), "public", "data", "lol", "version.json");
@@ -25,11 +28,9 @@ function normalize(x: unknown): string | null {
   return v ? v : null;
 }
 
-function pick(json: VersionJson | null): { patch: string | null; ddragon: string | null } {
-  if (!json) return { patch: null, ddragon: null };
-  const patch = normalize(json.patch) ?? normalize(json.version);
-  const ddragon = normalize(json.ddragon) ?? normalize(json.version) ?? normalize(json.patch);
-  return { patch, ddragon };
+function pickDisplayPatch(json: VersionJson | null): string | null {
+  if (!json) return null;
+  return normalize(json.patch) ?? normalize(json.version) ?? null;
 }
 
 function cmpVersion(a?: string, b?: string) {
@@ -67,84 +68,123 @@ async function readFromDisk(): Promise<VersionJson | null> {
   }
 }
 
-async function readFromRealms(): Promise<VersionJson | null> {
+async function readDdragonAssetVersion(): Promise<{
+  ddragon: string | null;
+  chosenRealm: string | null;
+  realmsTried: any[];
+  source: DdragonSource;
+}> {
   const realms = ["na", "euw", "kr"];
+  const tried: any[] = [];
+
   let best: { region: string; v?: string; dd?: string } | null = null;
 
   for (const r of realms) {
     const url = `https://ddragon.leagueoflegends.com/realms/${r}.json`;
     try {
       const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) continue;
+      if (!res.ok) {
+        tried.push({ region: r, ok: false, status: res.status });
+        continue;
+      }
       const j = await res.json();
 
       const v = typeof j?.v === "string" ? j.v : undefined;
       const dd = typeof j?.dd === "string" ? j.dd : undefined;
 
-      if (v && (!best || cmpVersion(v, best.v) > 0)) best = { region: r, v, dd };
-    } catch {
-      // ignore
+      tried.push({ region: r, ok: true, v, dd });
+
+      const candidate = dd ?? v;
+      if (candidate && (!best || cmpVersion(candidate, best.dd ?? best.v) > 0)) {
+        best = { region: r, v, dd: candidate };
+      }
+    } catch (e: any) {
+      tried.push({ region: r, ok: false, error: String(e?.message ?? e) });
     }
   }
 
-  if (!best?.v) return null;
+  const bestDd = normalize(best?.dd);
+  if (bestDd) {
+    return { ddragon: bestDd, chosenRealm: best?.region ?? null, realmsTried: tried, source: "realms" };
+  }
 
-  return {
-    patch: best.v,
-    ddragon: best.dd ?? best.v,
-    version: best.dd ?? best.v,
-    chosenRealm: best.region,
-    updatedAt: new Date().toISOString(),
-    source: "ddragon-realms-fallback",
-  };
+  // Fallback: versions.json (first item)
+  try {
+    const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
+      next: { revalidate: 60 * 60 }, // 1 hour
+    });
+    if (res.ok) {
+      const arr = (await res.json()) as unknown;
+      if (Array.isArray(arr) && typeof arr[0] === "string") {
+        const v0 = normalize(arr[0]);
+        if (v0) return { ddragon: v0, chosenRealm: null, realmsTried: tried, source: "versions" };
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  return { ddragon: null, chosenRealm: null, realmsTried: tried, source: "none" };
 }
 
-export async function getLolVersion() {
+export async function getLolVersion(): Promise<{
+  patch: string;
+  ddragon: string;
+  version: string;
+  chosenRealm: string | null;
+  fallbackUsed: boolean;
+  source: Source;
+  ddragonSource: DdragonSource;
+  updatedAt: string;
+  realmsTried?: any[];
+}> {
+  // 1) Display patch (26.x): blob -> disk -> unknown
   const blobJson = await readFromBlob();
-  const fromBlob = pick(blobJson);
-  if (fromBlob.patch) {
+  const blobPatch = pickDisplayPatch(blobJson);
+
+  if (blobPatch) {
+    const dd = await readDdragonAssetVersion();
     return {
-      patch: fromBlob.patch,
-      ddragon: fromBlob.ddragon,
-      version: normalize(blobJson?.version) ?? fromBlob.ddragon ?? fromBlob.patch,
-      chosenRealm: blobJson?.chosenRealm ?? null,
+      patch: blobPatch, // ✅ 26.4
+      ddragon: dd.ddragon ?? "unknown", // ✅ 16.x.x for assets
+      version: blobPatch, // legacy: keep “version” == display patch
+      chosenRealm: dd.chosenRealm ?? (blobJson?.chosenRealm ?? null),
       fallbackUsed: false,
-      source: "blob" as const,
+      source: "blob",
+      ddragonSource: dd.source,
+      updatedAt: blobJson?.updatedAt ?? new Date().toISOString(),
+      realmsTried: dd.realmsTried,
     };
   }
 
   const diskJson = await readFromDisk();
-  const fromDisk = pick(diskJson);
-  if (fromDisk.patch) {
+  const diskPatch = pickDisplayPatch(diskJson);
+
+  if (diskPatch) {
+    const dd = await readDdragonAssetVersion();
     return {
-      patch: fromDisk.patch,
-      ddragon: fromDisk.ddragon,
-      version: normalize(diskJson?.version) ?? fromDisk.ddragon ?? fromDisk.patch,
-      chosenRealm: diskJson?.chosenRealm ?? null,
+      patch: diskPatch,
+      ddragon: dd.ddragon ?? "unknown",
+      version: diskPatch,
+      chosenRealm: dd.chosenRealm ?? (diskJson?.chosenRealm ?? null),
       fallbackUsed: true,
-      source: "disk" as const,
+      source: "disk",
+      ddragonSource: dd.source,
+      updatedAt: diskJson?.updatedAt ?? new Date().toISOString(),
+      realmsTried: dd.realmsTried,
     };
   }
 
-  const realmJson = await readFromRealms();
-  const fromRealms = pick(realmJson);
-  if (fromRealms.patch) {
-    return {
-      patch: fromRealms.patch,
-      ddragon: fromRealms.ddragon,
-      version: normalize(realmJson?.version) ?? fromRealms.ddragon ?? fromRealms.patch,
-      chosenRealm: realmJson?.chosenRealm ?? null,
-      fallbackUsed: true,
-      source: "realms" as const,
-    };
-  }
-
+  const dd = await readDdragonAssetVersion();
   return {
     patch: "unknown",
-    ddragon: "unknown",
+    ddragon: dd.ddragon ?? "unknown",
     version: "unknown",
-    chosenRealm: null,
+    chosenRealm: dd.chosenRealm ?? null,
     fallbackUsed: true,
-    source: "none" as const,
+    source: "none",
+    ddragonSource: dd.source,
+    updatedAt: new Date().toISOString(),
+    realmsTried: dd.realmsTried,
   };
 }

@@ -1,26 +1,27 @@
+// app/api/version/route.ts
 import { NextResponse } from "next/server";
-import fs from "node:fs/promises";
-import path from "node:path";
+import { getLolVersion } from "../lol/_shared/getLolVersion";
 
 export const runtime = "nodejs";
 
 export async function GET() {
-  try {
-    const p = path.join(process.cwd(), "public", "data", "lol", "version.json");
-    const raw = await fs.readFile(p, "utf-8");
-    const json = JSON.parse(raw);
+  const v = await getLolVersion();
 
-    return NextResponse.json(
-      {
-        version: json.patch ?? json.version ?? "unknown",
-        fallbackUsed: false,
-      },
-      { status: 200 }
-    );
-  } catch {
-    return NextResponse.json(
-      { version: "unknown", fallbackUsed: true },
-      { status: 200 }
-    );
-  }
+  // Backward compat:
+  // - version = display patch (26.x)
+  // - patch = display patch (26.x)
+  // - ddragon = ddragon asset version (16.x.x)
+  return NextResponse.json(
+    {
+      version: v.version, // display patch (legacy)
+      patch: v.patch, // display patch
+      ddragon: v.ddragon, // asset version
+      source: v.source,
+      ddragonSource: v.ddragonSource,
+      chosenRealm: v.chosenRealm,
+      updatedAt: v.updatedAt,
+      fallbackUsed: v.fallbackUsed,
+    },
+    { status: 200 }
+  );
 }

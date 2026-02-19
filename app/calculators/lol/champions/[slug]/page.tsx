@@ -61,8 +61,6 @@ async function fetchJsonFromBlob<T>(pathname: string): Promise<T | null> {
 
   try {
     const res = await fetch(url, {
-      // ✅ allow Next to revalidate instead of pure no-store
-      // (helps crawlers see stable titles)
       next: { revalidate: 60 * 60 }, // 1 hour
     });
     if (!res.ok) return null;
@@ -113,7 +111,7 @@ const OVERRIDES_LOCAL = path.join(
 
 // Blob pathnames (relative to NEXT_PUBLIC_BLOB_BASE_URL)
 const CHAMPIONS_FULL_BLOB = "data/lol/champions_full.json";
-const VERSION_BLOB = "data/lol/version.json"; // ✅ version ONLY from blob
+const VERSION_BLOB = "data/lol/version.json"; // display patch label source
 const OVERRIDES_BLOB = "data/lol/spells_overrides.json";
 
 /* -------------------- data loaders -------------------- */
@@ -130,42 +128,54 @@ async function readChampionsFull(): Promise<ChampionsFullFile> {
 }
 
 /**
- * ✅ Patch label source of truth:
- * 1) Blob version.json ONLY
- * 2) Riot ddragon versions endpoint (server fetch)
- *
- * We DO NOT use local version.json.
- * We DO NOT use champions_full.version for SEO patch labeling.
+ * ✅ Patch label + image patch:
+ * - displayPatch: comes from Blob version.json (can be "26.1" if that's your branding)
+ * - ddragonPatch: MUST be a real Data Dragon version string (e.g. "16.3.1") to avoid 404 images
  */
-let currentPatchPromise: Promise<string> | null = null;
+let ddragonVersionsPromise: Promise<string[]> | null = null;
 
-async function readCurrentPatch(): Promise<string> {
-  if (!currentPatchPromise) {
-    currentPatchPromise = (async () => {
-      // 1) Blob version.json ONLY
-      const json = await fetchJsonFromBlob<{ version?: string }>(VERSION_BLOB);
-      const v = String(json?.version ?? "").trim();
-      if (v) return v;
-
-      // 2) Fallback: Data Dragon versions (latest is first)
+async function readDdragonVersions(): Promise<string[]> {
+  if (!ddragonVersionsPromise) {
+    ddragonVersionsPromise = (async () => {
       try {
         const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
           next: { revalidate: 60 * 60 }, // 1 hour
         });
-        if (!res.ok) return "current";
+        if (!res.ok) return [];
         const arr = (await res.json()) as unknown;
-        if (Array.isArray(arr) && typeof arr[0] === "string") {
-          const vv = String(arr[0]).trim();
-          if (vv) return vv;
+        if (Array.isArray(arr)) {
+          return arr.filter((v): v is string => typeof v === "string");
         }
       } catch {
         // ignore
       }
-
-      return "current";
+      return [];
     })();
   }
-  return currentPatchPromise;
+  return ddragonVersionsPromise;
+}
+
+let displayPatchPromise: Promise<string> | null = null;
+async function readDisplayPatch(): Promise<string> {
+  if (!displayPatchPromise) {
+    displayPatchPromise = (async () => {
+      const json = await fetchJsonFromBlob<{ version?: string }>(VERSION_BLOB);
+      const v = String(json?.version ?? "").trim();
+      return v || "current";
+    })();
+  }
+  return displayPatchPromise;
+}
+
+let ddragonPatchPromise: Promise<string> | null = null;
+async function readDdragonPatch(): Promise<string> {
+  if (!ddragonPatchPromise) {
+    ddragonPatchPromise = (async () => {
+      const versions = await readDdragonVersions();
+      return versions[0]?.trim() || "current";
+    })();
+  }
+  return ddragonPatchPromise;
 }
 
 /* ------------------- slug + champion helpers ------------------- */
@@ -362,7 +372,8 @@ function buildAbilitiesFromChampion(
 
 /**
  * ✅ Dynamic metadata per champion page (SEO)
- * Patch label comes from Blob version.json so Google shows current patch.
+ * - Patch label uses displayPatch (blob)
+ * - Images use ddragonPatch (not used in metadata here)
  */
 export async function generateMetadata({
   params,
@@ -381,7 +392,7 @@ export async function generateMetadata({
   const champions = file?.champions ?? [];
   const champ = findChampionBySlug(champions, slug);
 
-  const patch = await readCurrentPatch(); // ✅ blob-only
+  const patch = await readDisplayPatch(); // ✅ display label from blob
   const safeName = champ?.name ?? slug;
   const safeTitle = champ?.title ? ` — ${champ.title}` : "";
 
@@ -442,8 +453,8 @@ export default async function LolChampionPage({
   const champ = findChampionBySlug(champions, slug);
   if (!champ) return notFound();
 
-  // ✅ Patch label from blob-only version.json
-  const patch = await readCurrentPatch();
+  const displayPatch = await readDisplayPatch(); // can be 26.x
+  const imagePatch = await readDdragonPatch(); // ✅ real Data Dragon version
 
   const championId = champ.id;
   const championName = champ.name;
@@ -453,25 +464,19 @@ export default async function LolChampionPage({
   const overridesEntry = await findOverridesEntryByChampionId(championId).catch(() => null);
   const abilities = buildAbilitiesFromChampion(champ, overridesEntry);
 
-  const safeName = championName || championId;
-  const canonical = `/calculators/lol/champions/${slug}`;
-
   return (
     <main className="min-h-screen bg-transparent text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
-        
         <StatsClient
           championId={championId}
           championName={championName}
-          patch={patch}
+          patch={displayPatch}
+          imagePatch={imagePatch}
           calcHref={calcHref}
           stats={stats}
           abilities={abilities}
           defaultLevel={1}
         />
-
-        {/* ✅ SEO / About (SSR, collapsed) */}
-       
       </div>
     </main>
   );

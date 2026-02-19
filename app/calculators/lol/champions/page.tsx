@@ -4,7 +4,7 @@ import Link from "next/link";
 import ChampionPickerClient, { type ChampionRow } from "./client";
 
 export const metadata: Metadata = {
-  title: "LoL Champions “ Search Champion Stats | GamerStation",
+  title: "LoL Champions | Search Champion Stats | GamerStation",
   description:
     "Search League of Legends champions and open a champion stats page instantly. Data from Riot Data Dragon.",
   alternates: { canonical: "/calculators/lol/champions" },
@@ -13,15 +13,74 @@ export const metadata: Metadata = {
 const DD_BASE = "https://ddragon.leagueoflegends.com";
 const LOCALE = "en_US";
 
-async function getLatestPatch(): Promise<string> {
-  const res = await fetch(`${DD_BASE}/api/versions.json`, {
-    next: { revalidate: 60 * 60 },
-  });
-  if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
-  const versions = (await res.json()) as string[];
-  if (!Array.isArray(versions) || !versions[0]) throw new Error("No versions found");
-  return versions[0];
+// ✅ Blob pathnames (relative to NEXT_PUBLIC_BLOB_BASE_URL)
+const VERSION_BLOB = "data/lol/version.json";
+
+/* -------------------- Blob helpers (server-safe) -------------------- */
+
+function blobUrl(pathname: string) {
+  const base = process.env.NEXT_PUBLIC_BLOB_BASE_URL;
+  if (!base) return null;
+  return `${base.replace(/\/+$/, "")}/${pathname.replace(/^\/+/, "")}`;
 }
+
+async function fetchJsonFromBlob<T>(pathname: string): Promise<T | null> {
+  const url = blobUrl(pathname);
+  if (!url) return null;
+
+  try {
+    const res = await fetch(url, { next: { revalidate: 60 * 60 } }); // 1 hour
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
+/* -------------------- Patch helpers -------------------- */
+
+let ddragonVersionsPromise: Promise<string[]> | null = null;
+
+async function getDdragonVersions(): Promise<string[]> {
+  if (!ddragonVersionsPromise) {
+    ddragonVersionsPromise = (async () => {
+      try {
+        const res = await fetch(`${DD_BASE}/api/versions.json`, {
+          next: { revalidate: 60 * 60 },
+        });
+        if (!res.ok) return [];
+        const versions = (await res.json()) as unknown;
+        if (Array.isArray(versions)) {
+          return versions.filter((v): v is string => typeof v === "string");
+        }
+      } catch {
+        // ignore
+      }
+      return [];
+    })();
+  }
+  return ddragonVersionsPromise;
+}
+
+async function getLatestDdragonPatch(): Promise<string> {
+  const versions = await getDdragonVersions();
+  return versions[0]?.trim() || "current";
+}
+
+let displayPatchPromise: Promise<string> | null = null;
+
+async function getDisplayPatchFromBlob(): Promise<string> {
+  if (!displayPatchPromise) {
+    displayPatchPromise = (async () => {
+      const json = await fetchJsonFromBlob<{ version?: string }>(VERSION_BLOB);
+      const v = String(json?.version ?? "").trim();
+      return v || "current";
+    })();
+  }
+  return displayPatchPromise;
+}
+
+/* -------------------- Champion index fetch (Data Dragon) -------------------- */
 
 type ChampionIndexJson = {
   data: Record<
@@ -38,8 +97,8 @@ type ChampionIndexJson = {
   version: string;
 };
 
-async function getChampionIndex(version: string): Promise<ChampionRow[]> {
-  const res = await fetch(`${DD_BASE}/cdn/${version}/data/${LOCALE}/champion.json`, {
+async function getChampionIndex(ddragonVersion: string): Promise<ChampionRow[]> {
+  const res = await fetch(`${DD_BASE}/cdn/${ddragonVersion}/data/${LOCALE}/champion.json`, {
     next: { revalidate: 60 * 60 },
   });
   if (!res.ok) throw new Error(`champion.json failed: ${res.status}`);
@@ -58,8 +117,15 @@ async function getChampionIndex(version: string): Promise<ChampionRow[]> {
 }
 
 export default async function ChampionsPickerPage() {
-  const patch = await getLatestPatch();
-  const champions = await getChampionIndex(patch);
+  // ✅ Split:
+  // - imagePatch must be real Data Dragon version (icons + champion.json)
+  // - displayPatch comes from your Blob version.json (your "26 stuff")
+  const [imagePatch, displayPatch] = await Promise.all([
+    getLatestDdragonPatch(),
+    getDisplayPatchFromBlob(),
+  ]);
+
+  const champions = await getChampionIndex(imagePatch);
 
   const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
@@ -93,7 +159,7 @@ export default async function ChampionsPickerPage() {
                 className="h-10 w-10 rounded-xl bg-black p-1 shadow-[0_0_30px_rgba(0,255,255,0.12)]"
               />
               <span className="text-lg font-black tracking-tight">
-                GamerStation<span className="align-super text-[0.6em]">TM</span>
+                GamerStation<span className="align-super text-[0.6em]">™</span>
               </span>
             </Link>
 
@@ -108,11 +174,12 @@ export default async function ChampionsPickerPage() {
           <h1 className="mt-2 text-4xl font-bold tracking-tight">LoL Champion Index</h1>
           <p className="mt-3 text-neutral-300">
             Search a champion to open their stats page. Patch:{" "}
-            <span className="font-medium text-white">{patch}</span>
+            <span className="font-medium text-white">{displayPatch}</span>
           </p>
 
           <div className="mt-10">
-            <ChampionPickerClient champions={champions} />
+            {/* ✅ Use imagePatch for icons so they never 404 */}
+            <ChampionPickerClient champions={champions} patch={imagePatch} />
           </div>
         </div>
       </div>

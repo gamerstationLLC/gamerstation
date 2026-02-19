@@ -1,9 +1,8 @@
-// PART 1 / 3
+// app/calculators/lol/meta/client.tsx
 "use client";
-import { blobUrl } from "@/lib/blob-client";;
-;
-import Link from "next/link";
 
+import Link from "next/link";
+import { blobUrl } from "@/lib/blob-client";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type MetaMode = "ranked" | "casual";
@@ -96,6 +95,119 @@ function readModeFromUrl(): MetaMode {
   if (typeof window === "undefined") return "ranked";
   const p = new URLSearchParams(window.location.search);
   return p.get("mode") === "casual" ? "casual" : "ranked";
+}
+
+function SeoBlock() {
+  return (
+    <section className="mt-10 border-t border-white/10 pt-8">
+      {/* Collapsed by default, but still server-rendered content for crawlers */}
+      <details className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6" open={false}>
+        <summary className="cursor-pointer select-none list-none">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h2 className="text-base font-semibold text-white">About these LoL Meta Builds</h2>
+              <p className="mt-1 text-xs text-white/65">
+                Patch/role builds, ranked vs normals, core items, and popular skill orders. (Tap to
+                expand)
+              </p>
+            </div>
+            <span className="text-white/65" aria-hidden>
+              ▸
+            </span>
+          </div>
+        </summary>
+
+        <div className="mt-4 space-y-5 text-sm text-white/80">
+          <p>
+            GamerStation’s <strong>League of Legends meta builds</strong> page helps you find the{" "}
+            <strong>best builds</strong> for the current patch — including <strong>items</strong>,{" "}
+            <strong>runes</strong>, and <strong>role-based builds</strong> for each champion. You can
+            toggle between <strong>Ranked (Solo/Duo)</strong> and <strong>Casual (Normals)</strong>{" "}
+            to see what’s working in different environments.
+          </p>
+
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-white">What you’ll find here</h3>
+            <ul className="list-disc pl-5 text-sm text-white/80">
+              <li>
+                <strong>LoL meta builds by patch</strong> (current patch focus)
+              </li>
+              <li>
+                <strong>Champion builds by role</strong> (Top/Jungle/Mid/ADC/Support)
+              </li>
+              <li>
+                Common <strong>core item</strong> paths and build variations
+              </li>
+              <li>
+                <strong>Runes</strong> selections that pair with those builds
+              </li>
+              <li>
+                Quick “what’s strong right now?” browsing via compact champion cards
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-white">Related tools</h3>
+            <ul className="list-disc pl-5">
+              <li>
+                <Link href="/calculators/lol" className="text-white hover:underline">
+                  LoL Damage Calculator
+                </Link>{" "}
+                (test burst, DPS, and TTK with items)
+              </li>
+              <li>
+                <Link href="/tools/lol/champion-tiers" className="text-white hover:underline">
+                  Champion tiers
+                </Link>{" "}
+                (who’s strongest right now)
+              </li>
+              <li>
+                <Link href="/calculators/lol/champions" className="text-white hover:underline">
+                  Champion stats by level index
+                </Link>{" "}
+                (base stats + per-level scaling)
+              </li>
+            </ul>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-white">FAQ</h3>
+
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <div className="text-sm font-semibold text-white">
+                Are these “best builds” for ranked?
+              </div>
+              <p className="mt-1 text-sm text-white/80">
+                Yes — you can view ranked builds (Solo/Duo) and compare them to normals to see what
+                changes between competitive and casual play.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <div className="text-sm font-semibold text-white">
+                Do builds change by role?
+              </div>
+              <p className="mt-1 text-sm text-white/80">
+                Yes — champions often have different item/rune priorities depending on role, so the
+                page is organized around role-based build patterns.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-black/30 p-4">
+              <div className="text-sm font-semibold text-white">
+                Can I use this for ARAM?
+              </div>
+              <p className="mt-1 text-sm text-white/80">
+                This page focuses on Summoner’s Rift environments (ranked/normals). ARAM-specific
+                builds can be added later as a dedicated mode.
+              </p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+  );
 }
 
 function pushModeToUrl(mode: MetaMode) {
@@ -212,11 +324,11 @@ function pickBestBuild(
   return best;
 }
 
-// ✅ ADDED: simple guard for URL role parsing (used only for hydration)
+// ✅ URL role parsing guard (used only for hydration)
 function isRole(x: string | null): x is Role {
   return x === "TOP" || x === "JUNGLE" || x === "MIDDLE" || x === "BOTTOM" || x === "UTILITY";
 }
-// PART 2 / 3
+
 export default function MetaClient() {
   const [mode, setMode] = useState<MetaMode>("ranked");
   const [hydrated, setHydrated] = useState(false);
@@ -225,9 +337,15 @@ export default function MetaClient() {
   const [champions, setChampions] = useState<ChampionRow[]>([]);
   const [itemsById, setItemsById] = useState<Map<number, ItemData>>(new Map());
 
+  // ddVersion = "icon version" we can use, often comes from your cached champs/items json
   const [ddVersion, setDdVersion] = useState<string>("");
 
+  // patch = dataset patch key (comes from meta json keys)
   const [patch, setPatch] = useState<string>("");
+
+  // displayPatch = label patch from blob version.json (your "26 stuff")
+  const [displayPatch, setDisplayPatch] = useState<string>("");
+
   const [role, setRole] = useState<RoleFilter>("ALL");
   const [q, setQ] = useState<string>("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -249,17 +367,15 @@ export default function MetaClient() {
     Record<string, number | null>
   >({});
 
+  // Local (repo) endpoints
   const CHAMPS_URL = "/data/lol/champions_index.json";
   const ITEMS_URL = "/data/lol/items.json";
 
-  // ✅ ADDED: URL hydration refs (so we can auto-fill search from share link)
+  // ✅ URL hydration refs (share link hydration)
   const didHydrateRef = useRef(false);
   const patchFromUrlRef = useRef<string>("");
 
-  // ✅ UPDATED hydration effect:
-  // - reads mode normally
-  // - ALSO reads role/champ/patch from URL
-  // - champ => fills search input
+  // ✅ hydration effect (mode + role + champ + patch)
   useEffect(() => {
     setHydrated(true);
 
@@ -281,7 +397,7 @@ export default function MetaClient() {
     const urlRole = sp.get("role");
     if (isRole(urlRole)) setRole(urlRole);
 
-    // ✅ champ (auto-fill search bar)
+    // champ (auto-fill search bar)
     const urlChamp = sp.get("champ");
     if (typeof urlChamp === "string" && urlChamp.trim()) {
       setQ(urlChamp.trim());
@@ -292,10 +408,19 @@ export default function MetaClient() {
     patchFromUrlRef.current = typeof urlPatch === "string" ? urlPatch : "";
   }, []);
 
+  // ✅ load champs + items + blob version label
   useEffect(() => {
     let alive = true;
 
     (async () => {
+      // displayPatch from blob (your "26 stuff")
+      const vj = await safeFetchJson<{ version?: string }>(blobUrl("data/lol/version.json"));
+      if (alive) {
+        const v = String(vj?.version ?? "").trim();
+        if (v) setDisplayPatch(v);
+      }
+
+      // champs index
       const champsRaw = await safeFetchJson<any>(CHAMPS_URL);
       const champRows = normalizeChampionRows(champsRaw);
       if (!alive) return;
@@ -305,6 +430,7 @@ export default function MetaClient() {
       const v = typeof champsRaw?.version === "string" ? champsRaw.version : "";
       if (v) setDdVersion(v);
 
+      // items
       const itemsRaw = await safeFetchJson<ItemsDdragon>(ITEMS_URL);
       if (!alive) return;
 
@@ -329,6 +455,7 @@ export default function MetaClient() {
     };
   }, []);
 
+  // ✅ load meta json from Blob when mode changes
   useEffect(() => {
     if (!hydrated) return;
 
@@ -337,14 +464,10 @@ export default function MetaClient() {
     (async () => {
       setMeta(null);
 
-      
-
-const url =
-  mode === "ranked"
-    ? blobUrl("data/lol/meta_builds_ranked.json")
-    : blobUrl("data/lol/meta_builds_casual.json");
-
-
+      const url =
+        mode === "ranked"
+          ? blobUrl("data/lol/meta_builds_ranked.json")
+          : blobUrl("data/lol/meta_builds_casual.json");
 
       const json = await safeFetchJson<MetaJson>(url);
       if (!json || !json.patches) throw new Error(`Failed to load meta json: ${url}`);
@@ -355,7 +478,7 @@ const url =
       const patches = Object.keys(json.patches || {}).sort((a, b) => toPatchNum(b) - toPatchNum(a));
       const newest = patches[0] || "";
 
-      // ✅ ADDED: apply URL patch if it exists in the dataset
+      // apply URL patch if it exists in the dataset
       const urlPatch = patchFromUrlRef.current;
       if (urlPatch && json.patches?.[urlPatch]) {
         setPatch(urlPatch);
@@ -404,54 +527,13 @@ const url =
     roleSummaries: Array<{ role: Role; entry: MetaRoleEntry }>;
   };
 
-  // Champions shown in the list (search + optional role filter)
-  const visibleCards = useMemo<VisibleCard[]>(() => {
-    if (!meta || !patch) return [];
-
-    const needle = q.trim().toLowerCase();
-    const rows: VisibleCard[] = champions.map((c) => {
-      const champKey = String(c.key);
-      return {
-        champKey,
-        champId: c.id,
-        name: c.name,
-        title: c.title,
-        roleMap: (patchChampMap?.[champKey] || {}) as Partial<Record<Role, MetaRoleEntry[]>>,
-        roleSummaries: (["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[])
-          .map((r) => {
-            const arr = (patchChampMap?.[champKey] as Partial<Record<Role, MetaRoleEntry[]> | undefined>)?.[
-              r
-            ];
-            const best = bestBuildForRole(arr);
-            return best ? { role: r, entry: best } : null;
-          })
-          .filter(Boolean) as Array<{ role: Role; entry: MetaRoleEntry }>,
-      };
-    });
-
-    const filteredByQuery = needle
-      ? rows.filter((c) => {
-          const hay = `${c.name} ${c.champId} ${c.title || ""}`.toLowerCase();
-          return hay.includes(needle);
-        })
-      : rows;
-
-    if (role === "ALL") return filteredByQuery;
-
-    // If a global role filter is selected, only show champs that actually have any builds for that role.
-    return filteredByQuery.filter((c) => {
-      const arr = c.roleMap[role];
-      return !!bestBuildForRole(arr); // >=10 and prefers >=25
-    });
-  }, [meta, patch, champions, patchChampMap, q, role]);
-
   function itemLabel(id: number) {
     const item = itemsById.get(id);
     return item?.name ? String(item.name) : String(id);
   }
 
   function bestBuildForRole(roleBuilds: MetaRoleEntry[] | undefined) {
-    const preferred = meta?.minDisplaySample ?? 25; // your "good sample" target
+    const preferred = meta?.minDisplaySample ?? 25; // "good sample" target
     return pickBestBuild(roleBuilds, preferred, FALLBACK_MIN_GAMES);
   }
 
@@ -459,13 +541,6 @@ const url =
     if (!e || !meta) return false;
     if (e.lowSample) return false;
     return (e.games ?? 0) >= (meta.minDisplaySample ?? 25);
-  }
-
-  function champHasAnySigData(roleMap: Partial<Record<Role, MetaRoleEntry[]>>) {
-    return (["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[]).some((r) => {
-      const best = bestBuildForRole(roleMap[r]);
-      return isStatSig(best);
-    });
   }
 
   function pickBestSigEntry(roleMap: Partial<Record<Role, MetaRoleEntry[]>>) {
@@ -489,6 +564,45 @@ const url =
     return best ? { role: best.role, entry: best.entry } : null;
   }
 
+  // Champions shown in the list (search + optional role filter)
+  const visibleCards = useMemo<VisibleCard[]>(() => {
+    if (!meta || !patch) return [];
+
+    const needle = q.trim().toLowerCase();
+    const rows: VisibleCard[] = champions.map((c) => {
+      const champKey = String(c.key);
+      return {
+        champKey,
+        champId: c.id,
+        name: c.name,
+        title: c.title,
+        roleMap: (patchChampMap?.[champKey] || {}) as Partial<Record<Role, MetaRoleEntry[]>>,
+        roleSummaries: (["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"] as Role[])
+          .map((r) => {
+            const arr = (patchChampMap?.[champKey] as Partial<Record<Role, MetaRoleEntry[]> | undefined>)?.[r];
+            const best = bestBuildForRole(arr);
+            return best ? { role: r, entry: best } : null;
+          })
+          .filter(Boolean) as Array<{ role: Role; entry: MetaRoleEntry }>,
+      };
+    });
+
+    const filteredByQuery = needle
+      ? rows.filter((c) => {
+          const hay = `${c.name} ${c.champId} ${c.title || ""}`.toLowerCase();
+          return hay.includes(needle);
+        })
+      : rows;
+
+    if (role === "ALL") return filteredByQuery;
+
+    // If a global role filter is selected, only show champs that actually have any builds for that role.
+    return filteredByQuery.filter((c) => {
+      const arr = c.roleMap[role];
+      return !!bestBuildForRole(arr);
+    });
+  }, [meta, patch, champions, patchChampMap, q, role]); // eslint-disable-line react-hooks/exhaustive-deps
+
   function buildShareUrl(champId: string, champKey: string, roleSel: RoleFilter) {
     if (typeof window === "undefined") return "";
     const u = new URL(window.location.href);
@@ -497,7 +611,6 @@ const url =
     if (patch) u.searchParams.set("patch", patch);
     if (roleSel !== "ALL") u.searchParams.set("role", roleSel);
 
-    // ✅ ONLY CHANGE YOU NEEDED:
     // store champ as "Akali" etc so the search bar can auto-fill on open
     u.searchParams.set("champ", champId?.trim() ? champId.trim() : String(champKey));
 
@@ -522,9 +635,9 @@ const url =
     const core = Array.isArray(entry.core) ? entry.core : [];
     const full = Array.isArray(entry.items) && entry.items.length ? entry.items : [...boots, ...core];
 
-    const line1 = `${champName} • Patch ${patch || "—"} • ${mode === "ranked" ? "Ranked" : "Casual"} • ${shortRole(
-      r
-    )}`;
+    const line1 = `${champName} • Patch ${patch || "—"} • ${
+      mode === "ranked" ? "Ranked" : "Casual"
+    } • ${shortRole(r)}`;
     const line2 = `Boots: ${boots.length ? itemsToText(boots) : "—"}`;
     const line3 = `Core: ${core.length ? itemsToText(core) : "—"}`;
     const line4 = full.length ? `Items: ${itemsToText(full)}` : "";
@@ -538,7 +651,6 @@ const url =
         : "";
     const rSig = entry.runesSig ? `Runes: ${entry.runesSig}` : "";
 
-    // NOTE: leaving your original behavior as-is (uses global role filter state)
     const url = buildShareUrl(champId, champKey, role);
 
     return [line1, line2, line3, line4, line5, s, rSig, url].filter(Boolean).join("\n");
@@ -562,90 +674,9 @@ const url =
     setItemToast({ id, text });
     window.setTimeout(() => setItemToast(null), 1200);
   }
-// PART 3 / 3
-  function roleEntryUi(
-    roleBuilds: MetaRoleEntry[] | undefined,
-    champCtx?: { champKey: string; champId: string; champName: string },
-    roleCtx?: Role
-  ) {
-    const entry = bestBuildForRole(roleBuilds);
-    if (!entry) return null;
 
-    const boots = entry.boots ? itemLabel(entry.boots) : "—";
-    const core = Array.isArray(entry.core) && entry.core.length ? entry.core.map(itemLabel).join(" • ") : "—";
-    const wr = formatPct(entry.winrate);
-    const games = entry.games;
-
-    const sig = isStatSig(entry);
-
-    const canCopy = canUseClipboard() && !!champCtx && !!roleCtx;
-
-    return (
-      <div
-        className="
-          relative rounded-xl border border-white/15
-          bg-gradient-to-b from-white/[0.06] to-black/60
-          ring-1 ring-white/10
-          shadow-[0_0_0_1px_rgba(255,255,255,0.06),_0_0_32px_rgba(0,255,255,0.10)]
-          p-3
-        "
-      >
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-sm font-semibold text-white/95">{wr}</div>
-
-          <div className="flex items-center gap-2">
-            {!sig ? (
-              <span
-                className="rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[10px] text-white/70"
-                title={`Low sample: fewer than ${meta?.minDisplaySample ?? 0} games. Small samples can show inflated winrates.`}
-              >
-                low sample
-              </span>
-            ) : null}
-
-            <div className="text-xs text-white/60">{games}g</div>
-
-            {canCopy ? (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const text = buildShareText({
-                    champName: champCtx!.champName,
-                    champId: champCtx!.champId,
-                    champKey: champCtx!.champKey,
-                    role: roleCtx!,
-                    entry,
-                  });
-                  copyBuildText(text, `${champCtx!.champKey}-${roleCtx!}`);
-                }}
-                className="
-                  ml-1 rounded-md border border-white/20
-                  bg-black/60 px-2 py-1 text-[11px] text-white/85
-                  transition
-                  hover:border-cyan-400 hover:text-white
-                  hover:shadow-[0_0_12px_rgba(0,255,255,0.55)]
-                "
-                title="Copy build + link"
-              >
-                {copiedKey === `${champCtx!.champKey}-${roleCtx!}` ? "Copied" : "Copy"}
-              </button>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="mt-2 text-xs text-white/70">
-          <div>
-            <span className="text-white/45">Boots:</span> {boots}
-          </div>
-          <div className="mt-1">
-            <span className="text-white/45">Core:</span> {core}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // ✅ single source of truth for icons (never hardcode 16.x)
+  const iconVersion = ddVersion || displayPatch || patch || "current";
 
   function BuildPreviewList({
     summaries,
@@ -654,7 +685,7 @@ const url =
     summaries: Array<{ role: Role; entry: MetaRoleEntry }>;
     version: string;
   }) {
-    const v = version || "16.1.1";
+    const v = version || iconVersion || "current";
 
     return (
       <div className="mt-2 space-y-2">
@@ -702,7 +733,7 @@ const url =
     entry: MetaRoleEntry;
     champKey: string;
   }) {
-    const v = ddVersion || "16.1.1";
+    const v = iconVersion;
     const boots = entry.boots ? entry.boots : null;
     const core = Array.isArray(entry.core) ? entry.core : [];
 
@@ -758,7 +789,9 @@ const url =
           )}
         </div>
 
-        {selectedName ? <div className="min-w-0 truncate text-xs text-white/75">{selectedName}</div> : null}
+        {selectedName ? (
+          <div className="min-w-0 truncate text-xs text-white/75">{selectedName}</div>
+        ) : null}
       </div>
     );
   }
@@ -774,7 +807,10 @@ const url =
 
     return (
       <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/60">
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">Patch {patch || "—"}</span>
+        {/* ✅ label from blob (displayPatch) but keep dataset patch available */}
+        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
+          Patch {displayPatch || patch || "—"}
+        </span>
 
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-1">
           Min display {meta.minDisplaySample}
@@ -785,7 +821,7 @@ const url =
         </span>
       </div>
     );
-  }, [meta, mode, patch]);
+  }, [meta, patch, displayPatch]);
 
   const confidenceNote = useMemo(() => {
     if (!meta) return null;
@@ -802,8 +838,8 @@ const url =
               yet.”
             </div>
             <div className="mt-2 text-white/55">
-              Winrate scoring uses smoothing (Bayes K={meta.bayesK}, prior={Math.round(meta.priorWinrate * 100)}
-              %), but low samples can still be noisy.
+              Winrate scoring uses smoothing (Bayes K={meta.bayesK}, prior=
+              {Math.round(meta.priorWinrate * 100)}%), but low samples can still be noisy.
             </div>
           </div>
 
@@ -816,8 +852,6 @@ const url =
       </div>
     );
   }, [meta]);
-
-  const vForIcons = ddVersion || "16.1.1";
 
   function toggleCard(champKey: string) {
     setExpanded((prev) => ({ ...prev, [champKey]: !prev[champKey] }));
@@ -834,7 +868,7 @@ const url =
           Tiers List
         </Link>
       </div>
-
+<SeoBlock />
       <div className="space-y-4">
         <div className="mt-3 rounded-2xl border border-white/10 bg-black/[.6] p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -930,7 +964,8 @@ const url =
             const activeRole = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData[0];
             const activeEntry = activeRole ? bestBuildForRole(c.roleMap[activeRole]) : null;
 
-const champHref = `/calculators/lol/champions/${c.champId}`;
+            // ✅ slug pages are lowercase
+            const champHref = `/calculators/lol/champions/${String(c.champId).toLowerCase()}`;
 
             const canCopy = canUseClipboard() && (!!activeEntry || !!best);
             const copyToastKey = `${c.champKey}-${activeRole || "best"}`;
@@ -951,36 +986,35 @@ const champHref = `/calculators/lol/champions/${c.champId}`;
                 >
                   <div className="flex min-w-0 gap-3">
                     <Link
-  href={champHref}
-  prefetch={false}
-  onClick={(e) => e.stopPropagation()}
-  onKeyDown={(e) => e.stopPropagation()}
-  className="
-    group mt-0.5 shrink-0 rounded-xl
-    focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60
-  "
-  aria-label={`Open ${c.name} page`}
->
-  <img
-    src={champIconUrl(vForIcons, c.champId)}
-    alt={c.name}
-    className="
-      h-9 w-9 rounded-xl object-cover sm:h-10 sm:w-10
-      border border-white/10 bg-white/[0.02]
-      transition
-      group-hover:border-cyan-400/60
-      group-hover:shadow-[0_0_20px_rgba(0,255,255,0.45)]
-    "
-    loading="lazy"
-    draggable={false}
-    onError={(e) => {
-      const img = e.currentTarget;
-      img.onerror = null;
-      img.src = champIconUrl("16.1.1", c.champId);
-    }}
-  />
-</Link>
-
+                      href={champHref}
+                      prefetch={false}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                      className="
+                        group mt-0.5 shrink-0 rounded-xl
+                        focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/60
+                      "
+                      aria-label={`Open ${c.name} page`}
+                    >
+                      <img
+                        src={champIconUrl(iconVersion, c.champId)}
+                        alt={c.name}
+                        className="
+                          h-9 w-9 rounded-xl object-cover sm:h-10 sm:w-10
+                          border border-white/10 bg-white/[0.02]
+                          transition
+                          group-hover:border-cyan-400/60
+                          group-hover:shadow-[0_0_20px_rgba(0,255,255,0.45)]
+                        "
+                        loading="lazy"
+                        draggable={false}
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          img.onerror = null;
+                          img.src = champIconUrl("current", c.champId);
+                        }}
+                      />
+                    </Link>
 
                     <div className="min-w-0">
                       <div className="flex items-baseline gap-2">
@@ -989,7 +1023,7 @@ const champHref = `/calculators/lol/champions/${c.champId}`;
                       </div>
 
                       {c.roleSummaries.length ? (
-                        <BuildPreviewList summaries={c.roleSummaries} version={ddVersion || "16.1.1"} />
+                        <BuildPreviewList summaries={c.roleSummaries} version={iconVersion} />
                       ) : (
                         <div className="mt-2 text-xs text-white/45">
                           No builds ≥ {FALLBACK_MIN_GAMES} games for this champ on this patch yet.
@@ -1054,7 +1088,8 @@ const champHref = `/calculators/lol/champions/${c.champId}`;
                         );
                       }
 
-                      const active = (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData2[0];
+                      const active =
+                        (activeRoleByChamp[c.champKey] as Role | undefined) ?? rolesWithData2[0];
                       const entry = bestBuildForRole(c.roleMap[active])!;
 
                       const wr = formatPct(entry.winrate);
@@ -1075,7 +1110,8 @@ const champHref = `/calculators/lol/champions/${c.champId}`;
                         return true;
                       });
 
-                      const selectedItem = selectedExpandedItemByChamp[c.champKey] ?? uniqItems[0] ?? null;
+                      const selectedItem =
+                        selectedExpandedItemByChamp[c.champKey] ?? uniqItems[0] ?? null;
                       const selectedObj = selectedItem ? itemsById.get(selectedItem) : undefined;
 
                       return (
@@ -1143,10 +1179,15 @@ const champHref = `/calculators/lol/champions/${c.champId}`;
                                   title={nm}
                                 >
                                   <img
-                                    src={itemIconUrl(ddVersion || "16.1.1", id)}
+                                    src={itemIconUrl(iconVersion, id)}
                                     alt={nm}
                                     className="h-10 w-10 rounded-md object-cover"
                                     loading="lazy"
+                                    onError={(e) => {
+                                      const img = e.currentTarget;
+                                      img.onerror = null;
+                                      img.src = itemIconUrl("current", id);
+                                    }}
                                   />
                                 </button>
                               );
@@ -1161,7 +1202,9 @@ const champHref = `/calculators/lol/champions/${c.champId}`;
                                     {selectedObj.name ?? selectedItem}
                                   </div>
                                   {selectedObj.plaintext ? (
-                                    <div className="mt-0.5 text-xs text-white/55">{selectedObj.plaintext}</div>
+                                    <div className="mt-0.5 text-xs text-white/55">
+                                      {selectedObj.plaintext}
+                                    </div>
                                   ) : null}
                                 </div>
 
