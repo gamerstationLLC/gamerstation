@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "scripts/bloxfruits/build-items.mjs"  ],
+, "scripts/bloxfruits/build-items.mjs", "scripts/lol/write-version-json.mjs"  ],
   "exclude": ["node_modules"]
 }

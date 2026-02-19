@@ -7,9 +7,9 @@ import LolClient from "./LolClient";
 import { readPublicJson } from "@/lib/server/readPublicJson";
 
 export const metadata: Metadata = {
-  title: "LoL Damage Calculator (Burst, DPS) | GamerStation",
+  title: "LoL Damage Calculator (Burst & DPS) | GamerStation",
   description:
-    "LoL damage calculator for burst combos, DPS, and time-to-kill. Compare items and stats using Riot Data Dragon values. Simple & Advanced modes.",
+    "Calculate burst damage, DPS, and time-to-kill in League of Legends using official Riot Data Dragon values. Simple and Advanced modes supported.",
 };
 
 // ✅ Segment config (VALID)
@@ -57,35 +57,42 @@ export type ItemRow = {
   description: string;
 };
 
-/* -------------------- Blob helpers -------------------- */
-
-function blobUrl(pathname: string) {
-  const base = process.env.NEXT_PUBLIC_BLOB_BASE_URL;
-  if (!base) return null;
-  return `${base.replace(/\/+$/, "")}/${pathname.replace(/^\/+/, "")}`;
-}
-
-async function fetchJsonFromBlob<T>(pathname: string, revalidateSeconds = 300): Promise<T | null> {
-  const url = blobUrl(pathname);
-  if (!url) return null;
-
-  try {
-    const res = await fetch(url, { next: { revalidate: revalidateSeconds } });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
-}
-
 /**
- * ✅ Blob-only patch getter.
- * Source of truth: Blob -> data/lol/version.json
+ * ✅ We need TWO versions:
+ * - displayPatch: what you show in UI + what your local files correspond to (e.g. "26.4")
+ * - ddragon: Data Dragon asset version for CDN requests (e.g. "16.4.1")
+ *
+ * displayPatch comes from your local public/data/lol/version.json
+ * ddragon comes from https://ddragon.../api/versions.json
  */
-async function getPatchFromBlobOnly(): Promise<string> {
-  const json = await fetchJsonFromBlob<{ version?: string }>("data/lol/version.json", 300);
-  const v = String(json?.version ?? "").trim();
-  return v || "unknown";
+async function getLolVersions(): Promise<{ displayPatch: string; ddragon: string }> {
+  // default fallback if everything fails
+  let displayPatch = "unknown";
+  let ddragon = "unknown";
+
+  // 1) local display patch (your pipeline writes this)
+  try {
+    const local = await readPublicJson<{ patch?: string; version?: string }>("data/lol/version.json");
+    // support either "patch" or legacy "version"
+    displayPatch = String(local.patch ?? local.version ?? displayPatch).trim() || displayPatch;
+  } catch {
+    // ignore
+  }
+
+  // 2) ddragon asset version from Riot
+  try {
+    const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
+      next: { revalidate: 21600 },
+    });
+    if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
+    const versions = (await res.json()) as string[];
+    ddragon = String(versions?.[0] ?? ddragon).trim() || ddragon;
+  } catch {
+    // If Riot fails, fallback to displayPatch (still better than "unknown")
+    ddragon = displayPatch;
+  }
+
+  return { displayPatch, ddragon };
 }
 
 async function loadLolIndex(version: string): Promise<{
@@ -170,22 +177,6 @@ async function loadLolItems(version: string): Promise<{ patch: string; items: It
 
   return { patch, items };
 }
-
-function LoadingShell() {
-  return (
-    <main className="min-h-screen bg-transparent text-white px-6 py-12">
-      <div className="mx-auto max-w-6xl">
-        <div className="h-4 w-40 rounded bg-white/10" />
-        <div className="mt-8 h-10 w-[min(560px,100%)] rounded bg-white/10" />
-        <div className="mt-4 h-4 w-[min(720px,100%)] rounded bg-white/10" />
-        <div className="mt-10 h-[520px] w-full rounded-xl bg-white/5" />
-      </div>
-    </main>
-  );
-}
-
-const topButtonClass =
-  "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
 function SeoBlock({ patch }: { patch: string }) {
   return (
@@ -305,19 +296,35 @@ function SeoBlock({ patch }: { patch: string }) {
   );
 }
 
-export default async function LolCalculatorPage() {
-  // ✅ patch/version comes ONLY from Blob now
-  const version = await getPatchFromBlobOnly();
+function LoadingShell() {
+  return (
+    <main className="min-h-screen bg-transparent text-white px-6 py-12">
+      <div className="mx-auto max-w-6xl">
+        <div className="h-4 w-40 rounded bg-white/10" />
+        <div className="mt-8 h-10 w-[min(560px,100%)] rounded bg-white/10" />
+        <div className="mt-4 h-4 w-[min(720px,100%)] rounded bg-white/10" />
+        <div className="mt-10 h-[520px] w-full rounded-xl bg-white/5" />
+      </div>
+    </main>
+  );
+}
 
-  const [{ patch, champions }, { items }] = await Promise.all([
-    loadLolIndex(version),
-    loadLolItems(version),
+const topButtonClass =
+  "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+
+export default async function LolCalculatorPage() {
+  const { displayPatch, ddragon } = await getLolVersions();
+
+  const [{ champions }, { items }] = await Promise.all([
+    loadLolIndex(displayPatch),
+    loadLolItems(displayPatch),
   ]);
 
   return (
     <main className="min-h-screen bg-transparent text-white px-6 py-12">
       <div className="mx-auto max-w-6xl">
         <header className="flex items-center gap-3">
+          {/* GS brand */}
           <Link href="/" className="flex items-center gap-2 hover:opacity-90">
             <img
               src="/gs-logo-v2.png"
@@ -332,6 +339,7 @@ export default async function LolCalculatorPage() {
             </span>
           </Link>
 
+          {/* Top-right */}
           <div className="ml-auto">
             <Link href="/calculators/lol/hub" className={topButtonClass}>
               LoL Hub
@@ -360,15 +368,14 @@ export default async function LolCalculatorPage() {
             Champion Tiers
           </Link>
           <Link href="/calculators/lol/champions" className={topButtonClass}>
-            Champion Index
+            Index
           </Link>
         </div>
 
         <Suspense fallback={<LoadingShell />}>
-          <LolClient champions={champions} patch={patch} items={items} />
+          <LolClient champions={champions} patch={displayPatch} ddragon={ddragon} items={items} />
         </Suspense>
-
-        <SeoBlock patch={patch} />
+        <SeoBlock patch={displayPatch} />
       </div>
     </main>
   );
