@@ -146,8 +146,8 @@ jobs:
         if: always()
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          # IMPORTANT: keep these paths aligned with your app's Blob reads (rel = data/lol/...)
-          BLOB_UPLOADS: "data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
+          # IMPORTANT: left side = local file (repo), right side = blob key/path
+          BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
           BLOB_CACHE_SECONDS: "300"
           LOL_PATCH: ${{ github.run_id }}
           BLOB_FORCE_OVERWRITE: "1"
@@ -166,15 +166,6 @@ jobs:
         if: always()
         run: |
           set +e
-          # This should be YOUR existing generator script/command.
-          # Keep it here so it runs ONLY after meta builds are finalized + uploaded.
-          #
-          # Expected outputs (disk): public/data/lol/items_usage_ranked.json
-          #                          public/data/lol/items_usage_casual.json
-          #                          public/data/lol/items_usage_combined.json
-          #
-          # If your script outputs into data/lol instead of public/data/lol,
-          # change it in the script OR tweak the merge step's local path list.
           npm run lol:build:items-usage || true
           exit 0
 
@@ -253,10 +244,9 @@ jobs:
                 slug: row.slug || "",
                 games: 0,
                 wins: 0,
-                topChamps: new Map(), // champId -> { champId, games, wins }
+                topChamps: new Map(),
               };
 
-              // prefer latest slug if present
               if (row.slug) prev.slug = row.slug;
 
               prev.games += Number(row.games || 0);
@@ -275,11 +265,9 @@ jobs:
               byItem.set(itemId, prev);
             }
 
-            // Merge old + new
             for (const r of oldItems) upsertItem(r);
             for (const r of newItems) upsertItem(r);
 
-            // Rebuild output rows
             const outItems = Array.from(byItem.values()).map((it) => {
               const top = Array.from(it.topChamps.values())
                 .map((c) => ({
@@ -301,7 +289,6 @@ jobs:
               };
             });
 
-            // Stable sort: most played first
             outItems.sort((a, b) => b.games - a.games);
 
             return {
@@ -315,7 +302,6 @@ jobs:
           async function fetchOldFromBlob(rel) {
             if (!base) return null;
 
-            // Support both possible key styles: "data/..." and "public/data/..."
             const url1 = `${base.replace(/\/+$/, "")}/${rel.replace(/^\/+/, "")}`;
             const url2 = `${base.replace(/\/+$/, "")}/public/${rel.replace(/^\/+/, "")}`;
 
@@ -325,10 +311,9 @@ jobs:
           async function runOne(source) {
             const rel = `data/lol/items_usage_${source}.json`;
 
-            // Local candidates (in case your generator writes to either location)
             const localCandidates = [
               path.join("public", rel),
-              path.join(rel), // data/lol/... (repo-root)
+              path.join(rel),
             ];
 
             const oldRemote = await fetchOldFromBlob(rel);
@@ -341,7 +326,6 @@ jobs:
 
             const merged = mergeUsage(oldRemote, newLocal, source);
 
-            // Always write to public/ because your Next.js reads /public/data/...
             const outAbs = await writeLocalJson(path.join("public", rel), merged);
             console.log(`[items_usage:${source}] wrote merged -> ${outAbs}`);
 
@@ -355,7 +339,6 @@ jobs:
               if (outRel) outputs.push(outRel);
             }
 
-            // Print outputs so the next step can upload them
             await fsp.writeFile(
               path.join(process.cwd(), ".items_usage_outputs.txt"),
               outputs.join("\n") + "\n",
@@ -365,18 +348,15 @@ jobs:
             console.log("[items_usage] outputs:", outputs);
           })().catch((e) => {
             console.error("[items_usage] merge failed:", e);
-            process.exit(0); // never fail job
+            process.exit(0);
           });
           NODE
 
-          # Upload the merged (public) files to Blob by overwriting the keys
           if [ -n "$BLOB_READ_WRITE_TOKEN" ]; then
-            # Build BLOB_UPLOADS dynamically from what we actually wrote
             UPLOADS=""
             while IFS= read -r line; do
               [ -z "$line" ] && continue
-              # line is like: public/data/lol/items_usage_ranked.json
-              rel="${line#public/}"   # => data/lol/items_usage_ranked.json
+              rel="${line#public/}"
               if [ -n "$UPLOADS" ]; then
                 UPLOADS="${UPLOADS};${rel}=${line}"
               else

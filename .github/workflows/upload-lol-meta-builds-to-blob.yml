@@ -1,0 +1,67 @@
+name: Upload LoL Meta Builds to Blob (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_overwrite:
+        description: "Force overwrite blob keys (recommended)"
+        required: false
+        default: "true"
+      cache_seconds:
+        description: "Cache seconds for uploaded JSON"
+        required: false
+        default: "300"
+
+concurrency:
+  group: upload-lol-meta-builds-to-blob
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Sanity check local files exist
+        run: |
+          set -e
+          ls -la public/data/lol || true
+          test -f public/data/lol/meta_builds_ranked.json
+          test -f public/data/lol/meta_builds_casual.json
+          echo "✅ Found local meta build JSONs."
+
+      - name: Upload meta builds to Blob
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          # left side = local file path, right side = blob key/path
+          BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
+          BLOB_CACHE_SECONDS: ${{ inputs.cache_seconds }}
+          BLOB_FORCE_OVERWRITE: ${{ inputs.force_overwrite == 'true' && '1' || '0' }}
+          LOL_PATCH: manual-${{ github.run_id }}
+        run: |
+          set -e
+          node scripts/blob/upload-data.mjs
+
+      - name: Print blob URLs to test
+        run: |
+          echo "Ranked:"
+          echo "https://or3vgdqybw6oou7j.public.blob.vercel-storage.com/data/lol/meta_builds_ranked.json?t=${{ github.run_id }}"
+          echo ""
+          echo "Casual:"
+          echo "https://or3vgdqybw6oou7j.public.blob.vercel-storage.com/data/lol/meta_builds_casual.json?t=${{ github.run_id }}"
