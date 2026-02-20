@@ -2,7 +2,7 @@ name: Update LoL Champion Tiers
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "*/30 * * * *" # every 30 minutes
   workflow_dispatch: {}
 
 concurrency:
@@ -123,7 +123,7 @@ jobs:
           BLOB_UPLOADS: "public/data/lol/champion_tiers.json=data/lol/champion_tiers.json"
           BLOB_CACHE_SECONDS: "300"
           LOL_PATCH: ${{ github.run_id }}
-          BLOB_FORCE_OVERWRITE: "1" # ✅ required so manifest/latest pointers always update
+          BLOB_FORCE_OVERWRITE: "1" # ✅ overwrite blob every run
         run: |
           set +e
 

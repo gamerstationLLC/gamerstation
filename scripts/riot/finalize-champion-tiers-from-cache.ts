@@ -6,6 +6,11 @@ type Tier = "S" | "A" | "B" | "C" | "D" | "—";
 
 const ROOT = process.cwd();
 const MATCH_DIR = path.join(ROOT, "scripts", "riot", "cache", "champion_tiers", "matches");
+
+// NEW: persistent state to prevent double-counting across runs
+const STATE_DIR = path.join(ROOT, "scripts", "riot", "cache", "champion_tiers", "state");
+const SEEN_MATCH_IDS_PATH = path.join(STATE_DIR, "seen_match_ids.json");
+
 const OUT_PATH = path.join(ROOT, "public", "data", "lol", "champion_tiers.json");
 
 function mean(xs: number[]) {
@@ -66,8 +71,8 @@ async function fetchChampionIdToName(ddVersion: string): Promise<Map<number, str
 
   for (const k of Object.keys(data)) {
     const champ = data[k];
-    const keyStr = (champ?.key ?? "").toString().trim(); // numeric championId as string
-    const name = (champ?.id ?? champ?.name ?? k ?? "").toString().trim(); // canonical id for images
+    const keyStr = (champ?.key ?? "").toString().trim();
+    const name = (champ?.id ?? champ?.name ?? k ?? "").toString().trim();
     const idNum = Number(keyStr);
     if (Number.isFinite(idNum) && name) map.set(idNum, name);
   }
@@ -96,18 +101,51 @@ type OutRow = {
   score: number;
   tier: Tier;
 
-  // metadata
+  // metadata (same for all rows)
   matchesSeen: number;
   ddragonVersion: string;
   generatedAt: string;
 };
 
+async function readJsonIfExists<T>(p: string): Promise<T | null> {
+  try {
+    const raw = await fs.readFile(p, "utf-8");
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
+function fileToMatchId(filename: string): string {
+  // filename is expected to be "<matchId>.json"
+  return filename.endsWith(".json") ? filename.slice(0, -5) : filename;
+}
+
 export async function main() {
   await fs.mkdir(path.dirname(OUT_PATH), { recursive: true });
+  await fs.mkdir(STATE_DIR, { recursive: true });
 
+  const generatedAt = new Date().toISOString();
+
+  // Load existing output (if any) so we can COMPOUND totals
+  const existingOut = await readJsonIfExists<OutRow[]>(OUT_PATH);
+  const existingRows: OutRow[] = Array.isArray(existingOut) ? existingOut : [];
+
+  // Pull existing global meta (stored per-row)
+  const existingMatchesSeen =
+    existingRows.length > 0
+      ? Math.max(...existingRows.map((r) => (Number.isFinite(r.matchesSeen) ? r.matchesSeen : 0)))
+      : 0;
+
+  // Load seen match ids so we only add NEW matches since last finalize
+  const seenRaw = await readJsonIfExists<{ seen: string[] }>(SEEN_MATCH_IDS_PATH);
+  const seen = new Set<string>(Array.isArray(seenRaw?.seen) ? seenRaw!.seen : []);
+
+  // Fetch DDragon (used for consistent champ ids)
   const ddVersion = await fetchLatestDdragonVersion();
   const idToName = await fetchChampionIdToName(ddVersion);
 
+  // Read match files
   let files: string[] = [];
   try {
     files = (await fs.readdir(MATCH_DIR)).filter((f) => f.endsWith(".json"));
@@ -115,18 +153,20 @@ export async function main() {
     files = [];
   }
 
-  const generatedAt = new Date().toISOString();
-
   if (!files.length) {
-  console.log("[champion-tiers/finalize] No cached matches found. Keeping existing output.");
-  return;
-}
+    console.log("[champion-tiers/finalize] No cached matches found. Keeping existing output.");
+    return;
+  }
 
-  const agg = new Map<number, Agg>();
-  const bans = new Map<number, number>();
-  let matchesSeen = 0;
+  // Aggregate ONLY NEW matches (not seen before)
+  const deltaAgg = new Map<number, Agg>();
+  const deltaBans = new Map<number, number>();
+  let deltaMatchesSeen = 0;
 
   for (const file of files) {
+    const matchId = fileToMatchId(file);
+    if (seen.has(matchId)) continue; // ✅ already counted in a previous finalize
+
     const abs = path.join(MATCH_DIR, file);
     let match: any;
 
@@ -138,7 +178,9 @@ export async function main() {
 
     const info = match?.info;
     if (!info) continue;
-    matchesSeen++;
+
+    deltaMatchesSeen++;
+    seen.add(matchId);
 
     // bans live on teams[].bans[]
     const teams = info?.teams;
@@ -149,7 +191,7 @@ export async function main() {
         for (const ban of b) {
           const cid = Number(ban?.championId);
           if (!Number.isFinite(cid) || cid <= 0) continue;
-          bans.set(cid, (bans.get(cid) ?? 0) + 1);
+          deltaBans.set(cid, (deltaBans.get(cid) ?? 0) + 1);
         }
       }
     }
@@ -161,22 +203,50 @@ export async function main() {
 
       const win = Boolean(p?.win);
 
-      const a = agg.get(cid) ?? { games: 0, wins: 0, bans: 0 };
+      const a = deltaAgg.get(cid) ?? { games: 0, wins: 0, bans: 0 };
       a.games += 1;
       if (win) a.wins += 1;
-      agg.set(cid, a);
+      deltaAgg.set(cid, a);
     }
   }
 
-  // apply bans
-  for (const [cid, bcount] of bans.entries()) {
-    const a = agg.get(cid) ?? { games: 0, wins: 0, bans: 0 };
-    a.bans = bcount;
-    agg.set(cid, a);
+  if (deltaMatchesSeen === 0) {
+    console.log("[champion-tiers/finalize] No NEW matches since last finalize. Keeping existing output.");
+    return;
   }
 
-  // build rows
-  const rows = Array.from(agg.entries())
+  // Apply delta bans into deltaAgg
+  for (const [cid, bcount] of deltaBans.entries()) {
+    const a = deltaAgg.get(cid) ?? { games: 0, wins: 0, bans: 0 };
+    a.bans = bcount;
+    deltaAgg.set(cid, a);
+  }
+
+  // Build a map of existing totals for compounding
+  const totals = new Map<number, Agg>();
+  for (const r of existingRows) {
+    const cid = Number(r.championId);
+    if (!Number.isFinite(cid) || cid <= 0) continue;
+    totals.set(cid, {
+      games: Number(r.picks) || 0,
+      wins: Number(r.wins) || 0,
+      bans: Number(r.bans) || 0,
+    });
+  }
+
+  // Compound: existing += delta
+  for (const [cid, d] of deltaAgg.entries()) {
+    const cur = totals.get(cid) ?? { games: 0, wins: 0, bans: 0 };
+    cur.games += d.games;
+    cur.wins += d.wins;
+    cur.bans += d.bans;
+    totals.set(cid, cur);
+  }
+
+  const matchesSeenTotal = existingMatchesSeen + deltaMatchesSeen;
+
+  // Build rows from TOTALS
+  const baseRows = Array.from(totals.entries())
     .map(([cid, a]) => {
       const name = idToName.get(cid) || `Champion${cid}`;
       const slug = slugifyLoL(name);
@@ -186,7 +256,7 @@ export async function main() {
       const banCount = a.bans ?? 0;
 
       const winrate = picks ? wins / picks : 0;
-      const banrate = matchesSeen ? banCount / matchesSeen : 0;
+      const banrate = matchesSeenTotal ? banCount / matchesSeenTotal : 0;
 
       return {
         championId: cid,
@@ -201,15 +271,15 @@ export async function main() {
     })
     .filter((r) => r.picks > 0);
 
-  if (!rows.length) {
-  console.log("[champion-tiers/finalize] No usable rows. Keeping existing output.");
-  return;
-}
+  if (!baseRows.length) {
+    console.log("[champion-tiers/finalize] No usable rows after merge. Keeping existing output.");
+    return;
+  }
 
   // scoring inputs
-  const pickVals = rows.map((r) => Math.log1p(r.picks));
-  const winVals = rows.map((r) => r.winrate);
-  const banVals = rows.map((r) => r.banrate);
+  const pickVals = baseRows.map((r) => Math.log1p(r.picks));
+  const winVals = baseRows.map((r) => r.winrate);
+  const banVals = baseRows.map((r) => r.banrate);
 
   const muPick = mean(pickVals);
   const sdPick = std(pickVals, muPick);
@@ -220,16 +290,14 @@ export async function main() {
   const muBan = mean(banVals);
   const sdBan = std(banVals, muBan);
 
-  // weights (tweak whenever)
+  // weights
   const W_PICK = 0.40;
   const W_WIN = 0.50;
   const W_BAN = 0.10;
 
-  const scored = rows.map((r) => {
+  const scored = baseRows.map((r) => {
     const zPick = (Math.log1p(r.picks) - muPick) / sdPick;
     const zWin = (r.winrate - muWin) / sdWin;
-
-    // bans may be sparse; if sdBan ~ 0 we still get a safe divisor from std()
     const zBan = (r.banrate - muBan) / sdBan;
 
     const score = W_PICK * zPick + W_WIN * zWin + W_BAN * zBan;
@@ -262,21 +330,25 @@ export async function main() {
       score: Number(r.score.toFixed(6)),
       tier: tierById.get(r.championId) ?? "—",
 
-      matchesSeen,
+      matchesSeen: matchesSeenTotal,
       ddragonVersion: ddVersion,
       generatedAt,
     }))
     .sort((a, b) => {
-      // default: tier then score
       const order: Record<Tier, number> = { S: 0, A: 1, B: 2, C: 3, D: 4, "—": 9 };
       const dt = (order[a.tier] ?? 9) - (order[b.tier] ?? 9);
       if (dt !== 0) return dt;
       return b.score - a.score;
     });
 
+  // Persist new seen set (so we never double-count)
+  await fs.writeFile(SEEN_MATCH_IDS_PATH, JSON.stringify({ seen: Array.from(seen) }, null, 2), "utf-8");
+
+  // Write merged output
   await fs.writeFile(OUT_PATH, JSON.stringify(out, null, 2), "utf-8");
+
   console.log(
-    `[champion-tiers/finalize] wrote ${out.length} champs -> public/data/lol/champion_tiers.json (matches=${matchesSeen}, ddragon=${ddVersion})`
+    `[champion-tiers/finalize] merged + wrote ${out.length} champs -> public/data/lol/champion_tiers.json (deltaMatches=${deltaMatchesSeen}, matchesTotal=${matchesSeenTotal}, ddragon=${ddVersion})`
   );
 }
 
