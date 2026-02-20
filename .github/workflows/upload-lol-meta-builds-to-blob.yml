@@ -1,10 +1,10 @@
-name: Rebuild + Upload LoL Meta Builds (manual)
+name: Upload LoL Meta Builds to Blob (from cache)
 
 on:
   workflow_dispatch:
     inputs:
       force_overwrite:
-        description: "Overwrite canonical blob keys (recommended)"
+        description: "Overwrite canonical blob keys"
         required: false
         default: "true"
       cache_seconds:
@@ -13,14 +13,14 @@ on:
         default: "300"
 
 concurrency:
-  group: rebuild-upload-lol-meta-builds
+  group: upload-lol-meta-builds-from-cache
   cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
-  rebuild_upload:
+  upload:
     runs-on: ubuntu-latest
 
     defaults:
@@ -42,7 +42,7 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # Restore the SAME riot cache your main workflow uses so finalize has data to work with
+      # ✅ Restore the same cache your main LoL workflow compounding uses
       - name: Restore Riot cache
         uses: actions/cache@v4
         with:
@@ -55,26 +55,24 @@ jobs:
             lol-riot-cache-v1-${{ runner.os }}
             lol-riot-cache-v1
 
-      # Optional: keep it aligned with your pipeline (won't hurt; but not crawling)
+      # Optional alignment with main pipeline (kept, but no crawling)
       - name: Update LoL static data
         run: npm run lol:update
 
       - name: Update LoL overrides
         run: npm run lol:update:overrides
 
-      # This is the important part: rebuild meta_builds JSONs FROM CACHE (no crawling)
-      - name: Finalize meta builds (from cache)
+      # ✅ Rebuild meta outputs FROM CACHE
+      - name: Finalize meta builds (from restored cache)
         run: |
           set -e
           npm run lol:finalize:meta
 
-      - name: Sanity check outputs exist
+      - name: Sanity check generatedAt + files exist
         run: |
           set -e
-          ls -la public/data/lol || true
           test -f public/data/lol/meta_builds_ranked.json
           test -f public/data/lol/meta_builds_casual.json
-          echo "✅ Meta build JSONs exist."
 
           echo "Ranked generatedAt:"
           node -e "console.log(JSON.parse(require('fs').readFileSync('public/data/lol/meta_builds_ranked.json','utf8')).generatedAt)"
@@ -84,6 +82,7 @@ jobs:
       - name: Upload meta builds to Blob
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          # left = local file, right = blob key
           BLOB_UPLOADS: "public/data/lol/meta_builds_ranked.json=data/lol/meta_builds_ranked.json;public/data/lol/meta_builds_casual.json=data/lol/meta_builds_casual.json"
           BLOB_CACHE_SECONDS: ${{ inputs.cache_seconds }}
           BLOB_FORCE_OVERWRITE: ${{ inputs.force_overwrite == 'true' && '1' || '0' }}
