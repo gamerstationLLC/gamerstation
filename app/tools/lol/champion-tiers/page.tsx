@@ -177,7 +177,7 @@ export default async function LolChampionTiersPage() {
           </div>
         </div>
 
-        <SeoBlock patch={patch} />
+        
       </div>
 
       <Suspense
@@ -199,6 +199,7 @@ export default async function LolChampionTiersPage() {
         Tiers are computed from a blended score (pick volume + winrate + banrate when applicable).
         This is a meta snapshot, not a guarantee for every matchup.
       </div>
+      <SeoBlock patch={patch} />
     </main>
   );
 }

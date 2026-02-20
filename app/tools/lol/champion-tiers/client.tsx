@@ -77,6 +77,16 @@ function slugifyLoL(input: string) {
     .replace(/^-|-$/g, "");
 }
 
+/** ✅ Normalize champion names so "Belveth" matches "Bel'Veth", "AurelionSol" matches "Aurelion Sol", etc. */
+function normalizeChampName(input: string) {
+  return (input ?? "")
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/['"]/g, "")
+    .replace(/[^a-z0-9]+/g, ""); // remove spaces/punct entirely
+}
+
 function mean(xs: number[]) {
   if (!xs.length) return 0;
   let s = 0;
@@ -138,7 +148,7 @@ function buildDdragonSquareUrl(ddragon: string, champId: string) {
   return `https://ddragon.leagueoflegends.com/cdn/${ver}/img/champion/${id}.png`;
 }
 
-// --------- PATCH + DDRAGON RESOLUTION (NEW ROUTES) ---------
+// --------- PATCH + DDRAGON RESOLUTION ---------
 
 function norm(x: any) {
   const v = String(x ?? "").trim();
@@ -147,7 +157,6 @@ function norm(x: any) {
 }
 
 async function fetchPatchAndDdragon(): Promise<{ patch: string; ddragon: string } | null> {
-  // prefer your canonical route:
   const urls = ["/api/lol/patch", "/api/version"];
 
   for (const url of urls) {
@@ -159,7 +168,6 @@ async function fetchPatchAndDdragon(): Promise<{ patch: string; ddragon: string 
       const patch = norm(json?.patch ?? json?.version);
       const ddragon = norm(json?.ddragon);
 
-      // patch is display patch (26.x), ddragon is asset version (16.x.x)
       if (patch || ddragon) return { patch: patch || "—", ddragon: ddragon || "—" };
     } catch {
       // try next
@@ -182,6 +190,7 @@ type DDragonChampionIndex = {
 
 type ChampMap = {
   byNameLower: Map<string, string>;
+  byNameNorm: Map<string, string>;
   byKeyNum: Map<string, string>;
 };
 
@@ -197,20 +206,28 @@ async function fetchChampionMap(ddragon: string): Promise<ChampMap | null> {
     const json = (await res.json()) as DDragonChampionIndex;
 
     const byNameLower = new Map<string, string>();
+    const byNameNorm = new Map<string, string>();
     const byKeyNum = new Map<string, string>();
 
     for (const k of Object.keys(json.data || {})) {
       const c = json.data[k];
       if (!c?.id) continue;
 
-      const nm = (c.name ?? "").toString().trim().toLowerCase();
-      if (nm) byNameLower.set(nm, c.id);
+      const nm = (c.name ?? "").toString().trim();
+      const id = (c.id ?? "").toString().trim();
+
+      // Exact lower-name lookup
+      if (nm) byNameLower.set(nm.toLowerCase(), id);
+
+      // Normalized lookup (handles Bel'Veth vs Belveth, Aurelion Sol vs AurelionSol, etc)
+      if (nm) byNameNorm.set(normalizeChampName(nm), id);
+      if (id) byNameNorm.set(normalizeChampName(id), id); // also map on id
 
       const keyNum = (c.key ?? "").toString().trim();
-      if (keyNum) byKeyNum.set(keyNum, c.id);
+      if (keyNum) byKeyNum.set(keyNum, id);
     }
 
-    return { byNameLower, byKeyNum };
+    return { byNameLower, byNameNorm, byKeyNum };
   } catch {
     return null;
   }
@@ -324,7 +341,7 @@ function sortArrow(active: boolean, desc: boolean) {
 
 export default function LolChampionTiersClient({
   initialRows,
-  patch = "—",   // display patch (26.x)
+  patch = "—", // display patch (26.x)
   ddragon = "—", // asset version (16.x.x)
   hrefBase = "/calculators/lol/champions",
 }: {
@@ -346,7 +363,6 @@ export default function LolChampionTiersClient({
     return Number.isFinite(n) && n >= 0 ? n : 0;
   }, [minGamesText]);
 
-  // ✅ separate display patch vs asset version
   const [patchLive, setPatchLive] = useState<string>(patch || "—");
   const [ddragonLive, setDdragonLive] = useState<string>(ddragon || "—");
   const [champMap, setChampMap] = useState<ChampMap | null>(null);
@@ -366,10 +382,7 @@ export default function LolChampionTiersClient({
       if (map) setChampMap(map);
     }
 
-    // run once on mount
     refresh();
-
-    // periodic refresh
     const id = window.setInterval(refresh, 5 * 60 * 1000);
 
     return () => {
@@ -434,17 +447,26 @@ export default function LolChampionTiersClient({
       const existing = (r.icon || r.image || "").toString().trim();
 
       // Resolve DDragon champion ID:
-      // - If your row.key is numeric, map via champion.json key->id
-      // - Else map by exact name -> id
-      // - Else fallback: attempt to use displayName as id (won't work for "Lee Sin" etc)
       const keyStr = (r.key ?? "").toString().trim();
+      const idStr = (r.id ?? "").toString().trim();
 
       let champId = "";
+
+      // 1) numeric key -> id
       if (keyStr && /^\d+$/.test(keyStr) && champMap?.byKeyNum) {
         champId = champMap.byKeyNum.get(keyStr) ?? "";
       }
-      if (!champId && champMap?.byNameLower) {
-        champId = champMap.byNameLower.get(displayName.toLowerCase()) ?? "";
+      // 2) normalized name -> id
+      if (!champId && champMap?.byNameNorm) {
+        champId = champMap.byNameNorm.get(normalizeChampName(displayName)) ?? "";
+      }
+      // 3) normalized id field -> id (sometimes rows store "AurelionSol" / "MonkeyKing" etc)
+      if (!champId && champMap?.byNameNorm && idStr) {
+        champId = champMap.byNameNorm.get(normalizeChampName(idStr)) ?? "";
+      }
+      // 4) normalized slug -> id (last resort)
+      if (!champId && champMap?.byNameNorm && slug) {
+        champId = champMap.byNameNorm.get(normalizeChampName(slug)) ?? "";
       }
 
       const imgUrl = existing ? existing : buildDdragonSquareUrl(ddragonLive, champId);
@@ -565,18 +587,10 @@ export default function LolChampionTiersClient({
             <div className="text-sm font-semibold text-white">Tier List Filters</div>
 
             <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => setMode("ranked")}
-                className={mode === "ranked" ? BTN_ACTIVE : BTN}
-              >
+              <button type="button" onClick={() => setMode("ranked")} className={mode === "ranked" ? BTN_ACTIVE : BTN}>
                 Ranked
               </button>
-              <button
-                type="button"
-                onClick={() => setMode("pro")}
-                className={mode === "pro" ? BTN_ACTIVE : BTN}
-              >
+              <button type="button" onClick={() => setMode("pro")} className={mode === "pro" ? BTN_ACTIVE : BTN}>
                 Pro
               </button>
 
@@ -585,22 +599,14 @@ export default function LolChampionTiersClient({
               <div className="ml-1 self-center text-xs text-neutral-500">
                 Sort:{" "}
                 <span className="text-neutral-200">
-                  {sortBy === "tier"
-                    ? "Tier"
-                    : sortBy === "games"
-                    ? "Games"
-                    : sortBy === "winrate"
-                    ? "Win Rate"
-                    : "Ban Rate"}
+                  {sortBy === "tier" ? "Tier" : sortBy === "games" ? "Games" : sortBy === "winrate" ? "Win Rate" : "Ban Rate"}
                 </span>{" "}
                 <span className="text-neutral-600">{desc ? "↓" : "↑"}</span>
               </div>
             </div>
 
-            {/* Optional: show both versions for debugging */}
             <div className="text-[11px] text-neutral-500">
-              Patch <span className="text-neutral-300">{patchLive}</span>{" "}
-              <span className="text-neutral-700">•</span>{" "}
+              Patch <span className="text-neutral-300">{patchLive}</span> <span className="text-neutral-700">•</span>{" "}
               Assets <span className="text-neutral-300">{ddragonLive}</span>
             </div>
           </div>
@@ -636,7 +642,6 @@ export default function LolChampionTiersClient({
       <div className="mt-4 overflow-hidden rounded-2xl border border-neutral-800">
         <div className="overflow-x-hidden sm:overflow-x-auto">
           <div className="w-full sm:min-w-[760px]">
-            {/* Header */}
             <div className="grid grid-cols-12 gap-0 bg-neutral-900/50 px-2 py-2 text-[10px] text-neutral-400 sm:px-3 sm:py-2 sm:text-xs">
               <div className="col-span-6 sm:col-span-5 flex items-center justify-between gap-2 min-w-0">
                 <span className="whitespace-nowrap">Champion</span>
@@ -672,7 +677,6 @@ export default function LolChampionTiersClient({
               </div>
             </div>
 
-            {/* Body */}
             <div className="divide-y divide-neutral-800">
               {rows.length ? (
                 rows.map((r, idx) => (

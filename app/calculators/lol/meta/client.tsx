@@ -866,7 +866,7 @@ export default function MetaClient() {
           Tiers List
         </Link>
       </div>
-<SeoBlock />
+
       <div className="space-y-4">
         <div className="mt-3 rounded-2xl border border-white/10 bg-black/[.6] p-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
@@ -1239,8 +1239,9 @@ export default function MetaClient() {
               </div>
             );
           })}
+          
         </div>
-
+<SeoBlock />
         {itemToast ? (
           <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-white/15 bg-black/80 px-3 py-1 text-xs text-white/85 shadow-lg">
             {itemToast.text}
