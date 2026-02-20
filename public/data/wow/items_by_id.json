@@ -115398,45 +115398,6 @@
     ],
     "required_level": 40
   },
-  "134461": {
-    "id": 134461,
-    "name": "Thermal Bindings",
-    "slot": "WRIST",
-    "ilvl": 50,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Leather",
-    "stats": {
-      "INTELLECT": 7,
-      "AGILITY": 7,
-      "STAMINA": 11,
-      "CRIT_RATING": 5,
-      "MASTERY_RATING": 10
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 7
-      },
-      {
-        "type": "AGILITY",
-        "value": 7
-      },
-      {
-        "type": "STAMINA",
-        "value": 11
-      },
-      {
-        "type": "CRIT_RATING",
-        "value": 5
-      },
-      {
-        "type": "MASTERY_RATING",
-        "value": 10
-      }
-    ],
-    "required_level": 40
-  },
   "134462": {
     "id": 134462,
     "name": "Dream Bolstered Chestguard",
@@ -116688,45 +116649,6 @@
       {
         "type": "MASTERY_RATING",
         "value": 14
-      }
-    ],
-    "required_level": 40
-  },
-  "134500": {
-    "id": 134500,
-    "name": "Breastplate of Preservation",
-    "slot": "CHEST",
-    "ilvl": 50,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Plate",
-    "stats": {
-      "INTELLECT": 13,
-      "STRENGTH": 13,
-      "STAMINA": 20,
-      "CRIT_RATING": 18,
-      "MASTERY_RATING": 8
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 13
-      },
-      {
-        "type": "STRENGTH",
-        "value": 13
-      },
-      {
-        "type": "STAMINA",
-        "value": 20
-      },
-      {
-        "type": "CRIT_RATING",
-        "value": 18
-      },
-      {
-        "type": "MASTERY_RATING",
-        "value": 8
       }
     ],
     "required_level": 40
@@ -118892,45 +118814,6 @@
       {
         "type": "VERSATILITY",
         "value": 17
-      }
-    ],
-    "required_level": 40
-  },
-  "137305": {
-    "id": 137305,
-    "name": "Blighted Grasp Bracers",
-    "slot": "WRIST",
-    "ilvl": 50,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Mail",
-    "stats": {
-      "INTELLECT": 7,
-      "AGILITY": 7,
-      "STAMINA": 11,
-      "HASTE_RATING": 6,
-      "VERSATILITY": 9
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 7
-      },
-      {
-        "type": "AGILITY",
-        "value": 7
-      },
-      {
-        "type": "STAMINA",
-        "value": 11
-      },
-      {
-        "type": "HASTE_RATING",
-        "value": 6
-      },
-      {
-        "type": "VERSATILITY",
-        "value": 9
       }
     ],
     "required_level": 40
@@ -122675,25 +122558,6 @@
   "137484": {
     "id": 137484,
     "name": "Flask of the Solemn Night",
-    "slot": "TRINKET",
-    "ilvl": 50,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Miscellaneous",
-    "stats": {
-      "INTELLECT": 13
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 13
-      }
-    ],
-    "required_level": 40
-  },
-  "137485": {
-    "id": 137485,
-    "name": "Infernal Writ",
     "slot": "TRINKET",
     "ilvl": 50,
     "quality": "RARE",
@@ -135953,40 +135817,6 @@
     ],
     "required_level": 40
   },
-  "144473": {
-    "id": 144473,
-    "name": "Nathrezim Acolyte's Robes",
-    "slot": "ROBE",
-    "ilvl": 50,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Cloth",
-    "stats": {
-      "INTELLECT": 13,
-      "STAMINA": 20,
-      "HASTE_RATING": 18,
-      "MASTERY_RATING": 8
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 13
-      },
-      {
-        "type": "STAMINA",
-        "value": 20
-      },
-      {
-        "type": "HASTE_RATING",
-        "value": 18
-      },
-      {
-        "type": "MASTERY_RATING",
-        "value": 8
-      }
-    ],
-    "required_level": 40
-  },
   "144474": {
     "id": 144474,
     "name": "Sheer Felwoven Hosiery",
@@ -142084,30 +141914,6 @@
       },
       {
         "type": "STRENGTH",
-        "value": 11
-      },
-      {
-        "type": "STAMINA",
-        "value": 13
-      }
-    ],
-    "required_level": 50
-  },
-  "155886": {
-    "id": 155886,
-    "name": "Smartly Plumed Cap",
-    "slot": "HEAD",
-    "ilvl": 59,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Cloth",
-    "stats": {
-      "INTELLECT": 11,
-      "STAMINA": 13
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
         "value": 11
       },
       {
@@ -191288,6 +191094,45 @@
     ],
     "required_level": 68
   },
+  "221070": {
+    "id": 221070,
+    "name": "\"Azeroth's Greatest BEE.E.O.\" Cap",
+    "slot": "HEAD",
+    "ilvl": 437,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 17,
+      "AGILITY": 17,
+      "STAMINA": 25,
+      "VERSATILITY": 22,
+      "MASTERY_RATING": 12
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 17
+      },
+      {
+        "type": "AGILITY",
+        "value": 17
+      },
+      {
+        "type": "STAMINA",
+        "value": 25
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 22
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 12
+      }
+    ],
+    "required_level": 68
+  },
   "221071": {
     "id": 221071,
     "name": "Backbreaking Bootstrappers",
@@ -201292,6 +201137,6314 @@
     ],
     "required_level": 90
   },
+  "250144": {
+    "id": 250144,
+    "name": "Emberwing Feather",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250214": {
+    "id": 250214,
+    "name": "Lightspire Core",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250215": {
+    "id": 250215,
+    "name": "Freightrunner's Flask",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250223": {
+    "id": 250223,
+    "name": "Soulcatcher's Charm",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250224": {
+    "id": 250224,
+    "name": "Mindpiercer's Sigil",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 78
+  },
+  "250225": {
+    "id": 250225,
+    "name": "Void Execution Mandate",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "AGILITY": 7
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250226": {
+    "id": 250226,
+    "name": "Latch's Crooked Hook",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "AGILITY": 7,
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250227": {
+    "id": 250227,
+    "name": "Kroluk's Warbanner",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "AGILITY": 7,
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250228": {
+    "id": 250228,
+    "name": "Resonant Bellowstone",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "AGILITY": 7,
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250229": {
+    "id": 250229,
+    "name": "Idol of the War Loa",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "CRIT_RATING": 10
+    },
+    "stats_raw": [
+      {
+        "type": "CRIT_RATING",
+        "value": 10
+      }
+    ],
+    "required_level": 78
+  },
+  "250238": {
+    "id": 250238,
+    "name": "Seed of the Devouring Wild",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250241": {
+    "id": 250241,
+    "name": "Mark of Light",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250242": {
+    "id": 250242,
+    "name": "Jelly Replicator",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "AGILITY": 7,
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250243": {
+    "id": 250243,
+    "name": "Manaheart's Binding Flame",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "AGILITY": 7,
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250244": {
+    "id": 250244,
+    "name": "Permafrost Essence",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 78
+  },
+  "250245": {
+    "id": 250245,
+    "name": "Tumor of the Swarm",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "AGILITY": 7,
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250246": {
+    "id": 250246,
+    "name": "Refueling Orb",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250248": {
+    "id": 250248,
+    "name": "Mycolic Medicine",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250253": {
+    "id": 250253,
+    "name": "Whisper of the Duskwraith",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250254": {
+    "id": 250254,
+    "name": "Seed of Radiant Hope",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250255": {
+    "id": 250255,
+    "name": "Unstable Felheart Crystal",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250256": {
+    "id": 250256,
+    "name": "Heart of Wind",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250257": {
+    "id": 250257,
+    "name": "Eye of the Drowning Void",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "250258": {
+    "id": 250258,
+    "name": "Vessel of Tortured Souls",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "MASTERY_RATING": 10
+    },
+    "stats_raw": [
+      {
+        "type": "MASTERY_RATING",
+        "value": 10
+      }
+    ],
+    "required_level": 78
+  },
+  "250259": {
+    "id": 250259,
+    "name": "Sapling of the Dawnroot",
+    "slot": "TRINKET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STRENGTH": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251077": {
+    "id": 251077,
+    "name": "Roostwarden's Bough",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Staff",
+    "stats": {
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251078": {
+    "id": 251078,
+    "name": "Emberdawn Defender",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Sword",
+    "stats": {
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "VERSATILITY": 5,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251079": {
+    "id": 251079,
+    "name": "Amberfrond Bracers",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 3,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251080": {
+    "id": 251080,
+    "name": "Brambledawn Halo",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251081": {
+    "id": 251081,
+    "name": "Embergrove Grasps",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "HASTE_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251082": {
+    "id": 251082,
+    "name": "Snapvine Cinch",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251083": {
+    "id": 251083,
+    "name": "Excavating Cudgel",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Mace",
+    "stats": {
+      "INTELLECT": 21,
+      "STAMINA": 5,
+      "CRIT_RATING": 4,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 21
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251084": {
+    "id": 251084,
+    "name": "Whipcoil Sabatons",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 7,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 7
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251085": {
+    "id": 251085,
+    "name": "Mantle of Dark Devotion",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251086": {
+    "id": 251086,
+    "name": "Riphook Defender",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "HASTE_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251087": {
+    "id": 251087,
+    "name": "Legwraps of Lingering Legacies",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 6,
+      "HASTE_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251088": {
+    "id": 251088,
+    "name": "Warworn Cleaver",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Axe",
+    "stats": {
+      "STRENGTH": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 4,
+      "VERSATILITY": 3
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251089": {
+    "id": 251089,
+    "name": "Grips of Forgotten Honor",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251090": {
+    "id": 251090,
+    "name": "Commander's Faded Breeches",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "VERSATILITY": 9,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251091": {
+    "id": 251091,
+    "name": "Sabatons of Furious Revenge",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251092": {
+    "id": 251092,
+    "name": "Fallen Grunt's Mantle",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251093": {
+    "id": 251093,
+    "name": "Omission of Light",
+    "slot": "FINGER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "HASTE_RATING": 12,
+      "MASTERY_RATING": 8
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 12
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 8
+      }
+    ],
+    "required_level": 78
+  },
+  "251094": {
+    "id": 251094,
+    "name": "Sigil of the Restless Heart",
+    "slot": "HOLDABLE",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 11,
+      "STAMINA": 5,
+      "CRIT_RATING": 4,
+      "VERSATILITY": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 11
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251095": {
+    "id": 251095,
+    "name": "Hurricane's Heart",
+    "slot": "RANGED",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Bow",
+    "stats": {
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "HASTE_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251096": {
+    "id": 251096,
+    "name": "Pendant of Aching Grief",
+    "slot": "NECK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "HASTE_RATING": 8,
+      "VERSATILITY": 12
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 12
+      }
+    ],
+    "required_level": 78
+  },
+  "251097": {
+    "id": 251097,
+    "name": "Spaulders of Arrow's Flight",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251098": {
+    "id": 251098,
+    "name": "Fletcher's Faded Faceplate",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 8,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251099": {
+    "id": 251099,
+    "name": "Vest of the Howling Gale",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 8,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 8
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251100": {
+    "id": 251100,
+    "name": "Malfeasance Mallet",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Mace",
+    "stats": {
+      "STRENGTH": 4,
+      "STAMINA": 5,
+      "HASTE_RATING": 3,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251101": {
+    "id": 251101,
+    "name": "Arcane Guardian's Shell",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 6,
+      "VERSATILITY": 8
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 8
+      }
+    ],
+    "required_level": 78
+  },
+  "251102": {
+    "id": 251102,
+    "name": "Clasp of Compliance",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251103": {
+    "id": 251103,
+    "name": "Custodial Cuffs",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STAMINA": 6,
+      "HASTE_RATING": 3,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 3
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251104": {
+    "id": 251104,
+    "name": "Leggings of Orderly Conduct",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "VERSATILITY": 9,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251105": {
+    "id": 251105,
+    "name": "Ward of the Spellbreaker",
+    "slot": "SHIELD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Shield",
+    "stats": {
+      "INTELLECT": 11,
+      "STRENGTH": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 3,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 11
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251106": {
+    "id": 251106,
+    "name": "Resolute Runeglaive",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Warglaives",
+    "stats": {
+      "INTELLECT": 21,
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "VERSATILITY": 2,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 21
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 2
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251107": {
+    "id": 251107,
+    "name": "Oathsworn Stompers",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251108": {
+    "id": 251108,
+    "name": "Wraps of Watchful Wrath",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 4,
+      "STAMINA": 6,
+      "VERSATILITY": 3,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251109": {
+    "id": 251109,
+    "name": "Spellsnap Shadowmask",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 6,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251110": {
+    "id": 251110,
+    "name": "Sunlash's Sunsash",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251111": {
+    "id": 251111,
+    "name": "Splitshroud Stinger",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Dagger",
+    "stats": {
+      "INTELLECT": 21,
+      "STAMINA": 5,
+      "CRIT_RATING": 5,
+      "HASTE_RATING": 2
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 21
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 2
+      }
+    ],
+    "required_level": 78
+  },
+  "251112": {
+    "id": 251112,
+    "name": "Shadowsplit Girdle",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "VERSATILITY": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251113": {
+    "id": 251113,
+    "name": "Gloves of Viscous Goo",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251114": {
+    "id": 251114,
+    "name": "Voidwarped Oozemail",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "VERSATILITY": 9,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251115": {
+    "id": 251115,
+    "name": "Bifurcation Band",
+    "slot": "FINGER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "HASTE_RATING": 7,
+      "MASTERY_RATING": 12
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 7
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 12
+      }
+    ],
+    "required_level": 78
+  },
+  "251117": {
+    "id": 251117,
+    "name": "Whirling Voidcleaver",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Axe",
+    "stats": {
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 9,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251118": {
+    "id": 251118,
+    "name": "Legplates of Lingering Dusk",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251119": {
+    "id": 251119,
+    "name": "Vortex Visage",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 6,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251120": {
+    "id": 251120,
+    "name": "Wraps of Umbral Descent",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "VERSATILITY": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251121": {
+    "id": 251121,
+    "name": "Domanaar's Dire Treads",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "VERSATILITY": 4,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251122": {
+    "id": 251122,
+    "name": "Shadowslash Slicer",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Sword",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251123": {
+    "id": 251123,
+    "name": "Nibbles' Training Rod",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Staff",
+    "stats": {
+      "INTELLECT": 31,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "HASTE_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 31
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251124": {
+    "id": 251124,
+    "name": "Gauntlets of Fevered Defense",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 7,
+      "HASTE_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 7
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251125": {
+    "id": 251125,
+    "name": "Felsoaked Soles",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "VERSATILITY": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251126": {
+    "id": 251126,
+    "name": "Greathelm of Temptation",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251127": {
+    "id": 251127,
+    "name": "Nibbling Armbands",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 3,
+      "HASTE_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251128": {
+    "id": 251128,
+    "name": "Bladesorrow",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Dagger",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 4,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251129": {
+    "id": 251129,
+    "name": "Counterfeit Clutches",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "VERSATILITY": 4,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251130": {
+    "id": 251130,
+    "name": "Breeches of Deft Deals",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 8,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 8
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251131": {
+    "id": 251131,
+    "name": "Jangling Felpaulets",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251132": {
+    "id": 251132,
+    "name": "Speakeasy Shroud",
+    "slot": "CLOAK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STRENGTH": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251133": {
+    "id": 251133,
+    "name": "Overseer's Vambraces",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 4,
+      "STRENGTH": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 3,
+      "HASTE_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251134": {
+    "id": 251134,
+    "name": "Xathuux's Cleave",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Axe",
+    "stats": {
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 8,
+      "HASTE_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251135": {
+    "id": 251135,
+    "name": "Fury-fletched Armlets",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 3,
+      "HASTE_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251136": {
+    "id": 251136,
+    "name": "Signet of Snarling Servitude",
+    "slot": "FINGER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "CRIT_RATING": 12,
+      "MASTERY_RATING": 8
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 12
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 8
+      }
+    ],
+    "required_level": 78
+  },
+  "251137": {
+    "id": 251137,
+    "name": "Tempestuous Sandals",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251138": {
+    "id": 251138,
+    "name": "Cinderfury Shoulderguards",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 7,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 7
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251139": {
+    "id": 251139,
+    "name": "Summoner's Searing Shirt",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "HASTE_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251140": {
+    "id": 251140,
+    "name": "Vilefiend's Guise",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 8,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 8
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251141": {
+    "id": 251141,
+    "name": "Lithiel's Linked Leggings",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 9,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251142": {
+    "id": 251142,
+    "name": "Pendant of Malefic Fury",
+    "slot": "NECK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "HASTE_RATING": 6,
+      "MASTERY_RATING": 14
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 14
+      }
+    ],
+    "required_level": 78
+  },
+  "251143": {
+    "id": 251143,
+    "name": "Grim Harvest Gloves",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Fist Weapon",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "HASTE_RATING": 4,
+      "VERSATILITY": 3
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251144": {
+    "id": 251144,
+    "name": "Autumn's Boon Belt",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "VERSATILITY": 4,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251145": {
+    "id": 251145,
+    "name": "Forgotten Tribe Footguards",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 6,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251146": {
+    "id": 251146,
+    "name": "Scavenger's Spaulders",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251147": {
+    "id": 251147,
+    "name": "Hoarded Harvest Wrap",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "VERSATILITY": 6,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251148": {
+    "id": 251148,
+    "name": "Pilfered Precious Band",
+    "slot": "FINGER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "CRIT_RATING": 8,
+      "VERSATILITY": 12
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 12
+      }
+    ],
+    "required_level": 78
+  },
+  "251149": {
+    "id": 251149,
+    "name": "Victor's Flashfrozen Blade",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Polearm",
+    "stats": {
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 6,
+      "MASTERY_RATING": 8
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 8
+      }
+    ],
+    "required_level": 78
+  },
+  "251150": {
+    "id": 251150,
+    "name": "Tempest's Shelter",
+    "slot": "SHIELD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Shield",
+    "stats": {
+      "INTELLECT": 11,
+      "STRENGTH": 4,
+      "STAMINA": 5,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 11
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251151": {
+    "id": 251151,
+    "name": "Sentinel Challenger's Prize",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251152": {
+    "id": 251152,
+    "name": "Season's Turn Gauntlets",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 6,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251153": {
+    "id": 251153,
+    "name": "Arctic Explorer's Legwraps",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "HASTE_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251154": {
+    "id": 251154,
+    "name": "Winter's Embrace Bracers",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251155": {
+    "id": 251155,
+    "name": "Tribal Defender's Cord",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 7,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 7
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251156": {
+    "id": 251156,
+    "name": "Fallen Speaker's Staff",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Staff",
+    "stats": {
+      "INTELLECT": 31,
+      "STAMINA": 11,
+      "HASTE_RATING": 9,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 31
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251157": {
+    "id": 251157,
+    "name": "Searing Spaulders",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "HASTE_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251158": {
+    "id": 251158,
+    "name": "Nalorakk's Nightmare",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 6,
+      "VERSATILITY": 8
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 8
+      }
+    ],
+    "required_level": 78
+  },
+  "251159": {
+    "id": 251159,
+    "name": "War Trial Vestments",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 5,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251160": {
+    "id": 251160,
+    "name": "Forest Dream Leg-guards",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "HASTE_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251161": {
+    "id": 251161,
+    "name": "Soulhunter's Mask",
+    "slot": "CLOAK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STRENGTH": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 3,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251162": {
+    "id": 251162,
+    "name": "Traitor's Talon",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Polearm",
+    "stats": {
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "HASTE_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251163": {
+    "id": 251163,
+    "name": "Berserker's Hexclaws",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Fist Weapon",
+    "stats": {
+      "INTELLECT": 21,
+      "STAMINA": 5,
+      "CRIT_RATING": 3,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 21
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251164": {
+    "id": 251164,
+    "name": "Amalgamation's Harness",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251165": {
+    "id": 251165,
+    "name": "Pulverizing Pads",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251166": {
+    "id": 251166,
+    "name": "Falconer's Cinch",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 6,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251167": {
+    "id": 251167,
+    "name": "Nightprey Stalkers",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251168": {
+    "id": 251168,
+    "name": "Liferipper's Cutlass",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Sword",
+    "stats": {
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251169": {
+    "id": 251169,
+    "name": "Footwraps of Ill-Fate",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 6,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251170": {
+    "id": 251170,
+    "name": "Wickedweave Trousers",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251171": {
+    "id": 251171,
+    "name": "Enthralled Bonespines",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 6,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251172": {
+    "id": 251172,
+    "name": "Vilehex Bonds",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "HASTE_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251173": {
+    "id": 251173,
+    "name": "Yoke of the Charging Bear",
+    "slot": "NECK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "CRIT_RATING": 7,
+      "HASTE_RATING": 13
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 7
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 13
+      }
+    ],
+    "required_level": 78
+  },
+  "251174": {
+    "id": 251174,
+    "name": "Deceiver's Rotbow",
+    "slot": "RANGED",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Bow",
+    "stats": {
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 6,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251175": {
+    "id": 251175,
+    "name": "Soulblight Cleaver",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Axe",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 4,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251176": {
+    "id": 251176,
+    "name": "Reanimator's Weight",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "VERSATILITY": 6,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251177": {
+    "id": 251177,
+    "name": "Fetid Vilecrown",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251178": {
+    "id": 251178,
+    "name": "Ceremonial Hexblade",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Dagger",
+    "stats": {
+      "INTELLECT": 21,
+      "STAMINA": 5,
+      "CRIT_RATING": 3,
+      "HASTE_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 21
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251179": {
+    "id": 251179,
+    "name": "Decaying Cuirass",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 6,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251180": {
+    "id": 251180,
+    "name": "Thornblade",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Dagger",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "HASTE_RATING": 3,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251181": {
+    "id": 251181,
+    "name": "Pruning Lance",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Polearm",
+    "stats": {
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 8,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251182": {
+    "id": 251182,
+    "name": "Bedrock Breeches",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251183": {
+    "id": 251183,
+    "name": "Rootwarden Wraps",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251184": {
+    "id": 251184,
+    "name": "Ironroot Collar",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 7,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 7
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251185": {
+    "id": 251185,
+    "name": "Lightblossom Cinch",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251186": {
+    "id": 251186,
+    "name": "Thorntalon Edge",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Fist Weapon",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 3,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251187": {
+    "id": 251187,
+    "name": "Amirdrassil's Reach",
+    "slot": "RANGEDRIGHT",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Crossbow",
+    "stats": {
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 6,
+      "VERSATILITY": 8
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 8
+      }
+    ],
+    "required_level": 78
+  },
+  "251188": {
+    "id": 251188,
+    "name": "Doompetal",
+    "slot": "RANGEDRIGHT",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Wand",
+    "stats": {
+      "INTELLECT": 21,
+      "STAMINA": 5,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 21
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251189": {
+    "id": 251189,
+    "name": "Rootwalker Harness",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "VERSATILITY": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251190": {
+    "id": 251190,
+    "name": "Bloodthorn Burnous",
+    "slot": "CLOAK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STRENGTH": 4,
+      "STAMINA": 6,
+      "HASTE_RATING": 5,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251191": {
+    "id": 251191,
+    "name": "Luminescent Sprout",
+    "slot": "HOLDABLE",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 11,
+      "STAMINA": 5,
+      "HASTE_RATING": 3,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 11
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251192": {
+    "id": 251192,
+    "name": "Branch of Pride",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Staff",
+    "stats": {
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251193": {
+    "id": 251193,
+    "name": "Taproot Ribs",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 9,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251194": {
+    "id": 251194,
+    "name": "Lightwarden's Bind",
+    "slot": "FINGER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "VERSATILITY": 7,
+      "MASTERY_RATING": 13
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 7
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 13
+      }
+    ],
+    "required_level": 78
+  },
+  "251195": {
+    "id": 251195,
+    "name": "Thorned Reply",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Sword",
+    "stats": {
+      "STRENGTH": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 3,
+      "HASTE_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251196": {
+    "id": 251196,
+    "name": "Teldrassil's Sacrifice",
+    "slot": "SHIELD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Shield",
+    "stats": {
+      "INTELLECT": 11,
+      "STRENGTH": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 4,
+      "VERSATILITY": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 11
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251197": {
+    "id": 251197,
+    "name": "Thornspike Gauntlets",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "VERSATILITY": 4,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251198": {
+    "id": 251198,
+    "name": "Lightspore Leggings",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "VERSATILITY": 9,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251199": {
+    "id": 251199,
+    "name": "Worldroot Canopy",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251200": {
+    "id": 251200,
+    "name": "Saptorbane Guards",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 3,
+      "HASTE_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251201": {
+    "id": 251201,
+    "name": "Corespark Multitool",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Staff",
+    "stats": {
+      "INTELLECT": 31,
+      "STAMINA": 11,
+      "HASTE_RATING": 6,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 31
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251202": {
+    "id": 251202,
+    "name": "Reflux Reflector",
+    "slot": "SHIELD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Shield",
+    "stats": {
+      "INTELLECT": 11,
+      "STRENGTH": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 2,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 11
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 2
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251203": {
+    "id": 251203,
+    "name": "Kasreth's Bindings",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 4,
+      "STRENGTH": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 3,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 3
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251204": {
+    "id": 251204,
+    "name": "Corewright's Zappers",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 6,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251205": {
+    "id": 251205,
+    "name": "Leyline Leggings",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251206": {
+    "id": 251206,
+    "name": "Fluxweave Cloak",
+    "slot": "CLOAK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STRENGTH": 4,
+      "STAMINA": 6,
+      "VERSATILITY": 3,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251207": {
+    "id": 251207,
+    "name": "Dreadflail Bludgeon",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Mace",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 2,
+      "VERSATILITY": 5
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 2
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251208": {
+    "id": 251208,
+    "name": "Lightscarred Cuisses",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 6,
+      "VERSATILITY": 8
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 8
+      }
+    ],
+    "required_level": 78
+  },
+  "251209": {
+    "id": 251209,
+    "name": "Corewarden Cuffs",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STAMINA": 6,
+      "VERSATILITY": 3,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251210": {
+    "id": 251210,
+    "name": "Eclipse Espadrilles",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 4,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251211": {
+    "id": 251211,
+    "name": "Fractured Fingerguards",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 6,
+      "VERSATILITY": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251212": {
+    "id": 251212,
+    "name": "Radiant Slicer",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Dagger",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "HASTE_RATING": 4,
+      "VERSATILITY": 3
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251213": {
+    "id": 251213,
+    "name": "Nysarra's Mantle",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 7,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 7
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251214": {
+    "id": 251214,
+    "name": "Bonds of the Hash'ura",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "HASTE_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251215": {
+    "id": 251215,
+    "name": "Greaves of the Divine Guile",
+    "slot": "LEGS",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 6,
+      "MASTERY_RATING": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 9
+      }
+    ],
+    "required_level": 78
+  },
+  "251216": {
+    "id": 251216,
+    "name": "Maledict Vest",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 9,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251217": {
+    "id": 251217,
+    "name": "Occlusion of Void",
+    "slot": "FINGER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "CRIT_RATING": 14,
+      "HASTE_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 14
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251218": {
+    "id": 251218,
+    "name": "Taz'Rah's Cosmic Edge",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Sword",
+    "stats": {
+      "STRENGTH": 4,
+      "STAMINA": 5,
+      "HASTE_RATING": 4,
+      "MASTERY_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251219": {
+    "id": 251219,
+    "name": "Riftworn Stompers",
+    "slot": "FEET",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "HASTE_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251220": {
+    "id": 251220,
+    "name": "Voidscarred Crown",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 9,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251221": {
+    "id": 251221,
+    "name": "Despondent's Gauntlets",
+    "slot": "HAND",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 5,
+      "STRENGTH": 5,
+      "STAMINA": 8,
+      "VERSATILITY": 6,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STRENGTH",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251222": {
+    "id": 251222,
+    "name": "Ethereal Netherwrap",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 4,
+      "HASTE_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251223": {
+    "id": 251223,
+    "name": "Somber Spaulders",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "CRIT_RATING": 7,
+      "HASTE_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 7
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251224": {
+    "id": 251224,
+    "name": "Hulking Handaxe",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Axe",
+    "stats": {
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "HASTE_RATING": 2,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 2
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251225": {
+    "id": 251225,
+    "name": "Fang of Contagion",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Dagger",
+    "stats": {
+      "INTELLECT": 21,
+      "STAMINA": 5,
+      "VERSATILITY": 3,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 21
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251226": {
+    "id": 251226,
+    "name": "Hide of Pestilence",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 8,
+      "VERSATILITY": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251227": {
+    "id": 251227,
+    "name": "Poisoner's Pauldrons",
+    "slot": "SHOULDER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 5,
+      "STAMINA": 8,
+      "VERSATILITY": 6,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251228": {
+    "id": 251228,
+    "name": "Behemoth Waistband",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "HASTE_RATING": 6,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
+  "251229": {
+    "id": 251229,
+    "name": "Visor of the Predator",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 7,
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251230": {
+    "id": 251230,
+    "name": "Charonic Crescent",
+    "slot": "TWOHWEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Polearm",
+    "stats": {
+      "STRENGTH": 7,
+      "STAMINA": 11,
+      "VERSATILITY": 9,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "STRENGTH",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251231": {
+    "id": 251231,
+    "name": "Singularity Slicer",
+    "slot": "WEAPON",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Weapon",
+    "item_subclass": "Warglaives",
+    "stats": {
+      "INTELLECT": 21,
+      "AGILITY": 4,
+      "STAMINA": 5,
+      "CRIT_RATING": 4,
+      "HASTE_RATING": 3
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 21
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 5
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 3
+      }
+    ],
+    "required_level": 78
+  },
+  "251232": {
+    "id": 251232,
+    "name": "Overseer's Diadem",
+    "slot": "HEAD",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 9,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 9
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
+  },
+  "251233": {
+    "id": 251233,
+    "name": "Manipulator's Vest",
+    "slot": "CHEST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 9,
+      "HASTE_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 9
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "251234": {
+    "id": 251234,
+    "name": "Graft of the Domanaar",
+    "slot": "NECK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "CRIT_RATING": 13,
+      "MASTERY_RATING": 7
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 13
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 7
+      }
+    ],
+    "required_level": 78
+  },
+  "251235": {
+    "id": 251235,
+    "name": "Gravitic Girdle",
+    "slot": "WAIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 5,
+      "AGILITY": 5,
+      "STAMINA": 8,
+      "VERSATILITY": 7,
+      "MASTERY_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 5
+      },
+      {
+        "type": "AGILITY",
+        "value": 5
+      },
+      {
+        "type": "STAMINA",
+        "value": 8
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 7
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
   "251331": {
     "id": 251331,
     "name": "Draenic Ottoman",
@@ -201361,6 +207514,35 @@
       }
     ],
     "required_level": 68
+  },
+  "252258": {
+    "id": 252258,
+    "name": "Sickening Signet of Atroxus",
+    "slot": "FINGER",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "STAMINA": 6,
+      "HASTE_RATING": 14,
+      "MASTERY_RATING": 6
+    },
+    "stats_raw": [
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 14
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 6
+      }
+    ],
+    "required_level": 78
   },
   "252411": {
     "id": 252411,
@@ -201453,6 +207635,18 @@
     ],
     "required_level": 78
   },
+  "253451": {
+    "id": 253451,
+    "name": "Veilroot Fountain",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
   "255672": {
     "id": 255672,
     "name": "Gnomish Tesla Tower",
@@ -201489,6 +207683,66 @@
     "stats_raw": [],
     "required_level": 1
   },
+  "256625": {
+    "id": 256625,
+    "name": "Pattern: Hexwoven Strand",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "EPIC",
+    "item_class": "Recipe",
+    "item_subclass": "Leatherworking",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256640": {
+    "id": 256640,
+    "name": "Pattern: Row Walker's Insurance",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "EPIC",
+    "item_class": "Recipe",
+    "item_subclass": "Leatherworking",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256642": {
+    "id": 256642,
+    "name": "Pattern: Primal Spore Binding",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Leatherworking",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256652": {
+    "id": 256652,
+    "name": "Pattern: World Tender's Trunkplate",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "EPIC",
+    "item_class": "Recipe",
+    "item_subclass": "Leatherworking",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256653": {
+    "id": 256653,
+    "name": "Pattern: Ranger-General's Grips",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "EPIC",
+    "item_class": "Recipe",
+    "item_subclass": "Leatherworking",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
   "256656": {
     "id": 256656,
     "name": "Pattern: World Tender's Barkclasp",
@@ -201501,6 +207755,66 @@
     "stats_raw": [],
     "required_level": 1
   },
+  "256683": {
+    "id": 256683,
+    "name": "Silvermoon Training Dummy",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256716": {
+    "id": 256716,
+    "name": "Design: Prismatic Focusing Iris",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Jewelcrafting",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256721": {
+    "id": 256721,
+    "name": "Design: Voidstone Shielding Array",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Jewelcrafting",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256737": {
+    "id": 256737,
+    "name": "Formula: Enchant Chest - Mark of Nalorakk",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Enchanting",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256746": {
+    "id": 256746,
+    "name": "Formula: Smuggler's Enchanted Edge",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Enchanting",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
   "256750": {
     "id": 256750,
     "name": "Formula: Enchant Weapon - Worldsoul Cradle",
@@ -201509,6 +207823,42 @@
     "quality": "RARE",
     "item_class": "Recipe",
     "item_subclass": "Enchanting",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256755": {
+    "id": 256755,
+    "name": "Formula: Enchant Chest - Mark of the Magister",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Enchanting",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "256759": {
+    "id": 256759,
+    "name": "Formula: Enchant Weapon - Flames of the Sin'dorei",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Enchanting",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "258033": {
+    "id": 258033,
+    "name": "Pattern: Arcanoweave Lining",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Tailoring",
     "stats": {},
     "stats_raw": [],
     "required_level": 1
@@ -201688,6 +208038,18 @@
     ],
     "required_level": 0
   },
+  "258125": {
+    "id": 258125,
+    "name": "Pattern: Sunfire Sash",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "EPIC",
+    "item_class": "Recipe",
+    "item_subclass": "Tailoring",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
   "258218": {
     "id": 258218,
     "name": "Skybreaker's Blade",
@@ -201721,6 +208083,18 @@
       }
     ],
     "required_level": 78
+  },
+  "258268": {
+    "id": 258268,
+    "name": "Waxmaster's Candle Rack",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
   },
   "258412": {
     "id": 258412,
@@ -201892,6 +208266,18 @@
     ],
     "required_level": 78
   },
+  "258487": {
+    "id": 258487,
+    "name": "Plans: Murder Row Fleet Feet",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Blacksmithing",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
   "258514": {
     "id": 258514,
     "name": "Umbral Spire of Zuraal",
@@ -201959,6 +208345,18 @@
       }
     ],
     "required_level": 78
+  },
+  "258518": {
+    "id": 258518,
+    "name": "Plans: Murder Row Fishhook",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Recipe",
+    "item_subclass": "Blacksmithing",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
   },
   "258523": {
     "id": 258523,
@@ -202666,9 +209064,128 @@
     ],
     "required_level": 0
   },
+  "258744": {
+    "id": 258744,
+    "name": "Skyreach Circular Table",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "260312": {
+    "id": 260312,
+    "name": "Defiant Defender's Drape",
+    "slot": "CLOAK",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 4,
+      "AGILITY": 4,
+      "STRENGTH": 4,
+      "STAMINA": 6,
+      "CRIT_RATING": 4,
+      "HASTE_RATING": 4
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "AGILITY",
+        "value": 4
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 4
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 4
+      }
+    ],
+    "required_level": 78
+  },
   "260359": {
     "id": 260359,
     "name": "Valdrakken Bookcase",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "263193": {
+    "id": 263193,
+    "name": "Trollhunter's Bands",
+    "slot": "WRIST",
+    "ilvl": 108,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 4,
+      "STRENGTH": 4,
+      "STAMINA": 6,
+      "HASTE_RATING": 3,
+      "MASTERY_RATING": 5
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 4
+      },
+      {
+        "type": "STRENGTH",
+        "value": 4
+      },
+      {
+        "type": "STAMINA",
+        "value": 6
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 3
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 5
+      }
+    ],
+    "required_level": 78
+  },
+  "263230": {
+    "id": 263230,
+    "name": "Magister's Bookshelf",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "263238": {
+    "id": 263238,
+    "name": "Illicit Long Table",
     "slot": "NON_EQUIP",
     "ilvl": 1,
     "quality": "UNCOMMON",
@@ -202684,6 +209201,54 @@
     "slot": "NON_EQUIP",
     "ilvl": 1,
     "quality": "RARE",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "264332": {
+    "id": 264332,
+    "name": "Amani Ritual Altar",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "264336": {
+    "id": 264336,
+    "name": "Voidlight Brazier",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "264338": {
+    "id": 264338,
+    "name": "Domanaar Control Console",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
+    "item_class": "Housing",
+    "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "264717": {
+    "id": 264717,
+    "name": "Amani Warding Hex",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "UNCOMMON",
     "item_class": "Housing",
     "item_subclass": "Decor",
     "stats": {},
@@ -202734,6 +209299,18 @@
     "quality": "EPIC",
     "item_class": "Housing",
     "item_subclass": "Decor",
+    "stats": {},
+    "stats_raw": [],
+    "required_level": 1
+  },
+  "268728": {
+    "id": 268728,
+    "name": "Saptor Salve",
+    "slot": "NON_EQUIP",
+    "ilvl": 1,
+    "quality": "RARE",
+    "item_class": "Miscellaneous",
+    "item_subclass": "Other",
     "stats": {},
     "stats_raw": [],
     "required_level": 1
