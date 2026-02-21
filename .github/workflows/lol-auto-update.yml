@@ -81,6 +81,26 @@ jobs:
       - name: Update LoL overrides
         run: npm run lol:update:overrides
 
+      # ✅ NEW: Restore prior meta build snapshots from Blob so finalize can MERGE safely
+      - name: Restore meta builds snapshots from Vercel Blob (best-effort)
+        if: always()
+        run: |
+          set +e
+
+          BASE="https://or3vgdqybw6oou7j.public.blob.vercel-storage.com"
+          mkdir -p public/data/lol
+
+          echo "Restoring meta_builds_ranked.json (if exists)..."
+          curl -fsSL "$BASE/data/lol/meta_builds_ranked.json" -o public/data/lol/meta_builds_ranked.json || true
+          ls -lah public/data/lol/meta_builds_ranked.json || true
+
+          echo "Restoring meta_builds_casual.json (if exists)..."
+          curl -fsSL "$BASE/data/lol/meta_builds_casual.json" -o public/data/lol/meta_builds_casual.json || true
+          ls -lah public/data/lol/meta_builds_casual.json || true
+
+          echo "Restore step done."
+          exit 0
+
       - name: Set crawl mode
         id: mode
         run: |
