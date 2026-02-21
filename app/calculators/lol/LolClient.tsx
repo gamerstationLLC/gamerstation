@@ -1618,8 +1618,8 @@ useEffect(() => {
               onClick={toggleUiMode}
               className={`rounded-xl border px-3 py-1.5 text-xs font-semibold ${
                 uiMode === "advanced"
-                  ? "border-neutral-500 bg-neutral-900 text-white"
-                  : "border-neutral-800 bg-black text-neutral-200 hover:border-neutral-600"
+                  ? "border-neutral-500 bg-black text-white"
+                  : "border-neutral-800 bg-white text-black hover:border-black"
               }`}
               title="Click to switch mode"
             >
@@ -2544,14 +2544,7 @@ useEffect(() => {
                     </span>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={addOneAutoToBurst}
-                    disabled={!Number.isFinite(oneAutoRaw)}
-                    className="rounded-xl border border-neutral-800 bg-black px-3 py-1.5 text-xs text-neutral-200 hover:border-neutral-600 disabled:opacity-50"
-                  >
-                    Add 1 AA
-                  </button>
+                  
                 </div>
 
                 {/* Only show manual buckets when rotation is off */}
