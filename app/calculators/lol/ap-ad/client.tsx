@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChampionIndexRow, ItemRow } from "./page";
 
 function clamp(n: number, min: number, max: number) {
@@ -112,6 +112,8 @@ type StatRow = {
   digits?: number;
 };
 
+type MobileTab = "inputs" | "results";
+
 export default function LolItemCompareClient({
   champions,
   items,
@@ -131,6 +133,39 @@ export default function LolItemCompareClient({
   const [itemBId, setItemBId] = useState<string>("");
 
   const [showAll, setShowAll] = useState(false);
+  const [mobileTab, setMobileTab] = useState<MobileTab>("inputs");
+
+  // ✅ Display patch: start with server prop, then refresh from live route
+  const [displayPatch, setDisplayPatch] = useState<string>(patch);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadPatch() {
+      try {
+        // IMPORTANT: change this if your route is different
+        const res = await fetch("/api/lol/patch", { cache: "no-store" });
+        if (!res.ok) return;
+
+        const json = (await res.json()) as {
+          patch?: string;
+          version?: string;
+          ddragon?: string;
+        };
+
+        // Prefer display patch (26.x); fall back to version; finally keep existing
+        const next = (json.patch ?? json.version ?? "").trim();
+        if (!cancelled && next) setDisplayPatch(next);
+      } catch {
+        // ignore; keep server-provided patch
+      }
+    }
+
+    loadPatch();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const selectedChamp = useMemo(() => champions.find((c) => c.id === champId) ?? null, [champId, champions]);
 
@@ -226,24 +261,58 @@ export default function LolItemCompareClient({
   const aBoxRef = useRef<HTMLDivElement | null>(null);
   const bBoxRef = useRef<HTMLDivElement | null>(null);
 
+  const mobileInputsActive = mobileTab === "inputs";
+  const mobileResultsActive = mobileTab === "results";
+
   return (
     <div className="text-white">
-      {/* MOBILE: 2 columns, no page-scroll; each column scrolls internally so nothing gets clipped */}
+      {/* MOBILE: sticky tab header + normal page scrolling */}
       <div className="md:hidden -mx-6 px-6">
-        {/* 100dvh minus header/title area; tweakable but this prevents clipping */}
-        <div className="grid grid-cols-2 gap-2 h-[calc(100dvh-170px)] min-h-0 overflow-hidden">
-          {/* INPUTS */}
-          <section className="min-h-0 rounded-2xl border border-neutral-800 bg-neutral-950 p-3 overflow-y-auto overscroll-contain">
-            <div className="text-[11px] leading-tight">
-              <div className="flex items-center justify-between gap-2">
-                <div className="text-sm font-semibold">Inputs</div>
-                <div className="text-[10px] text-neutral-500">
-                  {champions.length} champs • {items.length} items
-                </div>
-              </div>
+        <div className="sticky top-0 z-30 -mx-6 px-6 border-b border-neutral-800 bg-neutral-950/95 backdrop-blur">
+          <div className="flex items-center justify-between py-2">
+            <div className="text-sm font-semibold">Item Compare</div>
+            <div className="text-[10px] text-neutral-500">
+              Patch: <span className="text-neutral-300 font-semibold">{displayPatch}</span>
+            </div>
+          </div>
 
+          <div className="pb-3">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setMobileTab("inputs")}
+                className={`rounded-xl border px-3 py-2 text-[12px] font-semibold ${
+                  mobileInputsActive
+                    ? "border-neutral-600 bg-black text-white"
+                    : "border-neutral-800 bg-neutral-950 text-neutral-300"
+                }`}
+              >
+                Inputs
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileTab("results")}
+                className={`rounded-xl border px-3 py-2 text-[12px] font-semibold ${
+                  mobileResultsActive
+                    ? "border-neutral-600 bg-black text-white"
+                    : "border-neutral-800 bg-neutral-950 text-neutral-300"
+                }`}
+              >
+                Results
+              </button>
+            </div>
+
+            <div className="mt-2 text-[10px] text-neutral-600">
+              {champions.length} champs • {items.length} items
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-3 rounded-2xl border border-neutral-800 bg-neutral-950 p-3">
+          {mobileInputsActive && (
+            <section className="text-[11px] leading-tight">
               {/* Champion */}
-              <div className="mt-2 rounded-2xl border border-neutral-800 bg-black p-2">
+              <div className="rounded-2xl border border-neutral-800 bg-black p-2">
                 <div className="text-[10px] text-neutral-400 font-semibold">Champion</div>
                 <input
                   value={champQuery}
@@ -280,7 +349,6 @@ export default function LolItemCompareClient({
                   )}
                 </div>
 
-                {/* Level */}
                 <div className="mt-2">
                   <div className="flex items-center justify-between">
                     <div className="text-[10px] text-neutral-400 font-semibold">Level</div>
@@ -318,9 +386,7 @@ export default function LolItemCompareClient({
                 )}
               </div>
 
-              {/* Items */}
               <div className="mt-2 grid gap-2">
-                {/* Item A */}
                 <div ref={aBoxRef} className="rounded-2xl border border-neutral-800 bg-black p-2">
                   <div className="flex items-center justify-between">
                     <div className="text-[10px] text-neutral-400 font-semibold">Item A</div>
@@ -370,7 +436,6 @@ export default function LolItemCompareClient({
                   </div>
                 </div>
 
-                {/* Item B */}
                 <div ref={bBoxRef} className="rounded-2xl border border-neutral-800 bg-black p-2">
                   <div className="flex items-center justify-between">
                     <div className="text-[10px] text-neutral-400 font-semibold">Item B</div>
@@ -422,14 +487,13 @@ export default function LolItemCompareClient({
               </div>
 
               <div className="mt-2 text-[10px] text-neutral-500">
-                Patch: <span className="text-neutral-300 font-semibold">{patch}</span>
+                Patch: <span className="text-neutral-300 font-semibold">{displayPatch}</span>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
 
-          {/* RESULTS */}
-          <section className="min-h-0 rounded-2xl border border-neutral-800 bg-neutral-950 p-3 overflow-y-auto overscroll-contain">
-            <div className="text-[11px] leading-tight">
+          {mobileResultsActive && (
+            <section className="text-[11px] leading-tight">
               <div className="flex items-center justify-between gap-2">
                 <div className="text-sm font-semibold">Results</div>
                 <button
@@ -517,9 +581,7 @@ export default function LolItemCompareClient({
                 </div>
 
                 {rows.length === 0 ? (
-                  <div className="mt-2 text-[11px] text-neutral-500">
-                    Pick Item A and Item B to see differences.
-                  </div>
+                  <div className="mt-2 text-[11px] text-neutral-500">Pick Item A and Item B to see differences.</div>
                 ) : (
                   <div className="mt-2 grid gap-1">
                     {rowsToShow.map((r) => {
@@ -527,10 +589,7 @@ export default function LolItemCompareClient({
                       const bad = r.d < 0;
 
                       return (
-                        <div
-                          key={String(r.key)}
-                          className="rounded-xl border border-neutral-900 bg-black px-2 py-1.5"
-                        >
+                        <div key={String(r.key)} className="rounded-xl border border-neutral-900 bg-black px-2 py-1.5">
                           <div className="flex items-center justify-between">
                             <span className="text-[11px] text-neutral-300">{r.label}</span>
                             <span
@@ -562,12 +621,12 @@ export default function LolItemCompareClient({
               <div className="mt-2 text-[10px] text-neutral-500">
                 Note: Unique passives/actives aren’t modeled here yet—this is core stat compare.
               </div>
-            </div>
-          </section>
+            </section>
+          )}
         </div>
       </div>
 
-      {/* DESKTOP/TABLET: unchanged */}
+      {/* DESKTOP/TABLET (unchanged layout, just uses displayPatch for the label) */}
       <div className="hidden md:block">
         <div className="grid gap-6 md:grid-cols-2 md:items-start">
           <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
@@ -736,14 +795,13 @@ export default function LolItemCompareClient({
             </div>
 
             <div className="mt-4 text-xs text-neutral-500">
-              Patch: <span className="text-neutral-300 font-semibold">{patch}</span>
+              Patch: <span className="text-neutral-300 font-semibold">{displayPatch}</span>
             </div>
           </section>
 
           <section className="rounded-2xl border border-neutral-800 bg-neutral-950 p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">Results</h2>
-              
             </div>
 
             {eff ? (

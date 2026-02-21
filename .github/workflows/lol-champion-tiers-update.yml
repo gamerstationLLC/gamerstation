@@ -43,6 +43,28 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      # ✅ NEW: Restore previous compounded snapshot + seen-state from Blob
+      - name: Restore champion tiers base + seen state from Vercel Blob (best-effort)
+        if: always()
+        run: |
+          set +e
+
+          # Your public Blob base URL (remembered)
+          BASE="https://or3vgdqybw6oou7j.public.blob.vercel-storage.com"
+
+          echo "Restoring previous tiers snapshot (if exists)..."
+          mkdir -p public/data/lol
+          curl -fsSL "$BASE/data/lol/champion_tiers.json" -o public/data/lol/champion_tiers.json || true
+          ls -lah public/data/lol/champion_tiers.json || true
+
+          echo "Restoring seen match ids state (if exists)..."
+          mkdir -p scripts/riot/cache/champion_tiers/state
+          curl -fsSL "$BASE/data/lol/champion_tiers_seen_match_ids.json" -o scripts/riot/cache/champion_tiers/state/seen_match_ids.json || true
+          ls -lah scripts/riot/cache/champion_tiers/state/seen_match_ids.json || true
+
+          echo "Restore step done."
+          exit 0
+
       - name: Prune old Champion Tiers cache (90 days)
         run: |
           set -e
@@ -110,17 +132,21 @@ jobs:
           ls -lah public/data/lol || true
           ls -lah public/data/lol/champion_tiers.json || true
 
+          echo "== Seen state sample =="
+          ls -lah scripts/riot/cache/champion_tiers/state/seen_match_ids.json || true
+
           echo "== Git status (champion_tiers.json) =="
           git status --porcelain -- public/data/lol/champion_tiers.json || true
 
           echo "== Diffstat (champion_tiers.json) =="
           git diff --stat -- public/data/lol/champion_tiers.json || true
 
-      - name: Upload champion tiers to Vercel Blob (never fails job)
+      # ✅ UPDATED: Upload BOTH the compounded snapshot and the seen-state
+      - name: Upload champion tiers + state to Vercel Blob (never fails job)
         if: always()
         env:
           BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
-          BLOB_UPLOADS: "public/data/lol/champion_tiers.json=data/lol/champion_tiers.json"
+          BLOB_UPLOADS: "public/data/lol/champion_tiers.json=data/lol/champion_tiers.json;scripts/riot/cache/champion_tiers/state/seen_match_ids.json=data/lol/champion_tiers_seen_match_ids.json"
           BLOB_CACHE_SECONDS: "300"
           LOL_PATCH: ${{ github.run_id }}
           BLOB_FORCE_OVERWRITE: "1" # ✅ overwrite blob every run
