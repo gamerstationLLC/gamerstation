@@ -110,26 +110,23 @@ export default function HubClient() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="text-sm font-semibold">
-                    LoL AP/AD Stat Impact
+                    LoL Item Compare
                   </div>
                   <div className="mt-2 text-sm text-neutral-400">
-                    See what +10 AP or +10 AD actually changes.
+                    See what stats actually change.
                   </div>
                 </div>
                 <span className="shrink-0 rounded-full border border-neutral-800 bg-black px-3 py-1 text-xs text-neutral-300">
-                  AP/AD
+                Items
                 </span>
               </div>
 
               <ul className="mt-4 space-y-2 text-sm text-neutral-300">
                 <li className="flex gap-2">
                   <span className="mt-[7px] inline-block h-1.5 w-1.5 rounded-full bg-neutral-400" />
-                  <span>Damage per +10 AP / +10 AD</span>
+                  <span>Fast item comparisons</span>
                 </li>
-                <li className="flex gap-2">
-                  <span className="mt-[7px] inline-block h-1.5 w-1.5 rounded-full bg-neutral-400" />
-                  <span>Breakpoints vs target HP + resists</span>
-                </li>
+                
                 <li className="flex gap-2">
                   <span className="mt-[7px] inline-block h-1.5 w-1.5 rounded-full bg-neutral-400" />
                   <span>Perfect for item decision-making</span>
