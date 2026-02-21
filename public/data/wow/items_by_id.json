@@ -115398,6 +115398,45 @@
     ],
     "required_level": 40
   },
+  "134461": {
+    "id": 134461,
+    "name": "Thermal Bindings",
+    "slot": "WRIST",
+    "ilvl": 50,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Leather",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "CRIT_RATING": 5,
+      "MASTERY_RATING": 10
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 5
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 10
+      }
+    ],
+    "required_level": 40
+  },
   "134462": {
     "id": 134462,
     "name": "Dream Bolstered Chestguard",
@@ -116649,6 +116688,45 @@
       {
         "type": "MASTERY_RATING",
         "value": 14
+      }
+    ],
+    "required_level": 40
+  },
+  "134500": {
+    "id": 134500,
+    "name": "Breastplate of Preservation",
+    "slot": "CHEST",
+    "ilvl": 50,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Plate",
+    "stats": {
+      "INTELLECT": 13,
+      "STRENGTH": 13,
+      "STAMINA": 20,
+      "CRIT_RATING": 18,
+      "MASTERY_RATING": 8
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 13
+      },
+      {
+        "type": "STRENGTH",
+        "value": 13
+      },
+      {
+        "type": "STAMINA",
+        "value": 20
+      },
+      {
+        "type": "CRIT_RATING",
+        "value": 18
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 8
       }
     ],
     "required_level": 40
@@ -118814,6 +118892,45 @@
       {
         "type": "VERSATILITY",
         "value": 17
+      }
+    ],
+    "required_level": 40
+  },
+  "137305": {
+    "id": 137305,
+    "name": "Blighted Grasp Bracers",
+    "slot": "WRIST",
+    "ilvl": 50,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Mail",
+    "stats": {
+      "INTELLECT": 7,
+      "AGILITY": 7,
+      "STAMINA": 11,
+      "HASTE_RATING": 6,
+      "VERSATILITY": 9
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 7
+      },
+      {
+        "type": "AGILITY",
+        "value": 7
+      },
+      {
+        "type": "STAMINA",
+        "value": 11
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 6
+      },
+      {
+        "type": "VERSATILITY",
+        "value": 9
       }
     ],
     "required_level": 40
@@ -122558,6 +122675,25 @@
   "137484": {
     "id": 137484,
     "name": "Flask of the Solemn Night",
+    "slot": "TRINKET",
+    "ilvl": 50,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Miscellaneous",
+    "stats": {
+      "INTELLECT": 13
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 13
+      }
+    ],
+    "required_level": 40
+  },
+  "137485": {
+    "id": 137485,
+    "name": "Infernal Writ",
     "slot": "TRINKET",
     "ilvl": 50,
     "quality": "RARE",
@@ -135817,6 +135953,40 @@
     ],
     "required_level": 40
   },
+  "144473": {
+    "id": 144473,
+    "name": "Nathrezim Acolyte's Robes",
+    "slot": "ROBE",
+    "ilvl": 50,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 13,
+      "STAMINA": 20,
+      "HASTE_RATING": 18,
+      "MASTERY_RATING": 8
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
+        "value": 13
+      },
+      {
+        "type": "STAMINA",
+        "value": 20
+      },
+      {
+        "type": "HASTE_RATING",
+        "value": 18
+      },
+      {
+        "type": "MASTERY_RATING",
+        "value": 8
+      }
+    ],
+    "required_level": 40
+  },
   "144474": {
     "id": 144474,
     "name": "Sheer Felwoven Hosiery",
@@ -141914,6 +142084,30 @@
       },
       {
         "type": "STRENGTH",
+        "value": 11
+      },
+      {
+        "type": "STAMINA",
+        "value": 13
+      }
+    ],
+    "required_level": 50
+  },
+  "155886": {
+    "id": 155886,
+    "name": "Smartly Plumed Cap",
+    "slot": "HEAD",
+    "ilvl": 59,
+    "quality": "RARE",
+    "item_class": "Armor",
+    "item_subclass": "Cloth",
+    "stats": {
+      "INTELLECT": 11,
+      "STAMINA": 13
+    },
+    "stats_raw": [
+      {
+        "type": "INTELLECT",
         "value": 11
       },
       {
