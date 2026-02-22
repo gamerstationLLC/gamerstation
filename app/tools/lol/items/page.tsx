@@ -381,16 +381,8 @@ export default async function ItemsIndexPage() {
     <Shell
       subtitle={
         <>
-          Patch <span className="font-semibold text-neutral-200">{displayPatch}</span> ·{" "}
-          <span className="font-semibold text-neutral-200">{enriched.length}</span> items · usage{" "}
-          <span className="font-semibold text-neutral-200">{source}</span> · generated{" "}
-          <span className="font-semibold text-neutral-200">
-            {new Date(generatedAt).toLocaleString()}
-          </span>
-          <span className="text-neutral-600">
-            {" "}
-            · assets <span className="font-semibold text-neutral-400">{ddragonPatch}</span>
-          </span>
+          Patch <span className="font-semibold text-neutral-200">{displayPatch}</span>
+          
         </>
       }
     >
