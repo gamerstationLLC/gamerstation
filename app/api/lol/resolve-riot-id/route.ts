@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { enforceSummonerCacheMissLimit } from "@/lib/ratelimit/summonerMiss";
 
 export const runtime = "nodejs"; // needs process.env
 export const dynamic = "force-dynamic"; // never cache
@@ -46,16 +47,81 @@ function json(data: unknown, init?: ResponseInit) {
   });
 }
 
+function isLikelyBotUA(uaRaw: string | null) {
+  const ua = (uaRaw || "").toLowerCase();
+  if (!ua) return true;
+  const needles = [
+    "bot",
+    "crawler",
+    "spider",
+    "scrape",
+    "scanner",
+    "headless",
+    "lighthouse",
+    "pagespeed",
+    "ahrefs",
+    "semrush",
+    "mj12bot",
+    "dotbot",
+    "dataforseo",
+    "serpapi",
+    "bingbot",
+    "googlebot",
+    "duckduckbot",
+    "yandex",
+    "baidu",
+    "slurp",
+  ];
+  return needles.some((n) => ua.includes(n));
+}
+
+function looksValid(gameName: string, tagLine: string) {
+  // lightweight sanity check; Riot will be final authority
+  if (!gameName || !tagLine) return false;
+  if (gameName.length < 2 || gameName.length > 24) return false;
+  if (tagLine.length < 2 || tagLine.length > 10) return false;
+  return true;
+}
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
+
   const region = (url.searchParams.get("region") || "na1") as PlatformRegion;
   const gameName = (url.searchParams.get("gameName") || "").trim();
   const tagLine = (url.searchParams.get("tagLine") || "").trim();
 
+  // 0) Bot guard (never call Riot, never count against rate limits)
+  const ua = req.headers.get("user-agent");
+  const accept = req.headers.get("accept") || "";
+  const likelyBot = isLikelyBotUA(ua);
+
+  // This is an API route; allow JSON-ish accepts. If it's not even asking for JSON, treat as bot-ish.
+  const wantsJson = accept.includes("application/json") || accept.includes("*/*") || accept === "";
+  if (likelyBot || !wantsJson) {
+    return json({ ok: false, reason: "bot_blocked" }, { status: 200 });
+  }
+
+  // 1) Validate params
   if (!gameName || !tagLine) {
     return json({ ok: false, reason: "missing_params" }, { status: 400 });
   }
+  if (!looksValid(gameName, tagLine)) {
+    return json({ ok: false, reason: "invalid_params" }, { status: 400 });
+  }
 
+  // 2) Rate limit (this route is ALWAYS a Riot call, so enforce here)
+  const rl = await enforceSummonerCacheMissLimit(req.headers);
+  if (!rl.ok) {
+    return json(
+      {
+        ok: false,
+        reason: rl.reason ?? "rate_limited",
+      },
+      { status: 429, headers: { "retry-after": "600" } }
+    );
+  }
+
+  // 3) Riot call
   const key = process.env.RIOT_API_KEY;
   if (!key) {
     return json({ ok: false, reason: "missing_riot_api_key" }, { status: 500 });
