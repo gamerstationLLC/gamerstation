@@ -3,16 +3,17 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { put } from "@vercel/blob";
 import SummonerProfileClient from "./client";
+import { enforceSummonerCacheMissLimit } from "@/lib/ratelimit/summonerMiss";
 
 export const revalidate = 300;
-
-type RouteParams = { gameName: string; tagLine: string };
 
 /** =========================
  *  Cache config
  *  ========================= */
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 const CACHE_PREFIX = "data/lol/summoners/by-riotid";
+
+type RouteParams = { gameName: string; tagLine: string };
 
 /** =========================
  *  Riot types
@@ -139,11 +140,7 @@ export type SummonerProfileData = {
   };
 };
 
-/** Cache wrapper stored in Blob */
-type CachedProfile = {
-  cachedAt: string; // ISO
-  data: SummonerProfileData;
-};
+type CachedProfile = { cachedAt: string; data: SummonerProfileData };
 
 /* =========================
    Riot routing helpers
@@ -210,7 +207,7 @@ function blobUrl(pathname: string) {
 }
 
 /* =========================
-   Bot guard (important)
+   Bot guard
 ========================= */
 
 function isLikelyBotUA(uaRaw: string | null) {
@@ -394,11 +391,8 @@ async function readCachedProfile(slug: string): Promise<CachedProfile | null> {
 }
 
 async function writeCachedProfile(slug: string, payload: CachedProfile) {
-  // needs token present, but we don't pass it manually; put() reads env internally
   mustBlobToken();
-
   const pathname = `${CACHE_PREFIX}/${slug}.json`;
-
   await put(pathname, JSON.stringify(payload), {
     access: "public",
     contentType: "application/json",
@@ -410,7 +404,10 @@ async function writeCachedProfile(slug: string, payload: CachedProfile) {
    Build profile data (Riot)
 ========================= */
 
-async function buildProfileFromRiot(gameName: string, tagLine: string): Promise<SummonerProfileData | null> {
+async function buildProfileFromRiot(
+  gameName: string,
+  tagLine: string
+): Promise<SummonerProfileData | null> {
   // 1) Account-V1 — try all clusters
   const clusters: Cluster[] = ["americas", "europe", "asia", "sea"];
   let account: AccountByRiotId | null = null;
@@ -563,7 +560,7 @@ async function buildProfileFromRiot(gameName: string, tagLine: string): Promise<
 
   const riotId = `${account.gameName}#${account.tagLine}`;
 
-  const data: SummonerProfileData = {
+  return {
     riotId,
     platform,
     cluster,
@@ -592,8 +589,6 @@ async function buildProfileFromRiot(gameName: string, tagLine: string): Promise<
       matchDetailsLoaded: loadedMatches.length,
     },
   };
-
-  return data;
 }
 
 /* =========================
@@ -610,47 +605,23 @@ export default async function SummonerProfilePage({
   const tagLine = normalizeTag(safeDecode(p.tagLine));
 
   const h = await headers();
-const ua = h.get("user-agent");
-const accept = h.get("accept") || "";
+  const ua = h.get("user-agent");
+  const accept = h.get("accept") || "";
   const likelyBot = isLikelyBotUA(ua);
   const wantsHtml = accept.includes("text/html") || accept.includes("*/*");
 
   // Bots/crawlers should NEVER trigger Riot calls or cache misses.
   if (likelyBot || !wantsHtml) {
-    return (
-      <main className="min-h-screen px-6 py-16 text-white">
-        <div className="mx-auto max-w-4xl">
-          <Link href="/tools/lol/summoner" className="text-sm text-neutral-300 hover:text-white">
-            ← Summoner lookup
-          </Link>
-          <div className="mt-6 rounded-3xl border border-neutral-800 bg-black/45 p-6">
-            <div className="text-2xl font-black">Summoner stats are interactive</div>
-            <div className="mt-2 text-neutral-300">Use the lookup page to view profiles.</div>
-          </div>
-        </div>
-      </main>
-    );
+    return cheapInfoPage("Summoner stats are interactive", "Use the lookup page to view profiles.");
   }
 
   if (!looksValidRiotId(gameName, tagLine)) {
-    return (
-      <main className="min-h-screen px-6 py-16 text-white">
-        <div className="mx-auto max-w-4xl">
-          <Link href="/tools/lol/summoner" className="text-sm text-neutral-300 hover:text-white">
-            ← New lookup
-          </Link>
-          <div className="mt-6 rounded-3xl border border-neutral-800 bg-black/45 p-6">
-            <div className="text-2xl font-black">Invalid Riot ID</div>
-            <div className="mt-2 text-neutral-300">Expected GameName#TAG.</div>
-          </div>
-        </div>
-      </main>
-    );
+    return cheapInfoPage("Invalid Riot ID", "Expected GameName#TAG.");
   }
 
   const slug = slugifyRiotId(gameName, tagLine);
 
-  // 1) Try Blob cache
+  // 1) Try Blob cache (HITS never count against rate limits)
   const cached = await readCachedProfile(slug);
   if (cached) {
     const age = Date.now() - Date.parse(cached.cachedAt);
@@ -659,11 +630,17 @@ const accept = h.get("accept") || "";
     }
   }
 
-  // 2) Cache miss or stale: fetch Riot
+  // 2) Cache MISS (or stale): enforce miss rate limit (KV)
+  const rl = await enforceSummonerCacheMissLimit(h);
+  if (!rl.ok) {
+    return tooManyRequestsPage();
+  }
+
+  // 3) Do Riot work
   const data = await buildProfileFromRiot(gameName, tagLine);
   if (!data) notFound();
 
-  // 3) Write Blob cache (best-effort; never fail the page)
+  // 4) Cache to Blob (best-effort; never fail page)
   try {
     await writeCachedProfile(slug, { cachedAt: new Date().toISOString(), data });
   } catch {
@@ -674,12 +651,47 @@ const accept = h.get("accept") || "";
 }
 
 /* =========================
-   Render
+   UI helpers
 ========================= */
 
+function navBtnClass() {
+  return "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+}
+
+function cheapInfoPage(title: string, message: string) {
+  return (
+    <main className="min-h-screen px-6 py-16 text-white">
+      <div className="mx-auto max-w-4xl">
+        <Link href="/tools/lol/summoner" className="text-sm text-neutral-300 hover:text-white">
+          ← Summoner lookup
+        </Link>
+        <div className="mt-6 rounded-3xl border border-neutral-800 bg-black/45 p-6">
+          <div className="text-2xl font-black">{title}</div>
+          <div className="mt-2 text-neutral-300">{message}</div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function tooManyRequestsPage() {
+  return (
+    <main className="min-h-screen px-6 py-16 text-white">
+      <div className="mx-auto max-w-4xl">
+        <Link href="/tools/lol/summoner" className="text-sm text-neutral-300 hover:text-white">
+          ← Summoner lookup
+        </Link>
+        <div className="mt-6 rounded-3xl border border-neutral-800 bg-black/45 p-6">
+          <div className="text-2xl font-black">Too many new lookups</div>
+          <div className="mt-2 text-neutral-300">Please wait a few minutes and try again.</div>
+        </div>
+      </div>
+    </main>
+  );
+}
+
 function renderPage(data: SummonerProfileData) {
-  const navBtn =
-    "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
+  const navBtn = navBtnClass();
 
   return (
     <main className="min-h-screen bg-transparent text-white px-5 py-5">
