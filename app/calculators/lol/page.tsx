@@ -57,39 +57,68 @@ export type ItemRow = {
   description: string;
 };
 
+type LolVersionJson = {
+  patch?: string; // display patch (e.g. "26.4")
+  ddragon?: string; // dd assets (e.g. "16.4.1")
+  version?: string; // legacy alias for display patch
+  updatedAt?: string;
+  source?: string;
+};
+
+function getBlobBase(): string {
+  return (
+    process.env.NEXT_PUBLIC_BLOB_BASE_URL ||
+    process.env.BLOB_BASE_URL ||
+    process.env.NEXT_PUBLIC_BLOB_BASE ||
+    ""
+  );
+}
+
 /**
  * ✅ We need TWO versions:
- * - displayPatch: what you show in UI + what your local files correspond to (e.g. "26.4")
+ * - displayPatch: what you show in UI (e.g. "26.4")
  * - ddragon: Data Dragon asset version for CDN requests (e.g. "16.4.1")
  *
- * displayPatch comes from your local public/data/lol/version.json
- * ddragon comes from https://ddragon.../api/versions.json
+ * BOTH come from your Blob version.json (blob-only).
+ * Riot versions.json is only a fallback if blob ddragon is missing.
  */
 async function getLolVersions(): Promise<{ displayPatch: string; ddragon: string }> {
-  // default fallback if everything fails
   let displayPatch = "unknown";
   let ddragon = "unknown";
 
-  // 1) local display patch (your pipeline writes this)
+  // 1) Blob-only version.json
   try {
-    const local = await readPublicJson<{ patch?: string; version?: string }>("data/lol/version.json");
-    // support either "patch" or legacy "version"
-    displayPatch = String(local.patch ?? local.version ?? displayPatch).trim() || displayPatch;
+    const base = getBlobBase();
+    if (base) {
+      const url = `${base.replace(/\/+$/, "")}/data/lol/version.json`;
+      const res = await fetch(url, { next: { revalidate: 60 } }); // keep fresh
+      if (res.ok) {
+        const json = (await res.json()) as LolVersionJson;
+
+        displayPatch =
+          String(json.patch ?? json.version ?? displayPatch).trim() || displayPatch;
+
+        // Prefer explicit ddragon from your pipeline
+        ddragon = String(json.ddragon ?? ddragon).trim() || ddragon;
+      }
+    }
   } catch {
     // ignore
   }
 
-  // 2) ddragon asset version from Riot
-  try {
-    const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
-      next: { revalidate: 21600 },
-    });
-    if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
-    const versions = (await res.json()) as string[];
-    ddragon = String(versions?.[0] ?? ddragon).trim() || ddragon;
-  } catch {
-    // If Riot fails, fallback to displayPatch (still better than "unknown")
-    ddragon = displayPatch;
+  // 2) If blob didn't give us a valid ddragon, fallback to Riot versions.json
+  if (!ddragon || ddragon === "unknown") {
+    try {
+      const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
+        next: { revalidate: 21600 },
+      });
+      if (!res.ok) throw new Error(`versions.json failed: ${res.status}`);
+      const versions = (await res.json()) as string[];
+      ddragon = String(versions?.[0] ?? ddragon).trim() || ddragon;
+    } catch {
+      // If Riot fails, fallback to displayPatch (still better than "unknown")
+      ddragon = displayPatch;
+    }
   }
 
   return { displayPatch, ddragon };
@@ -215,7 +244,6 @@ function SeoBlock({ patch }: { patch: string }) {
               <li>
                 <strong>DPS</strong> over a short window (autos + abilities)
               </li>
-              
               <li>
                 Damage comparisons across <strong>items</strong> and <strong>stats</strong>
               </li>
@@ -375,6 +403,8 @@ export default async function LolCalculatorPage() {
         <Suspense fallback={<LoadingShell />}>
           <LolClient champions={champions} patch={displayPatch} ddragon={ddragon} items={items} />
         </Suspense>
+
+        {/* ✅ SEO block now reflects blob-only displayPatch */}
         <SeoBlock patch={displayPatch} />
       </div>
     </main>

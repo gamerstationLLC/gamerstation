@@ -189,17 +189,39 @@ async function readJsonBlobFirst<T>(publicRelPath: string): Promise<T | null> {
   }
 }
 
-// ✅ Display patch: READ ONLY FROM /public/data/lol/version.json (disk-only)
-async function readDisplayPatchDiskOnly(): Promise<{
+/**
+ * ✅ Version JSON: BLOB ONLY (no disk fallback)
+ * Reads: /data/lol/version.json from Blob base URL.
+ */
+async function readVersionBlobOnly(): Promise<{
   displayPatch: string;
   ddragonFromVersionJson: string | null;
   updatedAt: string | null;
   source: string | null;
 }> {
+  const base = getBlobBase();
+  if (!base) {
+    return {
+      displayPatch: "unknown",
+      ddragonFromVersionJson: null,
+      updatedAt: null,
+      source: null,
+    };
+  }
+
   try {
-    const fs = await import("node:fs/promises");
-    const raw = await fs.readFile(`${process.cwd()}/public/data/lol/version.json`, "utf8");
-    const json = JSON.parse(raw) as LolVersionJson;
+    const url = `${base.replace(/\/+$/, "")}/data/lol/version.json`;
+    const res = await fetch(url, { next: { revalidate: 60 } }); // keep fresh
+    if (!res.ok) {
+      return {
+        displayPatch: "unknown",
+        ddragonFromVersionJson: null,
+        updatedAt: null,
+        source: null,
+      };
+    }
+
+    const json = (await res.json()) as LolVersionJson;
 
     const displayPatch = (json.patch || json.version || "").trim() || "unknown";
     const ddragonFromVersionJson = (json.ddragon || "").trim() || null;
@@ -391,8 +413,8 @@ export default async function ItemSlugPage({
       ? sourceRaw
       : "combined";
 
-  // ✅ display patch ONLY from /public/data/lol/version.json
-  const versionInfo = await readDisplayPatchDiskOnly();
+  // ✅ display patch ONLY from BLOB version.json
+  const versionInfo = await readVersionBlobOnly();
   const displayPatch = versionInfo.displayPatch;
 
   const [itemsJson, usage] = await Promise.all([
@@ -600,10 +622,6 @@ export default async function ItemSlugPage({
           <p className="mt-3 text-neutral-300">
             Patch <span className="font-semibold text-white">{displayPatch}</span> · Usage{" "}
             <span className="font-semibold text-white">{source}</span>
-            <span className="text-neutral-600">
-              {" "}
-              
-            </span>
           </p>
 
           <div className="mt-6">

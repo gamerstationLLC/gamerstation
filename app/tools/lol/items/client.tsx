@@ -61,8 +61,6 @@ export default function ItemsIndexClient({ items, totalItems, source, generatedA
   return (
     <div className="w-full">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        
-
         <div className="flex w-full flex-col gap-2 md:w-[520px]">
           <div className="relative">
             <input
