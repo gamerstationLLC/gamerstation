@@ -636,6 +636,8 @@ export default async function SummonerProfilePage({
     return tooManyRequestsPage();
   }
 
+console.log("BOT ALERT TRIGGERED");
+
   // 3) Do Riot work
   const data = await buildProfileFromRiot(gameName, tagLine);
   if (!data) notFound();
