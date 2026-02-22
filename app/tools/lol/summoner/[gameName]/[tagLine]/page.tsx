@@ -1,25 +1,27 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { put } from "@vercel/blob";
 import SummonerProfileClient from "./client";
 
 export const revalidate = 300;
 
 type RouteParams = { gameName: string; tagLine: string };
 
-type AccountByRiotId = {
-  puuid: string;
-  gameName: string;
-  tagLine: string;
-};
+/** =========================
+ *  Cache config
+ *  ========================= */
+const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+const CACHE_PREFIX = "data/lol/summoners/by-riotid";
 
-type AccountByPuuid = {
-  puuid: string;
-  gameName: string;
-  tagLine: string;
-};
+/** =========================
+ *  Riot types
+ *  ========================= */
+type AccountByRiotId = { puuid: string; gameName: string; tagLine: string };
+type AccountByPuuid = { puuid: string; gameName: string; tagLine: string };
 
 type SummonerV4 = {
-  id: string; // ✅ encryptedSummonerId (needed for LP)
+  id: string;
   accountId: string;
   puuid: string;
   name: string;
@@ -30,9 +32,9 @@ type SummonerV4 = {
 
 type LeagueEntryV4 = {
   leagueId: string;
-  queueType: string; // "RANKED_SOLO_5x5" | "RANKED_FLEX_SR" | ...
-  tier: string; // "CHALLENGER" | "GRANDMASTER" | ...
-  rank: string; // "I" | "II" | ...
+  queueType: string;
+  tier: string;
+  rank: string;
   summonerId: string;
   summonerName: string;
   leaguePoints: number;
@@ -77,26 +79,15 @@ type MatchV5 = {
   };
 };
 
-type PlayerRef = {
-  gameName?: string;
-  tagLine?: string;
-  summonerName?: string;
-  teamId?: number;
-};
+type PlayerRef = { gameName?: string; tagLine?: string; summonerName?: string; teamId?: number };
+type MatchPlayers = { blue: PlayerRef[]; red: PlayerRef[] };
 
-type MatchPlayers = {
-  blue: PlayerRef[];
-  red: PlayerRef[];
-};
-
-type SummonerProfileData = {
+export type SummonerProfileData = {
   riotId: string;
   platform: string;
   cluster: string;
   puuid: string;
   summoner: { profileIconId: number; summonerLevel: number };
-
-  // ✅ NEW: Ranked (LP) info for header
   ranked?: {
     queue: "RANKED_SOLO_5x5" | "RANKED_FLEX_SR" | string;
     tier: string;
@@ -105,7 +96,6 @@ type SummonerProfileData = {
     wins: number;
     losses: number;
   } | null;
-
   summary: {
     games: number;
     wins: number;
@@ -149,9 +139,15 @@ type SummonerProfileData = {
   };
 };
 
-/* ---------------------------
-   Helpers (NO lib/riot.ts)
---------------------------- */
+/** Cache wrapper stored in Blob */
+type CachedProfile = {
+  cachedAt: string; // ISO
+  data: SummonerProfileData;
+};
+
+/* =========================
+   Riot routing helpers
+========================= */
 
 const PLATFORMS = [
   "na1",
@@ -189,20 +185,72 @@ function riotHostForCluster(c: Cluster) {
   return `https://${c}.api.riotgames.com`;
 }
 
-function mustKey() {
+function mustRiotKey() {
   const key = process.env.RIOT_API_KEY;
   if (!key) throw new Error("Missing RIOT_API_KEY in environment.");
   return key;
 }
+
+function mustBlobToken() {
+  const v = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!v) throw new Error("Missing env var: BLOB_READ_WRITE_TOKEN");
+  return v;
+}
+
+function blobBase() {
+  const base = process.env.NEXT_PUBLIC_BLOB_BASE_URL || process.env.BLOB_BASE_URL;
+  if (!base) return null;
+  return base.replace(/\/+$/, "");
+}
+
+function blobUrl(pathname: string) {
+  const base = blobBase();
+  if (!base) return null;
+  return `${base}/${pathname.replace(/^\/+/, "")}`;
+}
+
+/* =========================
+   Bot guard (important)
+========================= */
+
+function isLikelyBotUA(uaRaw: string | null) {
+  const ua = (uaRaw || "").toLowerCase();
+  if (!ua) return true;
+  const needles = [
+    "bot",
+    "crawler",
+    "spider",
+    "scrape",
+    "scanner",
+    "headless",
+    "lighthouse",
+    "pagespeed",
+    "ahrefs",
+    "semrush",
+    "mj12bot",
+    "dotbot",
+    "dataforseo",
+    "serpapi",
+    "bingbot",
+    "googlebot",
+    "duckduckbot",
+    "yandex",
+    "baidu",
+    "slurp",
+  ];
+  return needles.some((n) => ua.includes(n));
+}
+
+/* =========================
+   Misc helpers
+========================= */
 
 function safeDecode(raw: string) {
   const s = String(raw ?? "");
   let out = s;
   try {
     out = decodeURIComponent(out);
-  } catch {
-    // ignore
-  }
+  } catch {}
   out = out.replace(/\+/g, " ").trim();
   return out;
 }
@@ -213,6 +261,19 @@ function normalizeName(s: string) {
 
 function normalizeTag(s: string) {
   return s.replace(/^#+/, "").replace(/\s+/g, "").trim();
+}
+
+function looksValidRiotId(gameName: string, tagLine: string) {
+  if (!gameName || !tagLine) return false;
+  if (gameName.length < 2 || gameName.length > 24) return false;
+  if (tagLine.length < 2 || tagLine.length > 10) return false;
+  return true;
+}
+
+function slugifyRiotId(gameName: string, tagLine: string) {
+  const gn = gameName.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9\-_.]/g, "");
+  const tg = tagLine.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+  return `${gn}--${tg}`;
 }
 
 function sleep(ms: number) {
@@ -227,7 +288,7 @@ async function riotFetchJson<T>(
     revalidate,
   }: { attempts?: number; softFail?: boolean; revalidate?: number } = {}
 ): Promise<T | null> {
-  const key = mustKey();
+  const key = mustRiotKey();
 
   for (let i = 0; i < attempts; i++) {
     const res = await fetch(url, {
@@ -242,8 +303,7 @@ async function riotFetchJson<T>(
     if (retryable && i < attempts - 1) {
       const ra = res.headers.get("retry-after");
       const raMs = ra ? Math.min(10_000, Number(ra) * 1000) : null;
-      const backoff =
-        Math.min(4000, 250 * Math.pow(2, i)) + Math.floor(Math.random() * 120);
+      const backoff = Math.min(4000, 250 * Math.pow(2, i)) + Math.floor(Math.random() * 120);
       await sleep(raMs ?? backoff);
       continue;
     }
@@ -291,11 +351,7 @@ async function detectPlatformByPuuid(
     const url = `${riotHostForPlatform(p)}/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(
       puuid
     )}`;
-    const s = await riotFetchJson<SummonerV4>(url, {
-      attempts: 2,
-      softFail: true,
-      revalidate: 300,
-    });
+    const s = await riotFetchJson<SummonerV4>(url, { attempts: 2, softFail: true, revalidate: 300 });
     if (s?.puuid) return { platform: p, summoner: s };
   }
   return null;
@@ -303,13 +359,10 @@ async function detectPlatformByPuuid(
 
 function pickRanked(entries: LeagueEntryV4[] | null) {
   if (!Array.isArray(entries) || entries.length === 0) return null;
-
-  // Prefer Solo > Flex
   const solo = entries.find((e) => e.queueType === "RANKED_SOLO_5x5");
   const flex = entries.find((e) => e.queueType === "RANKED_FLEX_SR");
   const e = solo ?? flex ?? entries[0];
   if (!e) return null;
-
   return {
     queue: e.queueType,
     tier: e.tier,
@@ -320,36 +373,45 @@ function pickRanked(entries: LeagueEntryV4[] | null) {
   };
 }
 
-/* ---------------------------
-   Page
---------------------------- */
+/* =========================
+   Blob cache read/write
+========================= */
 
-export default async function SummonerProfilePage({
-  params,
-}: {
-  params: Promise<RouteParams> | RouteParams;
-}) {
-  const p = await Promise.resolve(params as any);
-  const gameName = normalizeName(safeDecode(p.gameName));
-  const tagLine = normalizeTag(safeDecode(p.tagLine));
+async function readCachedProfile(slug: string): Promise<CachedProfile | null> {
+  const url = blobUrl(`${CACHE_PREFIX}/${slug}.json`);
+  if (!url) return null;
 
-  if (!gameName || !tagLine) {
-    return (
-      <main className="min-h-screen px-6 py-16 text-white">
-        <div className="mx-auto max-w-4xl">
-          <Link href="/tools/lol/summoner" className="text-sm text-neutral-300 hover:text-white">
-            ← New lookup
-          </Link>
-          <div className="mt-6 rounded-3xl border border-neutral-800 bg-black/45 p-6">
-            <div className="text-2xl font-black">Invalid Riot ID</div>
-            <div className="mt-2 text-neutral-300">Expected GameName#TAG.</div>
-          </div>
-        </div>
-      </main>
-    );
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return null;
+
+  try {
+    const j = (await res.json()) as CachedProfile;
+    if (!j?.cachedAt || !j?.data?.puuid) return null;
+    return j;
+  } catch {
+    return null;
   }
+}
 
-  // 1) Account-V1 (regional) — we don’t know cluster yet, so try all clusters
+async function writeCachedProfile(slug: string, payload: CachedProfile) {
+  // needs token present, but we don't pass it manually; put() reads env internally
+  mustBlobToken();
+
+  const pathname = `${CACHE_PREFIX}/${slug}.json`;
+
+  await put(pathname, JSON.stringify(payload), {
+    access: "public",
+    contentType: "application/json",
+    addRandomSuffix: false,
+  });
+}
+
+/* =========================
+   Build profile data (Riot)
+========================= */
+
+async function buildProfileFromRiot(gameName: string, tagLine: string): Promise<SummonerProfileData | null> {
+  // 1) Account-V1 — try all clusters
   const clusters: Cluster[] = ["americas", "europe", "asia", "sea"];
   let account: AccountByRiotId | null = null;
 
@@ -357,36 +419,28 @@ export default async function SummonerProfilePage({
     const url = `${riotHostForCluster(c)}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
       gameName
     )}/${encodeURIComponent(tagLine)}`;
-    const a = await riotFetchJson<AccountByRiotId>(url, {
-      attempts: 2,
-      softFail: true,
-      revalidate: 300,
-    });
+    const a = await riotFetchJson<AccountByRiotId>(url, { attempts: 2, softFail: true, revalidate: 300 });
     if (a?.puuid) {
       account = a;
       break;
     }
   }
 
-  if (!account?.puuid) notFound();
+  if (!account?.puuid) return null;
 
-  // 2) Detect platform (Summoner-V4 probe)
+  // 2) Detect platform
   const detected = await detectPlatformByPuuid(account.puuid);
-  if (!detected) notFound();
+  if (!detected) return null;
 
   const platform = detected.platform;
   const cluster = platformToCluster(platform);
   const summoner = detected.summoner;
 
-  // ✅ 2.5) Ranked (LP) — League-V4 (platform routing)
+  // 2.5) Ranked
   const leagueUrl = `${riotHostForPlatform(platform)}/lol/league/v4/entries/by-summoner/${encodeURIComponent(
     summoner.id
   )}`;
-  const leagueEntries = await riotFetchJson<LeagueEntryV4[]>(leagueUrl, {
-    attempts: 2,
-    softFail: true,
-    revalidate: 300,
-  });
+  const leagueEntries = await riotFetchJson<LeagueEntryV4[]>(leagueUrl, { attempts: 2, softFail: true, revalidate: 300 });
   const ranked = pickRanked(leagueEntries);
 
   // 3) Match IDs
@@ -394,11 +448,7 @@ export default async function SummonerProfilePage({
     account.puuid
   )}/ids?start=0&count=20`;
 
-  const matchIds = await riotFetchJson<string[]>(matchIdsUrl, {
-    attempts: 3,
-    softFail: true,
-    revalidate: 300,
-  });
+  const matchIds = await riotFetchJson<string[]>(matchIdsUrl, { attempts: 3, softFail: true, revalidate: 300 });
   const ids = Array.isArray(matchIds) ? matchIds : [];
 
   // 4) Match details
@@ -411,23 +461,16 @@ export default async function SummonerProfilePage({
   const loadedMatches = matchDetails.filter(Boolean) as MatchV5[];
   const ddVersion = deriveDdVersion(loadedMatches[0]?.info?.gameVersion);
 
-  // ✅ NEW: Build RiotID map for participants (PUUID -> gameName/tagLine)
+  // Participants RiotID map
   const uniquePuuids = Array.from(
-    new Set(
-      loadedMatches.flatMap((m) => m.info.participants.map((p) => p.puuid).filter(Boolean))
-    )
+    new Set(loadedMatches.flatMap((m) => m.info.participants.map((p) => p.puuid).filter(Boolean)))
   );
 
   const accountByPuuid = new Map<string, { gameName: string; tagLine: string }>();
 
-  // Fetch in a controlled way; soft-fail so page still loads even if Riot is cranky.
   const accountResults = await mapLimit(uniquePuuids, 6, async (puuid) => {
     const url = `${riotHostForCluster(cluster)}/riot/account/v1/accounts/by-puuid/${encodeURIComponent(puuid)}`;
-    const a = await riotFetchJson<AccountByPuuid>(url, {
-      attempts: 2,
-      softFail: true,
-      revalidate: 300,
-    });
+    const a = await riotFetchJson<AccountByPuuid>(url, { attempts: 2, softFail: true, revalidate: 300 });
     return { puuid, a };
   });
 
@@ -526,10 +569,7 @@ export default async function SummonerProfilePage({
     cluster,
     puuid: account.puuid,
     summoner: { profileIconId: summoner.profileIconId, summonerLevel: summoner.summonerLevel },
-
-    // ✅ passes to client (so LP stops showing —)
     ranked,
-
     summary: {
       games: rows.length,
       wins,
@@ -553,6 +593,91 @@ export default async function SummonerProfilePage({
     },
   };
 
+  return data;
+}
+
+/* =========================
+   Page
+========================= */
+
+export default async function SummonerProfilePage({
+  params,
+}: {
+  params: Promise<RouteParams> | RouteParams;
+}) {
+  const p = await Promise.resolve(params as any);
+  const gameName = normalizeName(safeDecode(p.gameName));
+  const tagLine = normalizeTag(safeDecode(p.tagLine));
+
+  const h = await headers();
+const ua = h.get("user-agent");
+const accept = h.get("accept") || "";
+  const likelyBot = isLikelyBotUA(ua);
+  const wantsHtml = accept.includes("text/html") || accept.includes("*/*");
+
+  // Bots/crawlers should NEVER trigger Riot calls or cache misses.
+  if (likelyBot || !wantsHtml) {
+    return (
+      <main className="min-h-screen px-6 py-16 text-white">
+        <div className="mx-auto max-w-4xl">
+          <Link href="/tools/lol/summoner" className="text-sm text-neutral-300 hover:text-white">
+            ← Summoner lookup
+          </Link>
+          <div className="mt-6 rounded-3xl border border-neutral-800 bg-black/45 p-6">
+            <div className="text-2xl font-black">Summoner stats are interactive</div>
+            <div className="mt-2 text-neutral-300">Use the lookup page to view profiles.</div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (!looksValidRiotId(gameName, tagLine)) {
+    return (
+      <main className="min-h-screen px-6 py-16 text-white">
+        <div className="mx-auto max-w-4xl">
+          <Link href="/tools/lol/summoner" className="text-sm text-neutral-300 hover:text-white">
+            ← New lookup
+          </Link>
+          <div className="mt-6 rounded-3xl border border-neutral-800 bg-black/45 p-6">
+            <div className="text-2xl font-black">Invalid Riot ID</div>
+            <div className="mt-2 text-neutral-300">Expected GameName#TAG.</div>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const slug = slugifyRiotId(gameName, tagLine);
+
+  // 1) Try Blob cache
+  const cached = await readCachedProfile(slug);
+  if (cached) {
+    const age = Date.now() - Date.parse(cached.cachedAt);
+    if (Number.isFinite(age) && age >= 0 && age < CACHE_TTL_MS) {
+      return renderPage(cached.data);
+    }
+  }
+
+  // 2) Cache miss or stale: fetch Riot
+  const data = await buildProfileFromRiot(gameName, tagLine);
+  if (!data) notFound();
+
+  // 3) Write Blob cache (best-effort; never fail the page)
+  try {
+    await writeCachedProfile(slug, { cachedAt: new Date().toISOString(), data });
+  } catch {
+    // ignore
+  }
+
+  return renderPage(data);
+}
+
+/* =========================
+   Render
+========================= */
+
+function renderPage(data: SummonerProfileData) {
   const navBtn =
     "rounded-xl border border-neutral-800 bg-black px-4 py-2 text-sm text-neutral-200 transition hover:border-neutral-600 hover:text-white hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]";
 
