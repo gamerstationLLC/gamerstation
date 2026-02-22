@@ -97,7 +97,6 @@ async function loadItemsForSlot(slot: OsrsSlot): Promise<OsrsItemRow[]> {
   }
 }
 
-
 type MobileTab = "user" | "enemies" | "results";
 
 export default function OsrsDpsPage() {
@@ -207,8 +206,8 @@ export default function OsrsDpsPage() {
 
     try {
       const res = await fetch("/data/osrs/enemies/enemies.json", {
-  cache: "no-store",
-});
+        cache: "no-store",
+      });
 
       const text = await res.text();
 
@@ -415,13 +414,23 @@ export default function OsrsDpsPage() {
 
     setHsError(null);
     setHsLoading(true);
+
     try {
       const res = await fetch(`/api/osrs/hiscores?player=${encodeURIComponent(name)}`, {
         method: "GET",
         cache: "no-store",
       });
-      const json = await res.json();
-      if (!res.ok) {
+
+      // handle non-json (edge cases)
+      const text = await res.text();
+      let json: any = null;
+      try {
+        json = text ? JSON.parse(text) : null;
+      } catch {
+        json = null;
+      }
+
+      if (!res.ok || !json?.ok) {
         setHsError(json?.error ?? "Could not load hiscores");
         return;
       }
@@ -464,21 +473,20 @@ export default function OsrsDpsPage() {
               GamerStation<span className="align-super text-[0.6em]">™</span>
             </span>
           </Link>
-          
-           <a
-  href="/calculators"
-  className="
-    ml-auto rounded-xl border border-neutral-800
-    bg-black px-4 py-2 text-sm text-neutral-200
-    transition
-    hover:border-grey-400
-   
-    hover:text-white
-    hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
-  "
->
-  Calculators
-</a>
+
+          <a
+            href="/calculators"
+            className="
+              ml-auto rounded-xl border border-neutral-800
+              bg-black px-4 py-2 text-sm text-neutral-200
+              transition
+              hover:border-grey-400
+              hover:text-white
+              hover:shadow-[0_0_25px_rgba(0,255,255,0.35)]
+            "
+          >
+            Calculators
+          </a>
         </header>
 
         <div className="mt-8">
@@ -489,8 +497,7 @@ export default function OsrsDpsPage() {
         </div>
 
         {/* MOBILE sticky bar (tabs + style) */}
-       <div className="mt-6 sticky top-0 z-30 -mx-6 px-6 py-3 bg-black/85 backdrop-blur border-b border-neutral-800 ios-glass lg:static lg:bg-transparent lg:backdrop-blur-0 lg:border-b-0 lg:mx-0 lg:px-0">
-
+        <div className="mt-6 sticky top-0 z-30 -mx-6 px-6 py-3 bg-black/85 backdrop-blur border-b border-neutral-800 ios-glass lg:static lg:bg-transparent lg:backdrop-blur-0 lg:border-b-0 lg:mx-0 lg:px-0">
           {/* Mobile section tabs (User / Enemies / Results) */}
           <div className="flex gap-2 lg:hidden">
             <MobileTopTab active={mobileTab === "user"} onClick={() => setMobileTab("user")} label="User" />
@@ -542,9 +549,7 @@ export default function OsrsDpsPage() {
 
               {hsError && <div className="mt-3 text-xs text-red-300">{hsError}</div>}
 
-              <div className="mt-3 text-xs text-neutral-500">
-                Pulls combat skill levels from OSRS hiscores. Gear stays manual.
-              </div>
+              <div className="mt-3 text-xs text-neutral-500">Pulls combat skill levels from OSRS hiscores. Gear stays manual.</div>
 
               <div className="mt-4">
                 <CollapsibleHeader
@@ -937,27 +942,27 @@ export default function OsrsDpsPage() {
           </section>
         </div>
       </div>
+
       {/* Mobile sticky results footer */}
-{mobileTab !== "results" && (
-  <button
-    type="button"
-    onClick={() => setMobileTab("results")}
-    className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-neutral-800 bg-black/90 backdrop-blur"
-  >
-    <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between text-sm">
-      <div className="flex flex-col text-left">
-        <span className="text-xs text-neutral-400">DPS</span>
-        <span className="font-semibold">{fmt(result.dps)}</span>
-      </div>
+      {mobileTab !== "results" && (
+        <button
+          type="button"
+          onClick={() => setMobileTab("results")}
+          className="fixed bottom-0 left-0 right-0 z-40 lg:hidden border-t border-neutral-800 bg-black/90 backdrop-blur"
+        >
+          <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between text-sm">
+            <div className="flex flex-col text-left">
+              <span className="text-xs text-neutral-400">DPS</span>
+              <span className="font-semibold">{fmt(result.dps)}</span>
+            </div>
 
-      <div className="flex flex-col text-right">
-        <span className="text-xs text-neutral-400">TTK</span>
-        <span className="font-semibold">{fmtTime(result.ttkSeconds)}</span>
-      </div>
-    </div>
-  </button>
-)}
-
+            <div className="flex flex-col text-right">
+              <span className="text-xs text-neutral-400">TTK</span>
+              <span className="font-semibold">{fmtTime(result.ttkSeconds)}</span>
+            </div>
+          </div>
+        </button>
+      )}
     </main>
   );
 }
