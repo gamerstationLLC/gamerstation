@@ -178105,40 +178105,6 @@
     ],
     "required_level": 30
   },
-  "188461": {
-    "id": 188461,
-    "name": "Heartshiver",
-    "slot": "WEAPON",
-    "ilvl": 35,
-    "quality": "EPIC",
-    "item_class": "Weapon",
-    "item_subclass": "Dagger",
-    "stats": {
-      "AGILITY": 8,
-      "STAMINA": 12,
-      "CRIT_RATING": 8,
-      "HASTE_RATING": 9
-    },
-    "stats_raw": [
-      {
-        "type": "AGILITY",
-        "value": 8
-      },
-      {
-        "type": "STAMINA",
-        "value": 12
-      },
-      {
-        "type": "CRIT_RATING",
-        "value": 8
-      },
-      {
-        "type": "HASTE_RATING",
-        "value": 9
-      }
-    ],
-    "required_level": 30
-  },
   "188462": {
     "id": 188462,
     "name": "Blood Boil Lancet",
@@ -190928,74 +190894,6 @@
     ],
     "required_level": 68
   },
-  "221059": {
-    "id": 221059,
-    "name": "I'pa's Pale Aleguards",
-    "slot": "WRIST",
-    "ilvl": 437,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Mail",
-    "stats": {
-      "INTELLECT": 9,
-      "AGILITY": 9,
-      "STAMINA": 14,
-      "CRIT_RATING": 12,
-      "VERSATILITY": 7
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 9
-      },
-      {
-        "type": "AGILITY",
-        "value": 9
-      },
-      {
-        "type": "STAMINA",
-        "value": 14
-      },
-      {
-        "type": "CRIT_RATING",
-        "value": 12
-      },
-      {
-        "type": "VERSATILITY",
-        "value": 7
-      }
-    ],
-    "required_level": 68
-  },
-  "221060": {
-    "id": 221060,
-    "name": "Strapped Rescue-Keg",
-    "slot": "NECK",
-    "ilvl": 437,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Miscellaneous",
-    "stats": {
-      "STAMINA": 14,
-      "HASTE_RATING": 33,
-      "MASTERY_RATING": 14
-    },
-    "stats_raw": [
-      {
-        "type": "STAMINA",
-        "value": 14
-      },
-      {
-        "type": "HASTE_RATING",
-        "value": 33
-      },
-      {
-        "type": "MASTERY_RATING",
-        "value": 14
-      }
-    ],
-    "required_level": 68
-  },
   "221061": {
     "id": 221061,
     "name": "Hops-Laden Greatboots",
@@ -200334,18 +200232,6 @@
     "stats_raw": [],
     "required_level": 1
   },
-  "245560": {
-    "id": 245560,
-    "name": "Meadery Ochre Window",
-    "slot": "NON_EQUIP",
-    "ilvl": 1,
-    "quality": "RARE",
-    "item_class": "Housing",
-    "item_subclass": "Decor",
-    "stats": {},
-    "stats_raw": [],
-    "required_level": 1
-  },
   "245681": {
     "id": 245681,
     "name": "Tidesage's Fireplace",
@@ -205916,45 +205802,6 @@
     ],
     "required_level": 78
   },
-  "251189": {
-    "id": 251189,
-    "name": "Rootwalker Harness",
-    "slot": "WAIST",
-    "ilvl": 108,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Leather",
-    "stats": {
-      "INTELLECT": 5,
-      "AGILITY": 5,
-      "STAMINA": 8,
-      "CRIT_RATING": 4,
-      "VERSATILITY": 7
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 5
-      },
-      {
-        "type": "AGILITY",
-        "value": 5
-      },
-      {
-        "type": "STAMINA",
-        "value": 8
-      },
-      {
-        "type": "CRIT_RATING",
-        "value": 4
-      },
-      {
-        "type": "VERSATILITY",
-        "value": 7
-      }
-    ],
-    "required_level": 78
-  },
   "251190": {
     "id": 251190,
     "name": "Bloodthorn Burnous",
@@ -205995,40 +205842,6 @@
       {
         "type": "MASTERY_RATING",
         "value": 3
-      }
-    ],
-    "required_level": 78
-  },
-  "251191": {
-    "id": 251191,
-    "name": "Luminescent Sprout",
-    "slot": "HOLDABLE",
-    "ilvl": 108,
-    "quality": "RARE",
-    "item_class": "Armor",
-    "item_subclass": "Miscellaneous",
-    "stats": {
-      "INTELLECT": 11,
-      "STAMINA": 5,
-      "HASTE_RATING": 3,
-      "MASTERY_RATING": 4
-    },
-    "stats_raw": [
-      {
-        "type": "INTELLECT",
-        "value": 11
-      },
-      {
-        "type": "STAMINA",
-        "value": 5
-      },
-      {
-        "type": "HASTE_RATING",
-        "value": 3
-      },
-      {
-        "type": "MASTERY_RATING",
-        "value": 4
       }
     ],
     "required_level": 78
