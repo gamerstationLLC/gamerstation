@@ -25,7 +25,8 @@
     "dota:immortal:finalize": "npx tsx scripts/dota/finalize-immortal-from-cache.ts",
     "dota:immortal": "npm run dota:immortal:build && npm run dota:immortal:finalize",
     "wow:update": "npx tsx scripts/wow/build-wow-items.ts",
-    "blox:update": "node scripts/roblox/bloxfruits/update-items-to-blob.mjs"
+    "blox:update": "node scripts/roblox/bloxfruits/update-items-to-blob.mjs",
+    "marathon:export": "tsx scripts/marathon/export-manifest.ts"
   },
   "dependencies": {
     "@upstash/redis": "^1.36.2",

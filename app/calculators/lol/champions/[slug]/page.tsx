@@ -4,10 +4,7 @@ import { notFound } from "next/navigation";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import StatsClient, {
-  type ChampionBaseStats,
-  type ChampionAbility,
-} from "./StatsClient";
+import StatsClient, { type ChampionBaseStats, type ChampionAbility } from "./StatsClient";
 
 type ChampionRow = {
   id: string; // "Ahri"
@@ -94,73 +91,56 @@ async function readJsonLocalFirstBlobFallback<T>(
 
 /* -------------------- paths (static, no dynamic tracing) -------------------- */
 
-const CHAMPIONS_FULL_LOCAL = path.join(
-  process.cwd(),
-  "public",
-  "data",
-  "lol",
-  "champions_full.json"
-);
-const OVERRIDES_LOCAL = path.join(
-  process.cwd(),
-  "public",
-  "data",
-  "lol",
-  "spells_overrides.json"
-);
+const CHAMPIONS_FULL_LOCAL = path.join(process.cwd(), "public", "data", "lol", "champions_full.json");
+const OVERRIDES_LOCAL = path.join(process.cwd(), "public", "data", "lol", "spells_overrides.json");
 
 // Blob pathnames (relative to NEXT_PUBLIC_BLOB_BASE_URL)
 const CHAMPIONS_FULL_BLOB = "data/lol/champions_full.json";
-const VERSION_BLOB = "data/lol/version.json"; // display patch label source
+const VERSION_BLOB = "data/lol/version.json"; // ✅ single source of truth for display + ddragon
 const OVERRIDES_BLOB = "data/lol/spells_overrides.json";
 
 /* -------------------- data loaders -------------------- */
 
 async function readChampionsFull(): Promise<ChampionsFullFile> {
   const file =
-    (await readJsonLocalFirstBlobFallback<ChampionsFullFile>(
-      CHAMPIONS_FULL_LOCAL,
-      CHAMPIONS_FULL_BLOB
-    )) ?? null;
+    (await readJsonLocalFirstBlobFallback<ChampionsFullFile>(CHAMPIONS_FULL_LOCAL, CHAMPIONS_FULL_BLOB)) ??
+    null;
 
   if (!file) throw new Error("champions_full.json missing (local and blob)");
   return file;
 }
 
 /**
- * ✅ Patch label + image patch:
- * - displayPatch: comes from Blob version.json (can be "26.1" if that's your branding)
- * - ddragonPatch: MUST be a real Data Dragon version string (e.g. "16.3.1") to avoid 404 images
+ * ✅ Version file on Blob contains BOTH:
+ * - display patch (26.x) as `patch` or `version`
+ * - Data Dragon version (16.x.y) as `ddragon`
  */
-let ddragonVersionsPromise: Promise<string[]> | null = null;
+type VersionBlob = {
+  patch?: string;
+  version?: string; // legacy alias
+  ddragon?: string;
+  updatedAt?: string;
+  source?: string;
+};
 
-async function readDdragonVersions(): Promise<string[]> {
-  if (!ddragonVersionsPromise) {
-    ddragonVersionsPromise = (async () => {
-      try {
-        const res = await fetch("https://ddragon.leagueoflegends.com/api/versions.json", {
-          next: { revalidate: 60 * 60 }, // 1 hour
-        });
-        if (!res.ok) return [];
-        const arr = (await res.json()) as unknown;
-        if (Array.isArray(arr)) {
-          return arr.filter((v): v is string => typeof v === "string");
-        }
-      } catch {
-        // ignore
-      }
-      return [];
+let versionBlobPromise: Promise<VersionBlob | null> | null = null;
+
+async function readVersionBlob(): Promise<VersionBlob | null> {
+  if (!versionBlobPromise) {
+    versionBlobPromise = (async () => {
+      const json = await fetchJsonFromBlob<VersionBlob>(VERSION_BLOB);
+      return json ?? null;
     })();
   }
-  return ddragonVersionsPromise;
+  return versionBlobPromise;
 }
 
 let displayPatchPromise: Promise<string> | null = null;
 async function readDisplayPatch(): Promise<string> {
   if (!displayPatchPromise) {
     displayPatchPromise = (async () => {
-      const json = await fetchJsonFromBlob<{ version?: string }>(VERSION_BLOB);
-      const v = String(json?.version ?? "").trim();
+      const json = await readVersionBlob();
+      const v = String(json?.patch ?? json?.version ?? "").trim();
       return v || "current";
     })();
   }
@@ -171,8 +151,10 @@ let ddragonPatchPromise: Promise<string> | null = null;
 async function readDdragonPatch(): Promise<string> {
   if (!ddragonPatchPromise) {
     ddragonPatchPromise = (async () => {
-      const versions = await readDdragonVersions();
-      return versions[0]?.trim() || "current";
+      // ✅ INTERNAL ONLY: used for images; never shown to users
+      const json = await readVersionBlob();
+      const v = String(json?.ddragon ?? "").trim();
+      return v || "current";
     })();
   }
   return ddragonPatchPromise;
@@ -263,19 +245,15 @@ async function readSpellsOverrides(): Promise<SpellsOverridesFile | null> {
   if (!overridesPromise) {
     overridesPromise = (async () => {
       const file =
-        (await readJsonLocalFirstBlobFallback<SpellsOverridesFile>(
-          OVERRIDES_LOCAL,
-          OVERRIDES_BLOB
-        )) ?? null;
+        (await readJsonLocalFirstBlobFallback<SpellsOverridesFile>(OVERRIDES_LOCAL, OVERRIDES_BLOB)) ??
+        null;
       return file;
     })();
   }
   return overridesPromise;
 }
 
-async function findOverridesEntryByChampionId(
-  championId: string
-): Promise<OverridesEntry | null> {
+async function findOverridesEntryByChampionId(championId: string): Promise<OverridesEntry | null> {
   const file = await readSpellsOverrides();
   if (!file) return null;
 
@@ -296,10 +274,7 @@ function toDamageType(t?: string): ChampionAbility["damageType"] | undefined {
 
 /* ------------------------- build merged abilities list ------------------------- */
 
-function buildAbilitiesFromChampion(
-  champ: ChampionRow,
-  overrides: OverridesEntry | null
-): ChampionAbility[] {
+function buildAbilitiesFromChampion(champ: ChampionRow, overrides: OverridesEntry | null): ChampionAbility[] {
   // Data Dragon spells array is Q,W,E,R order
   const ddSpells = champ.spells ?? [];
 
@@ -321,9 +296,7 @@ function buildAbilitiesFromChampion(
     const tooltip = String(dd?.tooltip ?? dd?.description ?? "");
     const summary = tooltip ? shortSummaryFromText(tooltip) : undefined;
 
-    const cooldown =
-      asNumArray(dd?.cooldown) ?? parseSlashNums(dd?.cooldownBurn) ?? undefined;
-
+    const cooldown = asNumArray(dd?.cooldown) ?? parseSlashNums(dd?.cooldownBurn) ?? undefined;
     const cost = asNumArray(dd?.cost) ?? parseSlashNums(dd?.costBurn) ?? undefined;
 
     const base = baseFromOverrides(key);
@@ -373,7 +346,6 @@ function buildAbilitiesFromChampion(
 /**
  * ✅ Dynamic metadata per champion page (SEO)
  * - Patch label uses displayPatch (blob)
- * - Images use ddragonPatch (not used in metadata here)
  */
 export async function generateMetadata({
   params,
@@ -453,8 +425,8 @@ export default async function LolChampionPage({
   const champ = findChampionBySlug(champions, slug);
   if (!champ) return notFound();
 
-  const displayPatch = await readDisplayPatch(); // can be 26.x
-  const imagePatch = await readDdragonPatch(); // ✅ real Data Dragon version
+  const displayPatch = await readDisplayPatch(); // ✅ 26.x label from blob
+  const imagePatch = await readDdragonPatch(); // ✅ 16.x.y from blob (INTERNAL ONLY)
 
   const championId = champ.id;
   const championName = champ.name;
@@ -470,8 +442,8 @@ export default async function LolChampionPage({
         <StatsClient
           championId={championId}
           championName={championName}
-          patch={displayPatch}
-          imagePatch={imagePatch}
+          patch={displayPatch}      // ✅ visible
+          imagePatch={imagePatch}    // ✅ NOT visible; only used for images
           calcHref={calcHref}
           stats={stats}
           abilities={abilities}

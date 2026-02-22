@@ -96,8 +96,8 @@ function GSBrand() {
 export default function StatsClient({
   championId,
   championName,
-  patch, // display patch (can be 26.x if you want)
-  imagePatch, // ✅ real Data Dragon version (e.g. 16.3.1) for images
+  patch, // ✅ display patch (26.x)
+  imagePatch, // ✅ INTERNAL ONLY: used for Data Dragon image URLs (16.x.y)
   calcHref,
   stats,
   abilities,
@@ -148,7 +148,6 @@ export default function StatsClient({
     };
   }, [level, stats]);
 
-  // ✅ SEO-ish helper values
   const adLevel1 = useMemo(
     () => statAtLevel(stats.attackdamage, stats.attackdamageperlevel, 1),
     [stats.attackdamage, stats.attackdamageperlevel]
@@ -158,7 +157,6 @@ export default function StatsClient({
     [stats.attackdamage, stats.attackdamageperlevel]
   );
 
-  // Order defensively: P Q W E R
   const abilityList = useMemo(() => {
     const order: AbilityKey[] = ["P", "Q", "W", "E", "R"];
     const map = new Map(abilities.map((a) => [a.key, a]));
@@ -243,8 +241,7 @@ export default function StatsClient({
       </div>
 
       <p className="max-w-3xl text-sm text-neutral-300">
-        Base stats and per-level scaling. For real fight math (items, resists, combos), use the
-        calculator.
+        Base stats and per-level scaling. For real fight math (items, resists, combos), use the calculator.
       </p>
 
       <section className="mt-6">
@@ -275,8 +272,7 @@ export default function StatsClient({
             </p>
 
             <p className="mb-3">
-              Want real fight math like burst combos, DPS, resist shredding, and item passives? Open
-              the{" "}
+              Want real fight math like burst combos, DPS, resist shredding, and item passives? Open the{" "}
               <Link href={calcHref} className="text-white underline">
                 LoL damage calculator
               </Link>{" "}
@@ -405,10 +401,7 @@ export default function StatsClient({
             const hasNumbers = isNumericAbility(ab);
 
             return (
-              <div
-                key={ab.key}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-black/30"
-              >
+              <div key={ab.key} className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
                 <button
                   type="button"
                   onClick={() => setOpen((prev) => ({ ...prev, [ab.key]: !isOpen }))}
@@ -424,9 +417,7 @@ export default function StatsClient({
 
                         <div className="min-w-0">
                           <div className="flex min-w-0 flex-wrap items-center gap-2">
-                            <div className="truncate text-sm font-semibold text-neutral-100">
-                              {ab.name}
-                            </div>
+                            <div className="truncate text-sm font-semibold text-neutral-100">{ab.name}</div>
 
                             {ab.key !== "P" ? (
                               <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-neutral-300">
@@ -450,9 +441,7 @@ export default function StatsClient({
                           </div>
 
                           {ab.summary ? (
-                            <div className="mt-1 line-clamp-2 break-words text-xs text-neutral-300">
-                              {ab.summary}
-                            </div>
+                            <div className="mt-1 line-clamp-2 break-words text-xs text-neutral-300">{ab.summary}</div>
                           ) : (
                             <div className="mt-1 text-xs text-neutral-500">—</div>
                           )}
@@ -461,14 +450,12 @@ export default function StatsClient({
                             <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-neutral-300">
                               {cdVal !== null ? (
                                 <Pill>
-                                  CD:{" "}
-                                  <span className="font-semibold text-white">{fmt(cdVal, 1)}s</span>
+                                  CD: <span className="font-semibold text-white">{fmt(cdVal, 1)}s</span>
                                 </Pill>
                               ) : null}
                               {costVal !== null ? (
                                 <Pill>
-                                  Cost:{" "}
-                                  <span className="font-semibold text-white">{fmt(costVal, 0)}</span>
+                                  Cost: <span className="font-semibold text-white">{fmt(costVal, 0)}</span>
                                 </Pill>
                               ) : null}
                               {ab.damageType ? <Pill>{ab.damageType}</Pill> : null}
@@ -526,10 +513,7 @@ export default function StatsClient({
                           const suffix = s.suffix ?? "";
 
                           return (
-                            <div
-                              key={s.label}
-                              className="rounded-2xl border border-white/10 bg-black/30 p-3"
-                            >
+                            <div key={s.label} className="rounded-2xl border border-white/10 bg-black/30 p-3">
                               <div className="text-[11px] text-neutral-400">{s.label}</div>
                               <div className="mt-1 text-sm font-semibold text-neutral-100">
                                 {Number.isFinite(val) ? `${fmt(val, precision)}${suffix}` : "—"}
@@ -564,9 +548,5 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 function Pill({ children }: { children: ReactNode }) {
-  return (
-    <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">
-      {children}
-    </span>
-  );
+  return <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5">{children}</span>;
 }
