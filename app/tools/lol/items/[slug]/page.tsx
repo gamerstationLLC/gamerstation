@@ -26,7 +26,7 @@ type ItemsUsageFile = {
 };
 
 type LoLItemsJson = {
-  version?: string;
+  version?: string; // ddversion for assets (e.g. "16.4.1")
   data: Record<
     string,
     {
@@ -54,6 +54,14 @@ type DDragonChampionJson = {
   data: Record<string, DDragonChampionLite>;
 };
 
+type LolVersionJson = {
+  patch?: string; // display patch (e.g. "26.4")
+  ddragon?: string; // dd assets (e.g. "16.4.1")
+  version?: string; // legacy alias for display patch
+  updatedAt?: string;
+  source?: string;
+};
+
 export type BuildPathItem = {
   itemId: number;
   name: string;
@@ -63,6 +71,7 @@ export type BuildPathItem = {
 };
 
 export type EnrichedItem = {
+  // NOTE: keep patch for ASSETS; display patch is separate
   patch: string;
   generatedAt: string;
   source: UsageSource;
@@ -79,7 +88,6 @@ export type EnrichedItem = {
   descriptionHtml: string | null;
   plaintext: string | null;
 
-  // ✅ NEW: base stats derived from items.json.stats
   baseStats: Array<{ label: string; value: string }>;
 
   buildsFrom: BuildPathItem[];
@@ -181,7 +189,38 @@ async function readJsonBlobFirst<T>(publicRelPath: string): Promise<T | null> {
   }
 }
 
-// ✅ Reliable champ map: always use Data Dragon champion.json
+// ✅ Display patch: READ ONLY FROM /public/data/lol/version.json (disk-only)
+async function readDisplayPatchDiskOnly(): Promise<{
+  displayPatch: string;
+  ddragonFromVersionJson: string | null;
+  updatedAt: string | null;
+  source: string | null;
+}> {
+  try {
+    const fs = await import("node:fs/promises");
+    const raw = await fs.readFile(`${process.cwd()}/public/data/lol/version.json`, "utf8");
+    const json = JSON.parse(raw) as LolVersionJson;
+
+    const displayPatch = (json.patch || json.version || "").trim() || "unknown";
+    const ddragonFromVersionJson = (json.ddragon || "").trim() || null;
+
+    return {
+      displayPatch,
+      ddragonFromVersionJson,
+      updatedAt: (json.updatedAt || "").trim() || null,
+      source: (json.source || "").trim() || null,
+    };
+  } catch {
+    return {
+      displayPatch: "unknown",
+      ddragonFromVersionJson: null,
+      updatedAt: null,
+      source: null,
+    };
+  }
+}
+
+// ✅ Reliable champ map: always use Data Dragon champion.json (ASSET patch)
 async function getDDragonChampMap(
   patch: string
 ): Promise<Map<number, { id: string; name: string }>> {
@@ -228,8 +267,7 @@ function buildPathItemFromId(
   };
 }
 
-// ✅ Base stat key → human label (covers the common ones)
-// Anything unknown falls back to raw key.
+// ✅ Base stat key → human label
 const STAT_LABELS: Record<string, string> = {
   FlatHPPoolMod: "Health",
   FlatMPPoolMod: "Mana",
@@ -258,7 +296,6 @@ const STAT_LABELS: Record<string, string> = {
 function formatStatValue(key: string, value: number): string {
   if (!Number.isFinite(value) || value === 0) return "";
 
-  // heuristics for percent-y keys
   const isPercent =
     key.startsWith("Percent") ||
     key.includes("Percent") ||
@@ -267,18 +304,18 @@ function formatStatValue(key: string, value: number): string {
     key.endsWith("LifeStealMod");
 
   if (isPercent) {
-    // values often come as 0.15 for 15%
     const pct = Math.abs(value) <= 1.5 ? value * 100 : value;
     return `${pct.toFixed(0)}%`;
   }
 
-  // attack speed sometimes is 0.15 (15%)
   if (key.toLowerCase().includes("attackspeed") && Math.abs(value) <= 1.5) {
     return `${(value * 100).toFixed(0)}%`;
   }
 
-  // default: number (no decimals unless needed)
-  const n = Math.abs(value) < 10 && value % 1 !== 0 ? value.toFixed(2) : String(Math.round(value * 100) / 100);
+  const n =
+    Math.abs(value) < 10 && value % 1 !== 0
+      ? value.toFixed(2)
+      : String(Math.round(value * 100) / 100);
   return n;
 }
 
@@ -295,7 +332,6 @@ function extractBaseStats(stats?: Record<string, number>): Array<{ label: string
     rows.push({ label, value });
   }
 
-  // stable-ish ordering for the common stats
   const order = [
     "Attack Damage",
     "Ability Power",
@@ -355,12 +391,16 @@ export default async function ItemSlugPage({
       ? sourceRaw
       : "combined";
 
+  // ✅ display patch ONLY from /public/data/lol/version.json
+  const versionInfo = await readDisplayPatchDiskOnly();
+  const displayPatch = versionInfo.displayPatch;
+
   const [itemsJson, usage] = await Promise.all([
     readJsonDiskFirst<LoLItemsJson>("/data/lol/items.json"),
     readJsonBlobFirst<ItemsUsageFile>(`/data/lol/items_usage_${source}.json`),
   ]);
 
-  const patch = (itemsJson?.version || "unknown").trim();
+  const patch = (itemsJson?.version || "unknown").trim(); // ASSET patch (ddragon)
   const champMap = await getDDragonChampMap(patch);
 
   if (!itemsJson?.data || !patch || patch === "unknown" || !slug) {
@@ -488,7 +528,7 @@ export default async function ItemSlugPage({
   });
 
   const enriched: EnrichedItem = {
-    patch,
+    patch, // ASSET patch (ddragon)
     generatedAt: usage?.generatedAt || new Date().toISOString(),
     source,
 
@@ -504,7 +544,6 @@ export default async function ItemSlugPage({
     descriptionHtml: typeof d?.description === "string" ? d.description : null,
     plaintext: typeof d?.plaintext === "string" ? d.plaintext : null,
 
-    // ✅ NEW: base stats from items.json.stats
     baseStats: extractBaseStats(d?.stats),
 
     buildsFrom,
@@ -559,7 +598,12 @@ export default async function ItemSlugPage({
 
           <h1 className="text-4xl font-bold tracking-tight">LoL Item</h1>
           <p className="mt-3 text-neutral-300">
-            Patch {patch} · Usage <span className="font-semibold text-white">{source}</span>
+            Patch <span className="font-semibold text-white">{displayPatch}</span> · Usage{" "}
+            <span className="font-semibold text-white">{source}</span>
+            <span className="text-neutral-600">
+              {" "}
+              
+            </span>
           </p>
 
           <div className="mt-6">

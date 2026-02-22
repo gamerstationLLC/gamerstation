@@ -32,7 +32,7 @@ type ItemsUsageFile = {
 
 // ✅ Your items.json (Data Dragon shaped)
 type LoLItemsJson = {
-  version?: string;
+  version?: string; // ddversion for assets (e.g. "16.4.1")
   type?: string;
   basic?: any;
   data: Record<
@@ -46,7 +46,6 @@ type LoLItemsJson = {
       requiredChampion?: string;
       inStore?: boolean;
       hideFromAll?: boolean;
-      // plenty more fields exist; we only need a few
     }
   >;
 };
@@ -60,6 +59,14 @@ type DDragonChampionLite = {
 type DDragonChampionJson = {
   version?: string;
   data: Record<string, DDragonChampionLite>;
+};
+
+type LolVersionJson = {
+  patch?: string; // display patch (e.g. "26.4")
+  ddragon?: string; // dd assets (e.g. "16.4.1")
+  version?: string; // legacy alias for display patch
+  updatedAt?: string;
+  source?: string;
 };
 
 export type EnrichedItemRow = {
@@ -155,13 +162,44 @@ async function readJsonBlobFirst<T>(publicRelPath: string): Promise<T | null> {
   }
 }
 
+// ✅ Display patch: READ ONLY FROM /public/data/lol/version.json (disk-only)
+async function readDisplayPatchDiskOnly(): Promise<{
+  displayPatch: string;
+  ddragonFromVersionJson: string | null;
+  updatedAt: string | null;
+  source: string | null;
+}> {
+  try {
+    const fs = await import("node:fs/promises");
+    const raw = await fs.readFile(`${process.cwd()}/public/data/lol/version.json`, "utf8");
+    const json = JSON.parse(raw) as LolVersionJson;
+
+    const displayPatch = (json.patch || json.version || "").trim() || "unknown";
+    const ddragonFromVersionJson = (json.ddragon || "").trim() || null;
+
+    return {
+      displayPatch,
+      ddragonFromVersionJson,
+      updatedAt: (json.updatedAt || "").trim() || null,
+      source: (json.source || "").trim() || null,
+    };
+  } catch {
+    return {
+      displayPatch: "unknown",
+      ddragonFromVersionJson: null,
+      updatedAt: null,
+      source: null,
+    };
+  }
+}
+
 // NOTE: patch for icons should match the items.json version (most consistent)
 async function getChampIdToKeyMap(
-  patch: string
+  ddragonPatch: string
 ): Promise<Map<number, { key: string; name: string }>> {
   try {
     const res = await fetch(
-      `https://ddragon.leagueoflegends.com/cdn/${patch}/data/en_US/champion.json`,
+      `https://ddragon.leagueoflegends.com/cdn/${ddragonPatch}/data/en_US/champion.json`,
       { next: { revalidate: 60 * 60 * 24 } }
     );
     if (!res.ok) return new Map();
@@ -182,26 +220,27 @@ async function getChampIdToKeyMap(
 }
 
 function isRealStoreItem(d: any): boolean {
-  // filter out weird/unbuyable/hidden stuff
   if (!d) return false;
   if (d.inStore === false) return false;
   if (d.hideFromAll === true) return false;
   if (typeof d.requiredChampion === "string" && d.requiredChampion.trim()) return false;
-  // some items have gold.purchasable false (in basic); per-item usually not.
-  // If total cost is 0 and no tags/name, skip.
   if (typeof d.name !== "string" || !d.name.trim()) return false;
   return true;
 }
 
 export default async function ItemsIndexPage() {
+  // ✅ display patch ONLY from /public/data/lol/version.json
+  const versionInfo = await readDisplayPatchDiskOnly();
+  const displayPatch = versionInfo.displayPatch;
+
   // ✅ usage is Blob-first
   const usage = await readJsonBlobFirst<ItemsUsageFile>("/data/lol/items_usage_combined.json");
 
-  // ✅ items.json is canonical list + version
+  // ✅ items.json is canonical list + DDragon asset version (keep this for icons)
   const itemsJson = await readJsonDiskFirst<LoLItemsJson>("/data/lol/items.json");
-  const patch = (itemsJson?.version || "unknown").trim();
+  const ddragonPatch = (itemsJson?.version || "unknown").trim();
 
-  const cacheTag = `lol-items-${patch}-${usage?.source ?? "unknown"}`;
+  const cacheTag = `lol-items-${ddragonPatch}-${usage?.source ?? "unknown"}`;
 
   // Page shell (your Dota style)
   const Shell = ({
@@ -251,7 +290,7 @@ export default async function ItemsIndexPage() {
     </main>
   );
 
-  if (!itemsJson?.data || !patch || patch === "unknown") {
+  if (!itemsJson?.data || !ddragonPatch || ddragonPatch === "unknown") {
     return (
       <Shell subtitle="Missing items.json (canonical item list).">
         <div className="rounded-2xl border border-neutral-800 bg-black/40 p-5 text-neutral-200">
@@ -268,8 +307,8 @@ export default async function ItemsIndexPage() {
     if (Number.isFinite(row.itemId)) usageById.set(row.itemId, row);
   }
 
-  // champ map for top champ icons/names
-  const champMap = await getChampIdToKeyMap(patch);
+  // champ map for top champ icons/names (use DDragon asset patch)
+  const champMap = await getChampIdToKeyMap(ddragonPatch);
 
   // ✅ canonical index = all items from items.json
   const enriched: EnrichedItemRow[] = Object.entries(itemsJson.data)
@@ -282,7 +321,7 @@ export default async function ItemsIndexPage() {
       const slug = slugify(name);
 
       const iconFile = d?.image?.full || `${itemId}.png`;
-      const iconUrl = `https://ddragon.leagueoflegends.com/cdn/${patch}/img/item/${iconFile}`;
+      const iconUrl = `https://ddragon.leagueoflegends.com/cdn/${ddragonPatch}/img/item/${iconFile}`;
 
       const tags = Array.isArray(d?.tags) ? d.tags : [];
       const costTotal =
@@ -295,7 +334,7 @@ export default async function ItemsIndexPage() {
         const champName = meta?.name || `Champion ${c.champId}`;
         const champKey = meta?.key || null;
         const champIconUrl = champKey
-          ? `https://ddragon.leagueoflegends.com/cdn/${patch}/img/champion/${champKey}.png`
+          ? `https://ddragon.leagueoflegends.com/cdn/${ddragonPatch}/img/champion/${champKey}.png`
           : null;
 
         return {
@@ -342,18 +381,22 @@ export default async function ItemsIndexPage() {
     <Shell
       subtitle={
         <>
-          Patch <span className="font-semibold text-neutral-200">{patch}</span> ·{" "}
+          Patch <span className="font-semibold text-neutral-200">{displayPatch}</span> ·{" "}
           <span className="font-semibold text-neutral-200">{enriched.length}</span> items · usage{" "}
           <span className="font-semibold text-neutral-200">{source}</span> · generated{" "}
           <span className="font-semibold text-neutral-200">
             {new Date(generatedAt).toLocaleString()}
+          </span>
+          <span className="text-neutral-600">
+            {" "}
+            · assets <span className="font-semibold text-neutral-400">{ddragonPatch}</span>
           </span>
         </>
       }
     >
       <ItemsIndexClient
         key={cacheTag}
-        patch={patch}
+        patch={ddragonPatch}
         items={enriched}
         generatedAt={generatedAt}
         source={source}

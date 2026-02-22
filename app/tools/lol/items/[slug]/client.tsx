@@ -110,10 +110,7 @@ export default function ItemClient({ item }: { item: EnrichedItem }) {
 
             <div className="min-w-0">
               <h2 className="text-2xl font-black tracking-tight">{item.name}</h2>
-              <p className="mt-1 text-sm text-white/70">
-                Patch <span className="font-semibold text-white">{item.patch}</span> · Usage{" "}
-                <span className="font-semibold text-white">{item.source}</span>
-              </p>
+              
 
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-white/70">
                 <span className="rounded-full border border-white/10 bg-black/30 px-3 py-1">
@@ -148,9 +145,7 @@ export default function ItemClient({ item }: { item: EnrichedItem }) {
             </div>
           </div>
 
-          <div className="text-xs text-white/50 sm:text-right">
-            <div>Generated: {new Date(item.generatedAt).toLocaleString()}</div>
-          </div>
+          
         </div>
 
         {item.plaintext ? <p className="mt-4 text-sm text-white/70">{item.plaintext}</p> : null}
